@@ -51,46 +51,52 @@
                 </div>
 
                 <div class="control-group">
-                    <label for="num-stories">Número de Pisos: <span id="num-stories-val">5</span></label>
+                    <label for="num-stories">Número de Pisos <span class="help-icon" data-tooltip="Define el número de niveles de la estructura (3 a 10 pisos). Afecta la masa total y el período fundamental de oscilación.">?</span>: <span id="num-stories-val">5</span></label>
                     <input type="range" id="num-stories" min="3" max="10" value="5" step="1">
                 </div>
 
                 <div class="control-group-row">
                     <div class="control-group-half">
-                        <label for="num-cols-x">Columnas X: <span id="num-cols-x-val">2</span></label>
+                        <label for="num-cols-x">Columnas X <span class="help-icon" data-tooltip="Cantidad de columnas en el eje X. Incrementa la rigidez lateral del edificio en ese sentido.">?</span>: <span id="num-cols-x-val">2</span></label>
                         <input type="range" id="num-cols-x" min="2" max="5" value="2" step="1">
                     </div>
                     <div class="control-group-half">
-                        <label for="num-cols-y">Columnas Y: <span id="num-cols-y-val">2</span></label>
+                        <label for="num-cols-y">Columnas Y <span class="help-icon" data-tooltip="Cantidad de columnas en el eje Y (perpendicular). Aporta estabilidad y redundancia torsional.">?</span>: <span id="num-cols-y-val">2</span></label>
                         <input type="range" id="num-cols-y" min="2" max="5" value="2" step="1">
                     </div>
                 </div>
 
                 <div class="control-group-row">
                     <div class="control-group-half">
-                        <label for="col-dist-x">Distancia X (m): <span id="col-dist-x-val">5.0</span></label>
+                        <label for="col-dist-x">Distancia X <span class="help-icon" data-tooltip="Separación entre columnas en el eje X. Luces mayores aumentan la flexión de las vigas.">?</span> (m): <span id="col-dist-x-val">5.0</span></label>
                         <input type="range" id="col-dist-x" min="3.0" max="8.0" value="5.0" step="0.5">
                     </div>
                     <div class="control-group-half">
-                        <label for="col-dist-y">Distancia Y (m): <span id="col-dist-y-val">5.0</span></label>
+                        <label for="col-dist-y">Distancia Y <span class="help-icon" data-tooltip="Separación entre columnas en el eje Y. Influye en el área tributaria de la losa y masa.">?</span> (m): <span id="col-dist-y-val">5.0</span></label>
                         <input type="range" id="col-dist-y" min="3.0" max="8.0" value="5.0" step="0.5">
                     </div>
                 </div>
 
                 <div class="control-group">
-                    <label for="story-height">Altura de Piso (m): <span id="story-height-val">3.0</span></label>
+                    <label for="story-height">Altura de Piso <span class="help-icon" data-tooltip="Altura entre niveles. Columnas más altas aumentan la flexibilidad y la susceptibilidad ante pandeo/deformación.">?</span> (m): <span id="story-height-val">3.0</span></label>
                     <input type="range" id="story-height" min="2.8" max="4.0" value="3.0" step="0.1">
                 </div>
 
                 <div class="control-group">
-                    <label for="story-mass">Masa por Piso (ton): <span id="story-mass-val">100</span></label>
+                    <label for="story-mass">Masa por Piso <span class="help-icon" data-tooltip="Carga total estimada en toneladas por nivel. A mayor masa, mayor fuerza inercial sísmica.">?</span> (ton): <span id="story-mass-val">100</span></label>
                     <input type="range" id="story-mass" min="50" max="250" value="100" step="10">
                 </div>
 
                 <div class="control-group">
-                    <label for="damping-ratio">Amortiguamiento Estructural (&zeta;): <span
+                    <label for="damping-ratio">Amortiguamiento Estructural (&zeta;) <span class="help-icon" data-tooltip="Controla la disipación elástica de la energía sísmica. Se fija en 5% por defecto para concreto armado.">?</span>: <span
                             id="damping-ratio-val">5%</span></label>
                     <input type="range" id="damping-ratio" min="0.02" max="0.10" value="0.05" step="0.01">
+                </div>
+
+                <div class="control-group">
+                    <label for="torsional-eccentricity">Excentricidad Torsional ($e_a$) <span class="help-icon" data-tooltip="Distancia relativa entre el centro de rigidez y centro de masas. Induce rotación en planta y castiga esquinas.">?</span>: <span
+                            id="torsional-eccentricity-val">0%</span></label>
+                    <input type="range" id="torsional-eccentricity" min="0.00" max="0.20" value="0.00" step="0.02">
                 </div>
 
                 <!-- COVENIN 1756:2001 -->
@@ -101,7 +107,7 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="covenin01-zone">Zona Sísmica (Acel. Roca $A_0$)</label>
+                        <label for="covenin01-zone">Zona Sísmica (Acel. Roca $A_0$) <span class="help-icon" data-tooltip="Define la aceleración horizontal en roca (Ao) según el mapa de zonificación sísmica COVENIN 1756:2001 (Zona 5 para Caracas).">?</span></label>
                         <select id="covenin01-zone">
                             <option value="7">Zona 7 ($A_0 = 0.40$g) - Elevado</option>
                             <option value="6">Zona 6 ($A_0 = 0.35$g) - Elevado</option>
@@ -114,7 +120,7 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="covenin01-soil">Forma Espectral (Tipo Suelo)</label>
+                        <label for="covenin01-soil">Forma Espectral (Tipo Suelo) <span class="help-icon" data-tooltip="Suelo de fundación de S1 (roca) a S4 (suelo muy blando/profundo). Suelos más blandos amplifican sismos de periodo largo.">?</span></label>
                         <select id="covenin01-soil">
                             <option value="S1">S1: Roca o Suelo muy denso ($T^*=0.4$s)</option>
                             <option value="S2" selected>S2: Suelo denso o rígido ($T^*=0.7$s)</option>
@@ -124,7 +130,7 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="covenin01-r">Factor de Reducción ($R$)</label>
+                        <label for="covenin01-r">Factor de Reducción ($R$) <span class="help-icon" data-tooltip="Simula la capacidad de disipar energía de la estructura. R=6 representa pórticos dúctiles (ND3), R=1 diseño elástico sin ductilidad.">?</span></label>
                         <select id="covenin01-r">
                             <option value="6" selected>R = 6 (Tipo I - ND3 Dúctil)</option>
                             <option value="4">R = 4 (ND2 Moderado)</option>
@@ -135,7 +141,7 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="covenin01-importance">Importancia (&alpha;)</label>
+                        <label for="covenin01-importance">Importancia (&alpha;) <span class="help-icon" data-tooltip="Coeficiente de amplificación por uso. Grupo A (1.30: hospitales, escuelas), Grupo B (1.00: viviendas, oficinas).">?</span></label>
                         <select id="covenin01-importance">
                             <option value="1.30">Grupo A (&alpha; = 1.30: Vital/Escuelas)</option>
                             <option value="1.00" selected>Grupo B (&alpha; = 1.00: Residencial)</option>
@@ -151,7 +157,7 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="covenin19-soil-class">Clase de Sitio (Vs30)</label>
+                        <label for="covenin19-soil-class">Clase de Sitio (Vs30) <span class="help-icon" data-tooltip="Perfil del suelo según la velocidad promedio de propagación de ondas de corte en los primeros 30 metros (Vs30, Clase A a E).">?</span></label>
                         <select id="covenin19-soil-class">
                             <option value="A">A: Roca muy dura ($V_{s30} > 1500$ m/s)</option>
                             <option value="B">B: Roca dura ($850 < V_{s30} \le 1300$ m/s)</option>
@@ -164,19 +170,19 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="covenin19-a0">Aceleración Roca $A_0$ (g): <span
+                        <label for="covenin19-a0">Aceleración Roca $A_0$ (g) <span class="help-icon" data-tooltip="Aceleración pico horizontal esperada en basamento rocoso para un sismo de diseño (período de 0 segundos).">?</span>: <span
                                 id="covenin19-a0-val">0.30</span></label>
                         <input type="range" id="covenin19-a0" min="0.10" max="0.40" value="0.30" step="0.05">
                     </div>
 
                     <div class="control-group">
-                        <label for="covenin19-a1">Aceleración Espectral $A_1$ (g): <span
+                        <label for="covenin19-a1">Aceleración Espectral $A_1$ (g) <span class="help-icon" data-tooltip="Aceleración de diseño en roca para estructuras flexibles con período de oscilación natural de 1.0 segundo.">?</span>: <span
                                 id="covenin19-a1-val">0.30</span></label>
                         <input type="range" id="covenin19-a1" min="0.10" max="0.45" value="0.30" step="0.05">
                     </div>
 
                     <div class="control-group">
-                        <label for="covenin19-r">Factor de Reducción ($R$)</label>
+                        <label for="covenin19-r">Factor de Reducción ($R$) <span class="help-icon" data-tooltip="Representa el nivel de ductilidad y capacidad de disipación de energía de la estructura según la normativa moderna.">?</span></label>
                         <select id="covenin19-r">
                             <option value="6" selected>R = 6 (Dúctil ND3)</option>
                             <option value="4">R = 4 (Moderado ND2)</option>
@@ -188,7 +194,7 @@
 
                     <div class="control-group-row">
                         <div class="control-group-half">
-                            <label for="covenin19-rho">Redundancia (&rho;)</label>
+                            <label for="covenin19-rho">Redundancia (&rho;) <span class="help-icon" data-tooltip="Factor de reducción por redundancia estructural. Menor número de columnas penaliza la estructura aumentando la fuerza de diseño.">?</span></label>
                             <select id="covenin19-rho">
                                 <option value="1.15">1.15 (Baja)</option>
                                 <option value="1.00" selected>1.00 (Normal)</option>
@@ -196,7 +202,7 @@
                             </select>
                         </div>
                         <div class="control-group-half">
-                            <label for="covenin19-fi">Irregularidad ($F_I$)</label>
+                            <label for="covenin19-fi">Irregularidad ($F_I$) <span class="help-icon" data-tooltip="Factor que reduce la capacidad de la edificación debido a asimetrías geométricas o distribución irregular de rigidez.">?</span></label>
                             <select id="covenin19-fi">
                                 <option value="1.00" selected>1.00 (Regular)</option>
                                 <option value="0.90">0.90 (Poco Irreg.)</option>
@@ -221,22 +227,22 @@
                     <div id="custom-sections-controls" style="display: none;">
                         <div class="control-group-row">
                             <div class="control-group-half">
-                                <label for="col-width">Col. Ancho (cm): <span id="col-width-val">35</span></label>
+                                <label for="col-width">Col. Ancho <span class="help-icon" data-tooltip="Ancho de la columna en centímetros. Influye en la inercia transversal de la columna.">?</span> (cm): <span id="col-width-val">35</span></label>
                                 <input type="range" id="col-width" min="20" max="80" value="35" step="5">
                             </div>
                             <div class="control-group-half">
-                                <label for="col-depth">Col. Peralte (cm): <span id="col-depth-val">35</span></label>
+                                <label for="col-depth">Col. Peralte <span class="help-icon" data-tooltip="Peralte (dimensión en dirección del sismo) en centímetros. Afecta drásticamente la inercia flexural.">?</span> (cm): <span id="col-depth-val">35</span></label>
                                 <input type="range" id="col-depth" min="20" max="80" value="35" step="5">
                             </div>
                         </div>
 
                         <div class="control-group-row">
                             <div class="control-group-half">
-                                <label for="beam-width">Viga Ancho (cm): <span id="beam-width-val">30</span></label>
+                                <label for="beam-width">Viga Ancho <span class="help-icon" data-tooltip="Ancho de la viga en centímetros.">?</span> (cm): <span id="beam-width-val">30</span></label>
                                 <input type="range" id="beam-width" min="15" max="60" value="30" step="5">
                             </div>
                             <div class="control-group-half">
-                                <label for="beam-depth">Viga Peralte (cm): <span id="beam-depth-val">45</span></label>
+                                <label for="beam-depth">Viga Peralte <span class="help-icon" data-tooltip="Peralte de la viga en centímetros. Aumentar el peralte rigidiza las vigas y disminuye la flexibilidad del nodo.">?</span> (cm): <span id="beam-depth-val">45</span></label>
                                 <input type="range" id="beam-depth" min="20" max="80" value="45" step="5">
                             </div>
                         </div>
@@ -244,11 +250,11 @@
                         <!-- Concreto f'c (kgf/cm²) -->
                         <div class="control-group-row">
                             <div class="control-group-half">
-                                <label for="concrete-fc-col">f'c Col. (kgf/cm²): <span id="concrete-fc-col-val">250</span></label>
+                                <label for="concrete-fc-col">f'c Col. <span class="help-icon" data-tooltip="Resistencia nominal a la compresión del concreto en columnas (kgf/cm²). Mayor f'c incrementa el módulo de elasticidad.">?</span> (kgf/cm²): <span id="concrete-fc-col-val">250</span></label>
                                 <input type="range" id="concrete-fc-col" min="200" max="450" value="250" step="10">
                             </div>
                             <div class="control-group-half">
-                                <label for="concrete-fc-beam">f'c Viga (kgf/cm²): <span id="concrete-fc-beam-val">250</span></label>
+                                <label for="concrete-fc-beam">f'c Viga <span class="help-icon" data-tooltip="Resistencia a la compresión del concreto en vigas (kgf/cm²).">?</span> (kgf/cm²): <span id="concrete-fc-beam-val">250</span></label>
                                 <input type="range" id="concrete-fc-beam" min="200" max="450" value="250" step="10">
                             </div>
                         </div>
@@ -256,29 +262,29 @@
                         <!-- Acero fy (kgf/cm²) -->
                         <div class="control-group-row">
                             <div class="control-group-half">
-                                <label for="steel-fy-col">fy Col. (kgf/cm²): <span id="steel-fy-col-val">4200</span></label>
+                                <label for="steel-fy-col">fy Col. <span class="help-icon" data-tooltip="Límite elástico de fluencia del acero en columnas (kgf/cm²).">?</span> (kgf/cm²): <span id="steel-fy-col-val">4200</span></label>
                                 <input type="range" id="steel-fy-col" min="2800" max="5000" value="4200" step="100">
                             </div>
                             <div class="control-group-half">
-                                <label for="steel-fy-beam">fy Viga (kgf/cm²): <span id="steel-fy-beam-val">4200</span></label>
+                                <label for="steel-fy-beam">fy Viga <span class="help-icon" data-tooltip="Límite de fluencia del acero en vigas (kgf/cm²).">?</span> (kgf/cm²): <span id="steel-fy-beam-val">4200</span></label>
                                 <input type="range" id="steel-fy-beam" min="2800" max="5000" value="4200" step="100">
                             </div>
                         </div>
 
                         <!-- Refuerzo Columna As_col (cm²) -->
                         <div class="control-group">
-                            <label for="col-as">As Col. Longitudinal (cm²): <span id="col-as-val">16</span></label>
+                            <label for="col-as">As Col. Longitudinal <span class="help-icon" data-tooltip="Área de acero total longitudinal en columnas (cm²). Aporta rigidez a la sección transformada.">?</span> (cm²): <span id="col-as-val">16</span></label>
                             <input type="range" id="col-as" min="4" max="80" value="16" step="1">
                         </div>
 
                         <!-- Refuerzo Viga As y As' (cm²) -->
                         <div class="control-group-row">
                             <div class="control-group-half">
-                                <label for="beam-as">As Trac. Viga (cm²): <span id="beam-as-val">12</span></label>
+                                <label for="beam-as">As Trac. Viga <span class="help-icon" data-tooltip="Área de acero a tracción en vigas (cm²). Controla la resistencia flexural en zonas agrietadas.">?</span> (cm²): <span id="beam-as-val">12</span></label>
                                 <input type="range" id="beam-as" min="4" max="35" value="12" step="1">
                             </div>
                             <div class="control-group-half">
-                                <label for="beam-as-prime">As' Comp. Viga (cm²): <span id="beam-as-prime-val">6</span></label>
+                                <label for="beam-as-prime">As' Comp. Viga <span class="help-icon" data-tooltip="Área de acero a compresión en vigas (cm²). Aporta ductilidad y resiste inversiones de momento en nodos.">?</span> (cm²): <span id="beam-as-prime-val">6</span></label>
                                 <input type="range" id="beam-as-prime" min="2" max="25" value="6" step="1">
                             </div>
                         </div>
@@ -479,6 +485,14 @@
                                             <p>Al activar "Secciones Físicas", la inercia de la columna ($I_{c,eff}$) se calcula usando la sección transformada total (concreto más el aporte del acero longitudinal en dos caras simétricas), ignorando la carga axial dinámica variable. La inercia de la viga ($I_{cr}$) se calcula bajo flexión pura empleando la sección agrietada transformada en flexión simple unilateral, omitiendo las variaciones por momento positivo/negativo o el ancho efectivo de losa colaborante.</p>
                                         </div>
                                     </div>
+
+                                    <div class="simplification-item">
+                                        <i class="fa-solid fa-rotate-right"></i>
+                                        <div class="simplification-content">
+                                            <h5>Efecto de Torsión en Planta y Excentricidad</h5>
+                                            <p>Se simula la torsión acoplando el giro de la losa (&theta;<sub>z</sub>) al desplazamiento traslacional en función de la excentricidad torsional elegida (e<sub>a</sub>). Este giro amplifica geométricamente la deriva en las columnas perimetrales más alejadas del centroide, lo que a su vez se traduce en un incremento proporcional del daño y la aceleración del colapso en el resolvedor físico.</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -509,7 +523,7 @@
                                         <i class="fa-solid fa-rotate" style="color: var(--color-warning);"></i>
                                         <div class="simplification-content">
                                             <h5>Torsión en Planta e Irregularidades</h5>
-                                            <p>Se asume un comportamiento simétrico y regular. En la realidad, las irregularidades en planta generan excentricidades que inducen <strong>torsión global</strong>, concentrando desplazamientos destructivos en las columnas perimetrales y de esquina, efecto que no es capturado en esta simulación bidimensional simplificada.</p>
+                                            <p>Aunque el simulador ahora incorpora una <strong>torsión estática-dinámica acoplada</strong> (que rota las losas y castiga las columnas extremas), en la realidad la torsión se acopla dinámicamente de forma tridimensional para cada modo de vibración, amplificando el daño de manera no lineal y asimétrica de acuerdo a las irregularidades geométricas específicas de la estructura.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -582,7 +596,7 @@
     </div>
 
     <!-- Custom JavaScript -->
-    <script src="app.js?v=900"></script>
+    <script src="app.js?v=901"></script>
 </body>
 
 </html>

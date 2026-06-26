@@ -995,3 +995,58 @@ select:focus {
     line-height: 1.45;
 }
 
+/* CUSTOM TOOLTIP STYLES */
+.help-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 700;
+    cursor: help;
+    margin-left: 6px;
+    position: relative;
+    vertical-align: middle;
+    transition: background 0.2s, color 0.2s;
+}
+
+.help-icon:hover {
+    background: var(--color-2001);
+    color: #fff;
+}
+
+/* Tooltip floating card */
+.help-icon::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    color: #f1f5f9;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 400;
+    width: 220px;
+    white-space: normal;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    line-height: 1.4;
+    text-align: left;
+}
+
+.help-icon:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+}
+
+

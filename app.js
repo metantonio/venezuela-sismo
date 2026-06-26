@@ -127,6 +127,16 @@ function initUI() {
         if (!isPlaying) generateSpectraAndEarthquake();
     });
 
+    // Excentricidad Torsional
+    const eccSlider = document.getElementById("torsional-eccentricity");
+    const eccSpan = document.getElementById("torsional-eccentricity-val");
+    if (eccSlider && eccSpan) {
+        eccSlider.addEventListener("input", () => {
+            eccSpan.textContent = Math.round(eccSlider.value * 100) + "%";
+            if (!isPlaying) generateSpectraAndEarthquake();
+        });
+    }
+
     // 2019 Sliders
     setupSlider("covenin19-a0");
     setupSlider("covenin19-a1");
@@ -417,6 +427,11 @@ class BuildingModel {
         const bD = sY_val * ((numColsY || 2) - 1);
         const area = bW * bD;
 
+        // Amplificación torsional simplificada
+        const eccVal = parseFloat(document.getElementById("torsional-eccentricity").value) || 0.0;
+        const rp = Math.sqrt((bW * bW + bD * bD) / 12) || 2.0;
+        this.torsionAmp = Math.sqrt(Math.pow(1.0 + (eccVal * bD) / (2.0 * rp), 2) + Math.pow((eccVal * bW) / (2.0 * rp), 2));
+
         // Masa real del entrepiso escalada por el área tributaria (referencia 25 m²)
         this.m = this.m_ref * (0.3 + 0.7 * (area / 25.0));
 
@@ -648,8 +663,8 @@ class BuildingModel {
                 this.E_h[i] += Math.abs(storyForces[i] * dup);
                 this.u_p_old[i] = this.u_p[i];
 
-                // Actualizar deriva máxima histórica
-                this.u_max[i] = Math.max(this.u_max[i], Math.abs(u));
+                // Actualizar deriva máxima histórica (amplificada por torsión en columna crítica)
+                this.u_max[i] = Math.max(this.u_max[i], Math.abs(u) * this.torsionAmp);
 
                 // Índice de daño de Park-Ang: D = u_max/u_ult + beta * Eh/(Vy*u_ult)
                 // U_ult = deriva de colapso por norma (2001: 3.5%, 2019: 4.5%)
@@ -667,7 +682,7 @@ class BuildingModel {
                 this.Vy[i] = this.Vy_init[i]   * Math.max(0.1,  vy_deg_factor);
 
                 // Comprobar Colapso de este piso (deriva supera límite de ductilidad o daño total)
-                const driftRatio = Math.abs(u) / this.h;
+                const driftRatio = (Math.abs(u) * this.torsionAmp) / this.h;
                 if (driftRatio > this.driftCollapseLimit || this.D[i] >= 0.99) {
                     this.isCollapsed = true;
                     this.collapseTime = currentTime;
@@ -719,7 +734,7 @@ class BuildingModel {
 
             // Medir deriva de piso actual
             const u_curr = this.x[i] - ((i === 0) ? 0 : this.x[i-1]);
-            const driftRatio = Math.abs(u_curr) / this.h;
+            const driftRatio = (Math.abs(u_curr) * this.torsionAmp) / this.h;
             if (driftRatio > this.maxDriftRatio) {
                 this.maxDriftRatio = driftRatio;
             }
@@ -1633,51 +1648,93 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDispX) {
         return;
     }
 
-    // Comportamiento normal (oscilación lateral)
+    // Parámetros geométricos para torsión
+    const ecc = parseFloat(document.getElementById("torsional-eccentricity").value) || 0.0;
+    const numColsX = parseInt(document.getElementById("num-cols-x").value) || 2;
+    const numColsY = parseInt(document.getElementById("num-cols-y").value) || 2;
+    const sX = parseFloat(document.getElementById("col-dist-x").value) || 5.0;
+    const sY = parseFloat(document.getElementById("col-dist-y").value) || 5.0;
+    const bW = sX * (numColsX - 1);
+    const bD = sY * (numColsY - 1);
+    const rp = Math.sqrt((bW * bW + bD * bD) / 12) || 2.0;
+
+    // Comportamiento normal (oscilación lateral + torsión)
     for (let lvl = 0; lvl < N; lvl++) {
         // Desplazamiento del nivel actual
         const dx_curr = bModel.x[lvl] * 6.0; // amplificado para visibilidad en 3D
         const dx_prev = (lvl === 0) ? 0 : bModel.x[lvl-1] * 6.0;
 
-        // Desplazar losa
+        // Ángulo de rotación del nivel actual (amplificado para visibilidad)
+        const theta_curr = (dx_curr * ecc) / rp;
+        const theta_prev = (lvl === 0) ? 0 : ((bModel.x[lvl-1] * 6.0) * ecc) / rp;
+
+        // Desplazar y rotar losa
         const floorMesh = b3D.floors[lvl];
         floorMesh.position.x = dx_curr;
+        floorMesh.rotation.y = theta_curr;
 
-        // Posicionar y deformar las 4 columnas de este nivel
+        // Posicionar y deformar las columnas de este nivel
         const cols = b3D.columns[lvl];
-        
-        // Deriva relativa del entrepiso actual
-        const storyDriftVal = Math.abs(bModel.x[lvl] - ((lvl === 0) ? 0 : bModel.x[lvl-1]));
-        const storyDriftRatio = storyDriftVal / h;
-
-        // Cambiar color de columnas según la deriva de piso (Salud Estructural)
-        let colColor;
-        if (storyDriftRatio < 0.015) {
-            colColor = varToHexColor('--color-safe');
-        } else if (storyDriftRatio < 0.018) {
-            colColor = varToHexColor('--color-warning');
-            if (bModel.analysisMode === 'nonlinear' && Math.random() < 0.1) {
-                // chispas/polvo leve
-                spawnParticles(b3D.group.position.x + dx_curr, (lvl+0.5)*h, 0, 1);
-            }
-        } else if (storyDriftRatio < 0.030) {
-            colColor = varToHexColor('--color-damage');
-            if (bModel.analysisMode === 'nonlinear') {
-                spawnParticles(b3D.group.position.x + dx_curr, (lvl+0.5)*h, 0, 3);
-            }
-        } else {
-            colColor = 0x222222; // falla inminente
-        }
 
         cols.forEach(col => {
+            const ox = col.offsetX;
+            const oz = col.offsetZ;
+
+            // Posición inferior de la columna (rotada en planta lvl-1)
+            const x_bottom = dx_prev + ox * Math.cos(theta_prev) - oz * Math.sin(theta_prev);
+            const z_bottom =           ox * Math.sin(theta_prev) + oz * Math.cos(theta_prev);
+
+            // Posición superior de la columna (rotada en planta lvl)
+            const x_top = dx_curr + ox * Math.cos(theta_curr) - oz * Math.sin(theta_curr);
+            const z_top =           ox * Math.sin(theta_curr) + oz * Math.cos(theta_curr);
+
+            // Calcular derivas reales (físicas, no amplificadas) de esta columna particular
+            const theta_curr_phys = (bModel.x[lvl] * ecc) / rp;
+            const theta_prev_phys = (lvl === 0) ? 0 : (bModel.x[lvl-1] * ecc) / rp;
+
+            const x_b_phys = (lvl === 0 ? 0 : bModel.x[lvl-1]) + ox * Math.cos(theta_prev_phys) - oz * Math.sin(theta_prev_phys);
+            const z_b_phys =                                     ox * Math.sin(theta_prev_phys) + oz * Math.cos(theta_prev_phys);
+
+            const x_t_phys = bModel.x[lvl] + ox * Math.cos(theta_curr_phys) - oz * Math.sin(theta_curr_phys);
+            const z_t_phys =                 ox * Math.sin(theta_curr_phys) + oz * Math.cos(theta_curr_phys);
+
+            const drift_x_phys = x_t_phys - x_b_phys;
+            const drift_z_phys = z_t_phys - z_b_phys;
+            const colDriftRatio = Math.sqrt(drift_x_phys * drift_x_phys + drift_z_phys * drift_z_phys) / h;
+
+            // Determinar color de esta columna según su propia deriva (torsión castiga unas columnas más que otras)
+            let colColor;
+            if (colDriftRatio < 0.015) {
+                colColor = varToHexColor('--color-safe');
+            } else if (colDriftRatio < 0.018) {
+                colColor = varToHexColor('--color-warning');
+                if (bModel.analysisMode === 'nonlinear' && Math.random() < 0.05) {
+                    spawnParticles(b3D.group.position.x + (x_bottom + x_top) / 2, (lvl + 0.5) * h, z_bottom, 1);
+                }
+            } else if (colDriftRatio < 0.030) {
+                colColor = varToHexColor('--color-damage');
+                if (bModel.analysisMode === 'nonlinear' && Math.random() < 0.15) {
+                    spawnParticles(b3D.group.position.x + (x_bottom + x_top) / 2, (lvl + 0.5) * h, z_bottom, 2);
+                }
+            } else {
+                colColor = 0x222222; // fallo local de la columna
+            }
+
             col.mesh.material.color.setHex(colColor);
 
-            // Centrar la columna a la mitad del tramo deformado
-            col.mesh.position.x = (dx_curr + dx_prev) / 2 + col.offsetX;
-            
-            // Ángulo de inclinación de la columna (Sway)
-            const angleZ = -Math.atan2(dx_curr - dx_prev, h);
-            col.mesh.rotation.z = angleZ;
+            // Posicionar columna en el punto medio deformado
+            col.mesh.position.set(
+                (x_bottom + x_top) / 2,
+                (lvl + 0.5) * h,
+                (z_bottom + z_top) / 2
+            );
+
+            // Orientar la columna a lo largo del tramo deformado (sway en X y Z)
+            const dx = x_top - x_bottom;
+            const dz = z_top - z_bottom;
+            col.mesh.rotation.z = -Math.atan2(dx, h);
+            col.mesh.rotation.x = Math.atan2(dz, h);
+            col.mesh.rotation.y = (theta_prev + theta_curr) / 2;
         });
     }
 }
@@ -1781,6 +1838,7 @@ function resetSimulation() {
 function toggleInputControls(disable) {
     const inputs = [
         "num-stories", "num-cols-x", "num-cols-y", "col-dist-x", "col-dist-y", "story-height", "story-mass", "damping-ratio",
+        "torsional-eccentricity",
         "covenin01-zone", "covenin01-soil", "covenin01-r", "covenin01-importance",
         "covenin19-soil-class", "covenin19-a0", "covenin19-a1", "covenin19-r",
         "covenin19-rho", "covenin19-fi", "analysis-mode", "degradation-severity",
