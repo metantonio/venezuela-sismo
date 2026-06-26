@@ -18,7 +18,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="index.css?v=903">
     <!-- CDNs de Librerías -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -364,6 +364,7 @@
                     <button class="tab-btn active" data-tab="tab-3d"><i class="fa-solid fa-cubes-stacked"></i> Vista 3D</button>
                     <button class="tab-btn" data-tab="tab-spectra"><i class="fa-solid fa-chart-line"></i> Espectros de Diseño</button>
                     <button class="tab-btn" data-tab="tab-response"><i class="fa-solid fa-wave-square"></i> Gráficos de Respuesta</button>
+                    <button class="tab-btn" data-tab="tab-calc"><i class="fa-solid fa-calculator"></i> Memoria de Cálculo</button>
                     <button class="tab-btn" data-tab="tab-info"><i class="fa-solid fa-circle-info"></i> Info Técnica</button>
                 </nav>
 
@@ -433,6 +434,21 @@
                                         <canvas id="hysteresis-2019-chart"></canvas>
                                         <div class="hyst-label font-2019">COVENIN 2019</div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MEMORIA DE CALCULO TAB -->
+                    <div id="tab-calc" class="tab-content">
+                        <div class="tab-info-container">
+                            <div class="info-section">
+                                <h3><i class="fa-solid fa-calculator"></i> Memoria de Cálculo (Tiempo Real)</h3>
+                                <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
+                                    Esta sección muestra las memorias de cálculo detalladas en tiempo real. Aquí puede auditar las inercias bruta y agrietada transformada, relaciones modulares, masas tributarias, coeficientes de rigidez y amplificaciones torsionales del modelo estructural dinámico.
+                                </p>
+                                <div id="calculation-report">
+                                    <!-- Dynamic content will be injected by JavaScript -->
                                 </div>
                             </div>
                         </div>
@@ -596,7 +612,7 @@
     </div>
 
     <!-- Custom JavaScript -->
-    <script src="app.js?v=901"></script>
+    <script src="app.js?v=903"></script>
 </body>
 
 </html>

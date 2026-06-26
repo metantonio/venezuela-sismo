@@ -790,6 +790,7 @@ function generateSpectraAndEarthquake() {
     };
 
     let T1_actual;
+    let reportHTML = '';
     if (customSections.enable) {
         // Calcular T1 usando la inercia agrietada transformada de las vigas
         const CONV = 98066.5; // 1 kgf/cm² = 98066.5 Pa
@@ -832,10 +833,128 @@ function generateSpectraAndEarthquake() {
         const eta   = (12.0 * kappa + 1.0) / (12.0 * kappa + 4.0);
         const k_init_custom = numCols * k_col_fixed * eta;
 
-
         const m_real = (storyMass * 1000) * (0.3 + 0.7 * (area / 25.0));
         const sinTerm = Math.sin(Math.PI / (4.0 * N + 2.0));
         T1_actual = Math.PI / (Math.sqrt(k_init_custom / m_real) * sinTerm);
+
+        // Torsión
+        const eccVal = parseFloat(document.getElementById("torsional-eccentricity").value) || 0.0;
+        const rp = Math.sqrt((bW * bW + bD * bD) / 12) || 2.0;
+        const torsionAmp = Math.sqrt(Math.pow(1.0 + (eccVal * bD) / (2.0 * rp), 2) + Math.pow((eccVal * bW) / (2.0 * rp), 2));
+
+        reportHTML = `
+            <table class="calc-table">
+                <thead>
+                    <tr>
+                        <th>Propiedad Estructural</th>
+                        <th>Fórmula / Relación</th>
+                        <th>Símbolo</th>
+                        <th>Valor Calculado</th>
+                        <th>Unidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="calc-param-name">Módulo Elasticidad Concreto (Col.)</td>
+                        <td class="calc-formula">15100 &times; &radic;(f'<sub>c,col</sub>)</td>
+                        <td class="calc-symbol">E<sub>c,col</sub></td>
+                        <td class="calc-value">${Math.round(15100.0 * Math.sqrt(customSections.fcCol)).toLocaleString()}</td>
+                        <td class="calc-unit">kgf/cm²</td>
+                    </tr>
+                    <tr>
+                        <td class="calc-param-name">Módulo Elasticidad Concreto (Vig.)</td>
+                        <td class="calc-formula">15100 &times; &radic;(f'<sub>c,vig</sub>)</td>
+                        <td class="calc-symbol">E<sub>c,vig</sub></td>
+                        <td class="calc-value">${Math.round(15100.0 * Math.sqrt(customSections.fcBeam)).toLocaleString()}</td>
+                        <td class="calc-unit">kgf/cm²</td>
+                    </tr>
+                    <tr>
+                        <td class="calc-param-name">Relación Modular Concreto-Acero</td>
+                        <td class="calc-formula">E<sub>s</sub> / E<sub>c,vig</sub></td>
+                        <td class="calc-symbol">n</td>
+                        <td class="calc-value">${n_mod.toFixed(2)}</td>
+                        <td class="calc-unit">-</td>
+                    </tr>
+                    <tr>
+                        <td class="calc-param-name">Inercia Bruta de Columna (sola)</td>
+                        <td class="calc-formula">b<sub>c</sub> &times; h<sub>c</sub><sup>3</sup> / 12</td>
+                        <td class="calc-symbol">I<sub>g,col</sub></td>
+                        <td class="calc-value">${(Ic_gross * 1e4).toFixed(3)}</td>
+                        <td class="calc-unit">10<sup>-4</sup> m⁴</td>
+                    </tr>
+                    <tr>
+                        <td class="calc-param-name">Inercia Transformada Columna (c/acero)</td>
+                        <td class="calc-formula">I<sub>g</sub> + (n-1) &times; A<sub>s</sub> &times; d'<sup>2</sup></td>
+                        <td class="calc-symbol">I<sub>c,eff</sub></td>
+                        <td class="calc-value">${(Ic * 1e4).toFixed(3)}</td>
+                        <td class="calc-unit">10<sup>-4</sup> m⁴</td>
+                    </tr>
+                    <tr>
+                        <td class="calc-param-name">Eje Neutro Agrietado de Viga</td>
+                        <td class="calc-formula">Ecuación cuadrática x<sub>na</sub></td>
+                        <td class="calc-symbol">x<sub>na</sub></td>
+                        <td class="calc-value">${(x_na * 100).toFixed(2)}</td>
+                        <td class="calc-unit">cm</td>
+                    </tr>
+                    <tr>
+                        <td class="calc-param-name">Inercia Agrietada Transf. de Viga</td>
+                        <td class="calc-formula">b &times; x<sup>3</sup>/3 + n &times; A<sub>sp</sub> &times; (x-d')<sup>2</sup> + n &times; A<sub>s</sub> &times; (d-x)<sup>2</sup></td>
+                        <td class="calc-symbol">I<sub>cr</sub></td>
+                        <td class="calc-value">${(Icr * 1e4).toFixed(3)}</td>
+                        <td class="calc-unit">10<sup>-4</sup> m⁴</td>
+                    </tr>
+                    <tr>
+                        <td class="calc-param-name">Rigidez de Columna Empotrada</td>
+                        <td class="calc-formula">12 &times; E<sub>c,col</sub> &times; I<sub>c,eff</sub> / H<sup>3</sup></td>
+                        <td class="calc-symbol">k<sub>col</sub></td>
+                        <td class="calc-value">${Math.round(k_col_fixed / 9.80665).toLocaleString()}</td>
+                        <td class="calc-unit">kgf/m</td>
+                    </tr>
+                    <tr>
+                        <td class="calc-param-name">Factor Rigidez Viga-Columna</td>
+                        <td class="calc-formula">(E<sub>v</sub> &times; I<sub>cr</sub> &times; H) / (2 &times; E<sub>c</sub> &times; I<sub>c,eff</sub> &times; L)</td>
+                        <td class="calc-symbol">&kappa;</td>
+                        <td class="calc-value">${kappa.toFixed(3)}</td>
+                        <td class="calc-unit">-</td>
+                    </tr>
+                    <tr>
+                        <td class="calc-param-name">Reducción por Flexibilidad de Vigas</td>
+                        <td class="calc-formula">(12&kappa; + 1) / (12&kappa; + 4)</td>
+                        <td class="calc-symbol">&eta;</td>
+                        <td class="calc-value">${eta.toFixed(3)}</td>
+                        <td class="calc-unit">-</td>
+                    </tr>
+                    <tr>
+                        <td class="calc-param-name">Masa Tributaria por Piso</td>
+                        <td class="calc-formula">m<sub>base</sub> &times; (0.3 + 0.7 &times; Área / 25)</td>
+                        <td class="calc-symbol">m</td>
+                        <td class="calc-value">${(m_real / 1000).toFixed(1)}</td>
+                        <td class="calc-unit">ton</td>
+                    </tr>
+                    <tr>
+                        <td class="calc-param-name">Rigidez Lateral Total de Entrepiso</td>
+                        <td class="calc-formula">N<sub>col</sub> &times; k<sub>col</sub> &times; &eta;</td>
+                        <td class="calc-symbol">k<sub>init</sub></td>
+                        <td class="calc-value">${Math.round(k_init_custom / 9.80665).toLocaleString()}</td>
+                        <td class="calc-unit">kgf/m</td>
+                    </tr>
+                    <tr>
+                        <td class="calc-param-name">Período Fundamental Calculado</td>
+                        <td class="calc-formula">&pi; / ( &radic;(k/m) &times; sen(&pi;/(4N+2)) )</td>
+                        <td class="calc-symbol">T<sub>1</sub></td>
+                        <td class="calc-value" style="color: #ff007f;">${T1_actual.toFixed(3)}</td>
+                        <td class="calc-unit">s</td>
+                    </tr>
+                    <tr>
+                        <td class="calc-param-name">Factor Amplificación Torsional</td>
+                        <td class="calc-formula">&radic;( (1 + e&middot;b<sub>D</sub>/(2r<sub>p</sub>))<sup>2</sup> + (e&middot;b<sub>W</sub>/(2r<sub>p</sub>))<sup>2</sup> )</td>
+                        <td class="calc-symbol">f<sub>torsion</sub></td>
+                        <td class="calc-value" style="color: #ffb703;">${torsionAmp.toFixed(3)}</td>
+                        <td class="calc-unit">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
     } else {
         // Ratios de masa y rigidez para calcular T1_actual estándar
         const massRatio = 0.3 + 0.7 * (area / 25.0);
@@ -843,6 +962,52 @@ function generateSpectraAndEarthquake() {
         const phi_ref = 0.8125;
         const stiffnessRatio = (numCols / 4.0) * (phi_Sx / phi_ref);
         T1_actual = targetT1 * Math.sqrt(massRatio / stiffnessRatio);
+
+        const m_real = (storyMass * 1000) * massRatio;
+        const sinTerm = Math.sin(Math.PI / (4.0 * N + 2.0));
+        const k_ref = (storyMass * 1000) * Math.pow(Math.PI / (targetT1 * sinTerm), 2);
+        const k_init_std = k_ref * (numCols / 4.0) * (phi_Sx / phi_ref);
+
+        // Torsión
+        const eccVal = parseFloat(document.getElementById("torsional-eccentricity").value) || 0.0;
+        const rp = Math.sqrt((bW * bW + bD * bD) / 12) || 2.0;
+        const torsionAmp = Math.sqrt(Math.pow(1.0 + (eccVal * bD) / (2.0 * rp), 2) + Math.pow((eccVal * bW) / (2.0 * rp), 2));
+
+        reportHTML = `
+            <div class="calc-sections-disabled-msg">
+                <p><strong>Modo Estándar (Sintonizado) Activo.</strong></p>
+                <p style="margin-top: 6px; font-size: 12px; color: var(--text-muted);">La rigidez lateral de los entrepisos está calibrada para coincidir con el período fundamental objetivo. Valores calculados básicos:</p>
+                <table class="calc-table" style="margin-top: 12px;">
+                    <tbody>
+                        <tr>
+                            <td class="calc-param-name">Masa por Piso</td>
+                            <td class="calc-symbol">m</td>
+                            <td class="calc-value">${(m_real / 1000).toFixed(1)}</td>
+                            <td class="calc-unit">ton</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Rigidez Calibrada de Entrepiso</td>
+                            <td class="calc-symbol">k<sub>init</sub></td>
+                            <td class="calc-value">${Math.round(k_init_std / 9.80665).toLocaleString()}</td>
+                            <td class="calc-unit">kgf/m</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Período Fundamental Estimado</td>
+                            <td class="calc-symbol">T<sub>1</sub></td>
+                            <td class="calc-value" style="color: #00b4d8;">${T1_actual.toFixed(3)}</td>
+                            <td class="calc-unit">s</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Factor Amplificación Torsional</td>
+                            <td class="calc-symbol">f<sub>torsion</sub></td>
+                            <td class="calc-value" style="color: #ffb703;">${torsionAmp.toFixed(3)}</td>
+                            <td class="calc-unit">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="margin-top: 12px; font-size: 11.5px; color: var(--color-2001);">Habilita la casilla <strong>"Habilitar Secciones Físicas"</strong> en el panel de control lateral para ver el desglose completo del cálculo de inercias transformadas y agrietadas.</p>
+            </div>
+        `;
     }
 
     // --- 1. Calcular Parámetros de Diseño COVENIN 2001 ---
@@ -914,6 +1079,12 @@ function generateSpectraAndEarthquake() {
 
     // --- 5. Dibujar los Espectros en el Tab de Gráficos ---
     drawSpectraChart(params01, params19, T1_actual);
+
+    // Inyectar el reporte de cálculos dinámicamente en el DOM
+    const reportDiv = document.getElementById("calculation-report");
+    if (reportDiv) {
+        reportDiv.innerHTML = reportHTML;
+    }
     
     // Inicializar o limpiar gráficos de respuesta
     resetChartsData();
