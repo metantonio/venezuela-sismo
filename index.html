@@ -355,12 +355,10 @@
             <main class="content-area">
                 <!-- TABS HEADER -->
                 <nav class="tabs-header">
-                    <button class="tab-btn active" data-tab="tab-3d"><i class="fa-solid fa-cubes-stacked"></i> Vista
-                        3D</button>
-                    <button class="tab-btn" data-tab="tab-spectra"><i class="fa-solid fa-chart-line"></i> Espectros de
-                        Diseño</button>
-                    <button class="tab-btn" data-tab="tab-response"><i class="fa-solid fa-wave-square"></i> Gráficos de
-                        Respuesta</button>
+                    <button class="tab-btn active" data-tab="tab-3d"><i class="fa-solid fa-cubes-stacked"></i> Vista 3D</button>
+                    <button class="tab-btn" data-tab="tab-spectra"><i class="fa-solid fa-chart-line"></i> Espectros de Diseño</button>
+                    <button class="tab-btn" data-tab="tab-response"><i class="fa-solid fa-wave-square"></i> Gráficos de Respuesta</button>
+                    <button class="tab-btn" data-tab="tab-info"><i class="fa-solid fa-circle-info"></i> Info Técnica</button>
                 </nav>
 
                 <!-- TAB CONTENT -->
@@ -428,6 +426,82 @@
                                     <div class="chart-wrapper-small">
                                         <canvas id="hysteresis-2019-chart"></canvas>
                                         <div class="hyst-label font-2019">COVENIN 2019</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TECHNICAL INFO & DISCLAIMER TAB -->
+                    <div id="tab-info" class="tab-content">
+                        <div class="tab-info-container">
+                            <!-- DISCLAIMER ALERT -->
+                            <div class="disclaimer-alert">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <div>
+                                    <h4>Deslinde de Responsabilidad (Disclaimer)</h4>
+                                    <p>Esta aplicación web es una herramienta puramente educativa, interactiva y de divulgación académica. Los cálculos y simulaciones presentados se basan en formulaciones simplificadas y no consideran la complejidad geotécnica, topográfica o estructural detallada de un proyecto real. <strong>Bajo ninguna circunstancia esta herramienta sustituye un estudio de ingeniería sísmica, un análisis de vulnerabilidad ni un diseño estructural profesional</strong> realizado por profesionales licenciados bajo las normativas nacionales vigentes.</p>
+                                </div>
+                            </div>
+
+                            <!-- SIMPLIFICATIONS SECTION -->
+                            <div class="info-section">
+                                <h3><i class="fa-solid fa-calculator"></i> Simplificaciones y Consideraciones de Cálculo</h3>
+                                <div class="simplifications-list">
+                                    <div class="simplification-item">
+                                        <i class="fa-solid fa-diagram-project"></i>
+                                        <div class="simplification-content">
+                                            <h5>Modelo de Edificio de Corte (Shear Building)</h5>
+                                            <p>El edificio se modela como un sistema de múltiples grados de libertad (MDOF) donde toda la masa está concentrada en los niveles de losa y las vigas son infinitamente rígidas a flexión comparadas con las columnas. En el caso de "Secciones Físicas", se incorpora un coeficiente de flexibilidad de vigas (&eta;) basado en la relación de rigidez viga-columna para modelar de manera simplificada la flexibilidad del nodo, omitiendo deformaciones axiales y rotacionales acopladas.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="simplification-item">
+                                        <i class="fa-solid fa-wave-square"></i>
+                                        <div class="simplification-content">
+                                            <h5>Análisis Dinámico de Tiempo-Historia No Lineal</h5>
+                                            <p>Para resolver las ecuaciones de movimiento, se utiliza el método de integración numérica de Newmark (Beta = 0.25, Gamma = 0.50). El comportamiento no lineal de los entrepisos se simula mediante una ley constitutiva histerética bilineal (elastoplástica con endurecimiento por deformación), en lugar de un análisis de elementos finitos de plasticidad distribuida o modelos de fibras tridimensionales.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="simplification-item">
+                                        <i class="fa-solid fa-heart-pulse"></i>
+                                        <div class="simplification-content">
+                                            <h5>Modelo de Daño de Park-Ang y Degradación</h5>
+                                            <p>El daño estructural se evalúa de manera continua en cada piso utilizando el Índice de Daño de Park-Ang, que combina la demanda de deformación máxima con el efecto acumulado de disipación de energía histerética. Este índice degrada de forma lineal la rigidez lateral y la resistencia de fluencia de los elementos a lo largo del sismo.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="simplification-item">
+                                        <i class="fa-solid fa-ruler-combined"></i>
+                                        <div class="simplification-content">
+                                            <h5>Inercias de Secciones Físicas (Transformadas y Agrietadas)</h5>
+                                            <p>Al activar "Secciones Físicas", la inercia de la columna ($I_{c,eff}$) se calcula usando la sección transformada total (concreto más el aporte del acero longitudinal en dos caras simétricas), ignorando la carga axial dinámica variable. La inercia de la viga ($I_{cr}$) se calcula bajo flexión pura empleando la sección agrietada transformada en flexión simple unilateral, omitiendo las variaciones por momento positivo/negativo o el ancho efectivo de losa colaborante.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CODE DIFFERENCES SECTION -->
+                            <div class="info-section">
+                                <h3><i class="fa-solid fa-book"></i> Diferencias y Consideraciones por Normativa</h3>
+                                <div class="info-grid">
+                                    <div class="norm-card-info norm-2001">
+                                        <h4>COVENIN 1756:2001 (Norma Tradicional)</h4>
+                                        <ul>
+                                            <li><strong>Espectro de Diseño:</strong> Basado en factores de aceleración de zona tradicional ($A_0 = 0.30$ para Caracas, Zona 5) y formas espectrales rígidas (suelos S1, S2, S3 o S4).</li>
+                                            <li><strong>Límite de Deriva de Colapso:</strong> Establecido de forma simplificada en un <strong>3.5%</strong> para el análisis dinámico no lineal en el simulador.</li>
+                                            <li><strong>Severidad de Degradación:</strong> Mayor susceptibilidad a la pérdida de rigidez y resistencia ante deformaciones plásticas cíclicas, emulando los detalles de confinamiento menos estrictos del siglo pasado.</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="norm-card-info norm-2019">
+                                        <h4>COVENIN 1756:2019 (Actualización y Propuestas)</h4>
+                                        <ul>
+                                            <li><strong>Espectro de Diseño:</strong> Emplea una formulación moderna basada en mapas de microzonificación e intensidades de aceleración espectral para períodos cortos ($A_0$) y de 1 segundo ($A_1$), permitiendo una mayor definición del tipo de sitio.</li>
+                                            <li><strong>Límite de Deriva de Colapso:</strong> Ampliado a un <strong>4.5%</strong>, debido a los mayores requerimientos de ductilidad exigidos en las normativas modernas.</li>
+                                            <li><strong>Severidad de Degradación:</strong> Reducida a la mitad en la simulación no lineal, representando la excelente capacidad de confinamiento y retención de resistencia de los marcos de concreto armado con detallado dúctil moderno (ND3).</li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
