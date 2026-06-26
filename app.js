@@ -426,7 +426,7 @@ class BuildingModel {
             // Ec (kgf/cm²) = 15100 * sqrt(fc)
             // Ec (Pa) = Ec (kgf/cm²) * 98066.5
             const CONV = 98066.5; // 1 kgf/cm² = 98066.5 Pa
-            const ES_PA = 2.0e9 * CONV; // Módulo del acero: 2,000,000 kgf/cm² en Pa
+            const ES_PA = 2.0e6 * CONV; // Módulo del acero: 2,000,000 kgf/cm² en Pa
 
             const fc_col  = customSections.fcCol;   // kgf/cm²
             const fc_beam = customSections.fcBeam;  // kgf/cm²
@@ -778,7 +778,7 @@ function generateSpectraAndEarthquake() {
     if (customSections.enable) {
         // Calcular T1 usando la inercia agrietada transformada de las vigas
         const CONV = 98066.5; // 1 kgf/cm² = 98066.5 Pa
-        const ES_PA = 2.0e9 * CONV; // Módulo del acero en Pa
+        const ES_PA = 2.0e6 * CONV; // Módulo del acero en Pa
         const Ec_col_Pa  = 15100.0 * Math.sqrt(customSections.fcCol)  * CONV;
         const Ec_beam_Pa = 15100.0 * Math.sqrt(customSections.fcBeam) * CONV;
 
