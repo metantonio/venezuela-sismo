@@ -482,6 +482,39 @@
                                 </div>
                             </div>
 
+                            <!-- MODEL VS REALITY SECTION -->
+                            <div class="info-section" style="border-left: 3px solid var(--color-warning);">
+                                <h3 style="color: var(--color-warning);"><i class="fa-solid fa-triangle-exclamation"></i> Limitación del Modelo frente a una Estructura Real</h3>
+                                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                                    Es crucial comprender que <strong>el simulador es generalmente más optimista (menos estricto) que el comportamiento de un edificio real</strong> ante el mismo terremoto. Esto se debe a que el modelo simplificado omite modos de falla críticos que reducen la capacidad de supervivencia de la estructura:
+                                </p>
+                                <div class="simplifications-list">
+                                    <div class="simplification-item">
+                                        <i class="fa-solid fa-burst" style="color: var(--color-warning);"></i>
+                                        <div class="simplification-content">
+                                            <h5>Oclusión de Fallas Frágiles (Cortante y Adherencia)</h5>
+                                            <p>El simulador asume una ductilidad ideal continua donde los elementos fluyen y se deforman cíclicamente hasta derivas altas (3.5% o 4.5%). En la realidad, si los estribos transversales no tienen el detallado moderno o están muy espaciados, se producirá un <strong>pandeo del acero o falla por cortante frágil</strong> a derivas mucho menores (entre 1.5% y 2.0%), colapsando la estructura de forma súbita.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="simplification-item">
+                                        <i class="fa-solid fa-arrows-up-down-left-right" style="color: var(--color-warning);"></i>
+                                        <div class="simplification-content">
+                                            <h5>Efectos Bidireccionales y Sismo Vertical</h5>
+                                            <p>El simulador modela las fuerzas sísmicas en un único eje horizontal unidireccional. Un terremoto real actúa en tres dimensiones ortogonales simultáneas, induciendo <strong>flexión esviada bidireccional</strong> y oscilaciones dinámicas de la carga axial por sismo vertical, disminuyendo drásticamente la capacidad resistente real de las columnas.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="simplification-item">
+                                        <i class="fa-solid fa-rotate" style="color: var(--color-warning);"></i>
+                                        <div class="simplification-content">
+                                            <h5>Torsión en Planta e Irregularidades</h5>
+                                            <p>Se asume un comportamiento simétrico y regular. En la realidad, las irregularidades en planta generan excentricidades que inducen <strong>torsión global</strong>, concentrando desplazamientos destructivos en las columnas perimetrales y de esquina, efecto que no es capturado en esta simulación bidimensional simplificada.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- CODE DIFFERENCES SECTION -->
                             <div class="info-section">
                                 <h3><i class="fa-solid fa-book"></i> Diferencias y Consideraciones por Normativa</h3>
