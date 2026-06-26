@@ -4,7 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>VZLA-SISMO 3D: Simulador Sismorresistente (COVENIN 1756)</title>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -202,6 +206,80 @@
                     </div>
                 </div>
 
+                <!-- SECCIONES PERSONALIZADAS -->
+                <div class="accordion-section advanced-theme">
+                    <div class="section-title">
+                        <i class="fa-solid fa-drafting-compass"></i>
+                        <h2>Secciones Personalizadas</h2>
+                    </div>
+
+                    <div class="checkbox-group" style="margin-bottom: 12px;">
+                        <input type="checkbox" id="custom-sections-enable">
+                        <label for="custom-sections-enable">Habilitar Secciones Físicas</label>
+                    </div>
+
+                    <div id="custom-sections-controls" style="display: none;">
+                        <div class="control-group-row">
+                            <div class="control-group-half">
+                                <label for="col-width">Col. Ancho (cm): <span id="col-width-val">35</span></label>
+                                <input type="range" id="col-width" min="20" max="80" value="35" step="5">
+                            </div>
+                            <div class="control-group-half">
+                                <label for="col-depth">Col. Peralte (cm): <span id="col-depth-val">35</span></label>
+                                <input type="range" id="col-depth" min="20" max="80" value="35" step="5">
+                            </div>
+                        </div>
+
+                        <div class="control-group-row">
+                            <div class="control-group-half">
+                                <label for="beam-width">Viga Ancho (cm): <span id="beam-width-val">30</span></label>
+                                <input type="range" id="beam-width" min="15" max="60" value="30" step="5">
+                            </div>
+                            <div class="control-group-half">
+                                <label for="beam-depth">Viga Peralte (cm): <span id="beam-depth-val">45</span></label>
+                                <input type="range" id="beam-depth" min="20" max="80" value="45" step="5">
+                            </div>
+                        </div>
+
+                        <!-- Concreto f'c (kgf/cm²) -->
+                        <div class="control-group-row">
+                            <div class="control-group-half">
+                                <label for="concrete-fc-col">f'c Col. (kgf/cm²): <span id="concrete-fc-col-val">250</span></label>
+                                <input type="range" id="concrete-fc-col" min="200" max="450" value="250" step="10">
+                            </div>
+                            <div class="control-group-half">
+                                <label for="concrete-fc-beam">f'c Viga (kgf/cm²): <span id="concrete-fc-beam-val">250</span></label>
+                                <input type="range" id="concrete-fc-beam" min="200" max="450" value="250" step="10">
+                            </div>
+                        </div>
+
+                        <!-- Acero fy (kgf/cm²) -->
+                        <div class="control-group-row">
+                            <div class="control-group-half">
+                                <label for="steel-fy-col">fy Col. (kgf/cm²): <span id="steel-fy-col-val">4200</span></label>
+                                <input type="range" id="steel-fy-col" min="2800" max="5000" value="4200" step="100">
+                            </div>
+                            <div class="control-group-half">
+                                <label for="steel-fy-beam">fy Viga (kgf/cm²): <span id="steel-fy-beam-val">4200</span></label>
+                                <input type="range" id="steel-fy-beam" min="2800" max="5000" value="4200" step="100">
+                            </div>
+                        </div>
+
+                        <!-- Refuerzo Viga As y As' (cm²) -->
+                        <div class="control-group-row">
+                            <div class="control-group-half">
+                                <label for="beam-as">As Trac. Viga (cm²): <span id="beam-as-val">12</span></label>
+                                <input type="range" id="beam-as" min="4" max="35" value="12" step="1">
+                            </div>
+                            <div class="control-group-half">
+                                <label for="beam-as-prime">As' Comp. Viga (cm²): <span id="beam-as-prime-val">6</span></label>
+                                <input type="range" id="beam-as-prime" min="2" max="25" value="6" step="1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
                 <!-- SISMO Y SIMULACION -->
                 <div class="section-title">
                     <i class="fa-solid fa-house-laptop"></i>
@@ -390,7 +468,7 @@
     </div>
 
     <!-- Custom JavaScript -->
-    <script src="app.js?v=5"></script>
+    <script src="app.js?v=900"></script>
 </body>
 
 </html>

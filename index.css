@@ -273,6 +273,15 @@ select:focus {
     border-color: rgba(255, 0, 127, 0.2);
 }
 
+.advanced-theme {
+    border-left: 3px solid var(--color-safe);
+}
+.advanced-theme:focus-within {
+    background: rgba(46, 196, 182, 0.03);
+    border-color: rgba(46, 196, 182, 0.2);
+}
+
+
 /* CHECKBOX */
 .checkbox-group {
     display: flex;

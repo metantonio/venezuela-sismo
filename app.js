@@ -39,11 +39,35 @@ let particlesData = [];
 
 // --- INICIALIZACIÓN ---
 document.addEventListener("DOMContentLoaded", () => {
-    initUI();
-    initThreeJS();
-    generateSpectraAndEarthquake(); // generación inicial
-    animate3D();
+    try {
+        initUI();
+    } catch(e) {
+        console.error('[initUI]', e);
+    }
+    try {
+        initThreeJS();
+    } catch(e) {
+        console.error('[initThreeJS]', e);
+        document.getElementById('canvas-3d-container').innerHTML = '<div style="color:red;padding:20px;font-size:12px;">[3D ERROR] ' + e.message + '</div>';
+    }
+    try {
+        generateSpectraAndEarthquake();
+    } catch(e) {
+        console.error('[generateSpectraAndEarthquake]', e);
+        // Show error somewhere visible
+        const el = document.querySelector('.content-area') || document.body;
+        const errDiv = document.createElement('div');
+        errDiv.style = 'position:fixed;top:0;left:50%;transform:translateX(-50%);background:rgba(200,0,0,0.9);color:white;padding:8px 16px;z-index:9999;border-radius:0 0 6px 6px;font-size:12px;max-width:600px;word-break:break-all;';
+        errDiv.textContent = '⚠ JS Error: ' + e.message + ' (line ' + (e.stack ? e.stack.split('\n')[1] : '?') + ')';
+        document.body.appendChild(errDiv);
+    }
+    try {
+        animate3D();
+    } catch(e) {
+        console.error('[animate3D]', e);
+    }
 });
+
 
 // --- INTERFAZ DE USUARIO (EVENTOS Y TABS) ---
 function initUI() {
@@ -106,6 +130,31 @@ function initUI() {
     // 2019 Sliders
     setupSlider("covenin19-a0");
     setupSlider("covenin19-a1");
+
+    // Sliders de Secciones Personalizadas
+    setupSlider("col-width", " cm");
+    setupSlider("col-depth", " cm");
+    setupSlider("beam-width", " cm");
+    setupSlider("beam-depth", " cm");
+    // Resistencia de materiales (kgf/cm²)
+    setupSlider("concrete-fc-col", " kgf/cm²");
+    setupSlider("concrete-fc-beam", " kgf/cm²");
+    setupSlider("steel-fy-col", " kgf/cm²");
+    setupSlider("steel-fy-beam", " kgf/cm²");
+    // Refuerzo de vigas (cm²)
+    setupSlider("beam-as", " cm²");
+    setupSlider("beam-as-prime", " cm²");
+
+    // Checkbox para habilitar secciones personalizadas
+    const customSectionsCheck = document.getElementById("custom-sections-enable");
+    const customSectionsControls = document.getElementById("custom-sections-controls");
+    
+    if (customSectionsCheck && customSectionsControls) {
+        customSectionsCheck.addEventListener("change", () => {
+            customSectionsControls.style.display = customSectionsCheck.checked ? "block" : "none";
+            if (!isPlaying) generateSpectraAndEarthquake();
+        });
+    }
 
     // Selects
     const selects = [
@@ -344,13 +393,21 @@ function generateSyntheticEarthquake(T_soil, pga1, pga2, hasSecond) {
 
 // --- SOLUCIONADOR DINÁMICO DE ESTRUCTURAS MDOF ---
 class BuildingModel {
-    constructor(N, storyHeight, storyMass, targetT1, designAd, analysisMode, degSeverity, numColsX, numColsY, sX, sY) {
+    constructor(N, storyHeight, storyMass, targetT1, designAd, analysisMode, degSeverity, numColsX, numColsY, sX, sY, customSections, codeYear) {
         this.N = N;
         this.h = storyHeight;
         this.m_ref = storyMass * 1000; // ton a kg (referencia para planta 5x5)
         this.analysisMode = analysisMode; // 'linear' o 'nonlinear'
         this.degSeverity = degSeverity; // multiplicador de degradación (0.1 a 1.2)
         this.numCols = (numColsX || 2) * (numColsY || 2);
+
+        // Diferenciación de ductilidad por norma (2001 vs 2019)
+        // COVENIN 2019 exige mayor confinamiento => mayor ductilidad, menor degradación
+        this.codeYear = codeYear || 2001;
+        // Límite de deriva para colapso: 2019 soporta mayor ductilidad
+        this.driftCollapseLimit = (codeYear === 2019) ? 0.045 : 0.035;
+        // Factor de severidad efectiva: 2019 degrada menos por buen detallado sísmico
+        this.effDegSeverity = (codeYear === 2019) ? degSeverity * 0.5 : degSeverity;
 
         // Calcular el área tributaria de la losa
         const sX_val = sX || 5.0;
@@ -362,31 +419,88 @@ class BuildingModel {
         // Masa real del entrepiso escalada por el área tributaria (referencia 25 m²)
         this.m = this.m_ref * (0.3 + 0.7 * (area / 25.0));
 
-        // Factor de flexibilidad de vigas en la dirección del sismo (eje X)
-        // kappa(S_x) = kappa_ref * 5.0 / S_x. Asumiendo kappa_ref = 1.0 a S_x = 5.0m
-        // phi(S_x) = (12*kappa + 1)/(12*kappa + 4) = (60 + S_x)/(60 + 4*S_x)
-        // El factor de escala de rigidez es phi(S_x) / phi(5.0), con phi(5.0) = 13/16 = 0.8125
-        const phi_Sx = (60.0 + sX_val) / (60.0 + 4.0 * sX_val);
-        const phi_ref = 0.8125;
-        const stiffnessScale = phi_Sx / phi_ref;
+        if (customSections && customSections.enable) {
+            // ---- CÁLCULO DE RIGIDEZ FÍSICA DIRECTA (SECCIONES PERSONALIZADAS) ----
+            // Módulo de elasticidad del concreto: fórmula venezolana/ACI
+            // Ec (kgf/cm²) = 15100 * sqrt(fc)
+            // Ec (Pa) = Ec (kgf/cm²) * 98066.5
+            const CONV = 98066.5; // 1 kgf/cm² = 98066.5 Pa
+            const ES_PA = 2.0e9 * CONV; // Módulo del acero: 2,000,000 kgf/cm² en Pa
 
-        // Periodo y rigidez sintonizados con el número de columnas y espaciamiento (referencia 4 columnas y 5m de separación)
-        const sinTerm = Math.sin(Math.PI / (4.0 * N + 2.0));
-        const k_ref = this.m_ref * Math.pow(Math.PI / (targetT1 * sinTerm), 2);
-        
-        // Rigidez inicial escalada por el número de columnas y por la flexibilidad de las vigas
-        this.k_init = k_ref * (this.numCols / 4.0) * stiffnessScale;
+            const fc_col  = customSections.fcCol;   // kgf/cm²
+            const fc_beam = customSections.fcBeam;  // kgf/cm²
+            const Ec_col  = 15100.0 * Math.sqrt(fc_col)  * CONV; // Pa
+            const Ec_beam = 15100.0 * Math.sqrt(fc_beam) * CONV; // Pa
 
-        // Periodo fundamental real T1 = targetT1 * sqrt((m/m_ref) / (k/k_ref))
-        const massRatio = this.m / this.m_ref;
-        const stiffnessRatio = (this.numCols / 4.0) * stiffnessScale;
-        this.T1 = targetT1 * Math.sqrt(massRatio / stiffnessRatio);
-        
+            const bc = customSections.colWidth  / 100; // cm a m
+            const hc = customSections.colDepth  / 100; // cm a m (en dirección del sismo X)
+            const bb = customSections.beamWidth / 100; // cm a m
+            const hb = customSections.beamDepth / 100; // cm a m
+
+            // Momento de Inercia Bruto de la Columna
+            const Ic = (bc * Math.pow(hc, 3)) / 12;
+
+            // ---------- INERCIA AGRIETADA TRANSFORMADA DE LA VIGA (Icr) ----------
+            // n = Es / Ec_beam (relación modular)
+            const n = ES_PA / Ec_beam;
+            // Área de acero en m²  (entrada en cm²)
+            const As_m2  = (customSections.beamAs)      / 1e4; // cm² a m²
+            const Asp_m2 = (customSections.beamAsPrime)  / 1e4; // cm² a m²
+            // Profundidades efectivas
+            const d_cover = 0.04; // recubrimiento mecánico típico 4 cm
+            const d  = hb - d_cover; // profundidad efectiva tracción
+            const dp = d_cover;      // profundidad efectiva compresión
+
+            // Ecuación cuadrática para hallar el eje neutro agrietado x:
+            // (bb/2)*x^2 + n*(As + As')*x - n*(As*d + As'*dp) = 0
+            const A_quad = bb / 2;
+            const B_quad = n * (As_m2 + Asp_m2);
+            const C_quad = -n * (As_m2 * d + Asp_m2 * dp);
+            const discriminant = B_quad * B_quad - 4 * A_quad * C_quad;
+            const x_na = (-B_quad + Math.sqrt(Math.max(0, discriminant))) / (2 * A_quad);
+
+            // Inercia agrietada transformada (m⁴)
+            const Icr = (bb * Math.pow(x_na, 3)) / 3
+                       + n * Asp_m2 * Math.pow(Math.max(0, x_na - dp), 2)
+                       + n * As_m2  * Math.pow(Math.max(0, d - x_na), 2);
+
+            // Rigidez lateral de una columna empotrada-empotrada (usando Ec_col e Ic)
+            const k_col_fixed = (12.0 * Ec_col * Ic) / Math.pow(this.h, 3);
+
+            // Relación de rigidez viga-columna (vigas con Icr, Ec_beam)
+            // kappa = (Ec_beam * Icr * h) / (2 * Ec_col * Ic * sX)
+            const kappa = (Ec_beam * Icr * this.h) / (2.0 * Ec_col * Ic * sX_val);
+
+            // Factor de reducción de rigidez por flexibilidad de vigas
+            const eta = (12.0 * kappa + 1.0) / (12.0 * kappa + 4.0);
+
+            // Rigidez lateral inicial total del entrepiso
+            this.k_init = this.numCols * k_col_fixed * eta;
+
+            // Periodo fundamental real T1 de la estructura MDOF uniforme
+            const sinTerm = Math.sin(Math.PI / (4.0 * N + 2.0));
+            this.T1 = Math.PI / (Math.sqrt(this.k_init / this.m) * sinTerm);
+        } else {
+            // COMPORTAMIENTO ESTÁNDAR (SINTONIZADO CON ESPECTRO)
+            const phi_Sx = (60.0 + sX_val) / (60.0 + 4.0 * sX_val);
+            const phi_ref = 0.8125;
+            const stiffnessScale = phi_Sx / phi_ref;
+
+            const sinTerm = Math.sin(Math.PI / (4.0 * N + 2.0));
+            const k_ref = this.m_ref * Math.pow(Math.PI / (targetT1 * sinTerm), 2);
+
+            this.k_init = k_ref * (this.numCols / 4.0) * stiffnessScale;
+
+            const massRatio = this.m / this.m_ref;
+            const stiffnessRatio = (this.numCols / 4.0) * stiffnessScale;
+            this.T1 = targetT1 * Math.sqrt(massRatio / stiffnessRatio);
+        }
+
         // Inicializar vectores de estado
         this.x = new Array(N).fill(0); // desplazamiento relativo (m)
         this.v = new Array(N).fill(0); // velocidad relativa (m/s)
         this.a = new Array(N).fill(0); // aceleración relativa (m/s^2)
-        
+
         // Histéresis bilineal por piso
         this.k = new Array(N).fill(this.k_init); // rigidez actual
         this.u_p = new Array(N).fill(0); // deriva plástica
@@ -411,14 +525,13 @@ class BuildingModel {
         for (let j = 0; j < N; j++) {
             sum_mh += this.m * (j + 1) * this.h;
         }
-        
+
         this.F_design = new Array(N);
         for (let j = 0; j < N; j++) {
             this.F_design[j] = V_base * (this.m * (j + 1) * this.h) / sum_mh;
         }
 
         // Cortante de diseño de cada piso (suma de fuerzas por encima)
-        // V_design_i = sum_{j=i}^N F_j
         this.V_design = new Array(N);
         for (let i = 0; i < N; i++) {
             let sum = 0;
@@ -442,26 +555,26 @@ class BuildingModel {
             groundShear: []
         };
 
-        // Coeficientes de amortiguamiento de Rayleigh (5% amortiguamiento nominal)
-        // Frecuencias circulares de los modos 1 y 2
+        // Coeficientes de amortiguamiento de Rayleigh
         const w1 = 2.0 * Math.sqrt(this.k_init / this.m) * Math.sin(Math.PI / (4.0 * N + 2.0));
         const w2 = 2.0 * Math.sqrt(this.k_init / this.m) * Math.sin(3.0 * Math.PI / (4.0 * N + 2.0));
-        
+
         const zeta = parseFloat(document.getElementById("damping-ratio").value);
         this.aM = zeta * (2.0 * w1 * w2) / (w1 + w2);
         this.aK = zeta * 2.0 / (w1 + w2);
-        
-        // Post-yield ratio
-        this.alpha_p = 0.05; // 5% de rigidez post-fluencia
+
+        // Post-yield ratio (2019 tiene mayor ductilidad disponible)
+        this.alpha_p = (codeYear === 2019) ? 0.03 : 0.05;
     }
+
 
     // Paso de integración mediante Newmark Beta
     step(a_ground) {
         if (this.isCollapsed) {
             // Si ya colapsó, no resolvemos ecuaciones dinámicas normales.
-            // Simplemente simulamos caída vertical libre o deformación estática fallada
             return;
         }
+
 
         const N = this.N;
         const dt2 = dt * dt;
@@ -526,27 +639,27 @@ class BuildingModel {
                 this.u_max[i] = Math.max(this.u_max[i], Math.abs(u));
 
                 // Índice de daño de Park-Ang: D = u_max/u_ult + beta * Eh/(Vy*u_ult)
-                // U_ult = 4% de la altura de piso (daño catastrófico / colapso)
-                const u_ult = 0.04 * this.h; 
-                const beta_daño = 0.05 * this.degSeverity;
-                
+                // U_ult = deriva de colapso por norma (2001: 3.5%, 2019: 4.5%)
+                const u_ult = this.driftCollapseLimit * this.h;
+                const beta_daño = 0.05 * this.effDegSeverity;
+
                 this.D[i] = (this.u_max[i] / u_ult) + (beta_daño * this.E_h[i]) / (this.Vy_init[i] * u_ult);
                 this.D[i] = Math.min(1.0, Math.max(0.0, this.D[i]));
 
-                // Degradación de Rigidez y Resistencia basadas en el Daño
-                const k_deg_factor = 1.0 - (0.6 * this.degSeverity * this.D[i]);
-                const vy_deg_factor = 1.0 - (0.4 * this.degSeverity * this.D[i]);
+                // Degradación de Rigidez y Resistencia — menor en 2019 (mejor detallado)
+                const k_deg_factor  = 1.0 - (0.6 * this.effDegSeverity * this.D[i]);
+                const vy_deg_factor = 1.0 - (0.4 * this.effDegSeverity * this.D[i]);
 
-                this.k[i] = this.k_init * Math.max(0.05, k_deg_factor);
-                this.Vy[i] = this.Vy_init[i] * Math.max(0.1, vy_deg_factor);
+                this.k[i]  = this.k_init       * Math.max(0.05, k_deg_factor);
+                this.Vy[i] = this.Vy_init[i]   * Math.max(0.1,  vy_deg_factor);
 
-                // Comprobar Colapso de este piso
-                // Si la deriva supera el 3.5% de la altura del piso o el daño es 1.0, el edificio colapsa.
+                // Comprobar Colapso de este piso (deriva supera límite de ductilidad o daño total)
                 const driftRatio = Math.abs(u) / this.h;
-                if (driftRatio > 0.035 || this.D[i] >= 0.99) {
+                if (driftRatio > this.driftCollapseLimit || this.D[i] >= 0.99) {
                     this.isCollapsed = true;
                     this.collapseTime = currentTime;
                 }
+
             }
         }
 
@@ -631,12 +744,71 @@ function generateSpectraAndEarthquake() {
     const bD = sY * (numColsY - 1);
     const area = bW * bD;
 
-    // Ratios de masa y rigidez para calcular T1_actual
-    const massRatio = 0.3 + 0.7 * (area / 25.0);
-    const phi_Sx = (60.0 + sX) / (60.0 + 4.0 * sX);
-    const phi_ref = 0.8125;
-    const stiffnessRatio = (numCols / 4.0) * (phi_Sx / phi_ref);
-    const T1_actual = targetT1 * Math.sqrt(massRatio / stiffnessRatio);
+    // Leer valores de secciones personalizadas
+    const customSectionsCheck = document.getElementById("custom-sections-enable");
+    const customSections = {
+        enable: customSectionsCheck ? customSectionsCheck.checked : false,
+        colWidth: parseFloat(document.getElementById("col-width").value) || 35,
+        colDepth: parseFloat(document.getElementById("col-depth").value) || 35,
+        beamWidth: parseFloat(document.getElementById("beam-width").value) || 30,
+        beamDepth: parseFloat(document.getElementById("beam-depth").value) || 45,
+        fcCol:     parseFloat(document.getElementById("concrete-fc-col").value) || 250,
+        fcBeam:    parseFloat(document.getElementById("concrete-fc-beam").value) || 250,
+        fyCol:     parseFloat(document.getElementById("steel-fy-col").value) || 4200,
+        fyBeam:    parseFloat(document.getElementById("steel-fy-beam").value) || 4200,
+        beamAs:      parseFloat(document.getElementById("beam-as").value) || 12,
+        beamAsPrime: parseFloat(document.getElementById("beam-as-prime").value) || 6
+    };
+
+    let T1_actual;
+    if (customSections.enable) {
+        // Calcular T1 usando la inercia agrietada transformada de las vigas
+        const CONV = 98066.5; // 1 kgf/cm² = 98066.5 Pa
+        const ES_PA = 2.0e9 * CONV; // Módulo del acero en Pa
+        const Ec_col_Pa  = 15100.0 * Math.sqrt(customSections.fcCol)  * CONV;
+        const Ec_beam_Pa = 15100.0 * Math.sqrt(customSections.fcBeam) * CONV;
+
+        const bc = customSections.colWidth  / 100; // m
+        const hc = customSections.colDepth  / 100; // m
+        const bb = customSections.beamWidth / 100; // m
+        const hb = customSections.beamDepth / 100; // m
+
+        const Ic = (bc * Math.pow(hc, 3)) / 12;
+
+        // Relación modular y áreas de acero en m²
+        const n_mod  = ES_PA / Ec_beam_Pa;
+        const As_m2  = customSections.beamAs      / 1e4;
+        const Asp_m2 = customSections.beamAsPrime  / 1e4;
+        const d_cover = 0.04; // recubrimiento 4 cm
+        const d  = hb - d_cover;
+        const dp = d_cover;
+
+        // Eje neutro agrietado (cuadrática)
+        const A_q = bb / 2;
+        const B_q = n_mod * (As_m2 + Asp_m2);
+        const C_q = -n_mod * (As_m2 * d + Asp_m2 * dp);
+        const x_na = (-B_q + Math.sqrt(Math.max(0, B_q*B_q - 4*A_q*C_q))) / (2 * A_q);
+
+        const Icr = (bb * Math.pow(x_na, 3)) / 3
+                  + n_mod * Asp_m2 * Math.pow(Math.max(0, x_na - dp), 2)
+                  + n_mod * As_m2  * Math.pow(Math.max(0, d - x_na), 2);
+
+        const k_col_fixed = (12.0 * Ec_col_Pa * Ic) / Math.pow(storyHeight, 3);
+        const kappa = (Ec_beam_Pa * Icr * storyHeight) / (2.0 * Ec_col_Pa * Ic * sX);
+        const eta   = (12.0 * kappa + 1.0) / (12.0 * kappa + 4.0);
+        const k_init_custom = numCols * k_col_fixed * eta;
+
+        const m_real = (storyMass * 1000) * (0.3 + 0.7 * (area / 25.0));
+        const sinTerm = Math.sin(Math.PI / (4.0 * N + 2.0));
+        T1_actual = Math.PI / (Math.sqrt(k_init_custom / m_real) * sinTerm);
+    } else {
+        // Ratios de masa y rigidez para calcular T1_actual estándar
+        const massRatio = 0.3 + 0.7 * (area / 25.0);
+        const phi_Sx = (60.0 + sX) / (60.0 + 4.0 * sX);
+        const phi_ref = 0.8125;
+        const stiffnessRatio = (numCols / 4.0) * (phi_Sx / phi_ref);
+        T1_actual = targetT1 * Math.sqrt(massRatio / stiffnessRatio);
+    }
 
     // --- 1. Calcular Parámetros de Diseño COVENIN 2001 ---
     const z01 = parseInt(document.getElementById("covenin01-zone").value);
@@ -676,9 +848,9 @@ function generateSpectraAndEarthquake() {
     // Obtener ordenada de diseño para el edificio 2019 en su periodo fundamental real
     const designAd2019 = getSpectrum2019(T1_actual, params19);
 
-    // --- 3. Instanciar los Modelos de Edificios con espaciamiento de columnas ---
-    eq2001 = new BuildingModel(N, storyHeight, storyMass, targetT1, designAd2001, analysisMode, degSeverity, numColsX, numColsY, sX, sY);
-    eq2019 = new BuildingModel(N, storyHeight, storyMass, targetT1, designAd2019, analysisMode, degSeverity, numColsX, numColsY, sX, sY);
+    // --- 3. Instanciar los Modelos de Edificios con espaciamiento y secciones ---
+    eq2001 = new BuildingModel(N, storyHeight, storyMass, targetT1, designAd2001, analysisMode, degSeverity, numColsX, numColsY, sX, sY, customSections, 2001);
+    eq2019 = new BuildingModel(N, storyHeight, storyMass, targetT1, designAd2019, analysisMode, degSeverity, numColsX, numColsY, sX, sY, customSections, 2019);
 
     // --- 4. Generar la Serie de Tiempo del Sismo Sucesivo ---
     // Determinamos el período del suelo para sintonizar la frecuencia del sismo
@@ -1250,15 +1422,28 @@ function rebuild3DStructures() {
         }
         const totalColsPerStory = colOffsets.length;
 
+        // Leer valores de sección para Three.js
+        const customSectionsCheck = document.getElementById("custom-sections-enable");
+        const useCustom = customSectionsCheck ? customSectionsCheck.checked : false;
+        
+        let colW, colD, beamW, beamH;
+        if (useCustom) {
+            colW = (parseFloat(document.getElementById("col-width").value) || 35) / 100;
+            colD = (parseFloat(document.getElementById("col-depth").value) || 35) / 100;
+            beamW = (parseFloat(document.getElementById("beam-width").value) || 30) / 100;
+            beamH = (parseFloat(document.getElementById("beam-depth").value) || 45) / 100;
+        } else {
+            colW = colorTheme === '2019' ? 0.35 : 0.28;
+            colD = colW;
+            beamW = colorTheme === '2019' ? 0.30 : 0.25;
+            beamH = colorTheme === '2019' ? 0.45 : 0.35;
+        }
+
         // Columnas
         for (let lvl = 0; lvl < N; lvl++) {
             const storyCols = [];
             for (let c = 0; c < totalColsPerStory; c++) {
-                // Usamos CylinderGeometry o BoxGeometry. Usaremos BoxGeometry para columnas de concreto
-                // Altura de la columna es storyHeight (h)
-                // Espesor: 2019 tiene columnas ligeramente más gruesas debido a mayores exigencias de diseño
-                const colSize = colorTheme === '2019' ? 0.35 : 0.28;
-                const colGeom = new THREE.BoxGeometry(colSize, h, colSize);
+                const colGeom = new THREE.BoxGeometry(colW, h, colD);
                 
                 // Material inicial seguro (Verde)
                 const colMat = new THREE.MeshStandardMaterial({
@@ -1282,6 +1467,62 @@ function rebuild3DStructures() {
                 });
             }
             bData.columns.push(storyCols);
+        }
+
+        // Crear vigas longitudinales (eje X)
+        if (numColsX > 1) {
+            const beamGeomX = new THREE.BoxGeometry(sX, beamH, beamW); // longitud, peralte, ancho
+            const beamMat = new THREE.MeshStandardMaterial({
+                color: colorTheme === '2001' ? 0x273549 : 0x182030,
+                roughness: 0.6
+            });
+
+            for (let lvl = 0; lvl < N; lvl++) {
+                const floorMesh = bData.floors[lvl];
+                for (let iy = 0; iy < numColsY; iy++) {
+                    const z = numColsY > 1 ? -bD/2 + (iy / (numColsY - 1)) * bD : 0;
+                    for (let ix = 0; ix < numColsX - 1; ix++) {
+                        const xStart = -bW/2 + (ix / (numColsX - 1)) * bW;
+                        const xEnd = -bW/2 + ((ix + 1) / (numColsX - 1)) * bW;
+                        const xCenter = (xStart + xEnd) / 2;
+
+                        const beamMesh = new THREE.Mesh(beamGeomX, beamMat);
+                        // Posicionar relativa a la losa (su centro Y está en (lvl+1)*h, Z en 0, X en 0)
+                        beamMesh.position.set(xCenter, -0.1 - beamH / 2, z); // 0.1 es la mitad del espesor de la losa (0.2)
+                        beamMesh.castShadow = true;
+                        beamMesh.receiveShadow = true;
+                        floorMesh.add(beamMesh);
+                    }
+                }
+            }
+        }
+
+        // Crear vigas transversales (eje Y)
+        if (numColsY > 1) {
+            const beamGeomY = new THREE.BoxGeometry(beamW, beamH, sY); // ancho, peralte, longitud
+            const beamMat = new THREE.MeshStandardMaterial({
+                color: colorTheme === '2001' ? 0x273549 : 0x182030,
+                roughness: 0.6
+            });
+
+            for (let lvl = 0; lvl < N; lvl++) {
+                const floorMesh = bData.floors[lvl];
+                for (let ix = 0; ix < numColsX; ix++) {
+                    const x = numColsX > 1 ? -bW/2 + (ix / (numColsX - 1)) * bW : 0;
+                    for (let iy = 0; iy < numColsY - 1; iy++) {
+                        const zStart = -bD/2 + (iy / (numColsY - 1)) * bD;
+                        const zEnd = -bD/2 + ((iy + 1) / (numColsY - 1)) * bD;
+                        const zCenter = (zStart + zEnd) / 2;
+
+                        const beamMesh = new THREE.Mesh(beamGeomY, beamMat);
+                        // Posicionar relativa a la losa
+                        beamMesh.position.set(x, -0.1 - beamH / 2, zCenter);
+                        beamMesh.castShadow = true;
+                        beamMesh.receiveShadow = true;
+                        floorMesh.add(beamMesh);
+                    }
+                }
+            }
         }
     };
 
@@ -1523,7 +1764,10 @@ function toggleInputControls(disable) {
         "covenin01-zone", "covenin01-soil", "covenin01-r", "covenin01-importance",
         "covenin19-soil-class", "covenin19-a0", "covenin19-a1", "covenin19-r",
         "covenin19-rho", "covenin19-fi", "analysis-mode", "degradation-severity",
-        "double-earthquake"
+        "double-earthquake", "custom-sections-enable", "col-width", "col-depth",
+        "beam-width", "beam-depth",
+        "concrete-fc-col", "concrete-fc-beam", "steel-fy-col", "steel-fy-beam",
+        "beam-as", "beam-as-prime"
     ];
     inputs.forEach(id => {
         const el = document.getElementById(id);
