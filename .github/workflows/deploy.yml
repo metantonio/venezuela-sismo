@@ -4,16 +4,13 @@ on:
   push:
     branches:
       - master
-  # Permite ejecutar manualmente desde la pestaña Actions
   workflow_dispatch:
 
-# Permisos para el token de GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Solo un deploy a la vez
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -30,11 +27,12 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true   # Auto-habilita Pages si no está activo
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Sube toda la raíz del repo (donde está index.html)
           path: '.'
 
       - name: Deploy to GitHub Pages
