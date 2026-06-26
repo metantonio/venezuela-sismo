@@ -142,6 +142,7 @@ function initUI() {
     setupSlider("steel-fy-col", " kgf/cm²");
     setupSlider("steel-fy-beam", " kgf/cm²");
     // Refuerzo de vigas (cm²)
+    setupSlider("col-as", " cm²");
     setupSlider("beam-as", " cm²");
     setupSlider("beam-as-prime", " cm²");
 
@@ -437,8 +438,20 @@ class BuildingModel {
             const bb = customSections.beamWidth / 100; // cm a m
             const hb = customSections.beamDepth / 100; // cm a m
 
+
             // Momento de Inercia Bruto de la Columna
-            const Ic = (bc * Math.pow(hc, 3)) / 12;
+            const Ic_gross = (bc * Math.pow(hc, 3)) / 12;
+
+            // ---- INERCIA TRANSFORMADA DE LA COLUMNA (acero longitudinal en 2 capas) ----
+            // Columna con acero simétrico: (n-1)*As_col en 2 capas (tracción y compresión)
+            // Contribución: (n_col-1) * As_col/2 * arm_col^2 * 2 = (n_col-1) * As_col * arm_col^2
+            const n_col = ES_PA / Ec_col;
+            const As_col_m2 = (customSections.colAs) / 1e4; // cm² a m²
+            const d_cover_col = 0.04; // recubrimiento 4 cm
+            const arm_col = hc / 2 - d_cover_col; // brazo del acero al centroide
+            // I_c_eff = I_bruta + (n_col - 1) * As_col * arm_col²
+            const Ic = Ic_gross + (n_col - 1) * As_col_m2 * arm_col * arm_col;
+
 
             // ---------- INERCIA AGRIETADA TRANSFORMADA DE LA VIGA (Icr) ----------
             // n = Es / Ec_beam (relación modular)
@@ -756,6 +769,7 @@ function generateSpectraAndEarthquake() {
         fcBeam:    parseFloat(document.getElementById("concrete-fc-beam").value) || 250,
         fyCol:     parseFloat(document.getElementById("steel-fy-col").value) || 4200,
         fyBeam:    parseFloat(document.getElementById("steel-fy-beam").value) || 4200,
+        colAs:     parseFloat(document.getElementById("col-as").value) || 16,
         beamAs:      parseFloat(document.getElementById("beam-as").value) || 12,
         beamAsPrime: parseFloat(document.getElementById("beam-as-prime").value) || 6
     };
@@ -773,7 +787,12 @@ function generateSpectraAndEarthquake() {
         const bb = customSections.beamWidth / 100; // m
         const hb = customSections.beamDepth / 100; // m
 
-        const Ic = (bc * Math.pow(hc, 3)) / 12;
+        // Inercia bruta y transformada de la columna con acero longitudinal
+        const Ic_gross = (bc * Math.pow(hc, 3)) / 12;
+        const n_col_g   = ES_PA / Ec_col_Pa;
+        const As_col_m2_g = (customSections.colAs) / 1e4;
+        const arm_col_g   = hc / 2 - 0.04; // recubrimiento 4 cm
+        const Ic = Ic_gross + (n_col_g - 1) * As_col_m2_g * arm_col_g * arm_col_g;
 
         // Relación modular y áreas de acero en m²
         const n_mod  = ES_PA / Ec_beam_Pa;
@@ -797,6 +816,7 @@ function generateSpectraAndEarthquake() {
         const kappa = (Ec_beam_Pa * Icr * storyHeight) / (2.0 * Ec_col_Pa * Ic * sX);
         const eta   = (12.0 * kappa + 1.0) / (12.0 * kappa + 4.0);
         const k_init_custom = numCols * k_col_fixed * eta;
+
 
         const m_real = (storyMass * 1000) * (0.3 + 0.7 * (area / 25.0));
         const sinTerm = Math.sin(Math.PI / (4.0 * N + 2.0));
@@ -1767,7 +1787,7 @@ function toggleInputControls(disable) {
         "double-earthquake", "custom-sections-enable", "col-width", "col-depth",
         "beam-width", "beam-depth",
         "concrete-fc-col", "concrete-fc-beam", "steel-fy-col", "steel-fy-beam",
-        "beam-as", "beam-as-prime"
+        "col-as", "beam-as", "beam-as-prime"
     ];
     inputs.forEach(id => {
         const el = document.getElementById(id);
