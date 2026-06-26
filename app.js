@@ -344,19 +344,43 @@ function generateSyntheticEarthquake(T_soil, pga1, pga2, hasSecond) {
 
 // --- SOLUCIONADOR DINÁMICO DE ESTRUCTURAS MDOF ---
 class BuildingModel {
-    constructor(N, storyHeight, storyMass, targetT1, designAd, analysisMode, degSeverity, numColsX, numColsY) {
+    constructor(N, storyHeight, storyMass, targetT1, designAd, analysisMode, degSeverity, numColsX, numColsY, sX, sY) {
         this.N = N;
         this.h = storyHeight;
-        this.m = storyMass * 1000; // ton a kg
+        this.m_ref = storyMass * 1000; // ton a kg (referencia para planta 5x5)
         this.analysisMode = analysisMode; // 'linear' o 'nonlinear'
         this.degSeverity = degSeverity; // multiplicador de degradación (0.1 a 1.2)
         this.numCols = (numColsX || 2) * (numColsY || 2);
 
-        // Periodo y rigidez sintonizados con el número de columnas (referencia 4 columnas)
+        // Calcular el área tributaria de la losa
+        const sX_val = sX || 5.0;
+        const sY_val = sY || 5.0;
+        const bW = sX_val * ((numColsX || 2) - 1);
+        const bD = sY_val * ((numColsY || 2) - 1);
+        const area = bW * bD;
+
+        // Masa real del entrepiso escalada por el área tributaria (referencia 25 m²)
+        this.m = this.m_ref * (0.3 + 0.7 * (area / 25.0));
+
+        // Factor de flexibilidad de vigas en la dirección del sismo (eje X)
+        // kappa(S_x) = kappa_ref * 5.0 / S_x. Asumiendo kappa_ref = 1.0 a S_x = 5.0m
+        // phi(S_x) = (12*kappa + 1)/(12*kappa + 4) = (60 + S_x)/(60 + 4*S_x)
+        // El factor de escala de rigidez es phi(S_x) / phi(5.0), con phi(5.0) = 13/16 = 0.8125
+        const phi_Sx = (60.0 + sX_val) / (60.0 + 4.0 * sX_val);
+        const phi_ref = 0.8125;
+        const stiffnessScale = phi_Sx / phi_ref;
+
+        // Periodo y rigidez sintonizados con el número de columnas y espaciamiento (referencia 4 columnas y 5m de separación)
         const sinTerm = Math.sin(Math.PI / (4.0 * N + 2.0));
-        const k_ref = this.m * Math.pow(Math.PI / (targetT1 * sinTerm), 2);
-        this.k_init = k_ref * (this.numCols / 4.0);
-        this.T1 = targetT1 * Math.sqrt(4.0 / this.numCols);
+        const k_ref = this.m_ref * Math.pow(Math.PI / (targetT1 * sinTerm), 2);
+        
+        // Rigidez inicial escalada por el número de columnas y por la flexibilidad de las vigas
+        this.k_init = k_ref * (this.numCols / 4.0) * stiffnessScale;
+
+        // Periodo fundamental real T1 = targetT1 * sqrt((m/m_ref) / (k/k_ref))
+        const massRatio = this.m / this.m_ref;
+        const stiffnessRatio = (this.numCols / 4.0) * stiffnessScale;
+        this.T1 = targetT1 * Math.sqrt(massRatio / stiffnessRatio);
         
         // Inicializar vectores de estado
         this.x = new Array(N).fill(0); // desplazamiento relativo (m)
@@ -595,11 +619,24 @@ function generateSpectraAndEarthquake() {
     // Período estimado inicial del edificio: T = 0.08 * N (para 4 columnas)
     const targetT1 = 0.08 * N;
 
-    // Leer número de columnas y calcular período real
+    // Leer número de columnas, espaciamiento y calcular período real acoplado
     const numColsX = parseInt(document.getElementById("num-cols-x").value) || 2;
     const numColsY = parseInt(document.getElementById("num-cols-y").value) || 2;
     const numCols = numColsX * numColsY;
-    const T1_actual = targetT1 * Math.sqrt(4.0 / numCols);
+    const sX = parseFloat(document.getElementById("col-dist-x").value) || 5.0;
+    const sY = parseFloat(document.getElementById("col-dist-y").value) || 5.0;
+
+    // Calcular área tributaria de la losa
+    const bW = sX * (numColsX - 1);
+    const bD = sY * (numColsY - 1);
+    const area = bW * bD;
+
+    // Ratios de masa y rigidez para calcular T1_actual
+    const massRatio = 0.3 + 0.7 * (area / 25.0);
+    const phi_Sx = (60.0 + sX) / (60.0 + 4.0 * sX);
+    const phi_ref = 0.8125;
+    const stiffnessRatio = (numCols / 4.0) * (phi_Sx / phi_ref);
+    const T1_actual = targetT1 * Math.sqrt(massRatio / stiffnessRatio);
 
     // --- 1. Calcular Parámetros de Diseño COVENIN 2001 ---
     const z01 = parseInt(document.getElementById("covenin01-zone").value);
@@ -639,9 +676,9 @@ function generateSpectraAndEarthquake() {
     // Obtener ordenada de diseño para el edificio 2019 en su periodo fundamental real
     const designAd2019 = getSpectrum2019(T1_actual, params19);
 
-    // --- 3. Instanciar los Modelos de Edificios ---
-    eq2001 = new BuildingModel(N, storyHeight, storyMass, targetT1, designAd2001, analysisMode, degSeverity, numColsX, numColsY);
-    eq2019 = new BuildingModel(N, storyHeight, storyMass, targetT1, designAd2019, analysisMode, degSeverity, numColsX, numColsY);
+    // --- 3. Instanciar los Modelos de Edificios con espaciamiento de columnas ---
+    eq2001 = new BuildingModel(N, storyHeight, storyMass, targetT1, designAd2001, analysisMode, degSeverity, numColsX, numColsY, sX, sY);
+    eq2019 = new BuildingModel(N, storyHeight, storyMass, targetT1, designAd2019, analysisMode, degSeverity, numColsX, numColsY, sX, sY);
 
     // --- 4. Generar la Serie de Tiempo del Sismo Sucesivo ---
     // Determinamos el período del suelo para sintonizar la frecuencia del sismo
