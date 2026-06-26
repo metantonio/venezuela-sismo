@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VZLA-SISMO 3D: Simulador Sismorresistente (COVENIN 1756)</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="index.css">
+    <!-- CDNs de Librerías -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="logo-area">
+                <i class="fa-solid fa-building-shield logo-icon"></i>
+                <div class="logo-text">
+                    <h1>VENEZUELA-SISMO 3D</h1>
+                    <p>Simulador Sismorresistente &bull; Comparación COVENIN 1756 (2001 vs 2019)</p>
+                </div>
+            </div>
+            <div class="header-badges">
+                <span class="badge badge-covenin-2001">COVENIN 2001</span>
+                <span class="badge badge-covenin-2019">COVENIN 2019</span>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <!-- SIDEBAR CONTROLS -->
+            <aside class="control-panel">
+                <div class="section-title">
+                    <i class="fa-solid fa-gears"></i>
+                    <h2>Configuración de Estructura</h2>
+                </div>
+
+                <div class="control-group">
+                    <label for="num-stories">Número de Pisos: <span id="num-stories-val">5</span></label>
+                    <input type="range" id="num-stories" min="3" max="10" value="5" step="1">
+                </div>
+
+                <div class="control-group-row">
+                    <div class="control-group-half">
+                        <label for="num-cols-x">Columnas X: <span id="num-cols-x-val">2</span></label>
+                        <input type="range" id="num-cols-x" min="2" max="5" value="2" step="1">
+                    </div>
+                    <div class="control-group-half">
+                        <label for="num-cols-y">Columnas Y: <span id="num-cols-y-val">2</span></label>
+                        <input type="range" id="num-cols-y" min="2" max="5" value="2" step="1">
+                    </div>
+                </div>
+
+                <div class="control-group-row">
+                    <div class="control-group-half">
+                        <label for="col-dist-x">Distancia X (m): <span id="col-dist-x-val">5.0</span></label>
+                        <input type="range" id="col-dist-x" min="3.0" max="8.0" value="5.0" step="0.5">
+                    </div>
+                    <div class="control-group-half">
+                        <label for="col-dist-y">Distancia Y (m): <span id="col-dist-y-val">5.0</span></label>
+                        <input type="range" id="col-dist-y" min="3.0" max="8.0" value="5.0" step="0.5">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="story-height">Altura de Piso (m): <span id="story-height-val">3.0</span></label>
+                    <input type="range" id="story-height" min="2.8" max="4.0" value="3.0" step="0.1">
+                </div>
+
+                <div class="control-group">
+                    <label for="story-mass">Masa por Piso (ton): <span id="story-mass-val">100</span></label>
+                    <input type="range" id="story-mass" min="50" max="250" value="100" step="10">
+                </div>
+
+                <div class="control-group">
+                    <label for="damping-ratio">Amortiguamiento Estructural (&zeta;): <span
+                            id="damping-ratio-val">5%</span></label>
+                    <input type="range" id="damping-ratio" min="0.02" max="0.10" value="0.05" step="0.01">
+                </div>
+
+                <!-- COVENIN 1756:2001 -->
+                <div class="accordion-section covenin-2001-theme">
+                    <div class="section-title">
+                        <i class="fa-solid fa-file-invoice"></i>
+                        <h2>Parámetros COVENIN 1756:2001</h2>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="covenin01-zone">Zona Sísmica (Acel. Roca $A_0$)</label>
+                        <select id="covenin01-zone">
+                            <option value="7">Zona 7 ($A_0 = 0.40$g) - Elevado</option>
+                            <option value="6">Zona 6 ($A_0 = 0.35$g) - Elevado</option>
+                            <option value="5" selected>Zona 5 ($A_0 = 0.30$g) - Elevado (Caracas)</option>
+                            <option value="4">Zona 4 ($A_0 = 0.25$g) - Intermedio</option>
+                            <option value="3">Zona 3 ($A_0 = 0.20$g) - Intermedio</option>
+                            <option value="2">Zona 2 ($A_0 = 0.15$g) - Intermedio</option>
+                            <option value="1">Zona 1 ($A_0 = 0.10$g) - Bajo</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="covenin01-soil">Forma Espectral (Tipo Suelo)</label>
+                        <select id="covenin01-soil">
+                            <option value="S1">S1: Roca o Suelo muy denso ($T^*=0.4$s)</option>
+                            <option value="S2" selected>S2: Suelo denso o rígido ($T^*=0.7$s)</option>
+                            <option value="S3">S3: Suelo de rigidez intermedia ($T^*=1.0$s)</option>
+                            <option value="S4">S4: Suelo blando o profundo ($T^*=1.3$s)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="covenin01-r">Factor de Reducción ($R$)</label>
+                        <select id="covenin01-r">
+                            <option value="6" selected>R = 6 (Tipo I - ND3 Dúctil)</option>
+                            <option value="4">R = 4 (ND2 Moderado)</option>
+                            <option value="2">R = 2 (ND1 Poco Dúctil)</option>
+                            <option value="1.5">R = 1.5 (Aislado/Especial)</option>
+                            <option value="1">R = 1.0 (Elástico)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="covenin01-importance">Importancia (&alpha;)</label>
+                        <select id="covenin01-importance">
+                            <option value="1.30">Grupo A (&alpha; = 1.30: Vital/Escuelas)</option>
+                            <option value="1.00" selected>Grupo B (&alpha; = 1.00: Residencial)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- COVENIN 1756-1:2019 -->
+                <div class="accordion-section covenin-2019-theme">
+                    <div class="section-title">
+                        <i class="fa-solid fa-file-shield"></i>
+                        <h2>Parámetros COVENIN 1756:2019</h2>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="covenin19-soil-class">Clase de Sitio (Vs30)</label>
+                        <select id="covenin19-soil-class">
+                            <option value="A">A: Roca muy dura ($V_{s30} > 1500$ m/s)</option>
+                            <option value="B">B: Roca dura ($850 < V_{s30} \le 1300$ m/s)</option>
+                            <option value="BC">BC: Roca/Suelo denso ($650 < V_{s30} \le 850$ m/s)</option>
+                            <option value="C" selected>C: Suelo muy denso/Roca blanda ($400 < V_{s30} \le 650$
+                                    m/s)</option>
+                            <option value="D">D: Suelo rígido/medio ($200 < V_{s30} \le 300$ m/s)</option>
+                            <option value="E">E: Suelo blando/arcilloso ($120 < V_{s30} \le 170$ m/s)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="covenin19-a0">Aceleración Roca $A_0$ (g): <span
+                                id="covenin19-a0-val">0.30</span></label>
+                        <input type="range" id="covenin19-a0" min="0.10" max="0.40" value="0.30" step="0.05">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="covenin19-a1">Aceleración Espectral $A_1$ (g): <span
+                                id="covenin19-a1-val">0.30</span></label>
+                        <input type="range" id="covenin19-a1" min="0.10" max="0.45" value="0.30" step="0.05">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="covenin19-r">Factor de Reducción ($R$)</label>
+                        <select id="covenin19-r">
+                            <option value="6" selected>R = 6 (Dúctil ND3)</option>
+                            <option value="4">R = 4 (Moderado ND2)</option>
+                            <option value="2">R = 2 (Bajo ND1)</option>
+                            <option value="1.5">R = 1.5</option>
+                            <option value="1">R = 1.0 (Elástico)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group-row">
+                        <div class="control-group-half">
+                            <label for="covenin19-rho">Redundancia (&rho;)</label>
+                            <select id="covenin19-rho">
+                                <option value="1.15">1.15 (Baja)</option>
+                                <option value="1.00" selected>1.00 (Normal)</option>
+                                <option value="0.90">0.90 (Alta)</option>
+                            </select>
+                        </div>
+                        <div class="control-group-half">
+                            <label for="covenin19-fi">Irregularidad ($F_I$)</label>
+                            <select id="covenin19-fi">
+                                <option value="1.00" selected>1.00 (Regular)</option>
+                                <option value="0.90">0.90 (Poco Irreg.)</option>
+                                <option value="0.80">0.80 (Muy Irreg.)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SISMO Y SIMULACION -->
+                <div class="section-title">
+                    <i class="fa-solid fa-house-laptop"></i>
+                    <h2>Opciones de Simulación</h2>
+                </div>
+
+                <div class="control-group">
+                    <label for="analysis-mode">Modelo Estructural</label>
+                    <select id="analysis-mode">
+                        <option value="linear">Lineal Elástico (Sin daños)</option>
+                        <option value="nonlinear" selected>No-Lineal Elasto-Plástico (Con daño y colapso)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="degradation-severity">Severidad de Degradación</label>
+                    <select id="degradation-severity">
+                        <option value="0.1">Leve (Estructura robusta)</option>
+                        <option value="0.5" selected>Media (Típica de concreto)</option>
+                        <option value="1.2">Alta (Vulnerable o autoconstrucción)</option>
+                    </select>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="double-earthquake" checked>
+                    <label for="double-earthquake">Simular segundo sismo a los 40s</label>
+                </div>
+
+                <div class="seismic-m-details">
+                    <div class="m-box">
+                        <span class="m-title">Sismo 1 (t=0s)</span>
+                        <span class="m-val">M 7.1</span>
+                    </div>
+                    <div class="m-box second-sismo-box">
+                        <span class="m-title">Sismo 2 (t=40s)</span>
+                        <span class="m-val text-red">M 7.5</span>
+                    </div>
+                </div>
+
+                <!-- SIMULATION BUTTONS -->
+                <div class="action-buttons">
+                    <button id="btn-run" class="btn btn-primary"><i class="fa-solid fa-play"></i> Iniciar
+                        Simulación</button>
+                    <div class="btn-group">
+                        <button id="btn-pause" class="btn btn-secondary" disabled><i class="fa-solid fa-pause"></i>
+                            Pausar</button>
+                        <button id="btn-reset" class="btn btn-danger"><i class="fa-solid fa-rotate-left"></i>
+                            Reiniciar</button>
+                    </div>
+                </div>
+
+                <!-- AUTOR -->
+                <div class="author-card">
+                    <i class="fa-solid fa-user-tie author-icon"></i>
+                    <div class="author-details">
+                        <span class="author-label">Desarrollado por:</span>
+                        <span class="author-name">Ing. Antonio Luis III Martínez B.</span>
+                        </br>
+                        <span class="author-name">www.github.com/metantonio</span>
+                        <span class="author-school">Egresado de la UCV</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- MAIN VIEWPORT AND PLOTS -->
+            <main class="content-area">
+                <!-- TABS HEADER -->
+                <nav class="tabs-header">
+                    <button class="tab-btn active" data-tab="tab-3d"><i class="fa-solid fa-cubes-stacked"></i> Vista
+                        3D</button>
+                    <button class="tab-btn" data-tab="tab-spectra"><i class="fa-solid fa-chart-line"></i> Espectros de
+                        Diseño</button>
+                    <button class="tab-btn" data-tab="tab-response"><i class="fa-solid fa-wave-square"></i> Gráficos de
+                        Respuesta</button>
+                </nav>
+
+                <!-- TAB CONTENT -->
+                <div class="tab-content-container">
+                    <!-- 3D VIEW TAB -->
+                    <div id="tab-3d" class="tab-content active">
+                        <div class="threejs-legend">
+                            <div class="legend-title">Estado de Columnas:</div>
+                            <div class="legend-items">
+                                <span class="legend-item"><span class="color-dot safe"></span> Seguro (&lt;1.5%
+                                    deriva)</span>
+                                <span class="legend-item"><span class="color-dot warning"></span> Fluencia (1.5% -
+                                    1.8%)</span>
+                                <span class="legend-item"><span class="color-dot damage"></span> Daño Severo (1.8% -
+                                    3.0%)</span>
+                                <span class="legend-item"><span class="color-dot collapse"></span> Colapso (&gt;3.0%
+                                    deriva)</span>
+                            </div>
+                        </div>
+                        <div class="side-by-side-labels">
+                            <div class="label-box label-2001">Edificio COVENIN 1756:2001</div>
+                            <div class="label-box label-2019">Edificio COVENIN 1756:2019</div>
+                        </div>
+                        <div id="canvas-3d-container">
+                            <!-- Three.js Canvas will be appended here -->
+                        </div>
+                    </div>
+
+                    <!-- SPECTRA TAB -->
+                    <div id="tab-spectra" class="tab-content">
+                        <div class="spectra-info">
+                            <h3>Espectros de Respuesta de Diseño</h3>
+                            <p>Esta gráfica compara la aceleración espectral máxima (adimensional $A_d$, en g) a la que
+                                se diseñaría la estructura bajo ambas normas según las condiciones geológicas elegidas.
+                                Las líneas verticales punteadas indican el período fundamental ($T_{fund}$) inicial
+                                estimado para los edificios.</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="spectra-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- RESPONSE PLOTS TAB -->
+                    <div id="tab-response" class="tab-content">
+                        <div class="grid-charts">
+                            <div class="chart-container-half">
+                                <h4>Aceleración del Terreno ($a_g$)</h4>
+                                <div class="chart-wrapper-small">
+                                    <canvas id="accel-chart"></canvas>
+                                </div>
+                            </div>
+                            <div class="chart-container-half">
+                                <h4>Desplazamiento del Techo ($x_N$)</h4>
+                                <div class="chart-wrapper-small">
+                                    <canvas id="disp-chart"></canvas>
+                                </div>
+                            </div>
+                            <div class="chart-container-full">
+                                <h4>Curva de Histéresis del Primer Piso (Cortante de Piso vs Deriva de Piso)</h4>
+                                <div class="grid-hysteresis">
+                                    <div class="chart-wrapper-small">
+                                        <canvas id="hysteresis-2001-chart"></canvas>
+                                        <div class="hyst-label font-2001">COVENIN 2001</div>
+                                    </div>
+                                    <div class="chart-wrapper-small">
+                                        <canvas id="hysteresis-2019-chart"></canvas>
+                                        <div class="hyst-label font-2019">COVENIN 2019</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATE AND METRICS BOARD -->
+                <section class="metrics-board">
+                    <div class="metric-card time-card">
+                        <div class="metric-header"><i class="fa-regular fa-clock"></i> Tiempo</div>
+                        <div class="metric-value" id="metric-time">0.00 <span class="unit">s</span></div>
+                        <div class="metric-footer">Estado: <span id="metric-phase" class="text-green">En reposo</span>
+                        </div>
+                    </div>
+
+                    <div class="metric-card building-card-2001">
+                        <div class="metric-header"><span class="bullet font-2001"></span> Edificio COVENIN 2001</div>
+                        <div class="metric-row">
+                            <span class="m-label">Deriva Máx:</span>
+                            <span class="m-value" id="drift-2001">0.00%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="m-label">Daño Park-Ang:</span>
+                            <span class="m-value" id="damage-2001">0.00%</span>
+                        </div>
+                        <div class="metric-status" id="status-2001">Estable</div>
+                    </div>
+
+                    <div class="metric-card building-card-2019">
+                        <div class="metric-header"><span class="bullet font-2019"></span> Edificio COVENIN 2019</div>
+                        <div class="metric-row">
+                            <span class="m-label">Deriva Máx:</span>
+                            <span class="m-value" id="drift-2019">0.00%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="m-label">Daño Park-Ang:</span>
+                            <span class="m-value" id="damage-2019">0.00%</span>
+                        </div>
+                        <div class="metric-status" id="status-2019">Estable</div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="app.js?v=5"></script>
+</body>
+
+</html>
