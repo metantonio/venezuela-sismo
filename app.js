@@ -167,12 +167,31 @@ function initUI() {
         });
     }
 
+    // Checkbox para autocalcular masa sísmica
+    const autoMassCheck = document.getElementById("auto-mass");
+    const manualMassCont = document.getElementById("manual-mass-container");
+    const autoMassCont = document.getElementById("auto-mass-controls");
+    if (autoMassCheck && manualMassCont && autoMassCont) {
+        autoMassCheck.addEventListener("change", () => {
+            manualMassCont.style.display = autoMassCheck.checked ? "none" : "block";
+            autoMassCont.style.display = autoMassCheck.checked ? "block" : "none";
+            if (!isPlaying) generateSpectraAndEarthquake();
+        });
+        // Sincronizar estado inicial
+        manualMassCont.style.display = autoMassCheck.checked ? "none" : "block";
+        autoMassCont.style.display = autoMassCheck.checked ? "block" : "none";
+    }
+
+    // Sliders de masa y cargas sísmicas
+    setupSlider("slab-thickness", " cm");
+    setupSlider("extra-dead-load", " kgf/m²");
+
     // Selects
     const selects = [
         "covenin01-zone", "covenin01-soil", "covenin01-r", "covenin01-importance",
         "covenin19-soil-class", "covenin19-r", "covenin19-rho", "covenin19-fi",
         "analysis-mode", "degradation-severity", "double-earthquake",
-        "sismo1-direction", "sismo2-direction"
+        "sismo1-direction", "sismo2-direction", "building-use"
     ];
     selects.forEach(id => {
         const el = document.getElementById(id);
@@ -401,6 +420,92 @@ function generateSyntheticEarthquake(T_soil, pga1, pga2, hasSecond) {
         // Combinar sismos multiplicados por su respectivo PGA (en g)
         groundAccel[i] = (filtered[i] * env1 * pga1) + (filtered[i] * env2 * pga2);
     }
+}
+
+// --- CÁLCULO DETALLADO DE PESOS Y CARGAS SÍSMICAS (COVENIN 1756) ---
+function getDetailedWeightBreakdown() {
+    const numColsX = parseInt(document.getElementById("num-cols-x").value) || 2;
+    const numColsY = parseInt(document.getElementById("num-cols-y").value) || 2;
+    const sX = parseFloat(document.getElementById("col-dist-x").value) || 5.0;
+    const sY = parseFloat(document.getElementById("col-dist-y").value) || 5.0;
+    const storyHeight = parseFloat(document.getElementById("story-height").value) || 3.0;
+
+    const bW = sX * (numColsX - 1);
+    const bD = sY * (numColsY - 1);
+    const area = bW * bD;
+
+    // Dimensiones de columnas y vigas para el cálculo de peso propio
+    let colW = 0.35, colD = 0.35, beamW = 0.30, beamH = 0.45; // defaults
+    const customSections = document.getElementById("custom-sections-enable").checked;
+    if (customSections) {
+        colW = (parseFloat(document.getElementById("col-width").value) || 35) / 100;
+        colD = (parseFloat(document.getElementById("col-depth").value) || 35) / 100;
+        beamW = (parseFloat(document.getElementById("beam-width").value) || 30) / 100;
+        beamH = (parseFloat(document.getElementById("beam-depth").value) || 45) / 100;
+    } else {
+        colW = 0.30; colD = 0.30; beamW = 0.25; beamH = 0.40;
+    }
+
+    // 1. Peso propio de Losa
+    const slabThickness = (parseFloat(document.getElementById("slab-thickness").value) || 20) / 100;
+    const w_slab = area * slabThickness * 2400.0; // en kgf
+
+    // 2. Peso propio de Columnas
+    const numCols = numColsX * numColsY;
+    const w_cols = numCols * (colW * colD) * storyHeight * 2400.0; // en kgf
+
+    // 3. Peso propio de Vigas
+    const w_beams_x = numColsY * bW * (beamW * beamH) * 2400.0;
+    const w_beams_y = numColsX * bD * (beamW * beamH) * 2400.0;
+    const w_beams = w_beams_x + w_beams_y;
+
+    // 4. Carga Muerta Adicional
+    const extraDL = parseFloat(document.getElementById("extra-dead-load").value) || 250.0;
+    const w_extraDL = area * extraDL;
+
+    // Peso permanente total (D)
+    const deadLoad = w_slab + w_cols + w_beams + w_extraDL;
+
+    // 5. Carga Variable (L)
+    const use = document.getElementById("building-use").value;
+    let liveLoadVal = 175.0; // residencial/oficina
+    let alpha = 0.25;
+    if (use === 'public') {
+        liveLoadVal = 300.0;
+        alpha = 0.50;
+    } else if (use === 'industrial') {
+        liveLoadVal = 500.0;
+        alpha = 0.50;
+    }
+    const w_liveLoad = area * liveLoadVal;
+
+    // Combinación sísmica: W = D + alpha * L
+    const w_seismic = deadLoad + alpha * w_liveLoad;
+    const mass = w_seismic / 1000.0; // en toneladas
+
+    return {
+        area,
+        w_slab,
+        w_cols,
+        w_beams,
+        w_extraDL,
+        deadLoad,
+        liveLoadVal,
+        w_liveLoad,
+        alpha,
+        w_seismic,
+        mass,
+        slabThickness,
+        extraDL
+    };
+}
+
+function getCalculatedStoryMass() {
+    const autoMass = document.getElementById("auto-mass").checked;
+    if (!autoMass) {
+        return parseFloat(document.getElementById("story-mass").value) || 100.0;
+    }
+    return getDetailedWeightBreakdown().mass;
 }
 
 class BuildingModel {
@@ -682,7 +787,20 @@ class BuildingModel {
 function generateSpectraAndEarthquake() {
     const N = parseInt(document.getElementById("num-stories").value);
     const storyHeight = parseFloat(document.getElementById("story-height").value);
-    const storyMass = parseFloat(document.getElementById("story-mass").value);
+    
+    const autoMass = document.getElementById("auto-mass").checked;
+    const storyMass = getCalculatedStoryMass();
+    
+    // Actualizar visualización en el sidebar
+    const massDisplay = document.getElementById("calculated-mass-display");
+    if (massDisplay) {
+        massDisplay.textContent = storyMass.toFixed(1);
+    }
+    const storyMassSliderVal = document.getElementById("story-mass-val");
+    if (storyMassSliderVal) {
+        storyMassSliderVal.textContent = Math.round(parseFloat(document.getElementById("story-mass").value));
+    }
+
     const analysisMode = document.getElementById("analysis-mode").value;
     const degSeverity = parseFloat(document.getElementById("degradation-severity").value);
     
@@ -719,7 +837,97 @@ function generateSpectraAndEarthquake() {
     };
 
     let T1_actual_x, T1_actual_y;
-    let reportHTML = '';
+
+    // Generar reporte de cargas si está habilitado el autocálculo de masa
+    let loadsReportHTML = '';
+    if (autoMass) {
+        const breakdown = getDetailedWeightBreakdown();
+        loadsReportHTML = `
+            <div style="margin-bottom: 24px;">
+                <h4 style="color: var(--color-2019); margin-bottom: 10px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <i class="fa-solid fa-scale-balanced"></i> Desglose de Masa y Carga Sísmica por Piso
+                </h4>
+                <table class="calc-table">
+                    <thead>
+                        <tr>
+                            <th>Concepto / Componente</th>
+                            <th>Fórmula / Parámetro</th>
+                            <th>Carga Unitaria</th>
+                            <th>Peso / Carga Total</th>
+                            <th>Porcentaje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="calc-param-name">Área Tributaria de Planta</td>
+                            <td class="calc-formula">b<sub>W</sub> &times; b<sub>D</sub> = ${breakdown.area.toFixed(1)} m²</td>
+                            <td class="calc-value">-</td>
+                            <td class="calc-value">${breakdown.area.toFixed(1)} m²</td>
+                            <td class="calc-unit">-</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Peso Propio de Losa</td>
+                            <td class="calc-formula">Area &times; h<sub>losa</sub> &times; 2400 kgf/m³</td>
+                            <td class="calc-value">${(breakdown.slabThickness * 100).toFixed(0)} cm (${Math.round(breakdown.slabThickness * 2400)} kgf/m²)</td>
+                            <td class="calc-value">${Math.round(breakdown.w_slab).toLocaleString()} kgf</td>
+                            <td class="calc-unit">${(breakdown.w_slab / breakdown.w_seismic * 100).toFixed(1)}%</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Peso Propio de Vigas</td>
+                            <td class="calc-formula">&Sigma; L<sub>vigas</sub> &times; A<sub>viga</sub> &times; 2400 kgf/m³</td>
+                            <td class="calc-value">-</td>
+                            <td class="calc-value">${Math.round(breakdown.w_beams).toLocaleString()} kgf</td>
+                            <td class="calc-unit">${(breakdown.w_beams / breakdown.w_seismic * 100).toFixed(1)}%</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Peso Propio de Columnas</td>
+                            <td class="calc-formula">N<sub>col</sub> &times; A<sub>col</sub> &times; H<sub>piso</sub> &times; 2400 kgf/m³</td>
+                            <td class="calc-value">-</td>
+                            <td class="calc-value">${Math.round(breakdown.w_cols).toLocaleString()} kgf</td>
+                            <td class="calc-unit">${(breakdown.w_cols / breakdown.w_seismic * 100).toFixed(1)}%</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Carga Muerta Adicional</td>
+                            <td class="calc-formula">Area &times; Carga<sub>adicional</sub></td>
+                            <td class="calc-value">${Math.round(breakdown.extraDL)} kgf/m²</td>
+                            <td class="calc-value">${Math.round(breakdown.w_extraDL).toLocaleString()} kgf</td>
+                            <td class="calc-unit">${(breakdown.w_extraDL / breakdown.w_seismic * 100).toFixed(1)}%</td>
+                        </tr>
+                        <tr style="border-top: 1.5px solid rgba(255,255,255,0.15); font-weight: bold;">
+                            <td class="calc-param-name" style="color: #fff;">Peso Permanente Total (D)</td>
+                            <td class="calc-formula">&Sigma; Cargas Muertas</td>
+                            <td class="calc-value" style="color: #fff;">${Math.round(breakdown.deadLoad / breakdown.area)} kgf/m²</td>
+                            <td class="calc-value" style="color: #fff;">${Math.round(breakdown.deadLoad).toLocaleString()} kgf</td>
+                            <td class="calc-unit" style="color: #fff;">${(breakdown.deadLoad / breakdown.w_seismic * 100).toFixed(1)}%</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Carga Variable Total (L)</td>
+                            <td class="calc-formula">Area &times; Carga<sub>variable</sub></td>
+                            <td class="calc-value">${Math.round(breakdown.liveLoadVal)} kgf/m²</td>
+                            <td class="calc-value">${Math.round(breakdown.w_liveLoad).toLocaleString()} kgf</td>
+                            <td class="calc-unit">-</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Factor de Participación Sísmica</td>
+                            <td class="calc-formula">Norma COVENIN 1756</td>
+                            <td class="calc-value">&alpha; = ${breakdown.alpha.toFixed(2)}</td>
+                            <td class="calc-value" style="color: #ffb703;">${Math.round(breakdown.alpha * breakdown.w_liveLoad).toLocaleString()} kgf (&alpha;&middot;L)</td>
+                            <td class="calc-unit">${((breakdown.alpha * breakdown.w_liveLoad) / breakdown.w_seismic * 100).toFixed(1)}%</td>
+                        </tr>
+                        <tr style="border-top: 2px solid var(--color-2019); font-weight: bold; background: rgba(255, 183, 3, 0.05);">
+                            <td class="calc-param-name" style="color: #ffb703;">Peso Sísmico de Diseño (W)</td>
+                            <td class="calc-formula" style="color: #ffb703;">D + &alpha; &times; L</td>
+                            <td class="calc-value" style="color: #ffb703;">${Math.round(breakdown.w_seismic / breakdown.area)} kgf/m²</td>
+                            <td class="calc-value" style="color: #ffb703; font-size: 13px;">${Math.round(breakdown.w_seismic).toLocaleString()} kgf</td>
+                            <td class="calc-unit" style="color: #ffb703; font-size: 13px;">${breakdown.mass.toFixed(1)} ton/piso</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    let reportHTML = loadsReportHTML;
 
     // Leer direcciones de los sismos
     const sismo1Dir = document.getElementById("sismo1-direction").value;
@@ -782,7 +990,7 @@ function generateSpectraAndEarthquake() {
         const eta_y   = (12.0 * kappa_y + 1.0) / (12.0 * kappa_y + 4.0);
         const k_init_custom_y = numCols * k_col_fixed_y * eta_y;
 
-        const m_real = (storyMass * 1000) * (0.3 + 0.7 * (area / 25.0));
+        const m_real = autoMass ? (storyMass * 1000) : ((storyMass * 1000) * (0.3 + 0.7 * (area / 25.0)));
         const sinTerm = Math.sin(Math.PI / (4.0 * N + 2.0));
         T1_actual_x = Math.PI / (Math.sqrt(k_init_custom_x / m_real) * sinTerm);
         T1_actual_y = Math.PI / (Math.sqrt(k_init_custom_y / m_real) * sinTerm);
@@ -794,8 +1002,12 @@ function generateSpectraAndEarthquake() {
         const torsionAmp_y = Math.sqrt(Math.pow(1.0 + (eccVal * bW) / (2.0 * rp), 2) + Math.pow((eccVal * bD) / (2.0 * rp), 2));
         const torsionAmp = Math.sqrt(Math.pow(1.0 + (eccVal * bD) / (2.0 * rp), 2) + Math.pow((eccVal * bW) / (2.0 * rp), 2));
 
-        reportHTML = `
-            <table class="calc-table">
+        reportHTML += `
+            <div style="margin-bottom: 24px;">
+                <h4 style="color: var(--color-2001); margin-bottom: 10px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <i class="fa-solid fa-chart-line"></i> Rigideces e Inercias de Secciones Físicas
+                </h4>
+                <table class="calc-table">
                 <thead>
                     <tr>
                         <th>Propiedad Estructural</th>
@@ -921,6 +1133,7 @@ function generateSpectraAndEarthquake() {
                     </tr>
                 </tbody>
             </table>
+            </div>
         `;
     } else {
         // Ratios de masa y rigidez para calcular T1_actual estándar
@@ -933,7 +1146,7 @@ function generateSpectraAndEarthquake() {
         T1_actual_x = targetT1 * Math.sqrt(massRatio / stiffnessRatio_x);
         T1_actual_y = targetT1 * Math.sqrt(massRatio / stiffnessRatio_y);
 
-        const m_real = (storyMass * 1000) * massRatio;
+        const m_real = autoMass ? (storyMass * 1000) : ((storyMass * 1000) * massRatio);
         const sinTerm = Math.sin(Math.PI / (4.0 * N + 2.0));
         const k_ref = (storyMass * 1000) * Math.pow(Math.PI / (targetT1 * sinTerm), 2);
         const k_init_std_x = k_ref * (numCols / 4.0) * (phi_Sx / phi_ref);
@@ -945,7 +1158,7 @@ function generateSpectraAndEarthquake() {
         const torsionAmp_x = Math.sqrt(Math.pow(1.0 + (eccVal * bD) / (2.0 * rp), 2) + Math.pow((eccVal * bW) / (2.0 * rp), 2));
         const torsionAmp_y = Math.sqrt(Math.pow(1.0 + (eccVal * bW) / (2.0 * rp), 2) + Math.pow((eccVal * bD) / (2.0 * rp), 2));
 
-        reportHTML = `
+        reportHTML += `
             <div class="calc-sections-disabled-msg">
                 <p><strong>Modo Estándar (Sintonizado) Activo.</strong></p>
                 <p style="margin-top: 6px; font-size: 12px; color: var(--text-muted);">La rigidez lateral de los entrepisos está calibrada para coincidir con el período fundamental objetivo. Valores calculados básicos:</p>
@@ -2048,7 +2261,8 @@ function toggleInputControls(disable) {
         "beam-width", "beam-depth",
         "concrete-fc-col", "concrete-fc-beam", "steel-fy-col", "steel-fy-beam",
         "col-as", "beam-as", "beam-as-prime",
-        "sismo1-direction", "sismo2-direction"
+        "sismo1-direction", "sismo2-direction",
+        "auto-mass", "building-use", "slab-thickness", "extra-dead-load"
     ];
     inputs.forEach(id => {
         const el = document.getElementById(id);
