@@ -1243,12 +1243,12 @@ select:focus {
     
     /* Panel de métricas deslizable horizontalmente */
     .metrics-board {
-        height: 105px !important;
+        height: 125px !important;
         overflow-x: auto !important;
         white-space: nowrap !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
-        padding: 8px 12px !important;
+        padding: 10px 12px !important;
         gap: 12px !important;
         scrollbar-width: none !important;
         background: rgba(9, 10, 15, 0.96) !important;
@@ -1260,13 +1260,17 @@ select:focus {
         display: none !important;
     }
     .metric-card {
-        flex: 0 0 240px !important;
-        height: 85px !important;
-        padding: 8px 14px !important;
-        display: inline-flex !important;
+        flex: 0 0 250px !important;
+        height: 105px !important;
+        padding: 10px 14px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
     }
     .metric-row {
-        margin: 2px 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        justify-content: space-between !important;
     }
     
     /* Botones de control flotantes para móviles */
@@ -1339,6 +1343,55 @@ select:focus {
         padding: 12px !important;
         overflow-y: auto !important;
         height: calc(100% - 45px) !important;
+    }
+
+    /* Evitar solapamiento de leyendas y etiquetas en móvil */
+    .threejs-legend {
+        top: auto !important;
+        bottom: 12px !important;
+        left: 12px !important;
+        right: auto !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 6px !important;
+        padding: 8px 10px !important;
+    }
+    .legend-title {
+        font-size: 10px !important;
+        margin-bottom: 2px !important;
+    }
+    .legend-items {
+        flex-direction: column !important;
+        gap: 4px !important;
+    }
+    .legend-item {
+        font-size: 10px !important;
+        gap: 4px !important;
+    }
+    
+    .side-by-side-labels {
+        top: 10px !important;
+        left: 10px !important;
+        right: 10px !important;
+        justify-content: space-between !important;
+        gap: 6px !important;
+    }
+    .label-box {
+        padding: 4px 8px !important;
+        font-size: 10px !important;
+        flex: 1 !important;
+        text-align: center !important;
+    }
+
+    /* Memoria de cálculo responsive (evitar zonas defasadas o tablas estrujadas) */
+    .calc-table {
+        display: block !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    .calc-table th, .calc-table td {
+        white-space: nowrap !important;
     }
 }
 
