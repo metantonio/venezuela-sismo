@@ -169,6 +169,8 @@ function initUI() {
             customSectionsControls.style.display = customSectionsCheck.checked ? "block" : "none";
             if (!isPlaying) generateSpectraAndEarthquake();
         });
+        // Sincronizar estado inicial
+        customSectionsControls.style.display = customSectionsCheck.checked ? "block" : "none";
     }
 
     // Checkbox para autocalcular masa sísmica
