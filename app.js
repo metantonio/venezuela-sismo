@@ -1762,8 +1762,160 @@ function createAxisIndicators() {
     scene.add(axisIndicatorsGroup);
 }
 
+function createPersonModel(colorTheme) {
+    const personGroup = new THREE.Group();
+    
+    // Materiales únicos por persona
+    const mainColor = colorTheme === '2001' ? 0x00ff66 : 0x00ffcc;
+    const bodyMat = new THREE.MeshStandardMaterial({
+        color: mainColor,
+        roughness: 0.4,
+        metalness: 0.1,
+        emissive: mainColor,
+        emissiveIntensity: 0.25
+    });
+    
+    const headMat = new THREE.MeshStandardMaterial({
+        color: 0xffdbac, // Piel
+        roughness: 0.6,
+        metalness: 0.0
+    });
+    
+    const clothesColor = colorTheme === '2001' ? 0x2563eb : 0xdb2777; // Ropa
+    const pantsMat = new THREE.MeshStandardMaterial({
+        color: clothesColor,
+        roughness: 0.5
+    });
+
+    // 1. Tronco / Torso (cuerpo)
+    const torsoGeom = new THREE.BoxGeometry(0.16, 0.3, 0.08);
+    const torsoMesh = new THREE.Mesh(torsoGeom, bodyMat);
+    torsoMesh.position.y = 0.35; // Altura local sobre la base
+    torsoMesh.castShadow = true;
+    personGroup.add(torsoMesh);
+
+    // 2. Cabeza
+    const headGeom = new THREE.SphereGeometry(0.08, 12, 12);
+    const headMesh = new THREE.Mesh(headGeom, headMat);
+    headMesh.position.y = 0.55;
+    headMesh.castShadow = true;
+    personGroup.add(headMesh);
+
+    // 3. Pierna Izquierda (con pivote en cadera)
+    const legGeom = new THREE.BoxGeometry(0.05, 0.2, 0.05);
+    const leftLegPivot = new THREE.Group();
+    leftLegPivot.position.set(-0.05, 0.2, 0);
+    const leftLegMesh = new THREE.Mesh(legGeom, pantsMat);
+    leftLegMesh.position.y = -0.1;
+    leftLegMesh.castShadow = true;
+    leftLegPivot.add(leftLegMesh);
+    personGroup.add(leftLegPivot);
+
+    // 4. Pierna Derecha (con pivote en cadera)
+    const rightLegPivot = new THREE.Group();
+    rightLegPivot.position.set(0.05, 0.2, 0);
+    const rightLegMesh = new THREE.Mesh(legGeom, pantsMat);
+    rightLegMesh.position.y = -0.1;
+    rightLegMesh.castShadow = true;
+    rightLegPivot.add(rightLegMesh);
+    personGroup.add(rightLegPivot);
+
+    // 5. Brazo Izquierdo (con pivote en hombro)
+    const armGeom = new THREE.BoxGeometry(0.04, 0.2, 0.04);
+    const leftArmPivot = new THREE.Group();
+    leftArmPivot.position.set(-0.1, 0.45, 0);
+    const leftArmMesh = new THREE.Mesh(armGeom, bodyMat);
+    leftArmMesh.position.y = -0.1;
+    leftArmMesh.castShadow = true;
+    leftArmPivot.add(leftArmMesh);
+    personGroup.add(leftArmPivot);
+
+    // 6. Brazo Derecho (con pivote en hombro)
+    const rightArmPivot = new THREE.Group();
+    rightArmPivot.position.set(0.1, 0.45, 0);
+    const rightArmMesh = new THREE.Mesh(armGeom, bodyMat);
+    rightArmMesh.position.y = -0.1;
+    rightArmMesh.castShadow = true;
+    rightArmPivot.add(rightArmMesh);
+    personGroup.add(rightArmPivot);
+
+    // Almacenar referencias para animaciones
+    personGroup.userData = {
+        leftLeg: leftLegPivot,
+        rightLeg: rightLegPivot,
+        leftArm: leftArmPivot,
+        rightArm: rightArmPivot,
+        torso: torsoMesh,
+        head: headMesh,
+        mats: [bodyMat, headMat, pantsMat]
+    };
+
+    personGroup.scale.set(1.2, 1.2, 1.2);
+    return personGroup;
+}
+
+function animatePerson(personGroup, animType) {
+    const data = personGroup.userData;
+    if (!data) return;
+
+    const time = currentTime;
+
+    if (animType === 'idle') {
+        // Respiración en reposo
+        const bob = Math.sin(time * 2) * 0.015;
+        data.torso.position.y = 0.35 + bob;
+        data.head.position.y = 0.55 + bob;
+        
+        data.leftArm.rotation.z = 0.15;
+        data.rightArm.rotation.z = -0.15;
+        data.leftArm.rotation.x = 0;
+        data.rightArm.rotation.x = 0;
+        data.leftLeg.rotation.x = 0;
+        data.rightLeg.rotation.x = 0;
+        personGroup.rotation.x = 0;
+        personGroup.rotation.z = 0;
+    } else if (animType === 'running') {
+        const runSpeed = 15;
+        const swing = Math.sin(time * runSpeed);
+        
+        // Piernas alternando
+        data.leftLeg.rotation.x = swing * 0.7;
+        data.rightLeg.rotation.x = -swing * 0.7;
+        
+        // Brazos alternando (opuestos a las piernas)
+        data.leftArm.rotation.x = -swing * 0.8;
+        data.rightArm.rotation.x = swing * 0.8;
+        data.leftArm.rotation.z = 0.1;
+        data.rightArm.rotation.z = -0.1;
+        
+        // Inclinación
+        data.torso.rotation.x = 0.15;
+        
+        // Oscilación vertical
+        const bob = Math.abs(Math.sin(time * runSpeed * 2)) * 0.04;
+        data.torso.position.y = 0.35 - 0.02 + bob;
+        data.head.position.y = 0.55 - 0.02 + bob;
+        
+        personGroup.rotation.x = 0;
+        personGroup.rotation.z = 0;
+    } else if (animType === 'trapped') {
+        // Lying down
+        personGroup.rotation.x = Math.PI / 2;
+        
+        data.leftLeg.rotation.x = 0.3;
+        data.rightLeg.rotation.x = -0.2;
+        data.leftArm.rotation.x = -0.5;
+        data.rightArm.rotation.x = 0.4;
+        data.leftArm.rotation.z = 0.5;
+        data.rightArm.rotation.z = -0.5;
+        data.torso.rotation.x = 0;
+        
+        data.torso.position.y = 0.35;
+        data.head.position.y = 0.55;
+    }
+}
+
 function createEvacuationGroup(bData, N, h, bW, bD) {
-    // Limpiar anteriores si existen
     if (bData.evacMeshes) {
         bData.evacMeshes.forEach(mesh => {
             if (mesh.parent) mesh.parent.remove(mesh);
@@ -1776,11 +1928,9 @@ function createEvacuationGroup(bData, N, h, bW, bD) {
         return [];
     }
 
-    // 4 personas representadas como esferas brillantes
-    const personGeom = new THREE.SphereGeometry(0.18, 16, 16);
     const topFloorY = N * h + 0.1;
 
-    // Distribuir en un pequeño cuadrado
+    // Distribuir
     const offsets = [
         { x: -0.5, z: -0.5 },
         { x: 0.5, z: -0.5 },
@@ -1788,20 +1938,11 @@ function createEvacuationGroup(bData, N, h, bW, bD) {
         { x: 0.5, z: 0.5 }
     ];
 
-    const peopleColors = [0x55ff55, 0x33ff33, 0x00ff00, 0x77ff33]; // Tonos verde brillante
     const meshes = [];
 
     for (let i = 0; i < 4; i++) {
-        const mat = new THREE.MeshStandardMaterial({
-            color: peopleColors[i],
-            roughness: 0.4,
-            metalness: 0.1,
-            emissive: peopleColors[i],
-            emissiveIntensity: 0.3
-        });
-        const mesh = new THREE.Mesh(personGeom, mat);
+        const mesh = createPersonModel(bData === buildings3D.b2001 ? '2001' : '2019');
         mesh.position.set(offsets[i].x, topFloorY, offsets[i].z);
-        mesh.castShadow = true;
         bData.group.add(mesh);
         meshes.push(mesh);
     }
@@ -1826,10 +1967,14 @@ function updateEvacuation(evacState, bModel, b3D, N, h, isLeft) {
             const floorMesh = b3D.floors[floorIdx];
             evacState.meshes.forEach((mesh, i) => {
                 mesh.position.y = floorMesh.position.y + 0.1;
-                if (mesh.material.color.getHex() !== 0xff0000) {
-                    mesh.material.color.setHex(0xff0000);
-                    mesh.material.emissive.setHex(0xff0000);
-                }
+                animatePerson(mesh, 'trapped');
+                
+                mesh.userData.mats.forEach(mat => {
+                    if (mat.color.getHex() !== 0xff0000) {
+                        mat.color.setHex(0xff0000);
+                        if (mat.emissive) mat.emissive.setHex(0xff0000);
+                    }
+                });
             });
         }
         return;
@@ -1844,10 +1989,16 @@ function updateEvacuation(evacState, bModel, b3D, N, h, isLeft) {
             } else {
                 if (mesh.position.x < 8) mesh.position.x += step;
             }
-            if (mesh.material.color.getHex() !== 0x00ff00) {
-                mesh.material.color.setHex(0x00ff00);
-                mesh.material.emissive.setHex(0x00ff00);
-            }
+            
+            mesh.rotation.y = isLeft ? -Math.PI / 2 : Math.PI / 2;
+            animatePerson(mesh, 'running');
+            
+            mesh.userData.mats.forEach(mat => {
+                if (mat.color.getHex() !== 0x00ff00) {
+                    mat.color.setHex(0x00ff00);
+                    if (mat.emissive) mat.emissive.setHex(0x00ff00);
+                }
+            });
         });
         return;
     }
@@ -1878,7 +2029,10 @@ function updateEvacuation(evacState, bModel, b3D, N, h, isLeft) {
             evacState.meshes.forEach((mesh, i) => {
                 mesh.position.x = floorMesh.position.x + (i < 2 ? -0.5 : 0.5);
                 mesh.position.z = floorMesh.position.z + (i % 2 === 0 ? -0.5 : 0.5);
-                mesh.position.y = floorMesh.position.y + 0.15; // Un poco más alto para verse bien
+                mesh.position.y = floorMesh.position.y + 0.1;
+                
+                mesh.rotation.y = 0;
+                animatePerson(mesh, 'idle');
             });
         }
     } else {
@@ -1897,12 +2051,15 @@ function updateEvacuation(evacState, bModel, b3D, N, h, isLeft) {
                 evacState.meshes.forEach((mesh, i) => {
                     mesh.position.x = floorMesh.position.x + (i < 2 ? -0.5 : 0.5);
                     mesh.position.z = floorMesh.position.z + (i % 2 === 0 ? -0.5 : 0.5);
-                    mesh.position.y = floorMesh.position.y + 0.15;
+                    mesh.position.y = floorMesh.position.y + 0.1;
+                    
+                    mesh.rotation.y = isLeft ? Math.PI / 4 : -Math.PI / 4;
+                    animatePerson(mesh, 'running');
                     
                     const cycle = Math.floor(currentTime * 4) % 2;
                     const evacColor = cycle === 0 ? 0xffaa00 : 0xffff00;
-                    mesh.material.color.setHex(evacColor);
-                    mesh.material.emissive.setHex(evacColor);
+                    mesh.userData.mats[0].color.setHex(evacColor);
+                    if (mesh.userData.mats[0].emissive) mesh.userData.mats[0].emissive.setHex(evacColor);
                 });
             }
         }
