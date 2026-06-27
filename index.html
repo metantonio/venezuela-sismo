@@ -442,6 +442,16 @@
                     </div>
                 </div>
 
+                <div class="control-group">
+                    <label for="evacuation-mode">Evacuación de Personas <span class="help-icon"
+                            data-tooltip="Simula 4 personas evacuando desde el último piso. 'Durante el sismo' agrega 10s de retardo por decisión. 'Después del primer sismo' inicia sin retardo cuando se calma el sismo 1 (t≈30s). Cada piso toma 8s en descender.">?</span></label>
+                    <select id="evacuation-mode">
+                        <option value="off">Desactivada</option>
+                        <option value="during" selected>Durante el sismo (10s retardo)</option>
+                        <option value="after">Después del primer sismo (sin retardo)</option>
+                    </select>
+                </div>
+
                 <!-- SIMULATION BUTTONS -->
                 <div class="action-buttons">
                     <button id="btn-run" class="btn btn-primary"><i class="fa-solid fa-play"></i> Iniciar
@@ -803,6 +813,10 @@
                             <span class="m-label">Daño Park-Ang:</span>
                             <span class="m-value" id="damage-2001">0.00%</span>
                         </div>
+                        <div class="metric-row">
+                            <span class="m-label">Evacuación:</span>
+                            <span class="m-value" id="evac-2001" style="font-weight: 600;">Desactivada</span>
+                        </div>
                         <div class="metric-status" id="status-2001">Estable</div>
                     </div>
 
@@ -815,6 +829,10 @@
                         <div class="metric-row">
                             <span class="m-label">Daño Park-Ang:</span>
                             <span class="m-value" id="damage-2019">0.00%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="m-label">Evacuación:</span>
+                            <span class="m-value" id="evac-2019" style="font-weight: 600;">Desactivada</span>
                         </div>
                         <div class="metric-status" id="status-2019">Estable</div>
                     </div>

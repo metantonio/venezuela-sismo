@@ -37,6 +37,10 @@ let particleSystem = null;
 let particlesCount = 200;
 let particlesData = [];
 
+// Estados de Evacuación
+let evacuation2001 = { meshes: [], currentFloor: 0, startTime: null, escaped: false, trapped: false };
+let evacuation2019 = { meshes: [], currentFloor: 0, startTime: null, escaped: false, trapped: false };
+
 // --- INICIALIZACIÓN ---
 document.addEventListener("DOMContentLoaded", () => {
     try {
@@ -191,7 +195,7 @@ function initUI() {
         "covenin01-zone", "covenin01-soil", "covenin01-r", "covenin01-importance",
         "covenin19-soil-class", "covenin19-r", "covenin19-rho", "covenin19-fi",
         "analysis-mode", "degradation-severity", "double-earthquake",
-        "sismo1-direction", "sismo2-direction", "building-use"
+        "sismo1-direction", "sismo2-direction", "building-use", "evacuation-mode"
     ];
     selects.forEach(id => {
         const el = document.getElementById(id);
@@ -1750,6 +1754,153 @@ function createAxisIndicators() {
     scene.add(axisIndicatorsGroup);
 }
 
+function createEvacuationGroup(bData, N, h, bW, bD) {
+    // Limpiar anteriores si existen
+    if (bData.evacMeshes) {
+        bData.evacMeshes.forEach(mesh => {
+            if (mesh.parent) mesh.parent.remove(mesh);
+        });
+    }
+    bData.evacMeshes = [];
+
+    const mode = document.getElementById("evacuation-mode").value;
+    if (mode === "off") {
+        return [];
+    }
+
+    // 4 personas representadas como esferas brillantes
+    const personGeom = new THREE.SphereGeometry(0.18, 16, 16);
+    const topFloorY = N * h + 0.1;
+
+    // Distribuir en un pequeño cuadrado
+    const offsets = [
+        { x: -0.5, z: -0.5 },
+        { x: 0.5, z: -0.5 },
+        { x: -0.5, z: 0.5 },
+        { x: 0.5, z: 0.5 }
+    ];
+
+    const peopleColors = [0x55ff55, 0x33ff33, 0x00ff00, 0x77ff33]; // Tonos verde brillante
+    const meshes = [];
+
+    for (let i = 0; i < 4; i++) {
+        const mat = new THREE.MeshStandardMaterial({
+            color: peopleColors[i],
+            roughness: 0.4,
+            metalness: 0.1,
+            emissive: peopleColors[i],
+            emissiveIntensity: 0.3
+        });
+        const mesh = new THREE.Mesh(personGeom, mat);
+        mesh.position.set(offsets[i].x, topFloorY, offsets[i].z);
+        mesh.castShadow = true;
+        bData.group.add(mesh);
+        meshes.push(mesh);
+    }
+    
+    bData.evacMeshes = meshes;
+    return meshes;
+}
+
+function updateEvacuation(evacState, bModel, b3D, N, h, isLeft) {
+    if (!evacState || !evacState.meshes || evacState.meshes.length === 0) return;
+
+    const mode = document.getElementById("evacuation-mode").value;
+    if (mode === "off") {
+        evacState.meshes.forEach(m => m.visible = false);
+        return;
+    }
+    evacState.meshes.forEach(m => m.visible = true);
+
+    if (evacState.trapped) {
+        const floorIdx = evacState.currentFloor - 1;
+        if (floorIdx >= 0 && floorIdx < b3D.floors.length) {
+            const floorMesh = b3D.floors[floorIdx];
+            evacState.meshes.forEach((mesh, i) => {
+                mesh.position.y = floorMesh.position.y + 0.1;
+                if (mesh.material.color.getHex() !== 0xff0000) {
+                    mesh.material.color.setHex(0xff0000);
+                    mesh.material.emissive.setHex(0xff0000);
+                }
+            });
+        }
+        return;
+    }
+
+    if (evacState.escaped) {
+        evacState.meshes.forEach((mesh, i) => {
+            mesh.position.y = 0.1;
+            const step = 0.05;
+            if (isLeft) {
+                if (mesh.position.x > -8) mesh.position.x -= step;
+            } else {
+                if (mesh.position.x < 8) mesh.position.x += step;
+            }
+            if (mesh.material.color.getHex() !== 0x00ff00) {
+                mesh.material.color.setHex(0x00ff00);
+                mesh.material.emissive.setHex(0x00ff00);
+            }
+        });
+        return;
+    }
+
+    // Verificar colapso del edificio
+    if (bModel.isCollapsed) {
+        let failedLevel = 0;
+        let maxD = 0;
+        for (let i = 0; i < N; i++) {
+            if (bModel.D[i] > maxD) {
+                maxD = bModel.D[i];
+                failedLevel = i;
+            }
+        }
+        if (evacState.currentFloor > failedLevel) {
+            evacState.trapped = true;
+            return;
+        }
+    }
+
+    let startThreshold = (mode === "during") ? 10.0 : 30.0;
+    
+    if (currentTime < startThreshold) {
+        evacState.currentFloor = N;
+        const floorIdx = N - 1;
+        if (floorIdx >= 0 && floorIdx < b3D.floors.length) {
+            const floorMesh = b3D.floors[floorIdx];
+            evacState.meshes.forEach((mesh, i) => {
+                mesh.position.x = floorMesh.position.x + (i < 2 ? -0.5 : 0.5);
+                mesh.position.z = floorMesh.position.z + (i % 2 === 0 ? -0.5 : 0.5);
+                mesh.position.y = floorMesh.position.y + 0.15; // Un poco más alto para verse bien
+            });
+        }
+    } else {
+        const elapsed = currentTime - startThreshold;
+        const floorsDown = Math.floor(elapsed / 8.0);
+        const currentFloor = N - floorsDown;
+
+        if (currentFloor <= 0) {
+            evacState.escaped = true;
+            evacState.currentFloor = 0;
+        } else {
+            evacState.currentFloor = currentFloor;
+            const floorIdx = currentFloor - 1;
+            if (floorIdx >= 0 && floorIdx < b3D.floors.length) {
+                const floorMesh = b3D.floors[floorIdx];
+                evacState.meshes.forEach((mesh, i) => {
+                    mesh.position.x = floorMesh.position.x + (i < 2 ? -0.5 : 0.5);
+                    mesh.position.z = floorMesh.position.z + (i % 2 === 0 ? -0.5 : 0.5);
+                    mesh.position.y = floorMesh.position.y + 0.15;
+                    
+                    const cycle = Math.floor(currentTime * 4) % 2;
+                    const evacColor = cycle === 0 ? 0xffaa00 : 0xffff00;
+                    mesh.material.color.setHex(evacColor);
+                    mesh.material.emissive.setHex(evacColor);
+                });
+            }
+        }
+    }
+}
+
 function initParticles() {
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particlesCount * 3);
@@ -2043,6 +2194,25 @@ function rebuild3DStructures() {
 
     buildBuilding(buildings3D.b2001, '2001');
     buildBuilding(buildings3D.b2019, '2019');
+
+    // Inicializar estados de evacuación
+    const evacMeshes2001 = createEvacuationGroup(buildings3D.b2001, N, h, bW, bD);
+    evacuation2001 = {
+        meshes: evacMeshes2001 || [],
+        currentFloor: N,
+        startTime: null,
+        escaped: false,
+        trapped: false
+    };
+
+    const evacMeshes2019 = createEvacuationGroup(buildings3D.b2019, N, h, bW, bD);
+    evacuation2019 = {
+        meshes: evacMeshes2019 || [],
+        currentFloor: N,
+        startTime: null,
+        escaped: false,
+        trapped: false
+    };
 }
 
 // Convertir colores CSS a Hex para ThreeJS
@@ -2085,6 +2255,12 @@ function update3DPhysics() {
     
     // Actualizar Edificio 2019
     updateBuilding3DPhysics(eq2019, buildings3D.b2019, xOffset, groundDisp, activeDir);
+
+    // Actualizar Evacuación
+    const evacN = eq2001.N;
+    const evacH = eq2001.h;
+    updateEvacuation(evacuation2001, eq2001, buildings3D.b2001, evacN, evacH, true);
+    updateEvacuation(evacuation2019, eq2019, buildings3D.b2019, evacN, evacH, false);
 }
 
 function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
@@ -2346,6 +2522,11 @@ function resetSimulation() {
     const status2 = document.getElementById("status-2019");
     status2.textContent = "Estable";
     status2.className = "metric-status";
+
+    const evac1 = document.getElementById("evac-2001");
+    if (evac1) evac1.innerHTML = getEvacStatusText(evacuation2001);
+    const evac2 = document.getElementById("evac-2019");
+    if (evac2) evac2.innerHTML = getEvacStatusText(evacuation2019);
 }
 
 function toggleInputControls(disable) {
@@ -2360,7 +2541,8 @@ function toggleInputControls(disable) {
         "concrete-fc-col", "concrete-fc-beam", "steel-fy-col", "steel-fy-beam",
         "col-as", "beam-as", "beam-as-prime",
         "sismo1-direction", "sismo2-direction",
-        "auto-mass", "building-use", "slab-thickness", "extra-dead-load"
+        "auto-mass", "building-use", "slab-thickness", "extra-dead-load",
+        "evacuation-mode"
     ];
     inputs.forEach(id => {
         const el = document.getElementById(id);
@@ -2397,6 +2579,25 @@ function simulationLoop() {
 }
 
 // ACTUALIZACIÓN DE LA TABLA DE ESTADOS Y MÉTRICAS
+function getEvacStatusText(evacState) {
+    const mode = document.getElementById("evacuation-mode").value;
+    if (mode === "off") return `<span style="color: var(--text-muted);">Desactivada</span>`;
+    
+    if (evacState.trapped) {
+        return `<span style="color: #ff4d4d; font-weight: bold;" class="animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i> Atrapados (Piso ${evacState.currentFloor})</span>`;
+    }
+    if (evacState.escaped) {
+        return `<span style="color: var(--color-safe); font-weight: bold;"><i class="fa-solid fa-circle-check"></i> A salvo</span>`;
+    }
+    
+    let startThreshold = (mode === "during") ? 10.0 : 30.0;
+    if (currentTime < startThreshold) {
+        return `<span style="color: var(--text-muted);"><i class="fa-regular fa-clock"></i> Esperando (Piso ${evacState.currentFloor})</span>`;
+    }
+    
+    return `<span style="color: #ffb703; font-weight: bold;" class="animate-pulse"><i class="fa-solid fa-person-running"></i> Piso ${evacState.currentFloor}</span>`;
+}
+
 function updateMetricsUI() {
     document.getElementById("metric-time").innerHTML = `${currentTime.toFixed(2)} <span class="unit">s</span>`;
 
@@ -2455,6 +2656,9 @@ function updateMetricsUI() {
         }
     }
 
+    const evac2001El = document.getElementById("evac-2001");
+    if (evac2001El) evac2001El.innerHTML = getEvacStatusText(evacuation2001);
+
     // Métricas del Edificio 2019
     const drift2 = (eq2019.maxDriftRatio * 100).toFixed(2) + "%";
     document.getElementById("drift-2019").textContent = drift2;
@@ -2479,4 +2683,7 @@ function updateMetricsUI() {
             status2.className = "metric-status";
         }
     }
+
+    const evac2019El = document.getElementById("evac-2019");
+    if (evac2019El) evac2019El.innerHTML = getEvacStatusText(evacuation2019);
 }
