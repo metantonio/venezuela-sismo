@@ -373,10 +373,28 @@
                     <div class="m-box">
                         <span class="m-title">Sismo 1 (t=0s)</span>
                         <span class="m-val">M 7.1</span>
+                        <div style="margin-top: 6px; text-align: left;">
+                            <label for="sismo1-direction"
+                                style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Dirección:</label>
+                            <select id="sismo1-direction"
+                                style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 4px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                                <option value="X" selected>Eje X (Long.)</option>
+                                <option value="Y">Eje Y (Transv.)</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="m-box second-sismo-box">
                         <span class="m-title">Sismo 2 (t=40s)</span>
                         <span class="m-val text-red">M 7.5</span>
+                        <div style="margin-top: 6px; text-align: left;">
+                            <label for="sismo2-direction"
+                                style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Dirección:</label>
+                            <select id="sismo2-direction"
+                                style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 4px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                                <option value="X" selected>Eje X (Long.)</option>
+                                <option value="Y">Eje Y (Transv.)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -687,7 +705,8 @@
                                                 permitiendo una mayor definición del tipo de sitio.</li>
                                             <li><strong>Límite de Deriva de Colapso:</strong> Ampliado a un
                                                 <strong>4.5%</strong>, debido a los mayores requerimientos de ductilidad
-                                                exigidos en las normativas modernas.</li>
+                                                exigidos en las normativas modernas.
+                                            </li>
                                             <li><strong>Severidad de Degradación:</strong> Reducida a la mitad en la
                                                 simulación no lineal, representando la excelente capacidad de
                                                 confinamiento y retención de resistencia de los marcos de concreto
@@ -703,7 +722,8 @@
                                 <h3
                                     style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px;">
                                     <i class="fa-solid fa-comments" style="color: var(--color-2019);"></i> ¿Tienes
-                                    sugerencias o comentarios?</h3>
+                                    sugerencias o comentarios?
+                                </h3>
                                 <p
                                     style="font-size: 12.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; max-width: 600px; margin-left: auto; margin-right: auto;">
                                     Este simulador es de código abierto. Si deseas proponer mejoras técnicas, reportar

@@ -171,7 +171,8 @@ function initUI() {
     const selects = [
         "covenin01-zone", "covenin01-soil", "covenin01-r", "covenin01-importance",
         "covenin19-soil-class", "covenin19-r", "covenin19-rho", "covenin19-fi",
-        "analysis-mode", "degradation-severity", "double-earthquake"
+        "analysis-mode", "degradation-severity", "double-earthquake",
+        "sismo1-direction", "sismo2-direction"
     ];
     selects.forEach(id => {
         const el = document.getElementById(id);
@@ -402,219 +403,193 @@ function generateSyntheticEarthquake(T_soil, pga1, pga2, hasSecond) {
     }
 }
 
-// --- SOLUCIONADOR DINÁMICO DE ESTRUCTURAS MDOF ---
 class BuildingModel {
-    constructor(N, storyHeight, storyMass, targetT1, designAd, analysisMode, degSeverity, numColsX, numColsY, sX, sY, customSections, codeYear) {
+    constructor(N, storyHeight, storyMass, targetT1, designAdX, designAdY, analysisMode, degSeverity, numColsX, numColsY, sX, sY, customSections, codeYear) {
         this.N = N;
         this.h = storyHeight;
-        this.m_ref = storyMass * 1000; // ton a kg (referencia para planta 5x5)
-        this.analysisMode = analysisMode; // 'linear' o 'nonlinear'
-        this.degSeverity = degSeverity; // multiplicador de degradación (0.1 a 1.2)
+        this.m_ref = storyMass * 1000;
+        this.analysisMode = analysisMode;
+        this.degSeverity = degSeverity;
         this.numCols = (numColsX || 2) * (numColsY || 2);
 
-        // Diferenciación de ductilidad por norma (2001 vs 2019)
-        // COVENIN 2019 exige mayor confinamiento => mayor ductilidad, menor degradación
         this.codeYear = codeYear || 2001;
-        // Límite de deriva para colapso: 2019 soporta mayor ductilidad
         this.driftCollapseLimit = (codeYear === 2019) ? 0.045 : 0.035;
-        // Factor de severidad efectiva: 2019 degrada menos por buen detallado sísmico
         this.effDegSeverity = (codeYear === 2019) ? degSeverity * 0.5 : degSeverity;
 
-        // Calcular el área tributaria de la losa
         const sX_val = sX || 5.0;
         const sY_val = sY || 5.0;
         const bW = sX_val * ((numColsX || 2) - 1);
         const bD = sY_val * ((numColsY || 2) - 1);
         const area = bW * bD;
-
-        // Amplificación torsional simplificada
-        const eccVal = parseFloat(document.getElementById("torsional-eccentricity").value) || 0.0;
         const rp = Math.sqrt((bW * bW + bD * bD) / 12) || 2.0;
-        this.torsionAmp = Math.sqrt(Math.pow(1.0 + (eccVal * bD) / (2.0 * rp), 2) + Math.pow((eccVal * bW) / (2.0 * rp), 2));
 
-        // Masa real del entrepiso escalada por el área tributaria (referencia 25 m²)
         this.m = this.m_ref * (0.3 + 0.7 * (area / 25.0));
 
+        const CONV = 98066.5;
+        const ES_PA = 2.0e6 * CONV;
+
         if (customSections && customSections.enable) {
-            // ---- CÁLCULO DE RIGIDEZ FÍSICA DIRECTA (SECCIONES PERSONALIZADAS) ----
-            // Módulo de elasticidad del concreto: fórmula venezolana/ACI
-            // Ec (kgf/cm²) = 15100 * sqrt(fc)
-            // Ec (Pa) = Ec (kgf/cm²) * 98066.5
-            const CONV = 98066.5; // 1 kgf/cm² = 98066.5 Pa
-            const ES_PA = 2.0e6 * CONV; // Módulo del acero: 2,000,000 kgf/cm² en Pa
+            const fc_col  = customSections.fcCol;
+            const fc_beam = customSections.fcBeam;
+            const Ec_col  = 15100.0 * Math.sqrt(fc_col)  * CONV;
+            const Ec_beam = 15100.0 * Math.sqrt(fc_beam) * CONV;
 
-            const fc_col  = customSections.fcCol;   // kgf/cm²
-            const fc_beam = customSections.fcBeam;  // kgf/cm²
-            const Ec_col  = 15100.0 * Math.sqrt(fc_col)  * CONV; // Pa
-            const Ec_beam = 15100.0 * Math.sqrt(fc_beam) * CONV; // Pa
-
-            const bc = customSections.colWidth  / 100; // cm a m
-            const hc = customSections.colDepth  / 100; // cm a m (en dirección del sismo X)
-            const bb = customSections.beamWidth / 100; // cm a m
-            const hb = customSections.beamDepth / 100; // cm a m
-
-
-            // Momento de Inercia Bruto de la Columna
-            const Ic_gross = (bc * Math.pow(hc, 3)) / 12;
-
-            // ---- INERCIA TRANSFORMADA DE LA COLUMNA (acero longitudinal en 2 capas) ----
-            // Columna con acero simétrico: (n-1)*As_col en 2 capas (tracción y compresión)
-            // Contribución: (n_col-1) * As_col/2 * arm_col^2 * 2 = (n_col-1) * As_col * arm_col^2
+            const bc_x = customSections.colWidth  / 100;
+            const hc_x = customSections.colDepth  / 100;
+            const Ic_gross_x = (bc_x * Math.pow(hc_x, 3)) / 12;
+            
             const n_col = ES_PA / Ec_col;
-            const As_col_m2 = (customSections.colAs) / 1e4; // cm² a m²
-            const d_cover_col = 0.04; // recubrimiento 4 cm
-            const arm_col = hc / 2 - d_cover_col; // brazo del acero al centroide
-            // I_c_eff = I_bruta + (n_col - 1) * As_col * arm_col²
-            const Ic = Ic_gross + (n_col - 1) * As_col_m2 * arm_col * arm_col;
+            const As_col_m2 = (customSections.colAs) / 1e4;
+            const d_cover_col = 0.04;
+            const arm_col_x = hc_x / 2 - d_cover_col;
+            const Ic_x = Ic_gross_x + (n_col - 1) * As_col_m2 * arm_col_x * arm_col_x;
 
-
-            // ---------- INERCIA AGRIETADA TRANSFORMADA DE LA VIGA (Icr) ----------
-            // n = Es / Ec_beam (relación modular)
             const n = ES_PA / Ec_beam;
-            // Área de acero en m²  (entrada en cm²)
-            const As_m2  = (customSections.beamAs)      / 1e4; // cm² a m²
-            const Asp_m2 = (customSections.beamAsPrime)  / 1e4; // cm² a m²
-            // Profundidades efectivas
-            const d_cover = 0.04; // recubrimiento mecánico típico 4 cm
-            const d  = hb - d_cover; // profundidad efectiva tracción
-            const dp = d_cover;      // profundidad efectiva compresión
+            const As_m2  = (customSections.beamAs)      / 1e4;
+            const Asp_m2 = (customSections.beamAsPrime)  / 1e4;
+            const d_cover = 0.04;
+            const d  = (customSections.beamDepth / 100) - d_cover;
+            const dp = d_cover;
 
-            // Ecuación cuadrática para hallar el eje neutro agrietado x:
-            // (bb/2)*x^2 + n*(As + As')*x - n*(As*d + As'*dp) = 0
-            const A_quad = bb / 2;
+            const A_quad = (customSections.beamWidth / 100) / 2;
             const B_quad = n * (As_m2 + Asp_m2);
             const C_quad = -n * (As_m2 * d + Asp_m2 * dp);
             const discriminant = B_quad * B_quad - 4 * A_quad * C_quad;
             const x_na = (-B_quad + Math.sqrt(Math.max(0, discriminant))) / (2 * A_quad);
 
-            // Inercia agrietada transformada (m⁴)
-            const Icr = (bb * Math.pow(x_na, 3)) / 3
+            const Icr = ((customSections.beamWidth / 100) * Math.pow(x_na, 3)) / 3
                        + n * Asp_m2 * Math.pow(Math.max(0, x_na - dp), 2)
                        + n * As_m2  * Math.pow(Math.max(0, d - x_na), 2);
 
-            // Rigidez lateral de una columna empotrada-empotrada (usando Ec_col e Ic)
-            const k_col_fixed = (12.0 * Ec_col * Ic) / Math.pow(this.h, 3);
+            const k_col_fixed_x = (12.0 * Ec_col * Ic_x) / Math.pow(this.h, 3);
+            const kappa_x = (Ec_beam * Icr * this.h) / (2.0 * Ec_col * Ic_x * sX_val);
+            const eta_x = (12.0 * kappa_x + 1.0) / (12.0 * kappa_x + 4.0);
+            this.k_init_x = this.numCols * k_col_fixed_x * eta_x;
 
-            // Relación de rigidez viga-columna (vigas con Icr, Ec_beam)
-            // kappa = (Ec_beam * Icr * h) / (2 * Ec_col * Ic * sX)
-            const kappa = (Ec_beam * Icr * this.h) / (2.0 * Ec_col * Ic * sX_val);
-
-            // Factor de reducción de rigidez por flexibilidad de vigas
-            const eta = (12.0 * kappa + 1.0) / (12.0 * kappa + 4.0);
-
-            // Rigidez lateral inicial total del entrepiso
-            this.k_init = this.numCols * k_col_fixed * eta;
-
-            // Periodo fundamental real T1 de la estructura MDOF uniforme
             const sinTerm = Math.sin(Math.PI / (4.0 * N + 2.0));
-            this.T1 = Math.PI / (Math.sqrt(this.k_init / this.m) * sinTerm);
+            this.T1_x = Math.PI / (Math.sqrt(this.k_init_x / this.m) * sinTerm);
+
+            const bc_y = hc_x;
+            const hc_y = bc_x;
+            const Ic_gross_y = (bc_y * Math.pow(hc_y, 3)) / 12;
+            const arm_col_y = hc_y / 2 - d_cover_col;
+            const Ic_y = Ic_gross_y + (n_col - 1) * As_col_m2 * arm_col_y * arm_col_y;
+
+            const k_col_fixed_y = (12.0 * Ec_col * Ic_y) / Math.pow(this.h, 3);
+            const kappa_y = (Ec_beam * Icr * this.h) / (2.0 * Ec_col * Ic_y * sY_val);
+            const eta_y = (12.0 * kappa_y + 1.0) / (12.0 * kappa_y + 4.0);
+            this.k_init_y = this.numCols * k_col_fixed_y * eta_y;
+            this.T1_y = Math.PI / (Math.sqrt(this.k_init_y / this.m) * sinTerm);
         } else {
-            // COMPORTAMIENTO ESTÁNDAR (SINTONIZADO CON ESPECTRO)
             const phi_Sx = (60.0 + sX_val) / (60.0 + 4.0 * sX_val);
+            const phi_Sy = (60.0 + sY_val) / (60.0 + 4.0 * sY_val);
             const phi_ref = 0.8125;
-            const stiffnessScale = phi_Sx / phi_ref;
+            const stiffnessScale_x = phi_Sx / phi_ref;
+            const stiffnessScale_y = phi_Sy / phi_ref;
 
             const sinTerm = Math.sin(Math.PI / (4.0 * N + 2.0));
             const k_ref = this.m_ref * Math.pow(Math.PI / (targetT1 * sinTerm), 2);
 
-            this.k_init = k_ref * (this.numCols / 4.0) * stiffnessScale;
+            this.k_init_x = k_ref * (this.numCols / 4.0) * stiffnessScale_x;
+            this.k_init_y = k_ref * (this.numCols / 4.0) * stiffnessScale_y;
 
             const massRatio = this.m / this.m_ref;
-            const stiffnessRatio = (this.numCols / 4.0) * stiffnessScale;
-            this.T1 = targetT1 * Math.sqrt(massRatio / stiffnessRatio);
+            const stiffnessRatio_x = (this.numCols / 4.0) * stiffnessScale_x;
+            const stiffnessRatio_y = (this.numCols / 4.0) * stiffnessScale_y;
+
+            this.T1_x = targetT1 * Math.sqrt(massRatio / stiffnessRatio_x);
+            this.T1_y = targetT1 * Math.sqrt(massRatio / stiffnessRatio_y);
         }
 
-        // Inicializar vectores de estado
-        this.x = new Array(N).fill(0); // desplazamiento relativo (m)
-        this.v = new Array(N).fill(0); // velocidad relativa (m/s)
-        this.a = new Array(N).fill(0); // aceleración relativa (m/s^2)
+        const eccVal = parseFloat(document.getElementById("torsional-eccentricity").value) || 0.0;
+        this.torsionAmp_x = Math.sqrt(Math.pow(1.0 + (eccVal * bD) / (2.0 * rp), 2) + Math.pow((eccVal * bW) / (2.0 * rp), 2));
+        this.torsionAmp_y = Math.sqrt(Math.pow(1.0 + (eccVal * bW) / (2.0 * rp), 2) + Math.pow((eccVal * bD) / (2.0 * rp), 2));
 
-        // Histéresis bilineal por piso
-        this.k = new Array(N).fill(this.k_init); // rigidez actual
-        this.u_p = new Array(N).fill(0); // deriva plástica
+        this.x = new Array(N).fill(0);
+        this.v = new Array(N).fill(0);
+        this.a = new Array(N).fill(0);
+
+        this.k = new Array(N).fill(this.k_init_x);
+        this.u_p = new Array(N).fill(0);
         this.u_p_old = new Array(N).fill(0);
-        this.u_max = new Array(N).fill(0); // deriva histórica máxima
-        this.E_h = new Array(N).fill(0); // energía histerética acumulada
-        this.D = new Array(N).fill(0); // índice de daño de Park-Ang (0 a 1)
+        this.u_max = new Array(N).fill(0);
+        this.E_h = new Array(N).fill(0);
+        this.D = new Array(N).fill(0);
         this.isCollapsed = false;
         this.collapseTime = null;
-
-        // Deriva máxima histórica total (como porcentaje de la altura de entrepiso)
         this.maxDriftRatio = 0;
 
-        // Diseñar Fuerza de Cedencia (Yield Force) basada en el espectro de diseño
         const totalMass = this.m * N;
         const totalWeight = totalMass * G;
-        const V_base = designAd * totalWeight; // cortante basal de diseño
+        const Omega = 1.8;
 
-        // Distribución de fuerzas sísmicas de diseño por piso (Fuerza Estática Equivalente)
-        // F_j = V_base * (m_j * h_j) / sum(m_r * h_r)
+        const V_base_x = designAdX * totalWeight;
         let sum_mh = 0;
-        for (let j = 0; j < N; j++) {
-            sum_mh += this.m * (j + 1) * this.h;
-        }
+        for (let j = 0; j < N; j++) sum_mh += this.m * (j + 1) * this.h;
 
-        this.F_design = new Array(N);
-        for (let j = 0; j < N; j++) {
-            this.F_design[j] = V_base * (this.m * (j + 1) * this.h) / sum_mh;
-        }
+        const F_design_x = new Array(N);
+        for (let j = 0; j < N; j++) F_design_x[j] = V_base_x * (this.m * (j + 1) * this.h) / sum_mh;
 
-        // Cortante de diseño de cada piso (suma de fuerzas por encima)
-        this.V_design = new Array(N);
+        this.V_design_x = new Array(N);
         for (let i = 0; i < N; i++) {
             let sum = 0;
-            for (let j = i; j < N; j++) {
-                sum += this.F_design[j];
-            }
-            this.V_design[i] = sum;
+            for (let j = i; j < N; j++) sum += F_design_x[j];
+            this.V_design_x[i] = sum;
         }
+        this.Vy_init_x = this.V_design_x.map(v => v * Omega);
 
-        // Fuerza de fluencia del piso con factor de sobrerresistencia Omega = 1.8
-        const Omega = 1.8;
-        this.Vy_init = this.V_design.map(v => v * Omega);
-        this.Vy = [...this.Vy_init]; // fluencia actual
-        this.uy_init = this.Vy_init.map((vy, i) => vy / this.k[i]); // deriva de fluencia inicial
+        const V_base_y = designAdY * totalWeight;
+        const F_design_y = new Array(N);
+        for (let j = 0; j < N; j++) F_design_y[j] = V_base_y * (this.m * (j + 1) * this.h) / sum_mh;
 
-        // Historiales para gráficos
-        this.history = {
-            time: [],
-            roofDisp: [],
-            groundDrift: [],
-            groundShear: []
-        };
+        this.V_design_y = new Array(N);
+        for (let i = 0; i < N; i++) {
+            let sum = 0;
+            for (let j = i; j < N; j++) sum += F_design_y[j];
+            this.V_design_y[i] = sum;
+        }
+        this.Vy_init_y = this.V_design_y.map(v => v * Omega);
 
-        // Coeficientes de amortiguamiento de Rayleigh
-        const w1 = 2.0 * Math.sqrt(this.k_init / this.m) * Math.sin(Math.PI / (4.0 * N + 2.0));
-        const w2 = 2.0 * Math.sqrt(this.k_init / this.m) * Math.sin(3.0 * Math.PI / (4.0 * N + 2.0));
+        this.Vy_init = [...this.Vy_init_x];
+        this.Vy = [...this.Vy_init];
+        this.uy_init = this.Vy_init.map((vy, i) => vy / this.k[i]);
+
+        this.history = { time: [], roofDisp: [], groundDrift: [], groundShear: [] };
+
+        const w1_x = 2.0 * Math.sqrt(this.k_init_x / this.m) * Math.sin(Math.PI / (4.0 * N + 2.0));
+        const w2_x = 2.0 * Math.sqrt(this.k_init_x / this.m) * Math.sin(3.0 * Math.PI / (4.0 * N + 2.0));
+        const w1_y = 2.0 * Math.sqrt(this.k_init_y / this.m) * Math.sin(Math.PI / (4.0 * N + 2.0));
+        const w2_y = 2.0 * Math.sqrt(this.k_init_y / this.m) * Math.sin(3.0 * Math.PI / (4.0 * N + 2.0));
 
         const zeta = parseFloat(document.getElementById("damping-ratio").value);
-        this.aM = zeta * (2.0 * w1 * w2) / (w1 + w2);
-        this.aK = zeta * 2.0 / (w1 + w2);
+        this.aM_x = zeta * (2.0 * w1_x * w2_x) / (w1_x + w2_x);
+        this.aK_x = zeta * 2.0 / (w1_x + w2_x);
+        this.aM_y = zeta * (2.0 * w1_y * w2_y) / (w1_y + w2_y);
+        this.aK_y = zeta * 2.0 / (w1_y + w2_y);
 
-        // Post-yield ratio (2019 tiene mayor ductilidad disponible)
+        this.aM = this.aM_x;
+        this.aK = this.aK_x;
         this.alpha_p = (codeYear === 2019) ? 0.03 : 0.05;
     }
 
+    step(a_ground, activeDir) {
+        if (this.isCollapsed) return;
 
-    // Paso de integración mediante Newmark Beta
-    step(a_ground) {
-        if (this.isCollapsed) {
-            // Si ya colapsó, no resolvemos ecuaciones dinámicas normales.
-            return;
-        }
+        const isX = (activeDir === 'X');
+        const torsionAmp_curr = isX ? this.torsionAmp_x : this.torsionAmp_y;
 
+        this.aM = isX ? this.aM_x : this.aM_y;
+        this.aK = isX ? this.aK_x : this.aK_y;
 
         const N = this.N;
         const dt2 = dt * dt;
         const beta = 0.25;
         const gamma = 0.5;
 
-        // Guardar valores anteriores
         const x_old = [...this.x];
         const v_old = [...this.v];
         const a_old = [...this.a];
 
-        // 1. Predictores de Newmark
         const x_pred = new Array(N);
         const v_pred = new Array(N);
         for(let i=0; i<N; i++) {
@@ -622,135 +597,89 @@ class BuildingModel {
             v_pred[i] = v_old[i] + dt * (1.0 - gamma) * a_old[i];
         }
 
-        // 2. Calcular Fuerzas Restauradoras e Histeréticas en el paso predicho
-        const f_rest = new Array(N).fill(0);
-        const storyDrifts = new Array(N); // deriva u_i = x_i - x_{i-1}
-        
+        const storyForces = new Array(N);
         for(let i=0; i<N; i++) {
             const x_i = x_pred[i];
             const x_prev = (i === 0) ? 0 : x_pred[i-1];
-            storyDrifts[i] = x_i - x_prev;
-        }
-
-        // Resolver histéresis bilinear para cada entrepiso
-        const storyForces = new Array(N);
-        for(let i=0; i<N; i++) {
-            const u = storyDrifts[i];
+            const u = x_i - x_prev;
             const up = this.u_p[i];
-            const vy = this.Vy[i];
+            
+            const k_init_floor_i = isX ? this.k_init_x : this.k_init_y;
+            const vy_init_floor_i = isX ? this.Vy_init_x[i] : this.Vy_init_y[i];
+
+            const k_deg_factor  = 1.0 - (0.6 * this.effDegSeverity * this.D[i]);
+            const vy_deg_factor = 1.0 - (0.4 * this.effDegSeverity * this.D[i]);
+
+            this.k[i]  = k_init_floor_i  * Math.max(0.05, k_deg_factor);
+            this.Vy[i] = vy_init_floor_i * Math.max(0.1,  vy_deg_factor);
+
             const k = this.k[i];
+            const vy = this.Vy[i];
 
             if (this.analysisMode === 'linear') {
                 storyForces[i] = k * u;
             } else {
-                // Modo no lineal elasto-plástico
                 let f_elastic = k * (u - up);
-                
                 if (Math.abs(f_elastic) <= vy) {
                     storyForces[i] = f_elastic;
-                } else if (f_elastic > vy) {
-                    storyForces[i] = vy + this.alpha_p * k * (u - up - this.uy_init[i]);
-                    // Actualizar deriva plástica
-                    this.u_p[i] = u - vy / k;
                 } else {
-                    storyForces[i] = -vy + this.alpha_p * k * (u - up + this.uy_init[i]);
-                    // Actualizar deriva plástica
-                    this.u_p[i] = u + vy / k;
+                    const f_sign = Math.sign(f_elastic);
+                    storyForces[i] = f_sign * vy + this.alpha_p * k * (u - up - f_sign * (vy / k));
+                    this.u_p[i] = u - f_sign * (vy / k);
+                    this.E_h[i] += Math.abs(storyForces[i] * (this.u_p[i] - this.u_p_old[i]));
                 }
+            }
+            this.u_p_old[i] = this.u_p[i];
+            this.u_max[i] = Math.max(this.u_max[i], Math.abs(u) * torsionAmp_curr);
 
-                // Calcular incremento de energía histerética dE_h = f * du_p
-                const dup = this.u_p[i] - this.u_p_old[i];
-                this.E_h[i] += Math.abs(storyForces[i] * dup);
-                this.u_p_old[i] = this.u_p[i];
+            const u_ult = this.driftCollapseLimit * this.h;
+            const beta_daño = 0.05 * this.effDegSeverity;
+            this.D[i] = (this.u_max[i] / u_ult) + (beta_daño * this.E_h[i]) / (vy_init_floor_i * u_ult);
+            this.D[i] = Math.min(1.0, Math.max(0.0, this.D[i]));
 
-                // Actualizar deriva máxima histórica (amplificada por torsión en columna crítica)
-                this.u_max[i] = Math.max(this.u_max[i], Math.abs(u) * this.torsionAmp);
-
-                // Índice de daño de Park-Ang: D = u_max/u_ult + beta * Eh/(Vy*u_ult)
-                // U_ult = deriva de colapso por norma (2001: 3.5%, 2019: 4.5%)
-                const u_ult = this.driftCollapseLimit * this.h;
-                const beta_daño = 0.05 * this.effDegSeverity;
-
-                this.D[i] = (this.u_max[i] / u_ult) + (beta_daño * this.E_h[i]) / (this.Vy_init[i] * u_ult);
-                this.D[i] = Math.min(1.0, Math.max(0.0, this.D[i]));
-
-                // Degradación de Rigidez y Resistencia — menor en 2019 (mejor detallado)
-                const k_deg_factor  = 1.0 - (0.6 * this.effDegSeverity * this.D[i]);
-                const vy_deg_factor = 1.0 - (0.4 * this.effDegSeverity * this.D[i]);
-
-                this.k[i]  = this.k_init       * Math.max(0.05, k_deg_factor);
-                this.Vy[i] = this.Vy_init[i]   * Math.max(0.1,  vy_deg_factor);
-
-                // Comprobar Colapso de este piso (deriva supera límite de ductilidad o daño total)
-                const driftRatio = (Math.abs(u) * this.torsionAmp) / this.h;
-                if (driftRatio > this.driftCollapseLimit || this.D[i] >= 0.99) {
-                    this.isCollapsed = true;
-                    this.collapseTime = currentTime;
-                }
-
+            const driftRatio = (Math.abs(u) * torsionAmp_curr) / this.h;
+            if (driftRatio > this.driftCollapseLimit || this.D[i] >= 0.99) {
+                this.isCollapsed = true;
+                this.collapseTime = currentTime;
             }
         }
 
-        // Fuerzas restauradoras que actúan sobre cada masa
-        // F_rest[i] = storyForces[i] - storyForces[i+1]
+        const f_rest = new Array(N);
         for(let i=0; i<N; i++) {
-            const f_below = storyForces[i];
-            const f_above = (i === N-1) ? 0 : storyForces[i+1];
-            f_rest[i] = f_below - f_above;
+            f_rest[i] = storyForces[i] - ((i === N-1) ? 0 : storyForces[i+1]);
         }
 
-        // 3. Calcular Fuerzas de Amortiguamiento Rayleigh (C*v)
-        // Rayleigh: C = aM * M + aK * K
-        // M es diagonal, K es tridiagonal
-        // c_force_i = aM * m * v_i + aK * [ k_i*(v_i - v_{i-1}) - k_{i+1}*(v_{i+1} - v_i) ]
         const f_damp = new Array(N).fill(0);
         for(let i=0; i<N; i++) {
             const v_i = v_pred[i];
             const v_prev = (i === 0) ? 0 : v_pred[i-1];
             const v_next = (i === N-1) ? 0 : v_pred[i+1];
-            
             const k_i = this.k[i];
             const k_next = (i === N-1) ? 0 : this.k[i+1];
-
-            const damp_M = this.aM * this.m * v_i;
-            const damp_K = this.aK * (k_i * (v_i - v_prev) - k_next * (v_next - v_i));
-            
-            f_damp[i] = damp_M + damp_K;
+            f_damp[i] = this.aM * this.m * v_i + this.aK * (k_i * (v_i - v_prev) - k_next * (v_next - v_i));
         }
 
-        // 4. Calcular Aceleración Correctora
-        // m_i * a_i + f_damp_i + f_rest_i = -m_i * a_ground
-        // a_new_i = -a_ground - (f_damp_i + f_rest_i)/m_i
         const a_new = new Array(N);
-        for(let i=0; i<N; i++) {
-            a_new[i] = -a_ground * G - (f_damp[i] + f_rest[i]) / this.m;
-        }
+        for(let i=0; i<N; i++) a_new[i] = -a_ground * G - (f_damp[i] + f_rest[i]) / this.m;
 
-        // 5. Corrección de Desplazamientos y Velocidades
         for(let i=0; i<N; i++) {
             this.x[i] = x_pred[i] + beta * dt2 * a_new[i];
             this.v[i] = v_pred[i] + gamma * dt * a_new[i];
             this.a[i] = a_new[i];
-
-            // Medir deriva de piso actual
             const u_curr = this.x[i] - ((i === 0) ? 0 : this.x[i-1]);
-            const driftRatio = (Math.abs(u_curr) * this.torsionAmp) / this.h;
-            if (driftRatio > this.maxDriftRatio) {
-                this.maxDriftRatio = driftRatio;
-            }
+            const driftRatio = (Math.abs(u_curr) * torsionAmp_curr) / this.h;
+            if (driftRatio > this.maxDriftRatio) this.maxDriftRatio = driftRatio;
         }
 
-        // Guardar historial
         this.history.time.push(currentTime);
         this.history.roofDisp.push(this.x[N-1]);
-        this.history.groundDrift.push(this.x[0] / this.h); // deriva primer piso
-        this.history.groundShear.push(storyForces[0]); // cortante primer piso
+        this.history.groundDrift.push(this.x[0] / this.h);
+        this.history.groundShear.push(storyForces[0]);
     }
 }
 
 // --- GENERACIÓN DE ESPECTROS Y ARCHIVO DE SISMO (MAIN ENGINE) ---
 function generateSpectraAndEarthquake() {
-    // Parámetros comunes de la estructura
     const N = parseInt(document.getElementById("num-stories").value);
     const storyHeight = parseFloat(document.getElementById("story-height").value);
     const storyMass = parseFloat(document.getElementById("story-mass").value);
@@ -789,8 +718,13 @@ function generateSpectraAndEarthquake() {
         beamAsPrime: parseFloat(document.getElementById("beam-as-prime").value) || 6
     };
 
-    let T1_actual;
+    let T1_actual_x, T1_actual_y;
     let reportHTML = '';
+
+    // Leer direcciones de los sismos
+    const sismo1Dir = document.getElementById("sismo1-direction").value;
+    const sismo2Dir = document.getElementById("sismo2-direction").value;
+
     if (customSections.enable) {
         // Calcular T1 usando la inercia agrietada transformada de las vigas
         const CONV = 98066.5; // 1 kgf/cm² = 98066.5 Pa
@@ -798,19 +732,27 @@ function generateSpectraAndEarthquake() {
         const Ec_col_Pa  = 15100.0 * Math.sqrt(customSections.fcCol)  * CONV;
         const Ec_beam_Pa = 15100.0 * Math.sqrt(customSections.fcBeam) * CONV;
 
-        const bc = customSections.colWidth  / 100; // m
-        const hc = customSections.colDepth  / 100; // m
+        const bc_x = customSections.colWidth  / 100; // m
+        const hc_x = customSections.colDepth  / 100; // m
+        const bc_y = hc_x;
+        const hc_y = bc_x;
+
         const bb = customSections.beamWidth / 100; // m
         const hb = customSections.beamDepth / 100; // m
 
-        // Inercia bruta y transformada de la columna con acero longitudinal
-        const Ic_gross = (bc * Math.pow(hc, 3)) / 12;
+        // Inercia bruta y transformada de la columna con acero longitudinal - Eje X
+        const Ic_gross_x = (bc_x * Math.pow(hc_x, 3)) / 12;
         const n_col_g   = ES_PA / Ec_col_Pa;
         const As_col_m2_g = (customSections.colAs) / 1e4;
-        const arm_col_g   = hc / 2 - 0.04; // recubrimiento 4 cm
-        const Ic = Ic_gross + (n_col_g - 1) * As_col_m2_g * arm_col_g * arm_col_g;
+        const arm_col_g_x   = hc_x / 2 - 0.04; // recubrimiento 4 cm
+        const Ic_x = Ic_gross_x + (n_col_g - 1) * As_col_m2_g * arm_col_g_x * arm_col_g_x;
 
-        // Relación modular y áreas de acero en m²
+        // Inercia bruta y transformada de la columna con acero longitudinal - Eje Y
+        const Ic_gross_y = (bc_y * Math.pow(hc_y, 3)) / 12;
+        const arm_col_g_y   = hc_y / 2 - 0.04;
+        const Ic_y = Ic_gross_y + (n_col_g - 1) * As_col_m2_g * arm_col_g_y * arm_col_g_y;
+
+        // Relación modular y áreas de acero en m² para vigas
         const n_mod  = ES_PA / Ec_beam_Pa;
         const As_m2  = customSections.beamAs      / 1e4;
         const Asp_m2 = customSections.beamAsPrime  / 1e4;
@@ -828,18 +770,28 @@ function generateSpectraAndEarthquake() {
                   + n_mod * Asp_m2 * Math.pow(Math.max(0, x_na - dp), 2)
                   + n_mod * As_m2  * Math.pow(Math.max(0, d - x_na), 2);
 
-        const k_col_fixed = (12.0 * Ec_col_Pa * Ic) / Math.pow(storyHeight, 3);
-        const kappa = (Ec_beam_Pa * Icr * storyHeight) / (2.0 * Ec_col_Pa * Ic * sX);
-        const eta   = (12.0 * kappa + 1.0) / (12.0 * kappa + 4.0);
-        const k_init_custom = numCols * k_col_fixed * eta;
+        // Rigidez de columnas y flexibilidad en X
+        const k_col_fixed_x = (12.0 * Ec_col_Pa * Ic_x) / Math.pow(storyHeight, 3);
+        const kappa_x = (Ec_beam_Pa * Icr * storyHeight) / (2.0 * Ec_col_Pa * Ic_x * sX);
+        const eta_x   = (12.0 * kappa_x + 1.0) / (12.0 * kappa_x + 4.0);
+        const k_init_custom_x = numCols * k_col_fixed_x * eta_x;
+
+        // Rigidez de columnas y flexibilidad en Y
+        const k_col_fixed_y = (12.0 * Ec_col_Pa * Ic_y) / Math.pow(storyHeight, 3);
+        const kappa_y = (Ec_beam_Pa * Icr * storyHeight) / (2.0 * Ec_col_Pa * Ic_y * sY);
+        const eta_y   = (12.0 * kappa_y + 1.0) / (12.0 * kappa_y + 4.0);
+        const k_init_custom_y = numCols * k_col_fixed_y * eta_y;
 
         const m_real = (storyMass * 1000) * (0.3 + 0.7 * (area / 25.0));
         const sinTerm = Math.sin(Math.PI / (4.0 * N + 2.0));
-        T1_actual = Math.PI / (Math.sqrt(k_init_custom / m_real) * sinTerm);
+        T1_actual_x = Math.PI / (Math.sqrt(k_init_custom_x / m_real) * sinTerm);
+        T1_actual_y = Math.PI / (Math.sqrt(k_init_custom_y / m_real) * sinTerm);
 
         // Torsión
         const eccVal = parseFloat(document.getElementById("torsional-eccentricity").value) || 0.0;
         const rp = Math.sqrt((bW * bW + bD * bD) / 12) || 2.0;
+        const torsionAmp_x = Math.sqrt(Math.pow(1.0 + (eccVal * bD) / (2.0 * rp), 2) + Math.pow((eccVal * bW) / (2.0 * rp), 2));
+        const torsionAmp_y = Math.sqrt(Math.pow(1.0 + (eccVal * bW) / (2.0 * rp), 2) + Math.pow((eccVal * bD) / (2.0 * rp), 2));
         const torsionAmp = Math.sqrt(Math.pow(1.0 + (eccVal * bD) / (2.0 * rp), 2) + Math.pow((eccVal * bW) / (2.0 * rp), 2));
 
         reportHTML = `
@@ -849,7 +801,8 @@ function generateSpectraAndEarthquake() {
                         <th>Propiedad Estructural</th>
                         <th>Fórmula / Relación</th>
                         <th>Símbolo</th>
-                        <th>Valor Calculado</th>
+                        <th>Eje X</th>
+                        <th>Eje Y</th>
                         <th>Unidad</th>
                     </tr>
                 </thead>
@@ -859,12 +812,14 @@ function generateSpectraAndEarthquake() {
                         <td class="calc-formula">15100 &times; &radic;(f'<sub>c,col</sub>)</td>
                         <td class="calc-symbol">E<sub>c,col</sub></td>
                         <td class="calc-value">${Math.round(15100.0 * Math.sqrt(customSections.fcCol)).toLocaleString()}</td>
+                        <td class="calc-value">${Math.round(15100.0 * Math.sqrt(customSections.fcCol)).toLocaleString()}</td>
                         <td class="calc-unit">kgf/cm²</td>
                     </tr>
                     <tr>
                         <td class="calc-param-name">Módulo Elasticidad Concreto (Vig.)</td>
                         <td class="calc-formula">15100 &times; &radic;(f'<sub>c,vig</sub>)</td>
                         <td class="calc-symbol">E<sub>c,vig</sub></td>
+                        <td class="calc-value">${Math.round(15100.0 * Math.sqrt(customSections.fcBeam)).toLocaleString()}</td>
                         <td class="calc-value">${Math.round(15100.0 * Math.sqrt(customSections.fcBeam)).toLocaleString()}</td>
                         <td class="calc-unit">kgf/cm²</td>
                     </tr>
@@ -873,26 +828,30 @@ function generateSpectraAndEarthquake() {
                         <td class="calc-formula">E<sub>s</sub> / E<sub>c,vig</sub></td>
                         <td class="calc-symbol">n</td>
                         <td class="calc-value">${n_mod.toFixed(2)}</td>
+                        <td class="calc-value">${n_mod.toFixed(2)}</td>
                         <td class="calc-unit">-</td>
                     </tr>
                     <tr>
                         <td class="calc-param-name">Inercia Bruta de Columna (sola)</td>
                         <td class="calc-formula">b<sub>c</sub> &times; h<sub>c</sub><sup>3</sup> / 12</td>
                         <td class="calc-symbol">I<sub>g,col</sub></td>
-                        <td class="calc-value">${(Ic_gross * 1e4).toFixed(3)}</td>
+                        <td class="calc-value">${(Ic_gross_x * 1e4).toFixed(3)}</td>
+                        <td class="calc-value">${(Ic_gross_y * 1e4).toFixed(3)}</td>
                         <td class="calc-unit">10<sup>-4</sup> m⁴</td>
                     </tr>
                     <tr>
                         <td class="calc-param-name">Inercia Transformada Columna (c/acero)</td>
                         <td class="calc-formula">I<sub>g</sub> + (n-1) &times; A<sub>s</sub> &times; d'<sup>2</sup></td>
                         <td class="calc-symbol">I<sub>c,eff</sub></td>
-                        <td class="calc-value">${(Ic * 1e4).toFixed(3)}</td>
+                        <td class="calc-value">${(Ic_x * 1e4).toFixed(3)}</td>
+                        <td class="calc-value">${(Ic_y * 1e4).toFixed(3)}</td>
                         <td class="calc-unit">10<sup>-4</sup> m⁴</td>
                     </tr>
                     <tr>
                         <td class="calc-param-name">Eje Neutro Agrietado de Viga</td>
                         <td class="calc-formula">Ecuación cuadrática x<sub>na</sub></td>
                         <td class="calc-symbol">x<sub>na</sub></td>
+                        <td class="calc-value">${(x_na * 100).toFixed(2)}</td>
                         <td class="calc-value">${(x_na * 100).toFixed(2)}</td>
                         <td class="calc-unit">cm</td>
                     </tr>
@@ -901,27 +860,31 @@ function generateSpectraAndEarthquake() {
                         <td class="calc-formula">b &times; x<sup>3</sup>/3 + n &times; A<sub>sp</sub> &times; (x-d')<sup>2</sup> + n &times; A<sub>s</sub> &times; (d-x)<sup>2</sup></td>
                         <td class="calc-symbol">I<sub>cr</sub></td>
                         <td class="calc-value">${(Icr * 1e4).toFixed(3)}</td>
+                        <td class="calc-value">${(Icr * 1e4).toFixed(3)}</td>
                         <td class="calc-unit">10<sup>-4</sup> m⁴</td>
                     </tr>
                     <tr>
                         <td class="calc-param-name">Rigidez de Columna Empotrada</td>
                         <td class="calc-formula">12 &times; E<sub>c,col</sub> &times; I<sub>c,eff</sub> / H<sup>3</sup></td>
                         <td class="calc-symbol">k<sub>col</sub></td>
-                        <td class="calc-value">${Math.round(k_col_fixed / 9.80665).toLocaleString()}</td>
+                        <td class="calc-value">${Math.round(k_col_fixed_x / 9.80665).toLocaleString()}</td>
+                        <td class="calc-value">${Math.round(k_col_fixed_y / 9.80665).toLocaleString()}</td>
                         <td class="calc-unit">kgf/m</td>
                     </tr>
                     <tr>
                         <td class="calc-param-name">Factor Rigidez Viga-Columna</td>
                         <td class="calc-formula">(E<sub>v</sub> &times; I<sub>cr</sub> &times; H) / (2 &times; E<sub>c</sub> &times; I<sub>c,eff</sub> &times; L)</td>
                         <td class="calc-symbol">&kappa;</td>
-                        <td class="calc-value">${kappa.toFixed(3)}</td>
+                        <td class="calc-value">${kappa_x.toFixed(3)}</td>
+                        <td class="calc-value">${kappa_y.toFixed(3)}</td>
                         <td class="calc-unit">-</td>
                     </tr>
                     <tr>
                         <td class="calc-param-name">Reducción por Flexibilidad de Vigas</td>
                         <td class="calc-formula">(12&kappa; + 1) / (12&kappa; + 4)</td>
                         <td class="calc-symbol">&eta;</td>
-                        <td class="calc-value">${eta.toFixed(3)}</td>
+                        <td class="calc-value">${eta_x.toFixed(3)}</td>
+                        <td class="calc-value">${eta_y.toFixed(3)}</td>
                         <td class="calc-unit">-</td>
                     </tr>
                     <tr>
@@ -929,27 +892,31 @@ function generateSpectraAndEarthquake() {
                         <td class="calc-formula">m<sub>base</sub> &times; (0.3 + 0.7 &times; Área / 25)</td>
                         <td class="calc-symbol">m</td>
                         <td class="calc-value">${(m_real / 1000).toFixed(1)}</td>
+                        <td class="calc-value">${(m_real / 1000).toFixed(1)}</td>
                         <td class="calc-unit">ton</td>
                     </tr>
                     <tr>
                         <td class="calc-param-name">Rigidez Lateral Total de Entrepiso</td>
                         <td class="calc-formula">N<sub>col</sub> &times; k<sub>col</sub> &times; &eta;</td>
                         <td class="calc-symbol">k<sub>init</sub></td>
-                        <td class="calc-value">${Math.round(k_init_custom / 9.80665).toLocaleString()}</td>
+                        <td class="calc-value">${Math.round(k_init_custom_x / 9.80665).toLocaleString()}</td>
+                        <td class="calc-value">${Math.round(k_init_custom_y / 9.80665).toLocaleString()}</td>
                         <td class="calc-unit">kgf/m</td>
                     </tr>
                     <tr>
                         <td class="calc-param-name">Período Fundamental Calculado</td>
                         <td class="calc-formula">&pi; / ( &radic;(k/m) &times; sen(&pi;/(4N+2)) )</td>
                         <td class="calc-symbol">T<sub>1</sub></td>
-                        <td class="calc-value" style="color: #ff007f;">${T1_actual.toFixed(3)}</td>
+                        <td class="calc-value" style="color: #00b4d8; font-weight: bold;">${T1_actual_x.toFixed(3)}</td>
+                        <td class="calc-value" style="color: #ff007f; font-weight: bold;">${T1_actual_y.toFixed(3)}</td>
                         <td class="calc-unit">s</td>
                     </tr>
                     <tr>
                         <td class="calc-param-name">Factor Amplificación Torsional</td>
                         <td class="calc-formula">&radic;( (1 + e&middot;b<sub>D</sub>/(2r<sub>p</sub>))<sup>2</sup> + (e&middot;b<sub>W</sub>/(2r<sub>p</sub>))<sup>2</sup> )</td>
                         <td class="calc-symbol">f<sub>torsion</sub></td>
-                        <td class="calc-value" style="color: #ffb703;">${torsionAmp.toFixed(3)}</td>
+                        <td class="calc-value" style="color: #ffb703;">${torsionAmp_x.toFixed(3)}</td>
+                        <td class="calc-value" style="color: #ffb703;">${torsionAmp_y.toFixed(3)}</td>
                         <td class="calc-unit">-</td>
                     </tr>
                 </tbody>
@@ -959,48 +926,66 @@ function generateSpectraAndEarthquake() {
         // Ratios de masa y rigidez para calcular T1_actual estándar
         const massRatio = 0.3 + 0.7 * (area / 25.0);
         const phi_Sx = (60.0 + sX) / (60.0 + 4.0 * sX);
+        const phi_Sy = (60.0 + sY) / (60.0 + 4.0 * sY);
         const phi_ref = 0.8125;
-        const stiffnessRatio = (numCols / 4.0) * (phi_Sx / phi_ref);
-        T1_actual = targetT1 * Math.sqrt(massRatio / stiffnessRatio);
+        const stiffnessRatio_x = (numCols / 4.0) * (phi_Sx / phi_ref);
+        const stiffnessRatio_y = (numCols / 4.0) * (phi_Sy / phi_ref);
+        T1_actual_x = targetT1 * Math.sqrt(massRatio / stiffnessRatio_x);
+        T1_actual_y = targetT1 * Math.sqrt(massRatio / stiffnessRatio_y);
 
         const m_real = (storyMass * 1000) * massRatio;
         const sinTerm = Math.sin(Math.PI / (4.0 * N + 2.0));
         const k_ref = (storyMass * 1000) * Math.pow(Math.PI / (targetT1 * sinTerm), 2);
-        const k_init_std = k_ref * (numCols / 4.0) * (phi_Sx / phi_ref);
+        const k_init_std_x = k_ref * (numCols / 4.0) * (phi_Sx / phi_ref);
+        const k_init_std_y = k_ref * (numCols / 4.0) * (phi_Sy / phi_ref);
 
         // Torsión
         const eccVal = parseFloat(document.getElementById("torsional-eccentricity").value) || 0.0;
         const rp = Math.sqrt((bW * bW + bD * bD) / 12) || 2.0;
-        const torsionAmp = Math.sqrt(Math.pow(1.0 + (eccVal * bD) / (2.0 * rp), 2) + Math.pow((eccVal * bW) / (2.0 * rp), 2));
+        const torsionAmp_x = Math.sqrt(Math.pow(1.0 + (eccVal * bD) / (2.0 * rp), 2) + Math.pow((eccVal * bW) / (2.0 * rp), 2));
+        const torsionAmp_y = Math.sqrt(Math.pow(1.0 + (eccVal * bW) / (2.0 * rp), 2) + Math.pow((eccVal * bD) / (2.0 * rp), 2));
 
         reportHTML = `
             <div class="calc-sections-disabled-msg">
                 <p><strong>Modo Estándar (Sintonizado) Activo.</strong></p>
                 <p style="margin-top: 6px; font-size: 12px; color: var(--text-muted);">La rigidez lateral de los entrepisos está calibrada para coincidir con el período fundamental objetivo. Valores calculados básicos:</p>
                 <table class="calc-table" style="margin-top: 12px;">
+                    <thead>
+                        <tr>
+                            <th>Propiedad</th>
+                            <th>Símbolo</th>
+                            <th>Eje X</th>
+                            <th>Eje Y</th>
+                            <th>Unidad</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         <tr>
                             <td class="calc-param-name">Masa por Piso</td>
                             <td class="calc-symbol">m</td>
+                            <td class="calc-value">${(m_real / 1000).toFixed(1)}</td>
                             <td class="calc-value">${(m_real / 1000).toFixed(1)}</td>
                             <td class="calc-unit">ton</td>
                         </tr>
                         <tr>
                             <td class="calc-param-name">Rigidez Calibrada de Entrepiso</td>
                             <td class="calc-symbol">k<sub>init</sub></td>
-                            <td class="calc-value">${Math.round(k_init_std / 9.80665).toLocaleString()}</td>
+                            <td class="calc-value">${Math.round(k_init_std_x / 9.80665).toLocaleString()}</td>
+                            <td class="calc-value">${Math.round(k_init_std_y / 9.80665).toLocaleString()}</td>
                             <td class="calc-unit">kgf/m</td>
                         </tr>
                         <tr>
                             <td class="calc-param-name">Período Fundamental Estimado</td>
                             <td class="calc-symbol">T<sub>1</sub></td>
-                            <td class="calc-value" style="color: #00b4d8;">${T1_actual.toFixed(3)}</td>
+                            <td class="calc-value" style="color: #00b4d8; font-weight: bold;">${T1_actual_x.toFixed(3)}</td>
+                            <td class="calc-value" style="color: #ff007f; font-weight: bold;">${T1_actual_y.toFixed(3)}</td>
                             <td class="calc-unit">s</td>
                         </tr>
                         <tr>
                             <td class="calc-param-name">Factor Amplificación Torsional</td>
                             <td class="calc-symbol">f<sub>torsion</sub></td>
-                            <td class="calc-value" style="color: #ffb703;">${torsionAmp.toFixed(3)}</td>
+                            <td class="calc-value" style="color: #ffb703;">${torsionAmp_x.toFixed(3)}</td>
+                            <td class="calc-value" style="color: #ffb703;">${torsionAmp_y.toFixed(3)}</td>
                             <td class="calc-unit">-</td>
                         </tr>
                     </tbody>
@@ -1030,8 +1015,9 @@ function generateSpectraAndEarthquake() {
         soil: document.getElementById("covenin01-soil").value
     };
     
-    // Obtener ordenada de diseño para el edificio 2001 en su periodo fundamental real
-    const designAd2001 = getSpectrum2001(T1_actual, params01);
+    // Obtener ordenada de diseño para el edificio 2001 en su periodo fundamental real de la dirección del sismo 1
+    const T1_design_2001 = (sismo1Dir === 'X') ? T1_actual_x : T1_actual_y;
+    const designAd2001 = getSpectrum2001(T1_design_2001, params01);
 
     // --- 2. Calcular Parámetros de Diseño COVENIN 2019 ---
     const params19 = {
@@ -1045,12 +1031,19 @@ function generateSpectraAndEarthquake() {
         soilClass: document.getElementById("covenin19-soil-class").value
     };
     
-    // Obtener ordenada de diseño para el edificio 2019 en su periodo fundamental real
-    const designAd2019 = getSpectrum2019(T1_actual, params19);
+    // Obtener ordenada de diseño para el edificio 2019 en su periodo fundamental real de la dirección del sismo 2
+    const T1_design_2019 = (sismo2Dir === 'X') ? T1_actual_x : T1_actual_y;
+    const designAd2019 = getSpectrum2019(T1_design_2019, params19);
+
+    // Calcular ordenadas de diseño específicas para X e Y para instanciación
+    const designAd2001_x = getSpectrum2001(T1_actual_x, params01);
+    const designAd2001_y = getSpectrum2001(T1_actual_y, params01);
+    const designAd2019_x = getSpectrum2019(T1_actual_x, params19);
+    const designAd2019_y = getSpectrum2019(T1_actual_y, params19);
 
     // --- 3. Instanciar los Modelos de Edificios con espaciamiento y secciones ---
-    eq2001 = new BuildingModel(N, storyHeight, storyMass, targetT1, designAd2001, analysisMode, degSeverity, numColsX, numColsY, sX, sY, customSections, 2001);
-    eq2019 = new BuildingModel(N, storyHeight, storyMass, targetT1, designAd2019, analysisMode, degSeverity, numColsX, numColsY, sX, sY, customSections, 2019);
+    eq2001 = new BuildingModel(N, storyHeight, storyMass, targetT1, designAd2001_x, designAd2001_y, analysisMode, degSeverity, numColsX, numColsY, sX, sY, customSections, 2001);
+    eq2019 = new BuildingModel(N, storyHeight, storyMass, targetT1, designAd2019_x, designAd2019_y, analysisMode, degSeverity, numColsX, numColsY, sX, sY, customSections, 2019);
 
     // --- 4. Generar la Serie de Tiempo del Sismo Sucesivo ---
     // Determinamos el período del suelo para sintonizar la frecuencia del sismo
@@ -1078,7 +1071,7 @@ function generateSpectraAndEarthquake() {
     }
 
     // --- 5. Dibujar los Espectros en el Tab de Gráficos ---
-    drawSpectraChart(params01, params19, T1_actual);
+    drawSpectraChart(params01, params19, T1_actual_x, T1_actual_y);
 
     // Inyectar el reporte de cálculos dinámicamente en el DOM
     const reportDiv = document.getElementById("calculation-report");
@@ -1094,7 +1087,7 @@ function generateSpectraAndEarthquake() {
 }
 
 // --- GRÁFICOS CON CHART.JS ---
-function drawSpectraChart(p01, p19, T_fund) {
+function drawSpectraChart(p01, p19, T_fund_x, T_fund_y) {
     const ctx = document.getElementById("spectra-chart").getContext("2d");
     
     // Generar datos para las curvas
@@ -1115,32 +1108,37 @@ function drawSpectraChart(p01, p19, T_fund) {
     const verticalLinePlugin = {
         id: 'verticalLine',
         afterDraw: (chart) => {
-            if (T_fund) {
-                const ctx = chart.ctx;
-                const xAxis = chart.scales.x;
-                const yAxis = chart.scales.y;
-                
-                const targetVal = T_fund.toFixed(2);
-                const xPos = xAxis.getPixelForValue(targetVal);
-                
-                if (xPos >= xAxis.left && xPos <= xAxis.right) {
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.strokeStyle = '#f8fafc';
-                    ctx.lineWidth = 1.5;
-                    ctx.setLineDash([4, 4]);
-                    ctx.moveTo(xPos, yAxis.top);
-                    ctx.lineTo(xPos, yAxis.bottom);
-                    ctx.stroke();
+            const ctx = chart.ctx;
+            const xAxis = chart.scales.x;
+            const yAxis = chart.scales.y;
+
+            const drawLine = (T_val, label, color) => {
+                if (T_val) {
+                    const targetVal = T_val.toFixed(2);
+                    const xPos = xAxis.getPixelForValue(targetVal);
                     
-                    // Draw a label text
-                    ctx.fillStyle = '#f8fafc';
-                    ctx.font = '10px Inter';
-                    ctx.textAlign = 'center';
-                    ctx.fillText(`T_fund = ${T_fund.toFixed(2)}s`, xPos, yAxis.top - 8);
-                    ctx.restore();
+                    if (xPos >= xAxis.left && xPos <= xAxis.right) {
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.strokeStyle = color;
+                        ctx.lineWidth = 1.5;
+                        ctx.setLineDash([4, 4]);
+                        ctx.moveTo(xPos, yAxis.top);
+                        ctx.lineTo(xPos, yAxis.bottom);
+                        ctx.stroke();
+                        
+                        // Draw a label text
+                        ctx.fillStyle = color;
+                        ctx.font = '10px Inter';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(`${label} = ${T_val.toFixed(2)}s`, xPos, yAxis.top - 8);
+                        ctx.restore();
+                    }
                 }
-            }
+            };
+
+            drawLine(T_fund_x, 'T_x', '#00b4d8');
+            drawLine(T_fund_y, 'T_y', '#ff007f');
         }
     };
 
@@ -1748,9 +1746,23 @@ function varToHexColor(varName) {
 
 // ACTUALIZACIÓN DE LA GEOMETRÍA 3D POR SWAY SÍSMICO Y DAÑO
 function update3DPhysics() {
+    const hasSecond = document.getElementById("double-earthquake").checked;
+    const sismo1Dir = document.getElementById("sismo1-direction").value;
+    const sismo2Dir = document.getElementById("sismo2-direction").value;
+    const activeTime = simStepIndex * dt;
+    const activeDir = (hasSecond && (activeTime >= 40.0)) ? sismo2Dir : sismo1Dir;
+    const isX = (activeDir === 'X');
+
     // Desplazamiento actual del terreno (vibración visual del suelo)
-    const groundDispX = groundAccel[simStepIndex] * 0.8; // amplificar visualmente el sismo
-    groundPlane.position.x = groundDispX;
+    const groundDisp = groundAccel[simStepIndex] * 0.8; // amplificar visualmente el sismo
+    
+    if (isX) {
+        groundPlane.position.x = groundDisp;
+        groundPlane.position.z = 0;
+    } else {
+        groundPlane.position.x = 0;
+        groundPlane.position.z = groundDisp;
+    }
 
     const numColsX = parseInt(document.getElementById("num-cols-x").value) || 2;
     const sX = parseFloat(document.getElementById("col-dist-x").value) || 5.0;
@@ -1758,18 +1770,20 @@ function update3DPhysics() {
     const xOffset = Math.max(6, bW / 2 + 3.5);
 
     // Actualizar Edificio 2001
-    updateBuilding3DPhysics(eq2001, buildings3D.b2001, -xOffset, groundDispX);
+    updateBuilding3DPhysics(eq2001, buildings3D.b2001, -xOffset, groundDisp, activeDir);
     
     // Actualizar Edificio 2019
-    updateBuilding3DPhysics(eq2019, buildings3D.b2019, xOffset, groundDispX);
+    updateBuilding3DPhysics(eq2019, buildings3D.b2019, xOffset, groundDisp, activeDir);
 }
 
-function updateBuilding3DPhysics(bModel, b3D, initialX, groundDispX) {
+function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
     const N = bModel.N;
     const h = bModel.h;
+    const isX = (activeDir === 'X');
 
     // Desplazamiento total en base es la vibración del suelo
-    b3D.group.position.x = initialX + groundDispX;
+    b3D.group.position.x = initialX + (isX ? groundDisp : 0);
+    b3D.group.position.z = isX ? 0 : groundDisp;
 
     if (bModel.isCollapsed) {
         // Animación de colapso progresivo
@@ -1796,13 +1810,14 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDispX) {
             if (floorMesh.position.y > targetY) {
                 floorMesh.position.y -= collapseSpeed;
                 floorMesh.position.x += (Math.random() - 0.5) * 0.05; // vibración de escombros
+                floorMesh.position.z += (Math.random() - 0.5) * 0.05;
                 
                 // Partículas de polvo en la caída
                 if (Math.random() < 0.3) {
                     spawnParticles(
                         b3D.group.position.x + floorMesh.position.x,
                         floorMesh.position.y,
-                        b3D.group.position.z,
+                        b3D.group.position.z + floorMesh.position.z,
                         5
                     );
                 }
@@ -1832,42 +1847,58 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDispX) {
     // Comportamiento normal (oscilación lateral + torsión)
     for (let lvl = 0; lvl < N; lvl++) {
         // Desplazamiento del nivel actual
-        const dx_curr = bModel.x[lvl] * 6.0; // amplificado para visibilidad en 3D
-        const dx_prev = (lvl === 0) ? 0 : bModel.x[lvl-1] * 6.0;
+        const d_curr = bModel.x[lvl] * 6.0; // amplificado para visibilidad en 3D
+        const d_prev = (lvl === 0) ? 0 : bModel.x[lvl-1] * 6.0;
 
         // Ángulo de rotación del nivel actual (amplificado para visibilidad)
-        const theta_curr = (dx_curr * ecc) / rp;
-        const theta_prev = (lvl === 0) ? 0 : ((bModel.x[lvl-1] * 6.0) * ecc) / rp;
+        const theta_curr = (d_curr * ecc) / rp;
+        const theta_prev = (lvl === 0) ? 0 : (d_prev * ecc) / rp;
 
         // Desplazar y rotar losa
         const floorMesh = b3D.floors[lvl];
-        floorMesh.position.x = dx_curr;
+        if (isX) {
+            floorMesh.position.x = d_curr;
+            floorMesh.position.z = 0;
+        } else {
+            floorMesh.position.x = 0;
+            floorMesh.position.z = d_curr;
+        }
         floorMesh.rotation.y = theta_curr;
 
         // Posicionar y deformar las columnas de este nivel
         const cols = b3D.columns[lvl];
+
+        const x_trans_prev = isX ? d_prev : 0;
+        const z_trans_prev = isX ? 0 : d_prev;
+        const x_trans_curr = isX ? d_curr : 0;
+        const z_trans_curr = isX ? 0 : d_curr;
 
         cols.forEach(col => {
             const ox = col.offsetX;
             const oz = col.offsetZ;
 
             // Posición inferior de la columna (rotada en planta lvl-1)
-            const x_bottom = dx_prev + ox * Math.cos(theta_prev) - oz * Math.sin(theta_prev);
-            const z_bottom =           ox * Math.sin(theta_prev) + oz * Math.cos(theta_prev);
+            const x_bottom = x_trans_prev + ox * Math.cos(theta_prev) - oz * Math.sin(theta_prev);
+            const z_bottom = z_trans_prev + ox * Math.sin(theta_prev) + oz * Math.cos(theta_prev);
 
             // Posición superior de la columna (rotada en planta lvl)
-            const x_top = dx_curr + ox * Math.cos(theta_curr) - oz * Math.sin(theta_curr);
-            const z_top =           ox * Math.sin(theta_curr) + oz * Math.cos(theta_curr);
+            const x_top = x_trans_curr + ox * Math.cos(theta_curr) - oz * Math.sin(theta_curr);
+            const z_top = z_trans_curr + ox * Math.sin(theta_curr) + oz * Math.cos(theta_curr);
 
             // Calcular derivas reales (físicas, no amplificadas) de esta columna particular
             const theta_curr_phys = (bModel.x[lvl] * ecc) / rp;
             const theta_prev_phys = (lvl === 0) ? 0 : (bModel.x[lvl-1] * ecc) / rp;
 
-            const x_b_phys = (lvl === 0 ? 0 : bModel.x[lvl-1]) + ox * Math.cos(theta_prev_phys) - oz * Math.sin(theta_prev_phys);
-            const z_b_phys =                                     ox * Math.sin(theta_prev_phys) + oz * Math.cos(theta_prev_phys);
+            const x_trans_p_phys = isX ? (lvl === 0 ? 0 : bModel.x[lvl-1]) : 0;
+            const z_trans_p_phys = isX ? 0 : (lvl === 0 ? 0 : bModel.x[lvl-1]);
+            const x_trans_c_phys = isX ? bModel.x[lvl] : 0;
+            const z_trans_c_phys = isX ? 0 : bModel.x[lvl];
 
-            const x_t_phys = bModel.x[lvl] + ox * Math.cos(theta_curr_phys) - oz * Math.sin(theta_curr_phys);
-            const z_t_phys =                 ox * Math.sin(theta_curr_phys) + oz * Math.cos(theta_curr_phys);
+            const x_b_phys = x_trans_p_phys + ox * Math.cos(theta_prev_phys) - oz * Math.sin(theta_prev_phys);
+            const z_b_phys = z_trans_p_phys + ox * Math.sin(theta_prev_phys) + oz * Math.cos(theta_prev_phys);
+
+            const x_t_phys = x_trans_c_phys + ox * Math.cos(theta_curr_phys) - oz * Math.sin(theta_curr_phys);
+            const z_t_phys = z_trans_c_phys + ox * Math.sin(theta_curr_phys) + oz * Math.cos(theta_curr_phys);
 
             const drift_x_phys = x_t_phys - x_b_phys;
             const drift_z_phys = z_t_phys - z_b_phys;
@@ -1880,12 +1911,12 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDispX) {
             } else if (colDriftRatio < 0.018) {
                 colColor = varToHexColor('--color-warning');
                 if (bModel.analysisMode === 'nonlinear' && Math.random() < 0.05) {
-                    spawnParticles(b3D.group.position.x + (x_bottom + x_top) / 2, (lvl + 0.5) * h, z_bottom, 1);
+                    spawnParticles(b3D.group.position.x + (x_bottom + x_top) / 2, (lvl + 0.5) * h, b3D.group.position.z + (z_bottom + z_top) / 2, 1);
                 }
             } else if (colDriftRatio < 0.030) {
                 colColor = varToHexColor('--color-damage');
                 if (bModel.analysisMode === 'nonlinear' && Math.random() < 0.15) {
-                    spawnParticles(b3D.group.position.x + (x_bottom + x_top) / 2, (lvl + 0.5) * h, z_bottom, 2);
+                    spawnParticles(b3D.group.position.x + (x_bottom + x_top) / 2, (lvl + 0.5) * h, b3D.group.position.z + (z_bottom + z_top) / 2, 2);
                 }
             } else {
                 colColor = 0x222222; // fallo local de la columna
@@ -2016,7 +2047,8 @@ function toggleInputControls(disable) {
         "double-earthquake", "custom-sections-enable", "col-width", "col-depth",
         "beam-width", "beam-depth",
         "concrete-fc-col", "concrete-fc-beam", "steel-fy-col", "steel-fy-beam",
-        "col-as", "beam-as", "beam-as-prime"
+        "col-as", "beam-as", "beam-as-prime",
+        "sismo1-direction", "sismo2-direction"
     ];
     inputs.forEach(id => {
         const el = document.getElementById(id);
@@ -2035,9 +2067,14 @@ function simulationLoop() {
     currentTime = simStepIndex * dt;
     const a_g = groundAccel[simStepIndex];
 
+    const hasSecond = document.getElementById("double-earthquake").checked;
+    const sismo1Dir = document.getElementById("sismo1-direction").value;
+    const sismo2Dir = document.getElementById("sismo2-direction").value;
+    const activeDir = (hasSecond && (currentTime >= 40.0)) ? sismo2Dir : sismo1Dir;
+
     // Correr paso dinámico de los edificios
-    eq2001.step(a_g);
-    eq2019.step(a_g);
+    eq2001.step(a_g, activeDir);
+    eq2019.step(a_g, activeDir);
 
     // Actualizar visualizaciones y métricas
     update3DPhysics();
