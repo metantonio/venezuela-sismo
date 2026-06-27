@@ -1642,6 +1642,9 @@ function initThreeJS() {
     gridHelper.position.y = 0.01;
     scene.add(gridHelper);
 
+    // --- EJES IDENTIFICADOS X / Y ---
+    createAxisIndicators();
+
     // Partículas de polvo/humo
     initParticles();
 
@@ -1653,6 +1656,98 @@ function initThreeJS() {
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
     });
+}
+// --- INDICADORES DE EJES X / Y ---
+let axisIndicatorsGroup = null;
+
+function createAxisLabel(text, color) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 128;
+    canvas.height = 64;
+
+    // Fondo semitransparente con bordes redondeados
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+    const r = 10;
+    ctx.beginPath();
+    ctx.moveTo(r, 0);
+    ctx.lineTo(canvas.width - r, 0);
+    ctx.quadraticCurveTo(canvas.width, 0, canvas.width, r);
+    ctx.lineTo(canvas.width, canvas.height - r);
+    ctx.quadraticCurveTo(canvas.width, canvas.height, canvas.width - r, canvas.height);
+    ctx.lineTo(r, canvas.height);
+    ctx.quadraticCurveTo(0, canvas.height, 0, canvas.height - r);
+    ctx.lineTo(0, r);
+    ctx.quadraticCurveTo(0, 0, r, 0);
+    ctx.closePath();
+    ctx.fill();
+
+    // Borde coloreado
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Texto
+    ctx.font = 'bold 36px Inter, sans-serif';
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+
+    const spriteMat = new THREE.SpriteMaterial({
+        map: texture,
+        transparent: true,
+        depthTest: false
+    });
+    const sprite = new THREE.Sprite(spriteMat);
+    sprite.scale.set(2.0, 1.0, 1);
+    return sprite;
+}
+
+function createAxisIndicators() {
+    if (axisIndicatorsGroup) {
+        scene.remove(axisIndicatorsGroup);
+    }
+    axisIndicatorsGroup = new THREE.Group();
+
+    const origin = new THREE.Vector3(-14, 0.1, 5);
+    const arrowLength = 4;
+    const headLength = 0.6;
+    const headWidth = 0.3;
+
+    // Eje X → Three.js +X (cian, 0x00b4d8)
+    const xDir = new THREE.Vector3(1, 0, 0);
+    const xColor = 0x00b4d8;
+    const xArrow = new THREE.ArrowHelper(xDir, origin, arrowLength, xColor, headLength, headWidth);
+    xArrow.line.material.linewidth = 2;
+    axisIndicatorsGroup.add(xArrow);
+
+    const xLabel = createAxisLabel('Eje X', '#00b4d8');
+    xLabel.position.set(origin.x + arrowLength + 1.2, origin.y + 0.5, origin.z);
+    axisIndicatorsGroup.add(xLabel);
+
+    // Eje Y → Three.js -Z (rosa, 0xff007f) 
+    // En la escena, el eje Y del simulador corresponde al eje -Z de Three.js
+    const yDir = new THREE.Vector3(0, 0, -1);
+    const yColor = 0xff007f;
+    const yArrow = new THREE.ArrowHelper(yDir, origin, arrowLength, yColor, headLength, headWidth);
+    yArrow.line.material.linewidth = 2;
+    axisIndicatorsGroup.add(yArrow);
+
+    const yLabel = createAxisLabel('Eje Y', '#ff007f');
+    yLabel.position.set(origin.x, origin.y + 0.5, origin.z - arrowLength - 1.2);
+    axisIndicatorsGroup.add(yLabel);
+
+    // Etiqueta de origen
+    const originLabel = createAxisLabel('O', '#94a3b8');
+    originLabel.position.set(origin.x - 0.6, origin.y + 0.5, origin.z + 0.6);
+    originLabel.scale.set(1.0, 0.5, 1);
+    axisIndicatorsGroup.add(originLabel);
+
+    scene.add(axisIndicatorsGroup);
 }
 
 function initParticles() {
@@ -1797,6 +1892,9 @@ function rebuild3DStructures() {
         gridHelper.position.y = 0.01;
         scene.add(gridHelper);
     }
+
+    // Reconstruir indicadores de ejes con posición adaptada
+    createAxisIndicators();
 
     // Función auxiliar para construir losas y columnas
     const buildBuilding = (bData, colorTheme) => {
