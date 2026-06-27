@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function initUI() {
     // Tab switching
     const tabBtns = document.querySelectorAll(".tab-btn");
-    const tabContents = document.querySelectorAll(".tab-content");
+    const tabContents = document.querySelectorAll(".tab-content, .control-panel");
     
     tabBtns.forEach(btn => {
         btn.addEventListener("click", () => {
@@ -210,6 +210,14 @@ function initUI() {
     document.getElementById("btn-run").addEventListener("click", toggleSimulation);
     document.getElementById("btn-pause").addEventListener("click", pauseSimulation);
     document.getElementById("btn-reset").addEventListener("click", resetSimulation);
+
+    // Botones móviles
+    const mobRun = document.getElementById("mobile-btn-run");
+    if (mobRun) mobRun.addEventListener("click", toggleSimulation);
+    const mobPause = document.getElementById("mobile-btn-pause");
+    if (mobPause) mobPause.addEventListener("click", pauseSimulation);
+    const mobReset = document.getElementById("mobile-btn-reset");
+    if (mobReset) mobReset.addEventListener("click", resetSimulation);
 }
 
 // --- FÓRMULAS SÍSMICAS COVENIN 1756 ---
@@ -2446,15 +2454,26 @@ function animate3D() {
 function toggleSimulation() {
     const btnRun = document.getElementById("btn-run");
     const btnPause = document.getElementById("btn-pause");
+    const mobRun = document.getElementById("mobile-btn-run");
+    const mobPause = document.getElementById("mobile-btn-pause");
+    const mobReset = document.getElementById("mobile-btn-reset");
     
     if (!isPlaying) {
         // INICIAR
         isPlaying = true;
         isPaused = false;
+        
         btnRun.innerHTML = '<i class="fa-solid fa-stop"></i> Detener';
         btnRun.classList.replace("btn-primary", "btn-danger");
         btnPause.disabled = false;
         document.getElementById("btn-reset").disabled = true;
+        
+        if (mobRun) {
+            mobRun.innerHTML = '<i class="fa-solid fa-stop"></i>';
+            mobRun.classList.replace("btn-primary", "btn-danger");
+        }
+        if (mobPause) mobPause.disabled = false;
+        if (mobReset) mobReset.disabled = true;
         
         // Bloquear controles de configuración
         toggleInputControls(true);
@@ -2483,20 +2502,37 @@ function stopSimulation() {
     document.getElementById("btn-pause").innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
     document.getElementById("btn-reset").disabled = false;
     
+    // Sincronizar botones móviles
+    const mobRun = document.getElementById("mobile-btn-run");
+    if (mobRun) {
+        mobRun.innerHTML = '<i class="fa-solid fa-play"></i>';
+        mobRun.classList.replace("btn-danger", "btn-primary");
+    }
+    const mobPause = document.getElementById("mobile-btn-pause");
+    if (mobPause) {
+        mobPause.disabled = true;
+        mobPause.innerHTML = '<i class="fa-solid fa-pause"></i>';
+    }
+    const mobReset = document.getElementById("mobile-btn-reset");
+    if (mobReset) mobReset.disabled = false;
+    
     toggleInputControls(false);
 }
 
 function pauseSimulation() {
     const btnPause = document.getElementById("btn-pause");
+    const mobPause = document.getElementById("mobile-btn-pause");
     if (!isPaused) {
         // PAUSAR
         isPaused = true;
         clearInterval(simInterval);
         btnPause.innerHTML = '<i class="fa-solid fa-play"></i> Reanudar';
+        if (mobPause) mobPause.innerHTML = '<i class="fa-solid fa-play"></i>';
     } else {
         // REANUDAR
         isPaused = false;
         btnPause.innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
+        if (mobPause) mobPause.innerHTML = '<i class="fa-solid fa-pause"></i>';
         simInterval = setInterval(simulationLoop, 10);
     }
 }

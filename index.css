@@ -1125,5 +1125,222 @@ select:focus {
     opacity: 0.85;
 }
 
+/* --- NATIVE RESPONSIVE MOBILE VIEW SUPPORT --- */
+.mobile-only {
+    display: none !important;
+}
+
+.mobile-floating-controls {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    .mobile-only {
+        display: flex !important;
+    }
+    
+    .header-badges {
+        display: none !important;
+    }
+    
+    /* Header adaptado */
+    .app-header {
+        height: 60px !important;
+        padding: 0 12px !important;
+    }
+    .logo-text h1 {
+        font-size: 15px !important;
+    }
+    .logo-text p {
+        font-size: 9px !important;
+    }
+    .logo-icon {
+        font-size: 20px !important;
+    }
+    
+    /* Layout principal */
+    .main-layout {
+        flex-direction: column !important;
+        height: calc(100vh - 60px) !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
+    
+    /* Panel de control como pestaña en móviles */
+    .control-panel {
+        opacity: 0 !important;
+        pointer-events: none !important;
+        width: 100% !important;
+        position: absolute !important;
+        top: 45px !important; /* Debajo de los tabs */
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        z-index: 95 !important;
+        background: #090a0f !important;
+        padding: 15px !important;
+        height: calc(100% - 45px) !important;
+        overflow-y: auto !important;
+        border-right: none !important;
+        transition: opacity 0.3s ease !important;
+        display: flex !important; /* Mantiene la flexibilidad de elementos internos */
+        flex-direction: column !important;
+    }
+    
+    .control-panel.active {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        display: flex !important;
+    }
+    
+    /* Área de contenido */
+    .content-area {
+        width: 100% !important;
+        height: 100% !important;
+        flex: 1 !important;
+        position: relative !important;
+    }
+    
+    /* Barra de navegación de pestañas con scroll horizontal táctil */
+    .tabs-header {
+        height: 45px !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        flex-wrap: nowrap !important;
+        scrollbar-width: none !important; /* Firefox */
+        -ms-overflow-style: none !important; /* IE 10+ */
+        padding: 0 8px !important;
+        display: flex !important;
+    }
+    .tabs-header::-webkit-scrollbar {
+        display: none !important; /* Chrome, Safari, Opera */
+    }
+    .tab-btn {
+        flex-shrink: 0 !important;
+        padding: 0 14px !important;
+        font-size: 12px !important;
+        height: 45px !important;
+    }
+    
+    /* Pestaña de 3D */
+    #tab-3d {
+        flex: 1 !important;
+        display: none;
+        height: calc(100% - 45px) !important;
+        position: relative !important;
+    }
+    #tab-3d.active {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    /* Contenedor canvas 3D adaptado */
+    #canvas-3d-container {
+        flex: 1 !important;
+        height: 100% !important;
+        min-height: 200px !important;
+    }
+    
+    /* Panel de métricas deslizable horizontalmente */
+    .metrics-board {
+        height: 105px !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        padding: 8px 12px !important;
+        gap: 12px !important;
+        scrollbar-width: none !important;
+        background: rgba(9, 10, 15, 0.96) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        display: flex !important;
+    }
+    .metrics-board::-webkit-scrollbar {
+        display: none !important;
+    }
+    .metric-card {
+        flex: 0 0 240px !important;
+        height: 85px !important;
+        padding: 8px 14px !important;
+        display: inline-flex !important;
+    }
+    .metric-row {
+        margin: 2px 0 !important;
+    }
+    
+    /* Botones de control flotantes para móviles */
+    .mobile-floating-controls {
+        display: flex !important;
+        position: absolute !important;
+        bottom: 120px !important; /* Por encima de las métricas */
+        right: 16px !important;
+        z-index: 1000 !important;
+        gap: 10px !important;
+    }
+    
+    .btn-round {
+        width: 46px !important;
+        height: 46px !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        transition: transform 0.2s, box-shadow 0.2s, background 0.2s !important;
+    }
+    .btn-round:active {
+        transform: scale(0.9) !important;
+    }
+    .btn-round i {
+        font-size: 16px !important;
+    }
+    
+    #mobile-btn-run {
+        background: linear-gradient(135deg, var(--color-2001), #0077b6) !important;
+        box-shadow: 0 0 15px rgba(0, 180, 216, 0.3), 0 6px 20px rgba(0, 0, 0, 0.6) !important;
+    }
+    #mobile-btn-run.btn-danger {
+        background: linear-gradient(135deg, var(--color-damage), #b7091e) !important;
+        box-shadow: 0 0 15px rgba(230, 57, 70, 0.3), 0 6px 20px rgba(0, 0, 0, 0.6) !important;
+    }
+    #mobile-btn-pause {
+        background: rgba(30, 41, 59, 0.8) !important;
+    }
+    #mobile-btn-reset {
+        background: rgba(30, 41, 59, 0.6) !important;
+        border-color: rgba(230, 57, 70, 0.3) !important;
+    }
+    #mobile-btn-reset:not([disabled]):active {
+        background: var(--color-damage) !important;
+    }
+    
+    /* Gráficos de respuesta a 1 columna */
+    .grid-charts {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto !important;
+        gap: 12px !important;
+        padding: 12px !important;
+        overflow-y: auto !important;
+        height: calc(100% - 45px) !important;
+    }
+    .chart-container-full {
+        grid-column: span 1 !important;
+    }
+    .grid-hysteresis {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+    
+    /* Ajustes generales de pestañas */
+    .tab-content {
+        padding: 12px !important;
+        overflow-y: auto !important;
+        height: calc(100% - 45px) !important;
+    }
+}
+
 
 
