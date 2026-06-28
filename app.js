@@ -2039,31 +2039,55 @@ function updateEvacuation(evacState, bModel, b3D, N, h, isLeft) {
         }
     } else {
         const elapsed = currentTime - startThreshold;
-        const floorsDown = Math.floor(elapsed / 8.0);
-        const currentFloor = N - floorsDown;
+        const fractionalFloorsDown = elapsed / 8.0;
+        const currentFloorFloat = N - fractionalFloorsDown;
 
-        if (currentFloor <= 0) {
+        if (currentFloorFloat <= 0) {
             evacState.escaped = true;
             evacState.currentFloor = 0;
         } else {
-            evacState.currentFloor = currentFloor;
-            const floorIdx = currentFloor - 1;
-            if (floorIdx >= 0 && floorIdx < b3D.floors.length) {
-                const floorMesh = b3D.floors[floorIdx];
-                evacState.meshes.forEach((mesh, i) => {
-                    mesh.position.x = floorMesh.position.x + (i < 2 ? -0.5 : 0.5);
-                    mesh.position.z = floorMesh.position.z + (i % 2 === 0 ? -0.5 : 0.5);
-                    mesh.position.y = floorMesh.position.y + 0.1;
-                    
-                    mesh.rotation.y = isLeft ? Math.PI / 4 : -Math.PI / 4;
-                    animatePerson(mesh, 'running');
-                    
-                    const cycle = Math.floor(currentTime * 4) % 2;
-                    const evacColor = cycle === 0 ? 0xffaa00 : 0xffff00;
-                    mesh.userData.mats[0].color.setHex(evacColor);
-                    if (mesh.userData.mats[0].emissive) mesh.userData.mats[0].emissive.setHex(evacColor);
-                });
+            // Piso entero actual para mostrar en las métricas
+            evacState.currentFloor = Math.ceil(currentFloorFloat);
+            
+            const floorIdxLower = Math.floor(currentFloorFloat); // piso de abajo (0 a N)
+            const floorIdxUpper = Math.ceil(currentFloorFloat);  // piso de arriba (1 a N)
+            
+            const frac = currentFloorFloat - floorIdxLower; // Fracción decimal (0 a 1)
+            
+            let xPosLower = 0, yPosLower = 0, zPosLower = 0;
+            if (floorIdxLower > 0 && floorIdxLower <= b3D.floors.length) {
+                const lowerMesh = b3D.floors[floorIdxLower - 1];
+                xPosLower = lowerMesh.position.x;
+                yPosLower = lowerMesh.position.y;
+                zPosLower = lowerMesh.position.z;
             }
+            
+            let xPosUpper = 0, yPosUpper = 0, zPosUpper = 0;
+            if (floorIdxUpper > 0 && floorIdxUpper <= b3D.floors.length) {
+                const upperMesh = b3D.floors[floorIdxUpper - 1];
+                xPosUpper = upperMesh.position.x;
+                yPosUpper = upperMesh.position.y;
+                zPosUpper = upperMesh.position.z;
+            }
+            
+            // Interpolación lineal
+            const xPos = xPosLower * (1 - frac) + xPosUpper * frac;
+            const yPos = yPosLower * (1 - frac) + yPosUpper * frac + 0.1;
+            const zPos = zPosLower * (1 - frac) + zPosUpper * frac;
+            
+            evacState.meshes.forEach((mesh, i) => {
+                mesh.position.x = xPos + (i < 2 ? -0.5 : 0.5);
+                mesh.position.z = zPos + (i % 2 === 0 ? -0.5 : 0.5);
+                mesh.position.y = yPos;
+                
+                mesh.rotation.y = isLeft ? Math.PI / 4 : -Math.PI / 4;
+                animatePerson(mesh, 'running');
+                
+                const cycle = Math.floor(currentTime * 4) % 2;
+                const evacColor = cycle === 0 ? 0xffaa00 : 0xffff00;
+                mesh.userData.mats[0].color.setHex(evacColor);
+                if (mesh.userData.mats[0].emissive) mesh.userData.mats[0].emissive.setHex(evacColor);
+            });
         }
     }
 }
