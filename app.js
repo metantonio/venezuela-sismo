@@ -120,9 +120,22 @@ function initUI() {
                 if (dispChartInstance) dispChartInstance.resize();
                 if (hyst2001ChartInstance) hyst2001ChartInstance.resize();
                 if (hyst2019ChartInstance) hyst2019ChartInstance.resize();
+            } else if (tabId === "tab-sismos") {
+                const container = document.getElementById("sismos-list-container");
+                if (container && container.children.length === 0) {
+                    fetchRecentEarthquakes();
+                }
             }
         });
     });
+
+    // Botón de refrescar sismos recientes
+    const refreshSismosBtn = document.getElementById("btn-refresh-sismos");
+    if (refreshSismosBtn) {
+        refreshSismosBtn.addEventListener("click", () => {
+            fetchRecentEarthquakes();
+        });
+    }
 
     // Inputs dinámicos (actualizar etiquetas de valores)
     const setupSlider = (id, suffix = "") => {
@@ -3309,4 +3322,115 @@ function updateMetricsUI() {
 
     // Actualizar datos de la columna seleccionada
     updateSelectedColumnPanel();
+}
+
+// --- OBTENER SISMOS RECIENTES DE LA REGION DE VENEZUELA (USGS API) ---
+function fetchRecentEarthquakes() {
+    const listContainer = document.getElementById("sismos-list-container");
+    const loadingStatus = document.getElementById("sismos-loading-status");
+    if (!listContainer || !loadingStatus) return;
+
+    listContainer.innerHTML = "";
+    loadingStatus.style.display = "block";
+
+    // 1000 km a la redonda del centro de Venezuela (Lat 8.0, Lon -66.0) para cubrir toda la red
+    const url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=8.0&longitude=-66.0&maxradiuskm=1000&minmagnitude=2.5&orderby=time&limit=12";
+
+    fetch(url)
+        .then(res => {
+            if (!res.ok) throw new Error("Error en la respuesta del servidor USGS");
+            return res.json();
+        })
+        .then(data => {
+            loadingStatus.style.display = "none";
+            const features = data.features || [];
+
+            if (features.length === 0) {
+                listContainer.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 25px; background: rgba(30, 41, 59, 0.2); border-radius: 8px;">
+                        No se registraron sismos de magnitud ≥ 2.5 en las últimas semanas para esta región.
+                    </div>
+                `;
+                return;
+            }
+
+            features.forEach(feature => {
+                const props = feature.properties;
+                const geom = feature.geometry;
+                const coords = geom.coordinates; // [longitude, latitude, depth]
+                const mag = props.mag;
+                const timeMs = props.time;
+                const place = props.place;
+                const urlDetail = props.url;
+
+                // Formatear fecha local venezolana
+                const dateObj = new Date(timeMs);
+                const dateFormatted = dateObj.toLocaleDateString("es-VE", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric"
+                });
+                const timeFormatted = dateObj.toLocaleTimeString("es-VE", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+                });
+
+                // Determinar clase de magnitud
+                let magClass = "mag-low";
+                if (mag >= 4.5) {
+                    magClass = "mag-high";
+                } else if (mag >= 3.5) {
+                    magClass = "mag-medium";
+                }
+
+                // Traducir ligeramente algunas ubicaciones comunes en inglés
+                let placeTranslated = place
+                    .replace("Venezuela", "Venezuela")
+                    .replace("offshore", "costa afuera de")
+                    .replace("of", "de")
+                    .replace("North", "Norte")
+                    .replace("South", "Sur")
+                    .replace("East", "Este")
+                    .replace("West", "Oeste");
+
+                const cardHtml = `
+                    <div class="sismo-card">
+                        <div>
+                            <div class="sismo-header">
+                                <span class="sismo-mag-badge ${magClass}">M ${mag.toFixed(1)}</span>
+                                <span class="sismo-time">${dateFormatted} ${timeFormatted}</span>
+                            </div>
+                            <div class="sismo-body">
+                                <div class="sismo-place">${placeTranslated}</div>
+                                <div class="sismo-detail">
+                                    <span>Latitud: ${coords[1].toFixed(3)}°</span>
+                                    <span>Longitud: ${coords[0].toFixed(3)}°</span>
+                                </div>
+                                <div class="sismo-detail">
+                                    <span>Profundidad: ${coords[2].toFixed(1)} km</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sismo-footer">
+                            <a href="${urlDetail}" target="_blank" class="sismo-link">
+                                Ver Detalles en USGS <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                listContainer.insertAdjacentHTML("beforeend", cardHtml);
+            });
+        })
+        .catch(err => {
+            console.error("[fetchRecentEarthquakes]", err);
+            loadingStatus.style.display = "none";
+            listContainer.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; color: var(--color-damage); padding: 30px; background: rgba(239, 68, 68, 0.05); border: 1px dashed var(--color-damage); border-radius: 8px;">
+                    <i class="fa-solid fa-triangle-exclamation fa-2x" style="margin-bottom: 12px; color: var(--color-damage);"></i>
+                    <p style="font-weight: 600;">No se pudo conectar con el catálogo de sismos del USGS.</p>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">Por favor, verifique su conexión a Internet o intente de nuevo.</p>
+                </div>
+            `;
+        });
 }

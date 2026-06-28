@@ -1472,5 +1472,110 @@ select:focus {
     }
 }
 
+/* --- TARJETAS DE SISMOS RECIENTES (USGS / FUNVISIS) --- */
+.sismos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.sismo-card {
+    background: rgba(30, 41, 59, 0.25);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.sismo-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(30, 41, 59, 0.45);
+}
+
+.sismo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.sismo-mag-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 13.5px;
+}
+
+.mag-low {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.mag-medium {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.mag-high {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.sismo-time {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.sismo-body {
+    font-size: 12.5px;
+    margin-bottom: 14px;
+    line-height: 1.45;
+}
+
+.sismo-place {
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.sismo-detail {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.sismo-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.sismo-link {
+    font-size: 11px;
+    color: var(--color-2001);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.15s ease;
+}
+
+.sismo-link:hover {
+    color: #fff;
+}
+
 
 

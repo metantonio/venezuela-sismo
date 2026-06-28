@@ -498,6 +498,8 @@
                         Respuesta</button>
                     <button class="tab-btn" data-tab="tab-calc"><i class="fa-solid fa-calculator"></i> Memoria de
                         Cálculo</button>
+                    <button class="tab-btn" data-tab="tab-sismos"><i class="fa-solid fa-earth-americas"></i> Sismos
+                        Recientes</button>
                     <button class="tab-btn" data-tab="tab-info"><i class="fa-solid fa-circle-info"></i> Info
                         Técnica</button>
                 </nav>
@@ -620,6 +622,33 @@
                                 </p>
                                 <div id="calculation-report">
                                     <!-- Dynamic content will be injected by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB SISMOS RECIENTES -->
+                    <div id="tab-sismos" class="tab-content">
+                        <div class="tab-info-container">
+                            <div class="info-section">
+                                <h3><i class="fa-solid fa-house-crack"></i> Sismos Recientes en la Región de Venezuela</h3>
+                                <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
+                                    Monitoreo en tiempo real de los últimos eventos sísmicos registrados en el territorio de Venezuela y sus alrededores. Los datos provienen del catálogo público global del USGS filtrados geográficamente (cobertura de un radio de 1000 km en torno al centro del país).
+                                </p>
+                                
+                                <div class="sismos-actions" style="margin-bottom: 20px;">
+                                    <button id="btn-refresh-sismos" class="btn btn-secondary">
+                                        <i class="fa-solid fa-arrows-rotate"></i> Actualizar Reportes
+                                    </button>
+                                </div>
+                                
+                                <div id="sismos-loading-status" style="display: none; text-align: center; padding: 40px; color: var(--text-muted);">
+                                    <i class="fa-solid fa-spinner fa-spin fa-2x" style="margin-bottom: 12px; color: var(--color-2019);"></i>
+                                    <p>Obteniendo últimos reportes sísmicos del catálogo internacional...</p>
+                                </div>
+
+                                <div id="sismos-list-container" class="sismos-grid">
+                                    <!-- Las tarjetas de sismos se insertarán dinámicamente -->
                                 </div>
                             </div>
                         </div>
