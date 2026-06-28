@@ -61,7 +61,8 @@ const hingeRedMat = new THREE.MeshStandardMaterial({
 
 // Selección e iluminación de columnas 3D
 let selectedColumn = null;
-let columnHighlightHelper = null;
+let selectionHighlightMesh = null;
+let selectionHighlightOutline = null;
 let initialReportHTML = "";
 
 // --- INICIALIZACIÓN ---
@@ -1888,28 +1889,61 @@ function updateSelectedColumnPanel() {
 }
 
 function selectColumn(info) {
+    // Limpiar selección anterior si existiese
+    deselectColumn();
+
     selectedColumn = info;
     const panel = document.getElementById("column-info-panel");
     if (panel) panel.style.display = "block";
     updateSelectedColumnPanel();
 
-    // Dibujar BoxHelper de selección alrededor del mesh de la columna
-    if (columnHighlightHelper) {
-        scene.remove(columnHighlightHelper);
-        columnHighlightHelper.dispose();
-    }
-    columnHighlightHelper = new THREE.BoxHelper(info.colData.mesh, 0xffca28); // Color dorado
-    scene.add(columnHighlightHelper);
+    const colMesh = info.colData.mesh;
+
+    // 1. Crear sleeve semi-transparente dorado alrededor de la columna
+    const glowMat = new THREE.MeshBasicMaterial({
+        color: 0xffca28,
+        transparent: true,
+        opacity: 0.35,
+        depthWrite: false,
+        side: THREE.DoubleSide
+    });
+    selectionHighlightMesh = new THREE.Mesh(colMesh.geometry, glowMat);
+    // Un 15% más grande en planta, mismo alto
+    selectionHighlightMesh.scale.set(1.15, 1.005, 1.15);
+    colMesh.add(selectionHighlightMesh);
+
+    // 2. Crear marco alambrado (Edges) dorado para destacar bordes
+    const edges = new THREE.EdgesGeometry(colMesh.geometry);
+    const lineMat = new THREE.LineBasicMaterial({
+        color: 0xffd700,
+        depthWrite: false
+    });
+    selectionHighlightOutline = new THREE.LineSegments(edges, lineMat);
+    // Un 15.5% más grande para que no haga z-fighting
+    selectionHighlightOutline.scale.set(1.155, 1.005, 1.155);
+    colMesh.add(selectionHighlightOutline);
 }
 
 function deselectColumn() {
     selectedColumn = null;
     const panel = document.getElementById("column-info-panel");
     if (panel) panel.style.display = "none";
-    if (columnHighlightHelper) {
-        scene.remove(columnHighlightHelper);
-        columnHighlightHelper.dispose();
-        columnHighlightHelper = null;
+
+    if (selectionHighlightMesh) {
+        if (selectionHighlightMesh.parent) {
+            selectionHighlightMesh.parent.remove(selectionHighlightMesh);
+        }
+        selectionHighlightMesh.material.dispose();
+        selectionHighlightMesh = null;
+    }
+
+    if (selectionHighlightOutline) {
+        if (selectionHighlightOutline.parent) {
+            selectionHighlightOutline.parent.remove(selectionHighlightOutline);
+        }
+        selectionHighlightOutline.geometry.dispose();
+        selectionHighlightOutline.material.dispose();
+        selectionHighlightOutline = null;
     }
 }
 
@@ -2993,11 +3027,6 @@ function animate3D() {
 
     // Actualizar partículas
     updateParticles();
-
-    // Actualizar recuadro de selección 3D
-    if (columnHighlightHelper) {
-        columnHighlightHelper.update();
-    }
 
     // Renderizado
     renderer.render(scene, camera);
