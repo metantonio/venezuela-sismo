@@ -519,6 +519,37 @@
                                     deriva)</span>
                             </div>
                         </div>
+
+                        <!-- COLUMN INFO OVERLAY CARD -->
+                        <div id="column-info-panel" class="column-info-card" style="display: none;">
+                            <div class="card-header">
+                                <span><i class="fa-solid fa-circle-info"></i> Columna Seleccionada</span>
+                                <button id="close-column-info" class="close-btn">&times;</button>
+                            </div>
+                            <div class="card-body">
+                                <div class="info-row">
+                                    <span class="info-lbl">Edificio:</span>
+                                    <span class="info-val" id="col-info-building">--</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-lbl">Nivel:</span>
+                                    <span class="info-val" id="col-info-level">--</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-lbl">Ubicación:</span>
+                                    <span class="info-val" id="col-info-pos">--</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-lbl">Deriva Máx:</span>
+                                    <span class="info-val text-yellow" id="col-info-drift">0.00%</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-lbl">Estado:</span>
+                                    <span class="info-val font-bold" id="col-info-status">--</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="side-by-side-labels">
                             <div class="label-box label-2001">Edificio COVENIN 1756:2001</div>
                             <div class="label-box label-2019">Edificio COVENIN 1756:2019</div>
@@ -583,7 +614,9 @@
                                     Esta sección muestra las memorias de cálculo detalladas en tiempo real. Aquí puede
                                     auditar las inercias bruta y agrietada transformada, relaciones modulares, masas
                                     tributarias, coeficientes de rigidez y amplificaciones torsionales del modelo
-                                    estructural dinámico.
+                                    estructural dinámico. <strong>Al finalizar la simulación, se anexará automáticamente
+                                        al final de esta sección un resumen detallado con el estado de las rótulas
+                                        plásticas y derivas máximas de cada columna individual.</strong>
                                 </p>
                                 <div id="calculation-report">
                                     <!-- Dynamic content will be injected by JavaScript -->

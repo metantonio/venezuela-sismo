@@ -59,6 +59,11 @@ const hingeRedMat = new THREE.MeshStandardMaterial({
     roughness: 0.2
 });
 
+// Selección e iluminación de columnas 3D
+let selectedColumn = null;
+let columnHighlightHelper = null;
+let initialReportHTML = "";
+
 // --- INICIALIZACIÓN ---
 document.addEventListener("DOMContentLoaded", () => {
     try {
@@ -1321,16 +1326,111 @@ function generateSpectraAndEarthquake() {
     drawSpectraChart(params01, params19, T1_actual_x, T1_actual_y);
 
     // Inyectar el reporte de cálculos dinámicamente en el DOM
-    const reportDiv = document.getElementById("calculation-report");
-    if (reportDiv) {
-        reportDiv.innerHTML = reportHTML;
-    }
+    initialReportHTML = reportHTML;
+    updateCalculationReport();
     
     // Inicializar o limpiar gráficos de respuesta
     resetChartsData();
 
     // Actualizar visualización 3D estructural (reconstruir edificios con número correcto de pisos)
     rebuild3DStructures();
+}
+
+// --- REPORTE DE RESULTADOS DE COLUMNAS (MEMORIA DE CÁLCULO) ---
+function updateCalculationReport() {
+    const reportDiv = document.getElementById("calculation-report");
+    if (!reportDiv) return;
+
+    let html = initialReportHTML;
+
+    // Si la simulación ha iniciado, añadir el reporte de columnas
+    if (simStepIndex > 0) {
+        html += `
+            <div style="margin-top: 32px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+                <h4 style="color: var(--color-2019); margin-bottom: 12px; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <i class="fa-solid fa-circle-notch"></i> Resumen de Derivas Locales y Rótulas en Columnas
+                </h4>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
+                    Este cuadro detalla el estado final y la deriva de entrepiso máxima registrada en cada columna de forma individual. Nótese que debido al efecto de la excentricidad torsional, las columnas de un mismo piso pueden experimentar derivas distintas.
+                </p>
+                
+                <div class="grid-columns-report" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <!-- Edificio 2001 -->
+                    <div>
+                        <h5 style="color: var(--color-2001); margin-bottom: 8px; font-size: 13px; font-weight: 600;">
+                            <i class="fa-solid fa-hotel"></i> Edificio COVENIN 1756:2001
+                        </h5>
+                        ${generateColumnsTableHTML(buildings3D.b2001, eq2001)}
+                    </div>
+                    
+                    <!-- Edificio 2019 -->
+                    <div>
+                        <h5 style="color: var(--color-2019); margin-bottom: 8px; font-size: 13px; font-weight: 600;">
+                            <i class="fa-solid fa-hotel"></i> Edificio COVENIN 1756:2019
+                        </h5>
+                        ${generateColumnsTableHTML(buildings3D.b2019, eq2019)}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    reportDiv.innerHTML = html;
+}
+
+function generateColumnsTableHTML(b3D, bModel) {
+    if (!b3D || !b3D.columns || b3D.columns.length === 0) {
+        return '<p style="color: var(--text-muted); font-size: 12px;">Sin datos en el modelo 3D.</p>';
+    }
+
+    let html = `
+        <table class="calc-table">
+            <thead>
+                <tr>
+                    <th>Piso</th>
+                    <th>Columna (X, Y)</th>
+                    <th>Deriva Máx</th>
+                    <th>Estado Final</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    b3D.columns.forEach((storyCols, lvl) => {
+        storyCols.forEach((col) => {
+            const maxDrift = col.maxDriftRatio || 0;
+            const maxDriftPercent = (maxDrift * 100).toFixed(2) + "%";
+            
+            let statusText = "Seguro";
+            let statusStyle = "color: var(--color-safe); font-weight: bold;";
+            
+            if (maxDrift >= bModel.driftCollapseLimit || bModel.D[lvl] >= 0.99) {
+                statusText = "Colapso / Fallo";
+                statusStyle = "color: var(--color-damage); font-weight: bold;";
+            } else if (maxDrift >= 0.018) {
+                statusText = "Rótula Roja (Severo)";
+                statusStyle = "color: #ff1744; font-weight: bold;";
+            } else if (maxDrift >= 0.015) {
+                statusText = "Rótula Amarilla (Fluencia)";
+                statusStyle = "color: #ffca28; font-weight: bold;";
+            }
+
+            html += `
+                <tr>
+                    <td class="calc-symbol" style="font-weight: normal; color: #fff;">Piso ${lvl + 1}</td>
+                    <td class="calc-param-name">Columna (${col.ix + 1}, ${col.iy + 1})</td>
+                    <td class="calc-value">${maxDriftPercent}</td>
+                    <td class="calc-unit" style="${statusStyle}">${statusText}</td>
+                </tr>
+            `;
+        });
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+    return html;
 }
 
 // --- GRÁFICOS CON CHART.JS ---
@@ -1685,6 +1785,63 @@ function initThreeJS() {
     // Flechas indicadoras de fuerza cortante base
     createBaseShearArrows();
 
+    // Evento de selección de columnas por click 3D (Raycasting con prevención de arrastre de cámara)
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let startX = 0, startY = 0;
+
+    renderer.domElement.addEventListener('pointerdown', (e) => {
+        startX = e.clientX;
+        startY = e.clientY;
+    });
+
+    renderer.domElement.addEventListener('pointerup', (e) => {
+        const diffX = Math.abs(e.clientX - startX);
+        const diffY = Math.abs(e.clientY - startY);
+        if (diffX > 3 || diffY > 3) return; // Arrastre detectado, ignorar click
+
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+
+        const targets = [];
+        const colMap = new Map();
+
+        const addCols = (b3D, bName) => {
+            if (!b3D.columns) return;
+            b3D.columns.forEach((storyCols, lvl) => {
+                storyCols.forEach((col, idx) => {
+                    targets.push(col.mesh);
+                    colMap.set(col.mesh, { buildingName: bName, level: lvl, index: idx, colData: col });
+                });
+            });
+        };
+
+        addCols(buildings3D.b2001, 'Edificio COVENIN 1756:2001');
+        addCols(buildings3D.b2019, 'Edificio COVENIN 1756:2019');
+
+        const intersects = raycaster.intersectObjects(targets);
+        if (intersects.length > 0) {
+            const hitMesh = intersects[0].object;
+            const info = colMap.get(hitMesh);
+            if (info) {
+                selectColumn(info);
+            }
+        } else {
+            deselectColumn();
+        }
+    });
+
+    // Botón de cerrar panel de columna
+    const closeBtn = document.getElementById("close-column-info");
+    if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+            deselectColumn();
+        });
+    }
+
     // Evento resize
     window.addEventListener("resize", () => {
         const width = container.clientWidth;
@@ -1693,6 +1850,67 @@ function initThreeJS() {
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
     });
+}
+
+// --- SELECCIÓN Y DETALLES DE COLUMNAS EN 3D ---
+function updateSelectedColumnPanel() {
+    if (!selectedColumn) return;
+
+    const col = selectedColumn.colData;
+    const maxDrift = col.maxDriftRatio || 0;
+    const maxDriftPercent = (maxDrift * 100).toFixed(2) + "%";
+
+    document.getElementById("col-info-building").textContent = selectedColumn.buildingName;
+    document.getElementById("col-info-level").textContent = `Piso ${selectedColumn.level + 1}`;
+    document.getElementById("col-info-pos").textContent = `Fila ${col.ix + 1}, Eje ${col.iy + 1}`;
+    document.getElementById("col-info-drift").textContent = maxDriftPercent;
+
+    let statusText = "Seguro";
+    let statusClass = "text-green";
+
+    const bModel = selectedColumn.buildingName.includes("2019") ? eq2019 : eq2001;
+    if (maxDrift >= bModel.driftCollapseLimit || bModel.D[selectedColumn.level] >= 0.99) {
+        statusText = "Colapsada";
+        statusClass = "text-red animate-pulse";
+    } else if (maxDrift >= 0.018) {
+        statusText = "Daño Severo";
+        statusClass = "text-red";
+    } else if (maxDrift >= 0.015) {
+        statusText = "Fluencia (Plástica)";
+        statusClass = "text-yellow";
+    }
+
+    const statusEl = document.getElementById("col-info-status");
+    if (statusEl) {
+        statusEl.textContent = statusText;
+        statusEl.className = "info-val " + statusClass;
+    }
+}
+
+function selectColumn(info) {
+    selectedColumn = info;
+    const panel = document.getElementById("column-info-panel");
+    if (panel) panel.style.display = "block";
+    updateSelectedColumnPanel();
+
+    // Dibujar BoxHelper de selección alrededor del mesh de la columna
+    if (columnHighlightHelper) {
+        scene.remove(columnHighlightHelper);
+        columnHighlightHelper.dispose();
+    }
+    columnHighlightHelper = new THREE.BoxHelper(info.colData.mesh, 0xffca28); // Color dorado
+    scene.add(columnHighlightHelper);
+}
+
+function deselectColumn() {
+    selectedColumn = null;
+    const panel = document.getElementById("column-info-panel");
+    if (panel) panel.style.display = "none";
+    if (columnHighlightHelper) {
+        scene.remove(columnHighlightHelper);
+        columnHighlightHelper.dispose();
+        columnHighlightHelper = null;
+    }
 }
 
 // --- INDICADORES DE FUERZA CORTANTE BASE (CORTE BASAL) ---
@@ -2370,7 +2588,7 @@ function rebuild3DStructures() {
             const x = numColsX > 1 ? -bW/2 + (ix / (numColsX - 1)) * bW : 0;
             for (let iy = 0; iy < numColsY; iy++) {
                 const z = numColsY > 1 ? -bD/2 + (iy / (numColsY - 1)) * bD : 0;
-                colOffsets.push({ x: x, z: z });
+                colOffsets.push({ x: x, z: z, ix: ix, iy: iy });
             }
         }
         const totalColsPerStory = colOffsets.length;
@@ -2434,6 +2652,9 @@ function rebuild3DStructures() {
                     offsetX: colOffsets[c].x,
                     offsetZ: colOffsets[c].z,
                     level: lvl,
+                    ix: colOffsets[c].ix,
+                    iy: colOffsets[c].iy,
+                    maxDriftRatio: 0,
                     bottomHinge: bottomHinge,
                     topHinge: topHinge
                 });
@@ -2706,6 +2927,7 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
             const drift_x_phys = x_t_phys - x_b_phys;
             const drift_z_phys = z_t_phys - z_b_phys;
             const colDriftRatio = Math.sqrt(drift_x_phys * drift_x_phys + drift_z_phys * drift_z_phys) / h;
+            col.maxDriftRatio = Math.max(col.maxDriftRatio || 0, colDriftRatio);
 
             // Determinar color de esta columna según su propia deriva (torsión castiga unas columnas más que otras)
             let colColor;
@@ -2771,6 +2993,11 @@ function animate3D() {
 
     // Actualizar partículas
     updateParticles();
+
+    // Actualizar recuadro de selección 3D
+    if (columnHighlightHelper) {
+        columnHighlightHelper.update();
+    }
 
     // Renderizado
     renderer.render(scene, camera);
@@ -2843,6 +3070,7 @@ function stopSimulation() {
     if (mobReset) mobReset.disabled = false;
     
     toggleInputControls(false);
+    updateCalculationReport();
 }
 
 function pauseSimulation() {
@@ -2854,6 +3082,7 @@ function pauseSimulation() {
         clearInterval(simInterval);
         btnPause.innerHTML = '<i class="fa-solid fa-play"></i> Reanudar';
         if (mobPause) mobPause.innerHTML = '<i class="fa-solid fa-play"></i>';
+        updateCalculationReport();
     } else {
         // REANUDAR
         isPaused = false;
@@ -3048,4 +3277,7 @@ function updateMetricsUI() {
 
     const evac2019El = document.getElementById("evac-2019");
     if (evac2019El) evac2019El.innerHTML = getEvacStatusText(evacuation2019);
+
+    // Actualizar datos de la columna seleccionada
+    updateSelectedColumnPanel();
 }
