@@ -45,6 +45,20 @@ let evacuation2019 = { meshes: [], currentFloor: 0, startTime: null, escaped: fa
 let arrow2001 = null;
 let arrow2019 = null;
 
+// Materiales de Rótulas Plásticas
+const hingeYellowMat = new THREE.MeshStandardMaterial({
+    color: 0xffca28,
+    emissive: 0xffca28,
+    emissiveIntensity: 0.6,
+    roughness: 0.2
+});
+const hingeRedMat = new THREE.MeshStandardMaterial({
+    color: 0xff1744,
+    emissive: 0xff1744,
+    emissiveIntensity: 0.7,
+    roughness: 0.2
+});
+
 // --- INICIALIZACIÓN ---
 document.addEventListener("DOMContentLoaded", () => {
     try {
@@ -2397,12 +2411,31 @@ function rebuild3DStructures() {
                 // Posicionar a la mitad de la altura de la planta
                 colMesh.position.set(colOffsets[c].x, (lvl + 0.5) * h, colOffsets[c].z);
                 
+                // Crear anillos de rótulas plásticas (Torus) en los extremos
+                const torusRadius = Math.sqrt(colW * colW + colD * colD) / 2 + 0.015;
+                const torusTube = 0.025;
+                const ringGeom = new THREE.TorusGeometry(torusRadius, torusTube, 8, 24);
+                
+                const dummyMat = new THREE.MeshStandardMaterial({ visible: false });
+                
+                const bottomHinge = new THREE.Mesh(ringGeom, dummyMat);
+                bottomHinge.position.set(0, -h/2 + 0.08, 0);
+                bottomHinge.rotation.x = Math.PI / 2;
+                colMesh.add(bottomHinge);
+                
+                const topHinge = new THREE.Mesh(ringGeom, dummyMat);
+                topHinge.position.set(0, h/2 - 0.08, 0);
+                topHinge.rotation.x = Math.PI / 2;
+                colMesh.add(topHinge);
+                
                 bData.group.add(colMesh);
                 storyCols.push({
                     mesh: colMesh,
                     offsetX: colOffsets[c].x,
                     offsetZ: colOffsets[c].z,
-                    level: lvl
+                    level: lvl,
+                    bottomHinge: bottomHinge,
+                    topHinge: topHinge
                 });
             }
             bData.columns.push(storyCols);
@@ -2595,6 +2628,10 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
                 col.mesh.scale.y = Math.max(0.1, col.mesh.scale.y - 0.05);
                 col.mesh.rotation.z += (col.offsetX > 0 ? 0.03 : -0.03);
                 col.mesh.material.color.setHex(0x111111); // Negro de escombros quemados/destruidos
+                
+                // Ocultar rótulas plásticas en colapso
+                if (col.bottomHinge) col.bottomHinge.visible = false;
+                if (col.topHinge) col.topHinge.visible = false;
             });
         }
         return;
@@ -2689,6 +2726,24 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
             }
 
             col.mesh.material.color.setHex(colColor);
+
+            // Actualizar visualización de Rótulas Plásticas
+            if (col.bottomHinge && col.topHinge) {
+                if (colDriftRatio >= 0.018) {
+                    col.bottomHinge.material = hingeRedMat;
+                    col.topHinge.material = hingeRedMat;
+                    col.bottomHinge.visible = true;
+                    col.topHinge.visible = true;
+                } else if (colDriftRatio >= 0.015) {
+                    col.bottomHinge.material = hingeYellowMat;
+                    col.topHinge.material = hingeYellowMat;
+                    col.bottomHinge.visible = true;
+                    col.topHinge.visible = true;
+                } else {
+                    col.bottomHinge.visible = false;
+                    col.topHinge.visible = false;
+                }
+            }
 
             // Posicionar columna en el punto medio deformado
             col.mesh.position.set(

@@ -686,7 +686,12 @@
                                         <i class="fa-solid fa-water"></i>
                                         <div class="simplification-content">
                                             <h5>Independencia de Ondas en Sismos Sucesivos</h5>
-                                            <p>Al simular sismos sucesivos (doble sismo), por facilidad de cálculo se asume que ambos eventos son independientes. No se considera la superposición o interferencia destructiva/constructiva de las ondas sísmicas en el suelo de fundación; el segundo sismo actúa directamente sobre la estructura en su estado de rigidez y resistencia remanentes degradadas por el primer sismo.</p>
+                                            <p>Al simular sismos sucesivos (doble sismo), por facilidad de cálculo se
+                                                asume que ambos eventos son independientes. No se considera la
+                                                superposición o interferencia destructiva/constructiva de las ondas
+                                                sísmicas en el suelo de fundación; el segundo sismo actúa directamente
+                                                sobre la estructura en su estado de rigidez y resistencia remanentes
+                                                degradadas por el primer sismo.</p>
                                         </div>
                                     </div>
 
@@ -706,6 +711,33 @@
                                                 Si el resolvedor detecta el colapso del edificio, los ocupantes por
                                                 encima de la losa fallada quedan atrapados y caen físicamente junto con
                                                 los escombros de la estructura.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="simplification-item">
+                                        <i class="fa-solid fa-arrow-right-left"></i>
+                                        <div class="simplification-content">
+                                            <h5>Vector de Fuerza Cortante Basal (Corte Basal 3D)</h5>
+                                            <p>Representa la fuerza cortante total en la base del edificio (V_0 = sum
+                                                F_i) mediante un vector 3D dinámico. La longitud de la flecha se escala
+                                                en tiempo real en proporción al peso total del edificio (una longitud de
+                                                3.5 metros representa un corte basal equivalente al 30% del peso
+                                                reactivo de la estructura), y su sentido indica la dirección en que
+                                                empuja la inercia del sismo en cada instante del resolvedor físico.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="simplification-item">
+                                        <i class="fa-solid fa-circle-notch"></i>
+                                        <div class="simplification-content">
+                                            <h5>Formación de Rótulas Plásticas</h5>
+                                            <p>Visualiza las articulaciones plásticas (zonas de fluencia por flexión) en
+                                                los extremos superiores e inferiores de cada columna de forma
+                                                individual. Si la deriva local de la columna supera el límite elástico
+                                                (1.5%), se dibuja un anillo amarillo. Si la deformación progresa y
+                                                supera la zona de seguridad estructural (1.8%), el anillo cambia a color
+                                                rojo de peligro, mostrando cómo se concentra la ductilidad y el daño
+                                                inelástico a lo largo del sismo.</p>
                                         </div>
                                     </div>
                                 </div>
