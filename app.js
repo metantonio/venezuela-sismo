@@ -41,6 +41,10 @@ let particlesData = [];
 let evacuation2001 = { meshes: [], currentFloor: 0, startTime: null, escaped: false, trapped: false };
 let evacuation2019 = { meshes: [], currentFloor: 0, startTime: null, escaped: false, trapped: false };
 
+// Indicadores de Fuerza Cortante Base (Corte Basal)
+let arrow2001 = null;
+let arrow2019 = null;
+
 // --- INICIALIZACIÓN ---
 document.addEventListener("DOMContentLoaded", () => {
     try {
@@ -637,6 +641,7 @@ class BuildingModel {
         this.isCollapsed = false;
         this.collapseTime = null;
         this.maxDriftRatio = 0;
+        this.currentBaseShear = 0;
 
         const totalMass = this.m * N;
         const totalWeight = totalMass * G;
@@ -762,6 +767,7 @@ class BuildingModel {
                 this.collapseTime = currentTime;
             }
         }
+        this.currentBaseShear = storyForces[0];
 
         const f_rest = new Array(N);
         for(let i=0; i<N; i++) {
@@ -1662,6 +1668,9 @@ function initThreeJS() {
     // Partículas de polvo/humo
     initParticles();
 
+    // Flechas indicadoras de fuerza cortante base
+    createBaseShearArrows();
+
     // Evento resize
     window.addEventListener("resize", () => {
         const width = container.clientWidth;
@@ -1670,6 +1679,79 @@ function initThreeJS() {
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
     });
+}
+
+// --- INDICADORES DE FUERZA CORTANTE BASE (CORTE BASAL) ---
+function createBaseShearArrows() {
+    if (arrow2001 && arrow2001.parent) arrow2001.parent.remove(arrow2001);
+    if (arrow2019 && arrow2019.parent) arrow2019.parent.remove(arrow2019);
+
+    const dir = new THREE.Vector3(1, 0, 0);
+    const origin = new THREE.Vector3(0, 0, 0);
+
+    // Colores: Cyan (0x00ffcc) para 2001 y Rosa/Magenta (0xff007f) para 2019
+    arrow2001 = new THREE.ArrowHelper(dir, origin, 1.0, 0x00ffcc, 0.4, 0.3);
+    arrow2019 = new THREE.ArrowHelper(dir, origin, 1.0, 0xff007f, 0.4, 0.3);
+
+    arrow2001.visible = false;
+    arrow2019.visible = false;
+
+    scene.add(arrow2001);
+    scene.add(arrow2019);
+}
+
+function updateBaseShearArrows(isX, xOffset, bD, groundDisp) {
+    if (!arrow2001 || !arrow2019) return;
+
+    if (!isPlaying) {
+        arrow2001.visible = false;
+        arrow2019.visible = false;
+        return;
+    }
+
+    // Fuerza de diseño o máxima de referencia (30% del peso del edificio)
+    const maxExpectedForce2001 = eq2001.m * eq2001.N * 9.80665 * 0.3;
+    const maxExpectedForce2019 = eq2019.m * eq2019.N * 9.80665 * 0.3;
+
+    const force2001 = eq2001.currentBaseShear || 0;
+    const force2019 = eq2019.currentBaseShear || 0;
+
+    // Actualizar flecha 2001 (lado izquierdo, offset negativo)
+    updateSingleBaseShearArrow(arrow2001, force2001, maxExpectedForce2001, -xOffset, bD, isX, groundDisp);
+
+    // Actualizar flecha 2019 (lado derecho, offset positivo)
+    updateSingleBaseShearArrow(arrow2019, force2019, maxExpectedForce2019, xOffset, bD, isX, groundDisp);
+}
+
+function updateSingleBaseShearArrow(arrow, forceVal, maxExpected, xOffsetPos, bD, isX, groundDisp) {
+    if (Math.abs(forceVal) < 1.0) {
+        arrow.visible = false;
+        return;
+    }
+
+    arrow.visible = true;
+
+    // Dirección del vector de fuerza
+    const dir = new THREE.Vector3(0, 0, 0);
+    if (isX) {
+        dir.set(Math.sign(forceVal), 0, 0);
+    } else {
+        // El eje Y en planta del simulador equivale al eje -Z de Three.js
+        dir.set(0, 0, -Math.sign(forceVal));
+    }
+    arrow.setDirection(dir);
+
+    // Longitud (proporcional, máx 4.5m, mín 0.4m)
+    const rawLength = (Math.abs(forceVal) / maxExpected) * 3.5;
+    const length = Math.max(0.4, Math.min(4.5, rawLength));
+    const headLength = Math.max(0.15, length * 0.25);
+    const headWidth = Math.max(0.12, length * 0.18);
+    arrow.setLength(length, headLength, headWidth);
+
+    // Posición: justo al frente de la losa base y vibrando en fase con el terreno
+    const currentX = xOffsetPos + (isX ? groundDisp : 0);
+    const currentZ = (isX ? 0 : groundDisp) + bD / 2 + 1.2;
+    arrow.position.set(currentX, 0.3, currentZ);
 }
 // --- INDICADORES DE EJES X / Y ---
 let axisIndicatorsGroup = null;
@@ -2452,6 +2534,12 @@ function update3DPhysics() {
     const evacH = eq2001.h;
     updateEvacuation(evacuation2001, eq2001, buildings3D.b2001, evacN, evacH, true);
     updateEvacuation(evacuation2019, eq2019, buildings3D.b2019, evacN, evacH, false);
+
+    // Actualizar Flechas de Corte Basal
+    const numColsY = parseInt(document.getElementById("num-cols-y").value) || 2;
+    const sY = parseFloat(document.getElementById("col-dist-y").value) || 5.0;
+    const bD = sY * (numColsY - 1);
+    updateBaseShearArrows(isX, xOffset, bD, groundDisp);
 }
 
 function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
