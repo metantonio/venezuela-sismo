@@ -477,7 +477,7 @@
                     <div class="author-details">
                         <span class="author-label">Desarrollado por:</span>
                         <span class="author-name">Ing. Antonio Luis III Martínez B.</span>
-                        </br>
+                        <br>
                         <span class="author-name">www.github.com/metantonio</span>
                         <span class="author-school">Egresado de la UCV</span>
                     </div>
@@ -708,26 +708,24 @@
                                     <div class="simplification-item">
                                         <i class="fa-solid fa-heart-pulse"></i>
                                         <div class="simplification-content">
-                                            <h5>Modelo de Daño de Park-Ang y Degradación</h5>
-                                            <p>El daño estructural se evalúa de manera continua en cada piso utilizando
-                                                el Índice de Daño de Park-Ang, que combina la demanda de deformación
-                                                máxima con el efecto acumulado de disipación de energía histerética.
-                                                Este índice degrada de forma lineal la rigidez lateral y la resistencia
-                                                de fluencia de los elementos a lo largo del sismo.</p>
+                                            <h5>Modelo de Daño de Park-Ang por Elemento y Degradación</h5>
+                                            <p>El daño estructural se evalúa de manera continua en cada piso utilizando el Índice de Daño de Park-Ang. Para mayor precisión, el simulador rastrea individualmente la deriva en las columnas de esquina (las más solicitadas por torsión) para calcular el daño máximo local (<strong>D<sub>max</sub></strong>). Este índice gobierna la formación de rótulas plásticas y el colapso del entrepiso cuando se alcanza un daño del 99% en cualquier columna individual, reflejando fallas locales críticas.</p>
                                         </div>
                                     </div>
 
                                     <div class="simplification-item">
                                         <i class="fa-solid fa-ruler-combined"></i>
                                         <div class="simplification-content">
-                                            <h5>Inercias de Secciones Físicas (Transformadas y Agrietadas)</h5>
-                                            <p>Al activar "Secciones Físicas", la inercia de la columna ($I_{c,eff}$) se
-                                                calcula usando la sección transformada total (concreto más el aporte del
-                                                acero longitudinal en dos caras simétricas), ignorando la carga axial
-                                                dinámica variable. La inercia de la viga ($I_{cr}$) se calcula bajo
-                                                flexión pura empleando la sección agrietada transformada en flexión
-                                                simple unilateral, omitiendo las variaciones por momento
-                                                positivo/negativo o el ancho efectivo de losa colaborante.</p>
+                                            <h5>Inercias de Secciones Físicas y Masa de Diseño</h5>
+                                            <p>Al activar "Secciones Físicas", la inercia de las columnas se calcula usando la sección transformada total (concreto + acero simétrico), y la de las vigas empleando la sección agrietada transformada en flexión simple. La masa de diseño se escala de forma realista según el área tributaria de la losa usando la relación <strong>m = m<sub>ref</sub> &times; (0.3 + 0.7 &times; Área / 25)</strong>, donde 0.3 representa el peso estructural fijo y 0.7 la losa y cargas variables asociadas.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="simplification-item">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                        <div class="simplification-content">
+                                            <h5>Filosofía Columna Fuerte - Viga Débil (SCWB)</h5>
+                                            <p>Cuando se activan las secciones personalizadas, el sistema calcula los momentos nominales de vigas (Mn,vig) y columnas (Mn,col) en cada nudo. Si se cumple el requisito de diseño dúctil (<strong>&Sigma;M<sub>n,col</sub> &ge; 1.2 &Sigma;M<sub>n,vig</sub></strong>), las rótulas plásticas se forman preferentemente en las vigas, protegiendo las columnas y reduciendo la degradación de rigidez de entrepiso en un 60%. Si no se cumple, el daño y la fluencia ocurren directamente en las columnas, induciendo un mecanismo de piso blando frágil.</p>
                                         </div>
                                     </div>
 
@@ -735,12 +733,7 @@
                                         <i class="fa-solid fa-rotate-right"></i>
                                         <div class="simplification-content">
                                             <h5>Efecto de Torsión en Planta y Excentricidad</h5>
-                                            <p>Se simula la torsión acoplando el giro de la losa (&theta;<sub>z</sub>)
-                                                al desplazamiento traslacional en función de la excentricidad torsional
-                                                elegida (e<sub>a</sub>). Este giro amplifica geométricamente la deriva
-                                                en las columnas perimetrales más alejadas del centroide, lo que a su vez
-                                                se traduce en un incremento proporcional del daño y la aceleración del
-                                                colapso en el resolvedor físico.</p>
+                                            <p>Se simula la torsión acoplando el giro de la losa (&theta;<sub>z</sub>) al desplazamiento traslacional en función de la excentricidad torsional elegida (e<sub>a</sub>). Este giro amplifica geométricamente la deriva en las columnas perimetrales más alejadas del centroide, lo que a su vez se traduce en un incremento proporcional del daño y la aceleración del colapso en el resolvedor físico.</p>
                                         </div>
                                     </div>
 

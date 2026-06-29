@@ -386,65 +386,70 @@ function generateSyntheticEarthquake(T_soil, pga1, pga2, hasSecond) {
     const N_steps = totalDuration / dt;
     groundAccel = new Array(N_steps).fill(0);
     
-    // Generar Ruido Blanco
-    let w = [];
-    for(let i=0; i<N_steps; i++) {
-        // Box-Muller para distribución normal (media 0, varianza 1)
-        let u1 = Math.random();
-        let u2 = Math.random();
-        let randStdNormal = Math.sqrt(-2.0 * Math.log(u1)) * Math.sin(2.0 * Math.PI * u2);
-        w.push(randStdNormal);
+    // --- Filtro de Kanai-Tajimi reutilizable ---
+    // Recibe un array de ruido blanco y devuelve la señal filtrada normalizada
+    function kanaiTajimiFilter(noise, omega_g, zeta_g) {
+        const len = noise.length;
+        const beta_nw = 0.25, gamma_nw = 0.5;
+        let x_f = 0, v_f = 0, a_f = 0;
+        const result = new Array(len);
+
+        for (let i = 0; i < len; i++) {
+            let x_pred = x_f + dt * v_f + dt * dt * (0.5 - beta_nw) * a_f;
+            let v_pred = v_f + dt * (1.0 - gamma_nw) * a_f;
+            let a_new = noise[i] - 2.0 * zeta_g * omega_g * v_pred - omega_g * omega_g * x_pred;
+            x_f = x_pred + beta_nw * dt * dt * a_new;
+            v_f = v_pred + gamma_nw * dt * a_new;
+            a_f = a_new;
+            result[i] = 2.0 * zeta_g * omega_g * v_f + omega_g * omega_g * x_f;
+        }
+
+        // Normalizar
+        let maxVal = 0;
+        for (let i = 0; i < len; i++) {
+            const absVal = Math.abs(result[i]);
+            if (absVal > maxVal) maxVal = absVal;
+        }
+        if (maxVal > 0) {
+            for (let i = 0; i < len; i++) result[i] /= maxVal;
+        }
+        return result;
     }
 
-    // Filtrado de Kanai-Tejimi (representa el filtrado del suelo)
-    // Suelo rígido: T_soil ~ 0.4s, Suelo blando: T_soil ~ 1.2s
+    // --- Generar dos señales de ruido blanco INDEPENDIENTES ---
+    function generateWhiteNoise(length) {
+        const w = new Array(length);
+        for (let i = 0; i < length; i++) {
+            let u1 = Math.random();
+            let u2 = Math.random();
+            w[i] = Math.sqrt(-2.0 * Math.log(u1)) * Math.sin(2.0 * Math.PI * u2);
+        }
+        return w;
+    }
+
     const omega_g = (2.0 * Math.PI) / T_soil;
-    const zeta_g = 0.6; // amortiguamiento del suelo típico
+    const zeta_g = 0.6;
 
-    // Solución del filtro (1 DOF) mediante Newmark predictor-corrector
-    let x_f = 0, v_f = 0, a_f = 0;
-    const beta = 0.25, gamma = 0.5;
-    
-    let filtered = new Array(N_steps).fill(0);
-    for(let i=0; i<N_steps; i++) {
-        // Predictores
-        let x_pred = x_f + dt * v_f + dt*dt * (0.5 - beta) * a_f;
-        let v_pred = v_f + dt * (1.0 - gamma) * a_f;
+    // Señal 1: Para el primer sismo
+    const w1 = generateWhiteNoise(N_steps);
+    const filtered1 = kanaiTajimiFilter(w1, omega_g, zeta_g);
 
-        // Fuerza externa es el ruido blanco
-        let force = w[i];
-
-        // Aceleración correctora
-        // m*a + c*v + k*x = f => a_new = f - 2*zeta*omega*v_pred - omega^2*x_pred
-        let a_new = force - 2.0 * zeta_g * omega_g * v_pred - omega_g*omega_g * x_pred;
-
-        // Corrección
-        x_f = x_pred + beta * dt*dt * a_new;
-        v_f = v_pred + gamma * dt * a_new;
-        a_f = a_new;
-
-        // Aceleración en superficie: a_g = 2*zeta_g*omega_g*v_f + omega_g^2*x_f
-        filtered[i] = 2.0 * zeta_g * omega_g * v_f + omega_g*omega_g * x_f;
-    }
-
-    // Normalizar la señal filtrada
-    let maxVal = Math.max(...filtered.map(Math.abs));
-    if (maxVal > 0) {
-        filtered = filtered.map(val => val / maxVal);
-    }
+    // Señal 2: Para el segundo sismo (ruido independiente → contenido frecuencial distinto)
+    const w2 = generateWhiteNoise(N_steps);
+    const filtered2 = kanaiTajimiFilter(w2, omega_g, zeta_g);
 
     // Modulación mediante envolventes de Jennings
     // Sismo 1: t = 0 a 30s
-    // Sismo 2: t = 40 a 70s
-    for(let i=0; i<N_steps; i++) {
+    // Sismo 2: t = 40 a 70s (señal independiente)
+    for (let i = 0; i < N_steps; i++) {
         let t = i * dt;
         let env1 = 0;
         let env2 = 0;
 
         // Envolvente Sismo 1
         if (t >= 0 && t < 30) {
-            let t1 = 2.0; // rampa de subida
-            let t2 = 10.0; // meseta
+            let t1 = 2.0;
+            let t2 = 10.0;
             if (t < t1) {
                 env1 = Math.pow(t / t1, 2);
             } else if (t <= t2) {
@@ -468,8 +473,8 @@ function generateSyntheticEarthquake(T_soil, pga1, pga2, hasSecond) {
             }
         }
 
-        // Combinar sismos multiplicados por su respectivo PGA (en g)
-        groundAccel[i] = (filtered[i] * env1 * pga1) + (filtered[i] * env2 * pga2);
+        // Combinar sismos con señales INDEPENDIENTES multiplicadas por su respectivo PGA
+        groundAccel[i] = (filtered1[i] * env1 * pga1) + (filtered2[i] * env2 * pga2);
     }
 }
 
@@ -579,14 +584,28 @@ class BuildingModel {
         const area = bW * bD;
         const rp = Math.sqrt((bW * bW + bD * bD) / 12) || 2.0;
 
+        // Corrección de masa por área tributaria:
+        // Para un edificio de referencia de 25 m² (5m×5m, 4 columnas), el factor es 1.0.
+        // Para edificios más grandes, la masa crece proporcionalmente al área de planta.
+        // El término 0.3 representa la masa mínima estructural (columnas, vigas, acabados fijos)
+        // independiente del área, y 0.7*(A/25) escala la contribución de la losa y cargas distribuidas.
         this.m = this.m_ref * (0.3 + 0.7 * (area / 25.0));
 
         const CONV = 98066.5;
         const ES_PA = 2.0e6 * CONV;
 
+        // --- VERIFICACIÓN COLUMNA FUERTE – VIGA DÉBIL (SCWB) ---
+        // Solo aplicable cuando se definen secciones personalizadas
+        this.scwbRatio = Infinity; // Por defecto, se asume diseño correcto
+        this.strongColumnWeakBeam = true;
+        this.Mn_beam = 0;  // Momento nominal de la viga (kgf·m)
+        this.Mn_col = 0;   // Momento nominal de la columna (kgf·m)
+
         if (customSections && customSections.enable) {
             const fc_col  = customSections.fcCol;
             const fc_beam = customSections.fcBeam;
+            const fy_col  = customSections.fyCol;
+            const fy_beam = customSections.fyBeam;
             const Ec_col  = 15100.0 * Math.sqrt(fc_col)  * CONV;
             const Ec_beam = 15100.0 * Math.sqrt(fc_beam) * CONV;
 
@@ -604,16 +623,18 @@ class BuildingModel {
             const As_m2  = (customSections.beamAs)      / 1e4;
             const Asp_m2 = (customSections.beamAsPrime)  / 1e4;
             const d_cover = 0.04;
-            const d  = (customSections.beamDepth / 100) - d_cover;
+            const bb = customSections.beamWidth / 100;
+            const hb = customSections.beamDepth / 100;
+            const d  = hb - d_cover;
             const dp = d_cover;
 
-            const A_quad = (customSections.beamWidth / 100) / 2;
+            const A_quad = bb / 2;
             const B_quad = n * (As_m2 + Asp_m2);
             const C_quad = -n * (As_m2 * d + Asp_m2 * dp);
             const discriminant = B_quad * B_quad - 4 * A_quad * C_quad;
             const x_na = (-B_quad + Math.sqrt(Math.max(0, discriminant))) / (2 * A_quad);
 
-            const Icr = ((customSections.beamWidth / 100) * Math.pow(x_na, 3)) / 3
+            const Icr = (bb * Math.pow(x_na, 3)) / 3
                        + n * Asp_m2 * Math.pow(Math.max(0, x_na - dp), 2)
                        + n * As_m2  * Math.pow(Math.max(0, d - x_na), 2);
 
@@ -636,6 +657,38 @@ class BuildingModel {
             const eta_y = (12.0 * kappa_y + 1.0) / (12.0 * kappa_y + 4.0);
             this.k_init_y = this.numCols * k_col_fixed_y * eta_y;
             this.T1_y = Math.PI / (Math.sqrt(this.k_init_y / this.m) * sinTerm);
+
+            // --- Cálculo de Momentos Nominales para Verificación SCWB ---
+
+            // Momento nominal de la VIGA (sección doblemente armada):
+            // Mn,viga = As × fy × (d - a/2)  donde  a = As × fy / (0.85 × f'c × b)
+            const As_beam_cm2 = customSections.beamAs;
+            const bb_cm = customSections.beamWidth;
+            const d_cm = (customSections.beamDepth) - 4.0; // recubrimiento 4 cm
+            const a_beam = (As_beam_cm2 * fy_beam) / (0.85 * fc_beam * bb_cm); // cm
+            this.Mn_beam = As_beam_cm2 * fy_beam * (d_cm - a_beam / 2.0); // kgf·cm
+            this.Mn_beam /= 100.0; // convertir a kgf·m
+
+            // Momento nominal de la COLUMNA (aproximación simplificada con carga axial):
+            // Pu estimada = peso tributario por columna (masa × g / numCols × N/2 pisos sobre el nudo promedio)
+            const Pu_approx = (this.m * N * 9.80665 / CONV) / this.numCols * 0.5; // kgf (carga axial promedio)
+            const As_col_cm2 = customSections.colAs;
+            const hc_cm = customSections.colDepth;
+            const bc_cm = customSections.colWidth;
+            const d_prime_col = 4.0; // recubrimiento 4 cm
+            // Mn,col ≈ As_col × fy × (h/2 - d') + 0.5 × Pu × (h - 2d') × (1 - Pu/(f'c × b × h))
+            const term1 = As_col_cm2 * fy_col * (hc_cm / 2.0 - d_prime_col);
+            const Pu_ratio = Math.min(0.9, Pu_approx / (fc_col * bc_cm * hc_cm));
+            const term2 = 0.5 * Pu_approx * (hc_cm - 2.0 * d_prime_col) * (1.0 - Pu_ratio);
+            this.Mn_col = (term1 + term2) / 100.0; // kgf·m
+
+            // Verificación SCWB en nudo interior (2 columnas, 2 vigas):
+            // ΣMn,col / ΣMn,viga ≥ 1.2
+            const sumMnCol = 2.0 * this.Mn_col;  // 2 columnas confluyen al nudo
+            const sumMnViga = 2.0 * this.Mn_beam; // 2 vigas confluyen al nudo
+            this.scwbRatio = (sumMnViga > 0) ? (sumMnCol / sumMnViga) : Infinity;
+            this.strongColumnWeakBeam = (this.scwbRatio >= 1.2);
+
         } else {
             const phi_Sx = (60.0 + sX_val) / (60.0 + 4.0 * sX_val);
             const phi_Sy = (60.0 + sY_val) / (60.0 + 4.0 * sY_val);
@@ -671,6 +724,13 @@ class BuildingModel {
         this.u_max = new Array(N).fill(0);
         this.E_h = new Array(N).fill(0);
         this.D = new Array(N).fill(0);
+
+        // --- Daño individualizado por columna ---
+        // D_max: daño Park-Ang de la columna de esquina (la más solicitada por torsión)
+        // u_max_corner: deformación máxima en la columna de esquina con torsión
+        this.D_max = new Array(N).fill(0);
+        this.u_max_corner = new Array(N).fill(0);
+
         this.isCollapsed = false;
         this.collapseTime = null;
         this.maxDriftRatio = 0;
@@ -754,6 +814,13 @@ class BuildingModel {
             v_pred[i] = v_old[i] + dt * (1.0 - gamma) * a_old[i];
         }
 
+        // Factor de protección SCWB:
+        // Si Columna Fuerte–Viga Débil se cumple (ratio ≥ 1.2), las rótulas se forman
+        // preferentemente en las vigas, protegiendo las columnas. Esto reduce la degradación
+        // efectiva de la rigidez y resistencia del entrepiso.
+        // Si no se cumple (ratio < 1.2), las columnas reciben toda la degradación (piso blando).
+        const scwbProtection = this.strongColumnWeakBeam ? 0.4 : 1.0;
+
         const storyForces = new Array(N);
         for(let i=0; i<N; i++) {
             const x_i = x_pred[i];
@@ -764,8 +831,11 @@ class BuildingModel {
             const k_init_floor_i = isX ? this.k_init_x : this.k_init_y;
             const vy_init_floor_i = isX ? this.Vy_init_x[i] : this.Vy_init_y[i];
 
-            const k_deg_factor  = 1.0 - (0.6 * this.effDegSeverity * this.D[i]);
-            const vy_deg_factor = 1.0 - (0.4 * this.effDegSeverity * this.D[i]);
+            // Degradación modulada por la protección SCWB:
+            // scwbProtection = 0.4 si SCWB se cumple (las columnas se degradan 60% menos)
+            // scwbProtection = 1.0 si SCWB no se cumple (degradación completa en columnas)
+            const k_deg_factor  = 1.0 - (0.6 * this.effDegSeverity * scwbProtection * this.D[i]);
+            const vy_deg_factor = 1.0 - (0.4 * this.effDegSeverity * scwbProtection * this.D[i]);
 
             this.k[i]  = k_init_floor_i  * Math.max(0.05, k_deg_factor);
             this.Vy[i] = vy_init_floor_i * Math.max(0.1,  vy_deg_factor);
@@ -787,15 +857,27 @@ class BuildingModel {
                 }
             }
             this.u_p_old[i] = this.u_p[i];
-            this.u_max[i] = Math.max(this.u_max[i], Math.abs(u) * torsionAmp_curr);
+
+            // --- Daño promedio del piso (deformación sin amplificación torsional) ---
+            this.u_max[i] = Math.max(this.u_max[i], Math.abs(u));
+
+            // --- Daño de la columna de esquina (con amplificación torsional completa) ---
+            this.u_max_corner[i] = Math.max(this.u_max_corner[i], Math.abs(u) * torsionAmp_curr);
 
             const u_ult = this.driftCollapseLimit * this.h;
             const beta_daño = 0.05 * this.effDegSeverity;
+
+            // D[i]: índice de daño promedio del piso (para degradación del modelo dinámico)
             this.D[i] = (this.u_max[i] / u_ult) + (beta_daño * this.E_h[i]) / (vy_init_floor_i * u_ult);
             this.D[i] = Math.min(1.0, Math.max(0.0, this.D[i]));
 
-            const driftRatio = (Math.abs(u) * torsionAmp_curr) / this.h;
-            if (driftRatio > this.driftCollapseLimit || this.D[i] >= 0.99) {
+            // D_max[i]: índice de daño de la columna más solicitada (esquina con torsión)
+            this.D_max[i] = (this.u_max_corner[i] / u_ult) + (beta_daño * this.E_h[i]) / (vy_init_floor_i * u_ult);
+            this.D_max[i] = Math.min(1.0, Math.max(0.0, this.D_max[i]));
+
+            // Colapso se evalúa con la columna más dañada (columna de esquina)
+            const driftRatioCorner = (Math.abs(u) * torsionAmp_curr) / this.h;
+            if (driftRatioCorner > this.driftCollapseLimit || this.D_max[i] >= 0.99) {
                 this.isCollapsed = true;
                 this.collapseTime = currentTime;
             }
@@ -1339,6 +1421,73 @@ function generateSpectraAndEarthquake() {
     // --- 5. Dibujar los Espectros en el Tab de Gráficos ---
     drawSpectraChart(params01, params19, T1_actual_x, T1_actual_y);
 
+    // --- Verificación SCWB en Reporte ---
+    if (customSections.enable) {
+        const check2001 = eq2001.strongColumnWeakBeam 
+            ? `<span style="color: var(--color-safe); font-weight: bold;"><i class="fa-solid fa-circle-check"></i> Cumple (Viga Débil)</span>` 
+            : `<span style="color: var(--color-damage); font-weight: bold;"><i class="fa-solid fa-triangle-exclamation"></i> Columna Débil (⚠️ Rótulas en Columnas)</span>`;
+        const check2019 = eq2019.strongColumnWeakBeam 
+            ? `<span style="color: var(--color-safe); font-weight: bold;"><i class="fa-solid fa-circle-check"></i> Cumple (Viga Débil)</span>` 
+            : `<span style="color: var(--color-damage); font-weight: bold;"><i class="fa-solid fa-triangle-exclamation"></i> Columna Débil (⚠️ Rótulas en Columnas)</span>`;
+
+        reportHTML += `
+            <div style="margin-top: 24px; margin-bottom: 24px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
+                <h4 style="color: #ffb703; margin-bottom: 10px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <i class="fa-solid fa-shield-halved"></i> Verificación Columna Fuerte - Viga Débil (SCWB)
+                </h4>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                    De acuerdo con los principios de diseño sismorresistente, la suma de los momentos nominales de las columnas en un nudo debe superar en al menos un 20% a la de las vigas (<strong>&Sigma;M<sub>n,col</sub> &ge; 1.2 &Sigma;M<sub>n,vig</sub></strong>) para inducir un mecanismo de falla dúctil y evitar el colapso por piso blando.
+                </p>
+                <table class="calc-table">
+                    <thead>
+                        <tr>
+                            <th>Parámetro de Diseño</th>
+                            <th>Fórmula / Método</th>
+                            <th>Símbolo</th>
+                            <th>COVENIN 2001</th>
+                            <th>COVENIN 2019</th>
+                            <th>Unidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="calc-param-name">Momento Nominal de Viga</td>
+                            <td class="calc-formula">A<sub>s</sub> &times; f<sub>y</sub> &times; (d - a/2)</td>
+                            <td class="calc-symbol">M<sub>n,vig</sub></td>
+                            <td class="calc-value">${eq2001.Mn_beam.toFixed(1)}</td>
+                            <td class="calc-value">${eq2019.Mn_beam.toFixed(1)}</td>
+                            <td class="calc-unit">kgf&middot;m</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Momento Nominal de Columna</td>
+                            <td class="calc-formula">Aproximación con P<sub>u</sub> promedio</td>
+                            <td class="calc-symbol">M<sub>n,col</sub></td>
+                            <td class="calc-value">${eq2001.Mn_col.toFixed(1)}</td>
+                            <td class="calc-value">${eq2019.Mn_col.toFixed(1)}</td>
+                            <td class="calc-unit">kgf&middot;m</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Relación de Momentos en Nudo</td>
+                            <td class="calc-formula">&Sigma;M<sub>n,col</sub> / &Sigma;M<sub>n,vig</sub></td>
+                            <td class="calc-symbol">Ratio (min 1.20)</td>
+                            <td class="calc-value" style="font-weight: bold; color: ${eq2001.strongColumnWeakBeam ? 'var(--color-safe)' : 'var(--color-damage)'};">${eq2001.scwbRatio.toFixed(2)}</td>
+                            <td class="calc-value" style="font-weight: bold; color: ${eq2019.strongColumnWeakBeam ? 'var(--color-safe)' : 'var(--color-damage)'};">${eq2019.scwbRatio.toFixed(2)}</td>
+                            <td class="calc-unit">-</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Estado de Verificación</td>
+                            <td class="calc-formula">&Sigma;M<sub>n,col</sub> &ge; 1.2 &Sigma;M<sub>n,vig</sub></td>
+                            <td class="calc-symbol">SCWB</td>
+                            <td class="calc-value">${check2001}</td>
+                            <td class="calc-value">${check2019}</td>
+                            <td class="calc-unit">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
     // Inyectar el reporte de cálculos dinámicamente en el DOM
     initialReportHTML = reportHTML;
     updateCalculationReport();
@@ -1418,7 +1567,7 @@ function generateColumnsTableHTML(b3D, bModel) {
             let statusText = "Seguro";
             let statusStyle = "color: var(--color-safe); font-weight: bold;";
             
-            if (maxDrift >= bModel.driftCollapseLimit || bModel.D[lvl] >= 0.99) {
+            if (maxDrift >= bModel.driftCollapseLimit || bModel.D_max[lvl] >= 0.99) {
                 statusText = "Colapso / Fallo";
                 statusStyle = "color: var(--color-damage); font-weight: bold;";
             } else if (maxDrift >= 0.018) {
@@ -1883,7 +2032,7 @@ function updateSelectedColumnPanel() {
     let statusClass = "text-green";
 
     const bModel = selectedColumn.buildingName.includes("2019") ? eq2019 : eq2001;
-    if (maxDrift >= bModel.driftCollapseLimit || bModel.D[selectedColumn.level] >= 0.99) {
+    if (maxDrift >= bModel.driftCollapseLimit || bModel.D_max[selectedColumn.level] >= 0.99) {
         statusText = "Colapsada";
         statusClass = "text-red animate-pulse";
     } else if (maxDrift >= 0.018) {
@@ -2371,8 +2520,8 @@ function updateEvacuation(evacState, bModel, b3D, N, h, isLeft) {
         let failedLevel = 0;
         let maxD = 0;
         for (let i = 0; i < N; i++) {
-            if (bModel.D[i] > maxD) {
-                maxD = bModel.D[i];
+            if (bModel.D_max[i] > maxD) {
+                maxD = bModel.D_max[i];
                 failedLevel = i;
             }
         }
@@ -2861,8 +3010,8 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
         let failedLevel = 0;
         let maxD = 0;
         for (let i = 0; i < N; i++) {
-            if (bModel.D[i] > maxD) {
-                maxD = bModel.D[i];
+            if (bModel.D_max[i] > maxD) {
+                maxD = bModel.D_max[i];
                 failedLevel = i;
             }
         }
@@ -3268,7 +3417,7 @@ function updateMetricsUI() {
     const drift1 = (eq2001.maxDriftRatio * 100).toFixed(2) + "%";
     document.getElementById("drift-2001").textContent = drift1;
     
-    const damage1 = (Math.max(...eq2001.D) * 100).toFixed(1) + "%";
+    const damage1 = (Math.max(...eq2001.D_max) * 100).toFixed(1) + "%";
     document.getElementById("damage-2001").textContent = damage1;
 
     const status1 = document.getElementById("status-2001");
@@ -3276,7 +3425,7 @@ function updateMetricsUI() {
         status1.textContent = "¡COLAPSO!";
         status1.className = "metric-status status-collapsed";
     } else {
-        const maxD = Math.max(...eq2001.D);
+        const maxD = Math.max(...eq2001.D_max);
         if (maxD > 0.6) {
             status1.textContent = "Daño Crítico";
             status1.className = "metric-status status-danger";
@@ -3296,7 +3445,7 @@ function updateMetricsUI() {
     const drift2 = (eq2019.maxDriftRatio * 100).toFixed(2) + "%";
     document.getElementById("drift-2019").textContent = drift2;
     
-    const damage2 = (Math.max(...eq2019.D) * 100).toFixed(1) + "%";
+    const damage2 = (Math.max(...eq2019.D_max) * 100).toFixed(1) + "%";
     document.getElementById("damage-2019").textContent = damage2;
 
     const status2 = document.getElementById("status-2019");
@@ -3304,7 +3453,7 @@ function updateMetricsUI() {
         status2.textContent = "¡COLAPSO!";
         status2.className = "metric-status status-collapsed";
     } else {
-        const maxD = Math.max(...eq2019.D);
+        const maxD = Math.max(...eq2019.D_max);
         if (maxD > 0.6) {
             status2.textContent = "Daño Crítico";
             status2.className = "metric-status status-danger";
