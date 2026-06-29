@@ -108,4 +108,4 @@ Este proyecto ha sido desarrollado como una herramienta educativa e interactiva 
 
 ## 📄 Licencia
 
-Este proyecto está bajo la Licencia MIT. Para más detalles, consulta el archivo [LICENSE](LICENSE).
+Este proyecto está bajo una Licencia MIT modificada para fines no comerciales y con requerimiento de atribución obligatoria. Se permite su uso y modificación siempre y cuando no se use comercialmente y se nombre al autor original: **Antonio Luis III Martínez B.** Para más detalles, consulta el archivo [LICENSE](LICENSE).
