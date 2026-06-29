@@ -250,6 +250,18 @@ function initUI() {
     document.getElementById("btn-pause").addEventListener("click", pauseSimulation);
     document.getElementById("btn-reset").addEventListener("click", resetSimulation);
 
+    // Exportar a PDF
+    const exportPdfBtn = document.getElementById("btn-export-pdf");
+    if (exportPdfBtn) {
+        exportPdfBtn.addEventListener("click", () => {
+            const printDateEl = document.getElementById("print-date");
+            if (printDateEl) {
+                printDateEl.textContent = new Date().toLocaleString("es-VE");
+            }
+            window.print();
+        });
+    }
+
     // Botones móviles
     const mobRun = document.getElementById("mobile-btn-run");
     if (mobRun) mobRun.addEventListener("click", toggleSimulation);
@@ -971,6 +983,135 @@ function generateSpectraAndEarthquake() {
         beamAsPrime: parseFloat(document.getElementById("beam-as-prime").value) || 6
     };
 
+    // --- Calcular Parámetros de Diseño Sísmico Tempranamente para el Reporte ---
+    const z01 = parseInt(document.getElementById("covenin01-zone").value);
+    let Ao01 = 0.30;
+    switch(z01) {
+        case 7: Ao01 = 0.40; break;
+        case 6: Ao01 = 0.35; break;
+        case 5: Ao01 = 0.30; break;
+        case 4: Ao01 = 0.25; break;
+        case 3: Ao01 = 0.20; break;
+        case 2: Ao01 = 0.15; break;
+        case 1: Ao01 = 0.10; break;
+    }
+    const params01 = {
+        Ao: Ao01,
+        alpha: parseFloat(document.getElementById("covenin01-importance").value),
+        phi: 1.0,
+        R: parseFloat(document.getElementById("covenin01-r").value),
+        soil: document.getElementById("covenin01-soil").value
+    };
+
+    const params19 = {
+        Ao: parseFloat(document.getElementById("covenin19-a0").value),
+        A1: parseFloat(document.getElementById("covenin19-a1").value),
+        TL: 4.0,
+        alpha: 1.0,
+        R: parseFloat(document.getElementById("covenin19-r").value),
+        rho: parseFloat(document.getElementById("covenin19-rho").value),
+        Fi: parseFloat(document.getElementById("covenin19-fi").value),
+        soilClass: document.getElementById("covenin19-soil-class").value
+    };
+
+    // Resumen de Parámetros de Entrada HTML
+    const useVal = document.getElementById("building-use").value;
+    let useText = "Residencial / Comercial";
+    if (useVal === "critical") useText = "A (Crítico)";
+    else if (useVal === "essential") useText = "B1 (Esencial)";
+    else useText = "B2 (General)";
+
+    let customSectionsHTML = "";
+    if (customSections.enable) {
+        customSectionsHTML = `
+            <tr>
+                <td class="calc-param-name">Columnas</td>
+                <td class="calc-value">${customSections.colWidth} &times; ${customSections.colDepth} cm</td>
+                <td class="calc-unit">f'c: ${customSections.fcCol} | As: ${customSections.colAs} cm²</td>
+            </tr>
+            <tr>
+                <td class="calc-param-name">Vigas</td>
+                <td class="calc-value">${customSections.beamWidth} &times; ${customSections.beamDepth} cm</td>
+                <td class="calc-unit">f'c: ${customSections.fcBeam} | As,sup: ${customSections.beamAs} | As,inf: ${customSections.beamAsPrime} cm²</td>
+            </tr>
+        `;
+    } else {
+        customSectionsHTML = `
+            <tr>
+                <td class="calc-param-name">Secciones</td>
+                <td class="calc-value" style="color: var(--text-muted);">Estándar (Sintonizada)</td>
+                <td class="calc-unit">Rigidez por T₁ objetivo</td>
+            </tr>
+        `;
+    }
+
+    const inputParamsHTML = `
+        <div style="margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
+            <h4 style="color: #ffb703; margin-bottom: 10px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                <i class="fa-solid fa-file-invoice"></i> Parámetros de Entrada de la Estructura
+            </h4>
+            <div class="grid-columns-report" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 12px;">
+                <div>
+                    <h5 style="color: #fff; margin-bottom: 6px; font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;">Geometría, Losa y Secciones</h5>
+                    <table class="calc-table" style="margin-top: 0;">
+                        <tbody>
+                            <tr>
+                                <td class="calc-param-name" style="width: 35%;">Pisos / Altura</td>
+                                <td class="calc-value" style="width: 25%;">${N} Pisos</td>
+                                <td class="calc-unit" style="width: 40%;">HP: ${storyHeight.toFixed(2)} m</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">Distribución</td>
+                                <td class="calc-value">${numColsX} &times; ${numColsY} cols</td>
+                                <td class="calc-unit">sX: ${sX.toFixed(1)}m | sY: ${sY.toFixed(1)}m</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">Losa / Uso</td>
+                                <td class="calc-value">${(parseFloat(document.getElementById("slab-thickness").value) || 20)} cm</td>
+                                <td class="calc-unit">Uso: ${useText}</td>
+                            </tr>
+                            ${customSectionsHTML}
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <h5 style="color: #fff; margin-bottom: 6px; font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;">Parámetros Sísmicos de Entrada</h5>
+                    <table class="calc-table" style="margin-top: 0;">
+                        <thead>
+                            <tr>
+                                <th style="width: 35%;">Parámetro</th>
+                                <th style="width: 32.5%;">COVENIN 2001</th>
+                                <th style="width: 32.5%;">COVENIN 2019</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="calc-param-name">Aceleración Base</td>
+                                <td class="calc-value">Ao: ${Ao01.toFixed(2)}g (Z${z01})</td>
+                                <td class="calc-value">Ao: ${params19.Ao.toFixed(2)}g | A₁: ${params19.A1.toFixed(2)}g</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">Perfil de Suelo</td>
+                                <td class="calc-value">${params01.soil}</td>
+                                <td class="calc-value">Clase ${params19.soilClass}</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">Reducción (R)</td>
+                                <td class="calc-value">R = ${params01.R.toFixed(1)}</td>
+                                <td class="calc-value">R = ${params19.R.toFixed(1)}</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">Otros Factores</td>
+                                <td class="calc-value">&alpha; = ${params01.alpha.toFixed(1)}</td>
+                                <td class="calc-value">&rho; = ${params19.rho.toFixed(1)} | &phi; = ${params19.Fi.toFixed(1)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+
     let T1_actual_x, T1_actual_y;
 
     // Generar reporte de cargas si está habilitado el autocálculo de masa
@@ -1062,7 +1203,7 @@ function generateSpectraAndEarthquake() {
         `;
     }
 
-    let reportHTML = loadsReportHTML;
+    let reportHTML = inputParamsHTML + loadsReportHTML;
 
     // Leer direcciones de los sismos
     const sismo1Dir = document.getElementById("sismo1-direction").value;
@@ -1343,42 +1484,10 @@ function generateSpectraAndEarthquake() {
         `;
     }
 
-    // --- 1. Calcular Parámetros de Diseño COVENIN 2001 ---
-    const z01 = parseInt(document.getElementById("covenin01-zone").value);
-    let Ao01 = 0.30;
-    switch(z01) {
-        case 7: Ao01 = 0.40; break;
-        case 6: Ao01 = 0.35; break;
-        case 5: Ao01 = 0.30; break;
-        case 4: Ao01 = 0.25; break;
-        case 3: Ao01 = 0.20; break;
-        case 2: Ao01 = 0.15; break;
-        case 1: Ao01 = 0.10; break;
-    }
-    const params01 = {
-        Ao: Ao01,
-        alpha: parseFloat(document.getElementById("covenin01-importance").value),
-        phi: 1.0, // Factor de corrección elástico usualmente 1.0 en roca/suelos firmes
-        R: parseFloat(document.getElementById("covenin01-r").value),
-        soil: document.getElementById("covenin01-soil").value
-    };
-    
     // Obtener ordenada de diseño para el edificio 2001 en su periodo fundamental real de la dirección del sismo 1
     const T1_design_2001 = (sismo1Dir === 'X') ? T1_actual_x : T1_actual_y;
     const designAd2001 = getSpectrum2001(T1_design_2001, params01);
 
-    // --- 2. Calcular Parámetros de Diseño COVENIN 2019 ---
-    const params19 = {
-        Ao: parseFloat(document.getElementById("covenin19-a0").value),
-        A1: parseFloat(document.getElementById("covenin19-a1").value),
-        TL: 4.0, // valor típico sugerido
-        alpha: 1.0, // residencial
-        R: parseFloat(document.getElementById("covenin19-r").value),
-        rho: parseFloat(document.getElementById("covenin19-rho").value),
-        Fi: parseFloat(document.getElementById("covenin19-fi").value),
-        soilClass: document.getElementById("covenin19-soil-class").value
-    };
-    
     // Obtener ordenada de diseño para el edificio 2019 en su periodo fundamental real de la dirección del sismo 2
     const T1_design_2019 = (sismo2Dir === 'X') ? T1_actual_x : T1_actual_y;
     const designAd2019 = getSpectrum2019(T1_design_2019, params19);

@@ -610,7 +610,25 @@
                     <div id="tab-calc" class="tab-content">
                         <div class="tab-info-container">
                             <div class="info-section">
+                                <div class="print-header"
+                                    style="display: none; border-bottom: 2px double #0f172a; padding-bottom: 10px; margin-bottom: 20px;">
+                                    <h2
+                                        style="font-family: 'Outfit', sans-serif; text-align: center; margin-bottom: 4px; color: #000;">
+                                        VENEZUELA-SISMO 3D &bull; MEMORIA DE CÁLCULO ESTRUCTURAL</h2>
+                                    <p style="text-align: center; font-size: 12px; color: #555; margin: 0;"> Resolvedor
+                                        dinámico no-lineal comparativo (Norma COVENIN 1756)</p>
+                                    <p style="text-align: center; font-size: 11px; color: #555; margin-top: 4px;">
+                                        Generado el: <span id="print-date"></span>
+                                        https://metantonio.github.io/venezuela-sismo</p>
+                                </div>
                                 <h3><i class="fa-solid fa-calculator"></i> Memoria de Cálculo (Tiempo Real)</h3>
+                                <div class="calc-actions"
+                                    style="margin-top: 12px; margin-bottom: 16px; display: flex; gap: 10px;">
+                                    <button id="btn-export-pdf" class="btn btn-primary"
+                                        style="background: linear-gradient(135deg, #e63946, #b7091e); border-color: rgba(230, 57, 70, 0.4);">
+                                        <i class="fa-solid fa-file-pdf"></i> Exportar Memoria a PDF
+                                    </button>
+                                </div>
                                 <p
                                     style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
                                     Esta sección muestra las memorias de cálculo detalladas en tiempo real. Aquí puede
@@ -631,19 +649,26 @@
                     <div id="tab-sismos" class="tab-content">
                         <div class="tab-info-container">
                             <div class="info-section">
-                                <h3><i class="fa-solid fa-house-crack"></i> Sismos Recientes en la Región de Venezuela</h3>
-                                <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
-                                    Monitoreo en tiempo real de los últimos eventos sísmicos registrados en el territorio de Venezuela y sus alrededores. Los datos provienen del catálogo público global del USGS filtrados geográficamente (cobertura de un radio de 1000 km en torno al centro del país).
+                                <h3><i class="fa-solid fa-house-crack"></i> Sismos Recientes en la Región de Venezuela
+                                </h3>
+                                <p
+                                    style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
+                                    Monitoreo en tiempo real de los últimos eventos sísmicos registrados en el
+                                    territorio de Venezuela y sus alrededores. Los datos provienen del catálogo público
+                                    global del USGS filtrados geográficamente (cobertura de un radio de 1000 km en torno
+                                    al centro del país).
                                 </p>
-                                
+
                                 <div class="sismos-actions" style="margin-bottom: 20px;">
                                     <button id="btn-refresh-sismos" class="btn btn-secondary">
                                         <i class="fa-solid fa-arrows-rotate"></i> Actualizar Reportes
                                     </button>
                                 </div>
-                                
-                                <div id="sismos-loading-status" style="display: none; text-align: center; padding: 40px; color: var(--text-muted);">
-                                    <i class="fa-solid fa-spinner fa-spin fa-2x" style="margin-bottom: 12px; color: var(--color-2019);"></i>
+
+                                <div id="sismos-loading-status"
+                                    style="display: none; text-align: center; padding: 40px; color: var(--text-muted);">
+                                    <i class="fa-solid fa-spinner fa-spin fa-2x"
+                                        style="margin-bottom: 12px; color: var(--color-2019);"></i>
                                     <p>Obteniendo últimos reportes sísmicos del catálogo internacional...</p>
                                 </div>
 
@@ -709,7 +734,14 @@
                                         <i class="fa-solid fa-heart-pulse"></i>
                                         <div class="simplification-content">
                                             <h5>Modelo de Daño de Park-Ang por Elemento y Degradación</h5>
-                                            <p>El daño estructural se evalúa de manera continua en cada piso utilizando el Índice de Daño de Park-Ang. Para mayor precisión, el simulador rastrea individualmente la deriva en las columnas de esquina (las más solicitadas por torsión) para calcular el daño máximo local (<strong>D<sub>max</sub></strong>). Este índice gobierna la formación de rótulas plásticas y el colapso del entrepiso cuando se alcanza un daño del 99% en cualquier columna individual, reflejando fallas locales críticas.</p>
+                                            <p>El daño estructural se evalúa de manera continua en cada piso utilizando
+                                                el Índice de Daño de Park-Ang. Para mayor precisión, el simulador
+                                                rastrea individualmente la deriva en las columnas de esquina (las más
+                                                solicitadas por torsión) para calcular el daño máximo local
+                                                (<strong>D<sub>max</sub></strong>). Este índice gobierna la formación de
+                                                rótulas plásticas y el colapso del entrepiso cuando se alcanza un daño
+                                                del 99% en cualquier columna individual, reflejando fallas locales
+                                                críticas.</p>
                                         </div>
                                     </div>
 
@@ -717,7 +749,13 @@
                                         <i class="fa-solid fa-ruler-combined"></i>
                                         <div class="simplification-content">
                                             <h5>Inercias de Secciones Físicas y Masa de Diseño</h5>
-                                            <p>Al activar "Secciones Físicas", la inercia de las columnas se calcula usando la sección transformada total (concreto + acero simétrico), y la de las vigas empleando la sección agrietada transformada en flexión simple. La masa de diseño se escala de forma realista según el área tributaria de la losa usando la relación <strong>m = m<sub>ref</sub> &times; (0.3 + 0.7 &times; Área / 25)</strong>, donde 0.3 representa el peso estructural fijo y 0.7 la losa y cargas variables asociadas.</p>
+                                            <p>Al activar "Secciones Físicas", la inercia de las columnas se calcula
+                                                usando la sección transformada total (concreto + acero simétrico), y la
+                                                de las vigas empleando la sección agrietada transformada en flexión
+                                                simple. La masa de diseño se escala de forma realista según el área
+                                                tributaria de la losa usando la relación <strong>m = m<sub>ref</sub>
+                                                    &times; (0.3 + 0.7 &times; Área / 25)</strong>, donde 0.3 representa
+                                                el peso estructural fijo y 0.7 la losa y cargas variables asociadas.</p>
                                         </div>
                                     </div>
 
@@ -725,7 +763,15 @@
                                         <i class="fa-solid fa-shield-halved"></i>
                                         <div class="simplification-content">
                                             <h5>Filosofía Columna Fuerte - Viga Débil (SCWB)</h5>
-                                            <p>Cuando se activan las secciones personalizadas, el sistema calcula los momentos nominales de vigas (Mn,vig) y columnas (Mn,col) en cada nudo. Si se cumple el requisito de diseño dúctil (<strong>&Sigma;M<sub>n,col</sub> &ge; 1.2 &Sigma;M<sub>n,vig</sub></strong>), las rótulas plásticas se forman preferentemente en las vigas, protegiendo las columnas y reduciendo la degradación de rigidez de entrepiso en un 60%. Si no se cumple, el daño y la fluencia ocurren directamente en las columnas, induciendo un mecanismo de piso blando frágil.</p>
+                                            <p>Cuando se activan las secciones personalizadas, el sistema calcula los
+                                                momentos nominales de vigas (Mn,vig) y columnas (Mn,col) en cada nudo.
+                                                Si se cumple el requisito de diseño dúctil
+                                                (<strong>&Sigma;M<sub>n,col</sub> &ge; 1.2
+                                                    &Sigma;M<sub>n,vig</sub></strong>), las rótulas plásticas se forman
+                                                preferentemente en las vigas, protegiendo las columnas y reduciendo la
+                                                degradación de rigidez de entrepiso en un 60%. Si no se cumple, el daño
+                                                y la fluencia ocurren directamente en las columnas, induciendo un
+                                                mecanismo de piso blando frágil.</p>
                                         </div>
                                     </div>
 
@@ -733,7 +779,12 @@
                                         <i class="fa-solid fa-rotate-right"></i>
                                         <div class="simplification-content">
                                             <h5>Efecto de Torsión en Planta y Excentricidad</h5>
-                                            <p>Se simula la torsión acoplando el giro de la losa (&theta;<sub>z</sub>) al desplazamiento traslacional en función de la excentricidad torsional elegida (e<sub>a</sub>). Este giro amplifica geométricamente la deriva en las columnas perimetrales más alejadas del centroide, lo que a su vez se traduce en un incremento proporcional del daño y la aceleración del colapso en el resolvedor físico.</p>
+                                            <p>Se simula la torsión acoplando el giro de la losa (&theta;<sub>z</sub>)
+                                                al desplazamiento traslacional en función de la excentricidad torsional
+                                                elegida (e<sub>a</sub>). Este giro amplifica geométricamente la deriva
+                                                en las columnas perimetrales más alejadas del centroide, lo que a su vez
+                                                se traduce en un incremento proporcional del daño y la aceleración del
+                                                colapso en el resolvedor físico.</p>
                                         </div>
                                     </div>
 

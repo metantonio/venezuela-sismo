@@ -1591,5 +1591,251 @@ select:focus {
     color: #fff;
 }
 
+/* --- ESTILOS DE IMPRESIÓN PARA EXPORTAR A PDF --- */
+@media print {
+    /* Forzar redefinición de variables para impresión en alto contraste (blanco y negro) */
+    :root {
+        --bg-main: #ffffff !important;
+        --text-primary: #000000 !important;
+        --text-muted: #475569 !important;
+        --color-2001: #0369a1 !important;
+        --color-2019: #be185d !important;
+        --color-safe: #15803d !important;
+        --color-warning: #b45309 !important;
+        --color-damage: #b91c1c !important;
+        --border-color: #cbd5e1 !important;
+    }
+
+    /* Quitar overflow hidden y alturas fijadas de los elementos contenedores de la app */
+    html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+        font-size: 11pt !important;
+    }
+
+    .app-container,
+    .main-layout,
+    .content-area,
+    .tab-content-container {
+        position: static !important;
+        display: block !important;
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Forzar que la pestaña de memoria de cálculo sea visible y ocupe el flujo natural del documento */
+    .tab-content {
+        position: static !important;
+        display: none !important;
+        opacity: 0 !important;
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+    }
+
+    .tab-content#tab-calc {
+        display: block !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    .tab-info-container {
+        position: static !important;
+        display: block !important;
+        overflow: visible !important;
+        height: auto !important;
+        min-height: auto !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    /* Ocultar interfaz interactiva y elementos innecesarios */
+    .app-header,
+    .control-panel,
+    .tabs-header,
+    .metrics-board,
+    .mobile-floating-controls,
+    .column-info-card,
+    #canvas-3d-container,
+    .threejs-legend,
+    .side-by-side-labels,
+    #spectra-chart,
+    #accel-chart,
+    #disp-chart,
+    #hysteresis-2001-chart,
+    #hysteresis-2019-chart,
+    .calc-actions,
+    #btn-refresh-sismos,
+    .sismos-actions {
+        display: none !important;
+    }
+
+    .info-section {
+        display: block !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    #calculation-report {
+        display: block !important;
+        width: 100% !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    /* Cabecera de impresión */
+    .print-header {
+        display: block !important;
+        margin-bottom: 30px !important;
+        text-align: center !important;
+    }
+    .print-header h2 {
+        font-family: 'Outfit', sans-serif !important;
+        font-weight: 800 !important;
+        color: #000000 !important;
+        font-size: 16pt !important;
+    }
+
+    /* Estilos profesionales de tablas impresas */
+    .calc-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-top: 15px !important;
+        margin-bottom: 25px !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        border: 1px solid #cbd5e1 !important;
+        page-break-inside: avoid !important;
+    }
+
+    .calc-table th {
+        background-color: #f1f5f9 !important;
+        color: #0f172a !important;
+        border-bottom: 2px solid #94a3b8 !important;
+        padding: 8px 10px !important;
+        font-weight: bold !important;
+        font-size: 9.5pt !important;
+        text-align: left !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+    }
+
+    .calc-table td {
+        border-bottom: 1px solid #e2e8f0 !important;
+        padding: 8px 10px !important;
+        color: #334155 !important;
+        font-size: 9pt !important;
+    }
+
+    .calc-table tr {
+        page-break-inside: avoid !important;
+    }
+
+    .calc-table .calc-param-name {
+        font-weight: 500 !important;
+        color: #0f172a !important;
+    }
+
+    .calc-table .calc-formula {
+        color: #475569 !important;
+        font-family: Cambria, Georgia, serif !important;
+        font-style: italic !important;
+    }
+
+    .calc-table .calc-symbol {
+        font-weight: bold !important;
+        color: #0f172a !important;
+    }
+
+    .calc-table .calc-value {
+        font-weight: 700 !important;
+        color: #000000 !important;
+    }
+
+    .calc-table .calc-unit {
+        color: #64748b !important;
+    }
+
+    /* Títulos de las secciones */
+    h3, h4, h5 {
+        color: #0f172a !important;
+        font-family: 'Outfit', sans-serif !important;
+        page-break-after: avoid !important;
+    }
+
+    h3 {
+        font-size: 16pt !important;
+        border-bottom: 2px solid #0f172a !important;
+        padding-bottom: 4px !important;
+        margin-top: 0 !important;
+        margin-bottom: 15px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    h3 i {
+        display: none !important; /* Ocultar íconos fontawesome en impresión */
+    }
+
+    h4 {
+        font-size: 12pt !important;
+        margin-top: 25px !important;
+        margin-bottom: 10px !important;
+        border-bottom: 1.5px solid #cbd5e1 !important;
+        padding-bottom: 4px !important;
+    }
+    
+    h4 i {
+        display: none !important;
+    }
+
+    h5 {
+        font-size: 10.5pt !important;
+        margin-top: 15px !important;
+        margin-bottom: 8px !important;
+        color: #1e293b !important;
+    }
+
+    h5 i {
+        display: none !important;
+    }
+
+    /* Ajuste de reporte de columnas a 2 columnas en impresión */
+    .grid-columns-report {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 20px !important;
+        width: 100% !important;
+    }
+    
+    /* Nota descriptiva del reporte */
+    p {
+        color: #334155 !important;
+        font-size: 9.5pt !important;
+        line-height: 1.5 !important;
+        margin-bottom: 12px !important;
+    }
+    
+    strong {
+        color: #000000 !important;
+    }
+}
+
 
 
