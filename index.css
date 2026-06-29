@@ -37,6 +37,7 @@ body {
     font-size: 14px;
     line-height: 1.5;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
 }
 
@@ -45,6 +46,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    height: 100dvh;
 }
 
 /* HEADER */
@@ -1145,8 +1147,10 @@ select:focus {
     
     /* Header adaptado */
     .app-header {
-        height: 60px !important;
-        padding: 0 12px !important;
+        height: calc(60px + env(safe-area-inset-top, 0px)) !important;
+        padding-top: env(safe-area-inset-top, 0px) !important;
+        padding-left: calc(12px + env(safe-area-inset-left, 0px)) !important;
+        padding-right: calc(12px + env(safe-area-inset-right, 0px)) !important;
     }
     .logo-text h1 {
         font-size: 15px !important;
@@ -1161,7 +1165,8 @@ select:focus {
     /* Layout principal */
     .main-layout {
         flex-direction: column !important;
-        height: calc(100vh - 60px) !important;
+        height: calc(100vh - 60px - env(safe-area-inset-top, 0px)) !important;
+        height: calc(100dvh - 60px - env(safe-area-inset-top, 0px)) !important;
         position: relative !important;
         overflow: hidden !important;
     }
@@ -1179,6 +1184,9 @@ select:focus {
         z-index: 95 !important;
         background: #090a0f !important;
         padding: 15px !important;
+        padding-left: calc(15px + env(safe-area-inset-left, 0px)) !important;
+        padding-right: calc(15px + env(safe-area-inset-right, 0px)) !important;
+        padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px)) !important;
         height: calc(100% - 45px) !important;
         overflow-y: auto !important;
         border-right: none !important;
@@ -1243,12 +1251,15 @@ select:focus {
     
     /* Panel de métricas deslizable horizontalmente */
     .metrics-board {
-        height: 125px !important;
+        height: calc(125px + env(safe-area-inset-bottom, 0px)) !important;
         overflow-x: auto !important;
         white-space: nowrap !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         padding: 10px 12px !important;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+        padding-left: calc(12px + env(safe-area-inset-left, 0px)) !important;
+        padding-right: calc(12px + env(safe-area-inset-right, 0px)) !important;
         gap: 12px !important;
         scrollbar-width: none !important;
         background: rgba(9, 10, 15, 0.96) !important;
@@ -1277,8 +1288,8 @@ select:focus {
     .mobile-floating-controls {
         display: flex !important;
         position: absolute !important;
-        bottom: 120px !important; /* Por encima de las métricas */
-        right: 16px !important;
+        bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important; /* Por encima de las métricas */
+        right: calc(16px + env(safe-area-inset-right, 0px)) !important;
         z-index: 1000 !important;
         gap: 10px !important;
     }
@@ -1341,6 +1352,9 @@ select:focus {
     /* Ajustes generales de pestañas */
     .tab-content {
         padding: 12px !important;
+        padding-left: calc(12px + env(safe-area-inset-left, 0px)) !important;
+        padding-right: calc(12px + env(safe-area-inset-right, 0px)) !important;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
         overflow-y: auto !important;
         height: calc(100% - 45px) !important;
     }
@@ -1463,9 +1477,9 @@ select:focus {
 /* Ajustes de tarjeta en móvil */
 @media (max-width: 768px) {
     .column-info-card {
-        top: 60px !important;
-        left: 12px !important;
-        width: calc(100% - 24px) !important;
+        top: calc(70px + env(safe-area-inset-top, 0px)) !important;
+        left: calc(12px + env(safe-area-inset-left, 0px)) !important;
+        width: calc(100% - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)) !important;
         max-width: 250px !important;
         padding: 8px 10px !important;
         font-size: 11px !important;
