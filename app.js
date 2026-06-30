@@ -178,6 +178,15 @@ function initUI() {
         });
     }
 
+    const showCmCrCheck = document.getElementById("show-cm-cr");
+    if (showCmCrCheck) {
+        showCmCrCheck.addEventListener("change", () => {
+            const visible = showCmCrCheck.checked;
+            if (buildings3D.b2001.cmCrGroup) buildings3D.b2001.cmCrGroup.visible = visible;
+            if (buildings3D.b2019.cmCrGroup) buildings3D.b2019.cmCrGroup.visible = visible;
+        });
+    }
+
     // 2019 Sliders
     setupSlider("covenin19-a0");
     setupSlider("covenin19-a1");
@@ -2799,6 +2808,88 @@ function updateParticles() {
     particleSystem.geometry.attributes.position.needsUpdate = true;
 }
 
+// Helper para crear etiquetas de texto 3D autogiratorias (Sprites)
+function createTextSprite(text, colorStr) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 128;
+    canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+    ctx.fillRect(0, 0, 128, 64);
+    
+    // Configurar tipografía y contorno para legibilidad
+    ctx.font = 'Bold 32px sans-serif';
+    ctx.fillStyle = colorStr;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.9)';
+    ctx.lineWidth = 4;
+    ctx.strokeText(text, 64, 32);
+    ctx.fillText(text, 64, 32);
+    
+    const texture = new THREE.CanvasTexture(canvas);
+    const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false });
+    const sprite = new THREE.Sprite(spriteMaterial);
+    sprite.scale.set(1.2, 0.6, 1);
+    return sprite;
+}
+
+// Actualizar posiciones de CM, CR y la flecha de excentricidad torsional
+function updateBuildingCmCr(bData, bW, bD, activeDir) {
+    if (!bData.cmCrGroup) return;
+
+    const eccVal = parseFloat(document.getElementById("torsional-eccentricity").value) || 0.0;
+    const isX = (activeDir === 'X');
+
+    // Determinar la dirección y magnitud de la excentricidad
+    // Si el sismo es en X, el desplazamiento del CM relativo al CR se da en el eje perpendicular (Z)
+    // Si el sismo es en Y (Z horizontal en 3D), la excentricidad se da en el eje X
+    let offsetX = 0;
+    let offsetZ = 0;
+    if (isX) {
+        offsetZ = eccVal * bD;
+    } else {
+        offsetX = eccVal * bW;
+    }
+
+    // Actualizar posición de la esfera de CM y su etiqueta
+    if (bData.cmMesh) {
+        bData.cmMesh.position.set(offsetX, 0.12, offsetZ);
+    }
+    if (bData.cmLabel) {
+        bData.cmLabel.position.set(offsetX, 0.38, offsetZ);
+    }
+
+    // Remover flecha anterior
+    if (bData.eccArrow) {
+        bData.cmCrGroup.remove(bData.eccArrow);
+        bData.eccArrow = null;
+    }
+
+    // Dibujar la nueva flecha si hay excentricidad
+    if (eccVal > 0) {
+        const origin = new THREE.Vector3(0, 0.12, 0);
+        const target = new THREE.Vector3(offsetX, 0.12, offsetZ);
+        const dir = new THREE.Vector3().subVectors(target, origin);
+        const length = dir.length();
+        dir.normalize();
+
+        const headLength = Math.min(0.4, length * 0.4);
+        const headWidth = Math.min(0.2, length * 0.2);
+        
+        const arrow = new THREE.ArrowHelper(
+            dir,
+            origin,
+            length,
+            0xfacc15, // Amarillo brillante
+            headLength,
+            headWidth
+        );
+        bData.cmCrGroup.add(arrow);
+        bData.eccArrow = arrow;
+    }
+}
+
 // RECONSTRUCCIÓN DE LOS MODELOS 3D DE CADA EDIFICIO
 function rebuild3DStructures() {
     // Limpiar escena anterior de edificios
@@ -2886,6 +2977,55 @@ function rebuild3DStructures() {
             bData.group.add(floorMesh);
             bData.floors.push(floorMesh);
         }
+
+        // Grupo de visualización de CM y CR en la losa de techo (nivel N-1)
+        const roofFloor = bData.floors[N - 1];
+        const cmCrGroup = new THREE.Group();
+        roofFloor.add(cmCrGroup);
+        bData.cmCrGroup = cmCrGroup;
+
+        // Comprobar estado inicial del checkbox
+        const showCmCrCheck = document.getElementById("show-cm-cr");
+        cmCrGroup.visible = showCmCrCheck ? showCmCrCheck.checked : true;
+
+        // CR (Centro de Rigidez): Esfera Roja
+        const sphereGeom = new THREE.SphereGeometry(0.12, 16, 16);
+        const crMat = new THREE.MeshStandardMaterial({
+            color: 0xef4444,
+            emissive: 0x450a0a,
+            roughness: 0.2,
+            metalness: 0.8
+        });
+        const crMesh = new THREE.Mesh(sphereGeom, crMat);
+        crMesh.position.set(0, 0.12, 0);
+        cmCrGroup.add(crMesh);
+        bData.crMesh = crMesh;
+
+        // Etiqueta CR
+        const crLabel = createTextSprite("CR", "#ef4444");
+        crLabel.position.set(0, 0.38, 0);
+        cmCrGroup.add(crLabel);
+
+        // CM (Centro de Masas): Esfera Verde
+        const cmMat = new THREE.MeshStandardMaterial({
+            color: 0x22c55e,
+            emissive: 0x052e16,
+            roughness: 0.2,
+            metalness: 0.8
+        });
+        const cmMesh = new THREE.Mesh(sphereGeom, cmMat);
+        cmMesh.position.set(0, 0.12, 0);
+        cmCrGroup.add(cmMesh);
+        bData.cmMesh = cmMesh;
+
+        // Etiqueta CM
+        const cmLabel = createTextSprite("CM", "#22c55e");
+        cmLabel.position.set(0, 0.38, 0);
+        cmCrGroup.add(cmLabel);
+        bData.cmLabel = cmLabel;
+
+        // Flecha / Vector de excentricidad
+        bData.eccArrow = null;
 
         // Crear columnas de entrepiso dinámicas
         const colOffsets = [];
@@ -3027,6 +3167,10 @@ function rebuild3DStructures() {
     buildBuilding(buildings3D.b2001, '2001');
     buildBuilding(buildings3D.b2019, '2019');
 
+    const activeDir = document.getElementById("sismo1-direction").value;
+    updateBuildingCmCr(buildings3D.b2001, bW, bD, activeDir);
+    updateBuildingCmCr(buildings3D.b2019, bW, bD, activeDir);
+
     // Inicializar estados de evacuación
     const evacMeshes2001 = createEvacuationGroup(buildings3D.b2001, N, h, bW, bD);
     evacuation2001 = {
@@ -3106,6 +3250,15 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
     const h = bModel.h;
     const isX = (activeDir === 'X');
 
+    // Calcular dimensiones en planta y actualizar CM/CR
+    const numColsX = parseInt(document.getElementById("num-cols-x").value) || 2;
+    const numColsY = parseInt(document.getElementById("num-cols-y").value) || 2;
+    const sX = parseFloat(document.getElementById("col-dist-x").value) || 5.0;
+    const sY = parseFloat(document.getElementById("col-dist-y").value) || 5.0;
+    const bW = sX * (numColsX - 1);
+    const bD = sY * (numColsY - 1);
+    updateBuildingCmCr(b3D, bW, bD, activeDir);
+
     // Desplazamiento total en base es la vibración del suelo
     b3D.group.position.x = initialX + (isX ? groundDisp : 0);
     b3D.group.position.z = isX ? 0 : groundDisp;
@@ -3165,12 +3318,6 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
 
     // Parámetros geométricos para torsión
     const ecc = parseFloat(document.getElementById("torsional-eccentricity").value) || 0.0;
-    const numColsX = parseInt(document.getElementById("num-cols-x").value) || 2;
-    const numColsY = parseInt(document.getElementById("num-cols-y").value) || 2;
-    const sX = parseFloat(document.getElementById("col-dist-x").value) || 5.0;
-    const sY = parseFloat(document.getElementById("col-dist-y").value) || 5.0;
-    const bW = sX * (numColsX - 1);
-    const bD = sY * (numColsY - 1);
     const rp = Math.sqrt((bW * bW + bD * bD) / 12) || 2.0;
 
     // Comportamiento normal (oscilación lateral + torsión)
