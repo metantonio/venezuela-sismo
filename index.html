@@ -774,6 +774,22 @@
                                     </div>
 
                                     <div class="simplification-item">
+                                        <i class="fa-solid fa-dice" style="color: #ffb703;"></i>
+                                        <div class="simplification-content">
+                                            <h5>Generación Estocástica de la Onda Sísmica (Tiempo-Historia)</h5>
+                                            <p>En cada simulación o cambio de configuración, el simulador genera un nuevo <strong>acelerograma sintético estocástico único</strong>. Para esto se emplea la Transformada de Box-Muller para producir ruido blanco gaussiano, el cual luego pasa por un <strong>Filtro de Kanai-Tajimi</strong> para moldear su frecuencia dominante según el período espectral del suelo seleccionado ($T_{soil}$). Finalmente, se modula en amplitud usando una envolvente de Jennings para simular el inicio, fase fuerte y atenuación del sismo. Esto implica que la señal en el tiempo varía en cada ejecución, manteniendo constantes únicamente su contenido de frecuencia promedio y aceleración pico (PGA).</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="simplification-item">
+                                        <i class="fa-solid fa-bolt" style="color: #facc15;"></i>
+                                        <div class="simplification-content">
+                                            <h5>Relación entre Magnitud ($M_w$ 7.1 vs. 7.5) e Intensidad (PGA)</h5>
+                                            <p>El simulador representa la diferencia de magnitud entre el <strong>Sismo 1 ($M_w$ 7.1)</strong> y el <strong>Sismo 2 ($M_w$ 7.5)</strong> a través del escalamiento de la aceleración pico del terreno (PGA) y el daño acumulado. En la física sísmica, un sismo de mayor magnitud libera significativamente más energía y genera aceleraciones de pico más altas en el sitio. Esto se modela aplicando un <strong>factor de amplificación de 1.5</strong> en el PGA del segundo evento ($\text{PGA}_2 = 1.5 \times \text{PGA}_1$). Adicionalmente, el sismo sucesivo aprovecha el ablandamiento y daño estructural (índice de Park-Ang) acumulado durante el primer evento, simulando de manera muy realista cómo la pérdida de rigidez inicial hace al edificio mucho más vulnerable al embate de una sacudida de mayor magnitud.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="simplification-item">
                                         <i class="fa-solid fa-heart-pulse"></i>
                                         <div class="simplification-content">
                                             <h5>Modelo de Daño de Park-Ang por Elemento y Degradación</h5>
