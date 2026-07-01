@@ -45,6 +45,24 @@
         <div class="main-layout">
             <!-- SIDEBAR CONTROLS -->
             <aside class="control-panel" id="tab-config">
+                <!-- PRESET DE VARGAS -->
+                <div class="control-group"
+                    style="background: rgba(250, 204, 21, 0.08); border: 1px solid rgba(250, 204, 21, 0.2); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+                    <h3
+                        style="margin-top: 0; margin-bottom: 6px; font-size: 13px; font-weight: 700; color: #facc15; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-house-chimney-crack"></i> Terremoto de Vargas (2026)
+                    </h3>
+                    <p
+                        style="font-size: 11px; margin-top: 0; margin-bottom: 10px; color: var(--text-muted); line-height: 1.4;">
+                        Carga el caso de Vargas (24/Jun/2026, 0.45g-0.60g): pórticos de 5x4 separados a 4m, secciones
+                        SCWB, residencial, losa de 15cm y excentricidad del 5%.
+                    </p>
+                    <button id="btn-preset-vargas" class="btn btn-secondary"
+                        style="font-size: 12px; padding: 8px; border-color: rgba(250, 204, 21, 0.3); color: #facc15; font-weight: bold; width: 100%;">
+                        <i class="fa-solid fa-building-shield"></i> Cargar Escenario Vargas
+                    </button>
+                </div>
+
                 <div class="section-title">
                     <i class="fa-solid fa-gears"></i>
                     <h2>Configuración de Estructura</h2>
@@ -741,11 +759,16 @@
                                             <h5>Espectro de Diseño vs. Aceleración del Terreno</h5>
                                             <p>El simulador opera bajo una doble metodología: la sacudida dinámica de la
                                                 estructura y el cálculo de desplazamientos paso a paso están basados
-                                                directamente en la señal del <strong>acelerograma del terreno (gráfico de
-                                                    aceleración)</strong>. Sin embargo, la resistencia lateral ante la fluencia
-                                                ($V_y$) y la rigidez inicial de diseño de los entrepisos se definen y calibran
-                                                a partir del <strong>espectro de diseño</strong> de cada norma para el período
-                                                fundamental calculado del edificio ($T_1$), acoplando el análisis espectral
+                                                directamente en la señal del <strong>acelerograma del terreno (gráfico
+                                                    de
+                                                    aceleración)</strong>. Sin embargo, la resistencia lateral ante la
+                                                fluencia
+                                                ($V_y$) y la rigidez inicial de diseño de los entrepisos se definen y
+                                                calibran
+                                                a partir del <strong>espectro de diseño</strong> de cada norma para el
+                                                período
+                                                fundamental calculado del edificio ($T_1$), acoplando el análisis
+                                                espectral
                                                 con la integración en el dominio del tiempo.</p>
                                         </div>
                                     </div>
@@ -871,19 +894,30 @@
 
                             <!-- RECOMENDACIONES DE EXCENTRICIDAD TORSIONAL -->
                             <div class="info-section" style="border-left: 3px solid var(--color-2019);">
-                                <h3 style="color: var(--color-2019);"><i
-                                        class="fa-solid fa-compass-drafting"></i> Recomendaciones para el Cálculo de la Excentricidad Torsional</h3>
-                                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
-                                    La excentricidad torsional es la separación entre el <strong>Centro de Masas (CM)</strong> y el <strong>Centro de Rigidez (CR)</strong> de un entrepiso. Para ingenieros en formación o sin suficiente experiencia práctica, se sugieren los siguientes criterios de estimación y cálculo bajo normativas sismorresistentes (como la COVENIN 1756):
+                                <h3 style="color: var(--color-2019);"><i class="fa-solid fa-compass-drafting"></i>
+                                    Recomendaciones para el Cálculo de la Excentricidad Torsional</h3>
+                                <p
+                                    style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                                    La excentricidad torsional es la separación entre el <strong>Centro de Masas
+                                        (CM)</strong> y el <strong>Centro de Rigidez (CR)</strong> de un entrepiso. Para
+                                    ingenieros en formación o sin suficiente experiencia práctica, se sugieren los
+                                    siguientes criterios de estimación y cálculo bajo normativas sismorresistentes (como
+                                    la COVENIN 1756):
                                 </p>
                                 <div class="simplifications-list">
                                     <div class="simplification-item">
                                         <i class="fa-solid fa-calculator" style="color: var(--color-2019);"></i>
                                         <div class="simplification-content">
                                             <h5>1. Excentricidad Estática o Teórica ($e_s$)</h5>
-                                            <p>Es la distancia física real entre el baricentro de las cargas de la losa (CM, gobernado por la distribución de tabiques, losas, equipos) y el centro de cortante de los elementos verticales de soporte (CR, gobernado por la ubicación y sección de columnas y muros). Se calcula en cada nivel de entrepiso mediante:</p>
-                                            <p style="font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 4px; margin-top: 4px; white-space: nowrap; overflow-x: auto; border: 1px solid rgba(255,255,255,0.05); color: #fff;">
-                                                x_CM = &Sigma;(m_i &middot; x_i) / &Sigma;m_i &nbsp;&nbsp;|&nbsp;&nbsp; x_CR = &Sigma;(K_y,j &middot; x_j) / &Sigma;K_y,j <br>
+                                            <p>Es la distancia física real entre el baricentro de las cargas de la losa
+                                                (CM, gobernado por la distribución de tabiques, losas, equipos) y el
+                                                centro de cortante de los elementos verticales de soporte (CR, gobernado
+                                                por la ubicación y sección de columnas y muros). Se calcula en cada
+                                                nivel de entrepiso mediante:</p>
+                                            <p
+                                                style="font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 4px; margin-top: 4px; white-space: nowrap; overflow-x: auto; border: 1px solid rgba(255,255,255,0.05); color: #fff;">
+                                                x_CM = &Sigma;(m_i &middot; x_i) / &Sigma;m_i &nbsp;&nbsp;|&nbsp;&nbsp;
+                                                x_CR = &Sigma;(K_y,j &middot; x_j) / &Sigma;K_y,j <br>
                                                 e_s = |x_CM - x_CR|
                                             </p>
                                         </div>
@@ -892,21 +926,35 @@
                                         <i class="fa-solid fa-shuffle" style="color: var(--color-2019);"></i>
                                         <div class="simplification-content">
                                             <h5>2. Excentricidad Accidental ($e_a$) obligatoria</h5>
-                                            <p>Debido a la incertidumbre en la posición real de las cargas vivas, variación del módulo de elasticidad del concreto, y efectos torsionales dinámicos no modelados, las normas exigen considerar una excentricidad accidental mínima. En la norma venezolana **COVENIN 1756**, se fija típicamente en:</p>
-                                            <p style="font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 4px; margin-top: 4px; white-space: nowrap; overflow-x: auto; border: 1px solid rgba(255,255,255,0.05); color: #fff;">
-                                                e_a = 0.06 &middot; L (Norma 2001) &nbsp;&nbsp;|&nbsp;&nbsp; e_a = 0.05 &middot; L (Norma 2019)
+                                            <p>Debido a la incertidumbre en la posición real de las cargas vivas,
+                                                variación del módulo de elasticidad del concreto, y efectos torsionales
+                                                dinámicos no modelados, las normas exigen considerar una excentricidad
+                                                accidental mínima. En la norma venezolana **COVENIN 1756**, se fija
+                                                típicamente en:</p>
+                                            <p
+                                                style="font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 4px; margin-top: 4px; white-space: nowrap; overflow-x: auto; border: 1px solid rgba(255,255,255,0.05); color: #fff;">
+                                                e_a = 0.06 &middot; L (Norma 2001) &nbsp;&nbsp;|&nbsp;&nbsp; e_a = 0.05
+                                                &middot; L (Norma 2019)
                                             </p>
-                                            <p style="margin-top: 4px;">Donde <em>L</em> es la dimensión de la planta del edificio medida en dirección perpendicular a la acción sísmica aplicada. Para un edificio simétrico ($e_s = 0$), el valor mínimo de diseño a introducir es esta excentricidad accidental (ej. 5% a 6%).</p>
+                                            <p style="margin-top: 4px;">Donde <em>L</em> es la dimensión de la planta
+                                                del edificio medida en dirección perpendicular a la acción sísmica
+                                                aplicada. Para un edificio simétrico ($e_s = 0$), el valor mínimo de
+                                                diseño a introducir es esta excentricidad accidental (ej. 5% a 6%).</p>
                                         </div>
                                     </div>
                                     <div class="simplification-item">
                                         <i class="fa-solid fa-chart-bar" style="color: var(--color-2019);"></i>
                                         <div class="simplification-content">
                                             <h5>3. Excentricidad de Diseño ($e_d$) para Análisis Estático</h5>
-                                            <p>Al realizar análisis estáticos equivalentes, la excentricidad teórica se amplifica dinámicamente para proteger los elementos extremos. Se calculan dos hipótesis de diseño en cada eje:</p>
-                                            <p style="font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 4px; margin-top: 4px; white-space: nowrap; overflow-x: auto; border: 1px solid rgba(255,255,255,0.05); color: #fff;">
-                                                e_d1 = 1.5 &middot; e_s + e_a &nbsp;&nbsp;(Amplifica el torque y castiga el extremo alejado)<br>
-                                                e_d2 = 0.5 &middot; e_s - e_a &nbsp;&nbsp;(Reduce el torque para revisar el lado menos solicitado)
+                                            <p>Al realizar análisis estáticos equivalentes, la excentricidad teórica se
+                                                amplifica dinámicamente para proteger los elementos extremos. Se
+                                                calculan dos hipótesis de diseño en cada eje:</p>
+                                            <p
+                                                style="font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 4px; margin-top: 4px; white-space: nowrap; overflow-x: auto; border: 1px solid rgba(255,255,255,0.05); color: #fff;">
+                                                e_d1 = 1.5 &middot; e_s + e_a &nbsp;&nbsp;(Amplifica el torque y castiga
+                                                el extremo alejado)<br>
+                                                e_d2 = 0.5 &middot; e_s - e_a &nbsp;&nbsp;(Reduce el torque para revisar
+                                                el lado menos solicitado)
                                             </p>
                                         </div>
                                     </div>
@@ -914,7 +962,13 @@
                                         <i class="fa-solid fa-lightbulb" style="color: var(--color-warning);"></i>
                                         <div class="simplification-content">
                                             <h5>4. Recomendaciones e Intuición Práctica</h5>
-                                            <p><strong>Evite irregularidad torsional:</strong> Si la excentricidad calculada supera el 10% del ancho del edificio (0.10), el edificio se comportará de manera muy inestable en planta, concentrando rotación e induciendo derivas severas en las columnas de esquina (efecto látigo torsional). Lo ideal es redistribuir las columnas o añadir pantallas (muros de cortante) para acercar el CR al CM y reducir la excentricidad a menos del 5%.</p>
+                                            <p><strong>Evite irregularidad torsional:</strong> Si la excentricidad
+                                                calculada supera el 10% del ancho del edificio (0.10), el edificio se
+                                                comportará de manera muy inestable en planta, concentrando rotación e
+                                                induciendo derivas severas en las columnas de esquina (efecto látigo
+                                                torsional). Lo ideal es redistribuir las columnas o añadir pantallas
+                                                (muros de cortante) para acercar el CR al CM y reducir la excentricidad
+                                                a menos del 5%.</p>
                                         </div>
                                     </div>
                                 </div>

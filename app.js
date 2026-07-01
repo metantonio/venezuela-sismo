@@ -69,18 +69,18 @@ let initialReportHTML = "";
 document.addEventListener("DOMContentLoaded", () => {
     try {
         initUI();
-    } catch(e) {
+    } catch (e) {
         console.error('[initUI]', e);
     }
     try {
         initThreeJS();
-    } catch(e) {
+    } catch (e) {
         console.error('[initThreeJS]', e);
         document.getElementById('canvas-3d-container').innerHTML = '<div style="color:red;padding:20px;font-size:12px;">[3D ERROR] ' + e.message + '</div>';
     }
     try {
         generateSpectraAndEarthquake();
-    } catch(e) {
+    } catch (e) {
         console.error('[generateSpectraAndEarthquake]', e);
         // Show error somewhere visible
         const el = document.querySelector('.content-area') || document.body;
@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     try {
         animate3D();
-    } catch(e) {
+    } catch (e) {
         console.error('[animate3D]', e);
     }
 });
@@ -102,16 +102,16 @@ function initUI() {
     // Tab switching
     const tabBtns = document.querySelectorAll(".tab-btn");
     const tabContents = document.querySelectorAll(".tab-content, .control-panel");
-    
+
     tabBtns.forEach(btn => {
         btn.addEventListener("click", () => {
             tabBtns.forEach(b => b.classList.remove("active"));
             tabContents.forEach(c => c.classList.remove("active"));
-            
+
             btn.classList.add("active");
             const tabId = btn.getAttribute("data-tab");
             document.getElementById(tabId).classList.add("active");
-            
+
             // Forzar redibujado de charts en tabs ocultos
             if (tabId === "tab-spectra" && spectraChartInstance) {
                 spectraChartInstance.resize();
@@ -159,7 +159,7 @@ function initUI() {
     setupSlider("col-dist-y", " m");
     setupSlider("story-height", " m");
     setupSlider("story-mass", " ton");
-    
+
     // Amortiguamiento
     const dampSlider = document.getElementById("damping-ratio");
     const dampSpan = document.getElementById("damping-ratio-val");
@@ -209,7 +209,7 @@ function initUI() {
     // Checkbox para habilitar secciones personalizadas
     const customSectionsCheck = document.getElementById("custom-sections-enable");
     const customSectionsControls = document.getElementById("custom-sections-controls");
-    
+
     if (customSectionsCheck && customSectionsControls) {
         customSectionsCheck.addEventListener("change", () => {
             customSectionsControls.style.display = customSectionsCheck.checked ? "block" : "none";
@@ -259,6 +259,98 @@ function initUI() {
     document.getElementById("btn-pause").addEventListener("click", pauseSimulation);
     document.getElementById("btn-reset").addEventListener("click", resetSimulation);
 
+    // Preset Vargas
+    const btnPresetVargas = document.getElementById("btn-preset-vargas");
+    if (btnPresetVargas) {
+        btnPresetVargas.addEventListener("click", () => {
+            // Si está corriendo la simulación, detenerla y forzar reinicio
+            if (isPlaying) {
+                toggleSimulation();
+            }
+
+            // Actualizar controles programáticamente
+            const setSlider = (id, val, suffix = "") => {
+                const slider = document.getElementById(id);
+                const valSpan = document.getElementById(`${id}-val`);
+                if (slider) {
+                    slider.value = val;
+                    if (valSpan) valSpan.textContent = val + suffix;
+                }
+            };
+
+            const setSelect = (id, val) => {
+                const select = document.getElementById(id);
+                if (select) select.value = val;
+            };
+
+            const setCheck = (id, checked) => {
+                const check = document.getElementById(id);
+                if (check) check.checked = checked;
+            };
+
+            // Geometría y Carga
+            setSlider("num-stories", 6);
+            setSlider("num-cols-x", 5);
+            setSlider("num-cols-y", 4);
+            setSlider("col-dist-x", 4.0, " m");
+            setSlider("col-dist-y", 4.0, " m");
+            setSlider("story-height", 3.0, " m");
+            setCheck("auto-mass", true);
+            setSelect("building-use", "residential");
+            setSlider("slab-thickness", 15, " cm");
+            setSlider("extra-dead-load", 250, " kgf/m²");
+
+            // Amortiguamiento
+            setSlider("damping-ratio", 0.05);
+            const dampValSpan = document.getElementById("damping-ratio-val");
+            if (dampValSpan) dampValSpan.textContent = "5%";
+
+            // Excentricidad
+            setSlider("torsional-eccentricity", 0.05);
+            const eccValSpan = document.getElementById("torsional-eccentricity-val");
+            if (eccValSpan) eccValSpan.textContent = "5%";
+
+            // Secciones Físicas (SCWB)
+            setCheck("custom-sections-enable", true);
+            const customSectionsControls = document.getElementById("custom-sections-controls");
+            if (customSectionsControls) customSectionsControls.style.display = "block";
+
+            setSlider("col-width", 45, " cm");
+            setSlider("col-depth", 50, " cm");
+            setSlider("beam-width", 30, " cm");
+            setSlider("beam-depth", 45, " cm");
+
+            setSlider("concrete-fc-col", 250, " kgf/cm²");
+            setSlider("concrete-fc-beam", 250, " kgf/cm²");
+            setSlider("steel-fy-col", 4200, " kgf/cm²");
+            setSlider("steel-fy-beam", 4200, " kgf/cm²");
+
+            setSlider("col-as", 33, " cm²");
+            setSlider("beam-as", 16, " cm²");
+            setSlider("beam-as-prime", 8, " cm²");
+
+            // Parámetros Sísmicos Vargas
+            setSelect("covenin01-zone", "7"); // Zona 7 (Ao = 0.40g)
+            setSelect("covenin01-soil", "S3"); // Depósitos aluviales de gran espesor (Caraballeda)
+            setSelect("covenin19-soil-class", "D"); // Suelo rígido/medio (alluvial fan profundo)
+            setSlider("covenin19-a0", 0.40);
+            setSlider("covenin19-a1", 0.40);
+            setCheck("double-earthquake", true);
+            setSelect("sismo1-direction", "X");
+            setSelect("sismo2-direction", "X");
+
+            // Sincronizar visibilidad de paneles de masa
+            const manualMassCont = document.getElementById("manual-mass-container");
+            const autoMassCont = document.getElementById("auto-mass-controls");
+            if (manualMassCont) manualMassCont.style.display = "none";
+            if (autoMassCont) autoMassCont.style.display = "block";
+
+            // Forzar reconstrucción de 3D, cálculos y reseteo
+            resetSimulation();
+            generateSpectraAndEarthquake();
+        });
+    }
+
     // Exportar a PDF
     const exportPdfBtn = document.getElementById("btn-export-pdf");
     if (exportPdfBtn) {
@@ -292,7 +384,7 @@ function getSpectrum2001(T, params) {
 
     // Tabla 7.1: Valores de beta, T* y p
     let beta, T_star, p;
-    switch(soil) {
+    switch (soil) {
         case 'S1': beta = 2.4; T_star = 0.4; p = 1.0; break;
         case 'S2': beta = 2.6; T_star = 0.7; p = 1.0; break;
         case 'S3': beta = 2.8; T_star = 1.0; p = 1.0; break;
@@ -307,7 +399,7 @@ function getSpectrum2001(T, params) {
     } else {
         T_plus = 0.4;
     }
-    
+
     // Acotación de T+
     const T_o = 0.25 * T_star;
     if (T_plus < T_o) T_plus = T_o;
@@ -343,14 +435,14 @@ function getSpectrum2019(T, params) {
 
     // Factores de sitio sugeridos según Clase de Sitio (Tablas 8, 9, 10 simplificadas)
     let Fac, Fvc, Fdc, q;
-    switch(soilClass) {
-        case 'A':  Fac = 0.8; Fvc = 0.8; Fdc = 0.8; q = 1.5; break;
-        case 'B':  Fac = 0.9; Fvc = 0.9; Fdc = 0.9; q = 1.5; break;
+    switch (soilClass) {
+        case 'A': Fac = 0.8; Fvc = 0.8; Fdc = 0.8; q = 1.5; break;
+        case 'B': Fac = 0.9; Fvc = 0.9; Fdc = 0.9; q = 1.5; break;
         case 'BC': Fac = 1.0; Fvc = 1.0; Fdc = 1.0; q = 1.7; break;
-        case 'C':  Fac = 1.2; Fvc = 1.4; Fdc = 1.4; q = 1.7; break;
-        case 'D':  Fac = 1.5; Fvc = 1.8; Fdc = 1.8; q = 1.9; break;
-        case 'E':  Fac = 2.0; Fvc = 2.4; Fdc = 2.4; q = 2.0; break;
-        default:   Fac = 1.2; Fvc = 1.4; Fdc = 1.4; q = 1.7;
+        case 'C': Fac = 1.2; Fvc = 1.4; Fdc = 1.4; q = 1.7; break;
+        case 'D': Fac = 1.5; Fvc = 1.8; Fdc = 1.8; q = 1.9; break;
+        case 'E': Fac = 2.0; Fvc = 2.4; Fdc = 2.4; q = 2.0; break;
+        default: Fac = 1.2; Fvc = 1.4; Fdc = 1.4; q = 1.7;
     }
 
     // Asumimos factores adicionales H (profundidad) y T (topográfico) unitarios
@@ -406,7 +498,7 @@ function getSpectrum2019(T, params) {
 function generateSyntheticEarthquake(T_soil, pga1, pga2, hasSecond) {
     const N_steps = totalDuration / dt;
     groundAccel = new Array(N_steps).fill(0);
-    
+
     // --- Filtro de Kanai-Tajimi reutilizable ---
     // Recibe un array de ruido blanco y devuelve la señal filtrada normalizada
     function kanaiTajimiFilter(noise, omega_g, zeta_g) {
@@ -623,17 +715,17 @@ class BuildingModel {
         this.Mn_col = 0;   // Momento nominal de la columna (kgf·m)
 
         if (customSections && customSections.enable) {
-            const fc_col  = customSections.fcCol;
+            const fc_col = customSections.fcCol;
             const fc_beam = customSections.fcBeam;
-            const fy_col  = customSections.fyCol;
+            const fy_col = customSections.fyCol;
             const fy_beam = customSections.fyBeam;
-            const Ec_col  = 15100.0 * Math.sqrt(fc_col)  * CONV;
+            const Ec_col = 15100.0 * Math.sqrt(fc_col) * CONV;
             const Ec_beam = 15100.0 * Math.sqrt(fc_beam) * CONV;
 
-            const bc_x = customSections.colWidth  / 100;
-            const hc_x = customSections.colDepth  / 100;
+            const bc_x = customSections.colWidth / 100;
+            const hc_x = customSections.colDepth / 100;
             const Ic_gross_x = (bc_x * Math.pow(hc_x, 3)) / 12;
-            
+
             const n_col = ES_PA / Ec_col;
             const As_col_m2 = (customSections.colAs) / 1e4;
             const d_cover_col = 0.04;
@@ -641,12 +733,12 @@ class BuildingModel {
             const Ic_x = Ic_gross_x + (n_col - 1) * As_col_m2 * arm_col_x * arm_col_x;
 
             const n = ES_PA / Ec_beam;
-            const As_m2  = (customSections.beamAs)      / 1e4;
-            const Asp_m2 = (customSections.beamAsPrime)  / 1e4;
+            const As_m2 = (customSections.beamAs) / 1e4;
+            const Asp_m2 = (customSections.beamAsPrime) / 1e4;
             const d_cover = 0.04;
             const bb = customSections.beamWidth / 100;
             const hb = customSections.beamDepth / 100;
-            const d  = hb - d_cover;
+            const d = hb - d_cover;
             const dp = d_cover;
 
             const A_quad = bb / 2;
@@ -656,8 +748,8 @@ class BuildingModel {
             const x_na = (-B_quad + Math.sqrt(Math.max(0, discriminant))) / (2 * A_quad);
 
             const Icr = (bb * Math.pow(x_na, 3)) / 3
-                       + n * Asp_m2 * Math.pow(Math.max(0, x_na - dp), 2)
-                       + n * As_m2  * Math.pow(Math.max(0, d - x_na), 2);
+                + n * Asp_m2 * Math.pow(Math.max(0, x_na - dp), 2)
+                + n * As_m2 * Math.pow(Math.max(0, d - x_na), 2);
 
             const k_col_fixed_x = (12.0 * Ec_col * Ic_x) / Math.pow(this.h, 3);
             const kappa_x = (Ec_beam * Icr * this.h) / (2.0 * Ec_col * Ic_x * sX_val);
@@ -830,7 +922,7 @@ class BuildingModel {
 
         const x_pred = new Array(N);
         const v_pred = new Array(N);
-        for(let i=0; i<N; i++) {
+        for (let i = 0; i < N; i++) {
             x_pred[i] = x_old[i] + dt * v_old[i] + dt2 * (0.5 - beta) * a_old[i];
             v_pred[i] = v_old[i] + dt * (1.0 - gamma) * a_old[i];
         }
@@ -843,23 +935,23 @@ class BuildingModel {
         const scwbProtection = this.strongColumnWeakBeam ? 0.4 : 1.0;
 
         const storyForces = new Array(N);
-        for(let i=0; i<N; i++) {
+        for (let i = 0; i < N; i++) {
             const x_i = x_pred[i];
-            const x_prev = (i === 0) ? 0 : x_pred[i-1];
+            const x_prev = (i === 0) ? 0 : x_pred[i - 1];
             const u = x_i - x_prev;
             const up = this.u_p[i];
-            
+
             const k_init_floor_i = isX ? this.k_init_x : this.k_init_y;
             const vy_init_floor_i = isX ? this.Vy_init_x[i] : this.Vy_init_y[i];
 
             // Degradación modulada por la protección SCWB:
             // scwbProtection = 0.4 si SCWB se cumple (las columnas se degradan 60% menos)
             // scwbProtection = 1.0 si SCWB no se cumple (degradación completa en columnas)
-            const k_deg_factor  = 1.0 - (0.6 * this.effDegSeverity * scwbProtection * this.D[i]);
+            const k_deg_factor = 1.0 - (0.6 * this.effDegSeverity * scwbProtection * this.D[i]);
             const vy_deg_factor = 1.0 - (0.4 * this.effDegSeverity * scwbProtection * this.D[i]);
 
-            this.k[i]  = k_init_floor_i  * Math.max(0.05, k_deg_factor);
-            this.Vy[i] = vy_init_floor_i * Math.max(0.1,  vy_deg_factor);
+            this.k[i] = k_init_floor_i * Math.max(0.05, k_deg_factor);
+            this.Vy[i] = vy_init_floor_i * Math.max(0.1, vy_deg_factor);
 
             const k = this.k[i];
             const vy = this.Vy[i];
@@ -906,34 +998,34 @@ class BuildingModel {
         this.currentBaseShear = storyForces[0];
 
         const f_rest = new Array(N);
-        for(let i=0; i<N; i++) {
-            f_rest[i] = storyForces[i] - ((i === N-1) ? 0 : storyForces[i+1]);
+        for (let i = 0; i < N; i++) {
+            f_rest[i] = storyForces[i] - ((i === N - 1) ? 0 : storyForces[i + 1]);
         }
 
         const f_damp = new Array(N).fill(0);
-        for(let i=0; i<N; i++) {
+        for (let i = 0; i < N; i++) {
             const v_i = v_pred[i];
-            const v_prev = (i === 0) ? 0 : v_pred[i-1];
-            const v_next = (i === N-1) ? 0 : v_pred[i+1];
+            const v_prev = (i === 0) ? 0 : v_pred[i - 1];
+            const v_next = (i === N - 1) ? 0 : v_pred[i + 1];
             const k_i = this.k[i];
-            const k_next = (i === N-1) ? 0 : this.k[i+1];
+            const k_next = (i === N - 1) ? 0 : this.k[i + 1];
             f_damp[i] = this.aM * this.m * v_i + this.aK * (k_i * (v_i - v_prev) - k_next * (v_next - v_i));
         }
 
         const a_new = new Array(N);
-        for(let i=0; i<N; i++) a_new[i] = -a_ground * G - (f_damp[i] + f_rest[i]) / this.m;
+        for (let i = 0; i < N; i++) a_new[i] = -a_ground * G - (f_damp[i] + f_rest[i]) / this.m;
 
-        for(let i=0; i<N; i++) {
+        for (let i = 0; i < N; i++) {
             this.x[i] = x_pred[i] + beta * dt2 * a_new[i];
             this.v[i] = v_pred[i] + gamma * dt * a_new[i];
             this.a[i] = a_new[i];
-            const u_curr = this.x[i] - ((i === 0) ? 0 : this.x[i-1]);
+            const u_curr = this.x[i] - ((i === 0) ? 0 : this.x[i - 1]);
             const driftRatio = (Math.abs(u_curr) * torsionAmp_curr) / this.h;
             if (driftRatio > this.maxDriftRatio) this.maxDriftRatio = driftRatio;
         }
 
         this.history.time.push(currentTime);
-        this.history.roofDisp.push(this.x[N-1]);
+        this.history.roofDisp.push(this.x[N - 1]);
         this.history.groundDrift.push(this.x[0] / this.h);
         this.history.groundShear.push(storyForces[0]);
     }
@@ -943,10 +1035,10 @@ class BuildingModel {
 function generateSpectraAndEarthquake() {
     const N = parseInt(document.getElementById("num-stories").value);
     const storyHeight = parseFloat(document.getElementById("story-height").value);
-    
+
     const autoMass = document.getElementById("auto-mass").checked;
     const storyMass = getCalculatedStoryMass();
-    
+
     // Actualizar visualización en el sidebar
     const massDisplay = document.getElementById("calculated-mass-display");
     if (massDisplay) {
@@ -959,7 +1051,7 @@ function generateSpectraAndEarthquake() {
 
     const analysisMode = document.getElementById("analysis-mode").value;
     const degSeverity = parseFloat(document.getElementById("degradation-severity").value);
-    
+
     // Período estimado inicial del edificio: T = 0.08 * N (para 4 columnas)
     const targetT1 = 0.08 * N;
 
@@ -983,19 +1075,19 @@ function generateSpectraAndEarthquake() {
         colDepth: parseFloat(document.getElementById("col-depth").value) || 35,
         beamWidth: parseFloat(document.getElementById("beam-width").value) || 30,
         beamDepth: parseFloat(document.getElementById("beam-depth").value) || 45,
-        fcCol:     parseFloat(document.getElementById("concrete-fc-col").value) || 250,
-        fcBeam:    parseFloat(document.getElementById("concrete-fc-beam").value) || 250,
-        fyCol:     parseFloat(document.getElementById("steel-fy-col").value) || 4200,
-        fyBeam:    parseFloat(document.getElementById("steel-fy-beam").value) || 4200,
-        colAs:     parseFloat(document.getElementById("col-as").value) || 16,
-        beamAs:      parseFloat(document.getElementById("beam-as").value) || 12,
+        fcCol: parseFloat(document.getElementById("concrete-fc-col").value) || 250,
+        fcBeam: parseFloat(document.getElementById("concrete-fc-beam").value) || 250,
+        fyCol: parseFloat(document.getElementById("steel-fy-col").value) || 4200,
+        fyBeam: parseFloat(document.getElementById("steel-fy-beam").value) || 4200,
+        colAs: parseFloat(document.getElementById("col-as").value) || 16,
+        beamAs: parseFloat(document.getElementById("beam-as").value) || 12,
         beamAsPrime: parseFloat(document.getElementById("beam-as-prime").value) || 6
     };
 
     // --- Calcular Parámetros de Diseño Sísmico Tempranamente para el Reporte ---
     const z01 = parseInt(document.getElementById("covenin01-zone").value);
     let Ao01 = 0.30;
-    switch(z01) {
+    switch (z01) {
         case 7: Ao01 = 0.40; break;
         case 6: Ao01 = 0.35; break;
         case 5: Ao01 = 0.30; break;
@@ -1222,11 +1314,11 @@ function generateSpectraAndEarthquake() {
         // Calcular T1 usando la inercia agrietada transformada de las vigas
         const CONV = 98066.5; // 1 kgf/cm² = 98066.5 Pa
         const ES_PA = 2.0e6 * CONV; // Módulo del acero en Pa
-        const Ec_col_Pa  = 15100.0 * Math.sqrt(customSections.fcCol)  * CONV;
+        const Ec_col_Pa = 15100.0 * Math.sqrt(customSections.fcCol) * CONV;
         const Ec_beam_Pa = 15100.0 * Math.sqrt(customSections.fcBeam) * CONV;
 
-        const bc_x = customSections.colWidth  / 100; // m
-        const hc_x = customSections.colDepth  / 100; // m
+        const bc_x = customSections.colWidth / 100; // m
+        const hc_x = customSections.colDepth / 100; // m
         const bc_y = hc_x;
         const hc_y = bc_x;
 
@@ -1235,44 +1327,44 @@ function generateSpectraAndEarthquake() {
 
         // Inercia bruta y transformada de la columna con acero longitudinal - Eje X
         const Ic_gross_x = (bc_x * Math.pow(hc_x, 3)) / 12;
-        const n_col_g   = ES_PA / Ec_col_Pa;
+        const n_col_g = ES_PA / Ec_col_Pa;
         const As_col_m2_g = (customSections.colAs) / 1e4;
-        const arm_col_g_x   = hc_x / 2 - 0.04; // recubrimiento 4 cm
+        const arm_col_g_x = hc_x / 2 - 0.04; // recubrimiento 4 cm
         const Ic_x = Ic_gross_x + (n_col_g - 1) * As_col_m2_g * arm_col_g_x * arm_col_g_x;
 
         // Inercia bruta y transformada de la columna con acero longitudinal - Eje Y
         const Ic_gross_y = (bc_y * Math.pow(hc_y, 3)) / 12;
-        const arm_col_g_y   = hc_y / 2 - 0.04;
+        const arm_col_g_y = hc_y / 2 - 0.04;
         const Ic_y = Ic_gross_y + (n_col_g - 1) * As_col_m2_g * arm_col_g_y * arm_col_g_y;
 
         // Relación modular y áreas de acero en m² para vigas
-        const n_mod  = ES_PA / Ec_beam_Pa;
-        const As_m2  = customSections.beamAs      / 1e4;
-        const Asp_m2 = customSections.beamAsPrime  / 1e4;
+        const n_mod = ES_PA / Ec_beam_Pa;
+        const As_m2 = customSections.beamAs / 1e4;
+        const Asp_m2 = customSections.beamAsPrime / 1e4;
         const d_cover = 0.04; // recubrimiento 4 cm
-        const d  = hb - d_cover;
+        const d = hb - d_cover;
         const dp = d_cover;
 
         // Eje neutro agrietado (cuadrática)
         const A_q = bb / 2;
         const B_q = n_mod * (As_m2 + Asp_m2);
         const C_q = -n_mod * (As_m2 * d + Asp_m2 * dp);
-        const x_na = (-B_q + Math.sqrt(Math.max(0, B_q*B_q - 4*A_q*C_q))) / (2 * A_q);
+        const x_na = (-B_q + Math.sqrt(Math.max(0, B_q * B_q - 4 * A_q * C_q))) / (2 * A_q);
 
         const Icr = (bb * Math.pow(x_na, 3)) / 3
-                  + n_mod * Asp_m2 * Math.pow(Math.max(0, x_na - dp), 2)
-                  + n_mod * As_m2  * Math.pow(Math.max(0, d - x_na), 2);
+            + n_mod * Asp_m2 * Math.pow(Math.max(0, x_na - dp), 2)
+            + n_mod * As_m2 * Math.pow(Math.max(0, d - x_na), 2);
 
         // Rigidez de columnas y flexibilidad en X
         const k_col_fixed_x = (12.0 * Ec_col_Pa * Ic_x) / Math.pow(storyHeight, 3);
         const kappa_x = (Ec_beam_Pa * Icr * storyHeight) / (2.0 * Ec_col_Pa * Ic_x * sX);
-        const eta_x   = (12.0 * kappa_x + 1.0) / (12.0 * kappa_x + 4.0);
+        const eta_x = (12.0 * kappa_x + 1.0) / (12.0 * kappa_x + 4.0);
         const k_init_custom_x = numCols * k_col_fixed_x * eta_x;
 
         // Rigidez de columnas y flexibilidad en Y
         const k_col_fixed_y = (12.0 * Ec_col_Pa * Ic_y) / Math.pow(storyHeight, 3);
         const kappa_y = (Ec_beam_Pa * Icr * storyHeight) / (2.0 * Ec_col_Pa * Ic_y * sY);
-        const eta_y   = (12.0 * kappa_y + 1.0) / (12.0 * kappa_y + 4.0);
+        const eta_y = (12.0 * kappa_y + 1.0) / (12.0 * kappa_y + 4.0);
         const k_init_custom_y = numCols * k_col_fixed_y * eta_y;
 
         const m_real = autoMass ? (storyMass * 1000) : ((storyMass * 1000) * (0.3 + 0.7 * (area / 25.0)));
@@ -1516,13 +1608,13 @@ function generateSpectraAndEarthquake() {
     // COVENIN 2001 suelo determina T*
     // S1: 0.4s, S2: 0.7s, S3: 1.0s, S4: 1.3s
     let T_soil = 0.7;
-    switch(params01.soil) {
+    switch (params01.soil) {
         case 'S1': T_soil = 0.4; break;
         case 'S2': T_soil = 0.7; break;
         case 'S3': T_soil = 1.0; break;
         case 'S4': T_soil = 1.3; break;
     }
-    
+
     // PGAs: Sismo 1 (M7.1) = Ao01 * g (ej. 0.30g). Sismo 2 (M7.5) = 1.5 * PGA1 (ej. 0.45g)
     const pga1 = params19.Ao; // usamos Ao en roca de 2019 para calibrar la aceleración base (ej. 0.30g)
     const pga2 = pga1 * 1.5; // M7.5 es más fuerte
@@ -1532,7 +1624,7 @@ function generateSpectraAndEarthquake() {
 
     // Llenar el vector de tiempos
     timeSeries = [];
-    for(let i=0; i<groundAccel.length; i++) {
+    for (let i = 0; i < groundAccel.length; i++) {
         timeSeries.push((i * dt).toFixed(2));
     }
 
@@ -1541,12 +1633,39 @@ function generateSpectraAndEarthquake() {
 
     // --- Verificación SCWB en Reporte ---
     if (customSections.enable) {
-        const check2001 = eq2001.strongColumnWeakBeam 
-            ? `<span style="color: var(--color-safe); font-weight: bold;"><i class="fa-solid fa-circle-check"></i> Cumple (Viga Débil)</span>` 
+        const check2001 = eq2001.strongColumnWeakBeam
+            ? `<span style="color: var(--color-safe); font-weight: bold;"><i class="fa-solid fa-circle-check"></i> Cumple (Viga Débil)</span>`
             : `<span style="color: var(--color-damage); font-weight: bold;"><i class="fa-solid fa-triangle-exclamation"></i> Columna Débil (⚠️ Rótulas en Columnas)</span>`;
-        const check2019 = eq2019.strongColumnWeakBeam 
-            ? `<span style="color: var(--color-safe); font-weight: bold;"><i class="fa-solid fa-circle-check"></i> Cumple (Viga Débil)</span>` 
+        const check2019 = eq2019.strongColumnWeakBeam
+            ? `<span style="color: var(--color-safe); font-weight: bold;"><i class="fa-solid fa-circle-check"></i> Cumple (Viga Débil)</span>`
             : `<span style="color: var(--color-damage); font-weight: bold;"><i class="fa-solid fa-triangle-exclamation"></i> Columna Débil (⚠️ Rótulas en Columnas)</span>`;
+
+        // --- Verificación de Cuantías y Acero Mínimo (COVENIN 1753) ---
+        const Ag_col = customSections.colWidth * customSections.colDepth; // cm²
+        const As_col_placed = customSections.colAs; // cm²
+        const rho_col_placed = As_col_placed / Ag_col; // ratio
+        const colSteelRatioPercent = (rho_col_placed * 100).toFixed(2) + "%";
+        const colAsMin = 0.01 * Ag_col; // cm²
+        const colCompliance = (As_col_placed >= colAsMin)
+            ? `<span style="color: var(--color-safe); font-weight: bold;"><i class="fa-solid fa-circle-check"></i> Cumple (&rho; &ge; 1.0%)</span>`
+            : `<span style="color: var(--color-damage); font-weight: bold;"><i class="fa-solid fa-triangle-exclamation"></i> No Cumple (Cuantía < 1.0% | Mín: ${colAsMin.toFixed(1)} cm²)</span>`;
+
+        const bw_beam = customSections.beamWidth; // cm
+        const hb_beam = customSections.beamDepth; // cm
+        const d_beam = hb_beam - 4.0; // cm
+        const fc_beam_val = customSections.fcBeam;
+        const fy_beam_val = customSections.fyBeam;
+        const rho_min_beam = Math.max((0.8 * Math.sqrt(fc_beam_val)) / fy_beam_val, 14.0 / fy_beam_val);
+        const beamAsMin = rho_min_beam * bw_beam * d_beam; // cm²
+        const As_beam_placed = customSections.beamAs; // cm²
+        const beamCompliance = (As_beam_placed >= beamAsMin)
+            ? `<span style="color: var(--color-safe); font-weight: bold;"><i class="fa-solid fa-circle-check"></i> Cumple (Mín: ${beamAsMin.toFixed(2)} cm²)</span>`
+            : `<span style="color: var(--color-damage); font-weight: bold;"><i class="fa-solid fa-triangle-exclamation"></i> No Cumple (Mín: ${beamAsMin.toFixed(2)} cm²)</span>`;
+
+        const AsPrime_beam_placed = customSections.beamAsPrime; // cm²
+        const beamSeismicCompliance = (AsPrime_beam_placed >= 0.5 * As_beam_placed)
+            ? `<span style="color: var(--color-safe); font-weight: bold;"><i class="fa-solid fa-circle-check"></i> Cumple (A'<sub>s</sub> &ge; 0.5A<sub>s</sub>)</span>`
+            : `<span style="color: var(--color-damage); font-weight: bold;"><i class="fa-solid fa-triangle-exclamation"></i> No Cumple (A'<sub>s</sub> < 0.5A<sub>s</sub> | Mín: ${(0.5 * As_beam_placed).toFixed(1)} cm²)</span>`;
 
         reportHTML += `
             <div style="margin-top: 24px; margin-bottom: 24px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
@@ -1603,13 +1722,60 @@ function generateSpectraAndEarthquake() {
                     </tbody>
                 </table>
             </div>
+
+            <div style="margin-top: 24px; margin-bottom: 24px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
+                <h4 style="color: var(--color-2019); margin-bottom: 10px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <i class="fa-solid fa-shield-cat"></i> Verificación de Cuantías y Acero Mínimo (COVENIN 1753)
+                </h4>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                    Verificación de límites normativos de refuerzo longitudinal para elementos de pórticos especiales resistentes a sismos (Nivel de Diseño ND3 / Ductilidad Alta).
+                </p>
+                <table class="calc-table">
+                    <thead>
+                        <tr>
+                            <th>Miembro Estructural</th>
+                            <th>Límite Normativo COVENIN 1753</th>
+                            <th>Fórmula de Control</th>
+                            <th>Acero Requerido</th>
+                            <th>Acero Colocado</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="calc-param-name"><strong>Columnas</strong> (Acero Total)</td>
+                            <td class="calc-formula">Cuantía geométrica mínima del 1.0%</td>
+                            <td class="calc-symbol">A<sub>st,mín</sub> = 0.01 &times; A<sub>g</sub></td>
+                            <td class="calc-value">${colAsMin.toFixed(1)} cm²</td>
+                            <td class="calc-value" style="font-weight: bold; color: ${As_col_placed >= colAsMin ? 'var(--color-safe)' : 'var(--color-damage)'};">${As_col_placed.toFixed(1)} cm² (${colSteelRatioPercent})</td>
+                            <td class="calc-value">${colCompliance}</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name"><strong>Vigas apoyos</strong> (Cara Tracción)</td>
+                            <td class="calc-formula">Acero mínimo por flexión en vigas</td>
+                            <td class="calc-symbol">A<sub>s,mín</sub> = max(0.8&radic;f'c/fy, 14/fy)bd</td>
+                            <td class="calc-value">${beamAsMin.toFixed(2)} cm²</td>
+                            <td class="calc-value" style="font-weight: bold; color: ${As_beam_placed >= beamAsMin ? 'var(--color-safe)' : 'var(--color-damage)'};">${As_beam_placed.toFixed(2)} cm²</td>
+                            <td class="calc-value">${beamCompliance}</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name"><strong>Vigas apoyos</strong> (Cara Compresión)</td>
+                            <td class="calc-formula">Doble armadura por sismo invertido (ND3)</td>
+                            <td class="calc-symbol">A'<sub>s</sub> &ge; 0.5 &times; A<sub>s</sub></td>
+                            <td class="calc-value">${(0.5 * As_beam_placed).toFixed(2)} cm²</td>
+                            <td class="calc-value" style="font-weight: bold; color: ${AsPrime_beam_placed >= 0.5 * As_beam_placed ? 'var(--color-safe)' : 'var(--color-damage)'};">${AsPrime_beam_placed.toFixed(2)} cm²</td>
+                            <td class="calc-value">${beamSeismicCompliance}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         `;
     }
 
     // Inyectar el reporte de cálculos dinámicamente en el DOM
     initialReportHTML = reportHTML;
     updateCalculationReport();
-    
+
     // Inicializar o limpiar gráficos de respuesta
     resetChartsData();
 
@@ -1681,10 +1847,10 @@ function generateColumnsTableHTML(b3D, bModel) {
         storyCols.forEach((col) => {
             const maxDrift = col.maxDriftRatio || 0;
             const maxDriftPercent = (maxDrift * 100).toFixed(2) + "%";
-            
+
             let statusText = "Seguro";
             let statusStyle = "color: var(--color-safe); font-weight: bold;";
-            
+
             if (maxDrift >= bModel.driftCollapseLimit || bModel.D_max[lvl] >= 0.99) {
                 statusText = "Colapso / Fallo";
                 statusStyle = "color: var(--color-damage); font-weight: bold;";
@@ -1717,12 +1883,12 @@ function generateColumnsTableHTML(b3D, bModel) {
 // --- GRÁFICOS CON CHART.JS ---
 function drawSpectraChart(p01, p19, T_fund_x, T_fund_y) {
     const ctx = document.getElementById("spectra-chart").getContext("2d");
-    
+
     // Generar datos para las curvas
     const periods = [];
     const data2001 = [];
     const data2019 = [];
-    
+
     for (let t = 0.01; t <= 4.0; t += 0.02) {
         periods.push(t.toFixed(2));
         data2001.push(getSpectrum2001(t, p01));
@@ -1744,7 +1910,7 @@ function drawSpectraChart(p01, p19, T_fund_x, T_fund_y) {
                 if (T_val) {
                     const targetVal = T_val.toFixed(2);
                     const xPos = xAxis.getPixelForValue(targetVal);
-                    
+
                     if (xPos >= xAxis.left && xPos <= xAxis.right) {
                         ctx.save();
                         ctx.beginPath();
@@ -1754,7 +1920,7 @@ function drawSpectraChart(p01, p19, T_fund_x, T_fund_y) {
                         ctx.moveTo(xPos, yAxis.top);
                         ctx.lineTo(xPos, yAxis.bottom);
                         ctx.stroke();
-                        
+
                         // Draw a label text
                         ctx.fillStyle = color;
                         ctx.font = '10px Inter';
@@ -1823,7 +1989,7 @@ function resetChartsData() {
     // Acelerograma del terreno
     const ctxAccel = document.getElementById("accel-chart").getContext("2d");
     if (accelChartInstance) accelChartInstance.destroy();
-    
+
     // Solo mostrar una porción inicial vacía o la señal completa pero sin cursor
     accelChartInstance = new Chart(ctxAccel, {
         type: 'line',
@@ -1977,7 +2143,7 @@ function updateChartsRealTime(step) {
         const data = hyst2001ChartInstance.data.datasets[0].data;
         const driftPercent = (eq2001.x[0] / eq2001.h) * 100;
         const force_kN = eq2001.history.groundShear[eq2001.history.groundShear.length - 1] / 1000; // N a kN
-        
+
         data.push({ x: driftPercent, y: force_kN });
         if (data.length > 1000) data.shift();
         hyst2001ChartInstance.update('none');
@@ -1987,7 +2153,7 @@ function updateChartsRealTime(step) {
         const data = hyst2019ChartInstance.data.datasets[0].data;
         const driftPercent = (eq2019.x[0] / eq2019.h) * 100;
         const force_kN = eq2019.history.groundShear[eq2019.history.groundShear.length - 1] / 1000;
-        
+
         data.push({ x: driftPercent, y: force_kN });
         if (data.length > 1000) data.shift();
         hyst2019ChartInstance.update('none');
@@ -1997,7 +2163,7 @@ function updateChartsRealTime(step) {
 // --- SIMULACIÓN 3D CON THREE.JS ---
 function initThreeJS() {
     const container = document.getElementById("canvas-3d-container");
-    
+
     // Crear Escena
     scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x090a0f, 0.015);
@@ -2394,7 +2560,7 @@ function createAxisIndicators() {
 
 function createPersonModel(colorTheme) {
     const personGroup = new THREE.Group();
-    
+
     // Materiales únicos por persona
     const mainColor = colorTheme === '2001' ? 0x00ff66 : 0x00ffcc;
     const bodyMat = new THREE.MeshStandardMaterial({
@@ -2404,13 +2570,13 @@ function createPersonModel(colorTheme) {
         emissive: mainColor,
         emissiveIntensity: 0.25
     });
-    
+
     const headMat = new THREE.MeshStandardMaterial({
         color: 0xffdbac, // Piel
         roughness: 0.6,
         metalness: 0.0
     });
-    
+
     const clothesColor = colorTheme === '2001' ? 0x2563eb : 0xdb2777; // Ropa
     const pantsMat = new THREE.MeshStandardMaterial({
         color: clothesColor,
@@ -2495,7 +2661,7 @@ function animatePerson(personGroup, animType) {
         const bob = Math.sin(time * 2) * 0.015;
         data.torso.position.y = 0.35 + bob;
         data.head.position.y = 0.55 + bob;
-        
+
         data.leftArm.rotation.z = 0.15;
         data.rightArm.rotation.z = -0.15;
         data.leftArm.rotation.x = 0;
@@ -2507,31 +2673,31 @@ function animatePerson(personGroup, animType) {
     } else if (animType === 'running') {
         const runSpeed = 15;
         const swing = Math.sin(time * runSpeed);
-        
+
         // Piernas alternando
         data.leftLeg.rotation.x = swing * 0.7;
         data.rightLeg.rotation.x = -swing * 0.7;
-        
+
         // Brazos alternando (opuestos a las piernas)
         data.leftArm.rotation.x = -swing * 0.8;
         data.rightArm.rotation.x = swing * 0.8;
         data.leftArm.rotation.z = 0.1;
         data.rightArm.rotation.z = -0.1;
-        
+
         // Inclinación
         data.torso.rotation.x = 0.15;
-        
+
         // Oscilación vertical
         const bob = Math.abs(Math.sin(time * runSpeed * 2)) * 0.04;
         data.torso.position.y = 0.35 - 0.02 + bob;
         data.head.position.y = 0.55 - 0.02 + bob;
-        
+
         personGroup.rotation.x = 0;
         personGroup.rotation.z = 0;
     } else if (animType === 'trapped') {
         // Lying down
         personGroup.rotation.x = Math.PI / 2;
-        
+
         data.leftLeg.rotation.x = 0.3;
         data.rightLeg.rotation.x = -0.2;
         data.leftArm.rotation.x = -0.5;
@@ -2539,7 +2705,7 @@ function animatePerson(personGroup, animType) {
         data.leftArm.rotation.z = 0.5;
         data.rightArm.rotation.z = -0.5;
         data.torso.rotation.x = 0;
-        
+
         data.torso.position.y = 0.35;
         data.head.position.y = 0.55;
     }
@@ -2576,7 +2742,7 @@ function createEvacuationGroup(bData, N, h, bW, bD) {
         bData.group.add(mesh);
         meshes.push(mesh);
     }
-    
+
     bData.evacMeshes = meshes;
     return meshes;
 }
@@ -2598,7 +2764,7 @@ function updateEvacuation(evacState, bModel, b3D, N, h, isLeft) {
             evacState.meshes.forEach((mesh, i) => {
                 mesh.position.y = floorMesh.position.y + 0.1;
                 animatePerson(mesh, 'trapped');
-                
+
                 mesh.userData.mats.forEach(mat => {
                     if (mat.color.getHex() !== 0xff0000) {
                         mat.color.setHex(0xff0000);
@@ -2619,10 +2785,10 @@ function updateEvacuation(evacState, bModel, b3D, N, h, isLeft) {
             } else {
                 if (mesh.position.x < 8) mesh.position.x += step;
             }
-            
+
             mesh.rotation.y = isLeft ? -Math.PI / 2 : Math.PI / 2;
             animatePerson(mesh, 'running');
-            
+
             mesh.userData.mats.forEach(mat => {
                 if (mat.color.getHex() !== 0x00ff00) {
                     mat.color.setHex(0x00ff00);
@@ -2650,7 +2816,7 @@ function updateEvacuation(evacState, bModel, b3D, N, h, isLeft) {
     }
 
     let startThreshold = (mode === "during") ? 10.0 : 30.0;
-    
+
     if (currentTime < startThreshold) {
         evacState.currentFloor = N;
         const floorIdx = N - 1;
@@ -2660,7 +2826,7 @@ function updateEvacuation(evacState, bModel, b3D, N, h, isLeft) {
                 mesh.position.x = floorMesh.position.x + (i < 2 ? -0.5 : 0.5);
                 mesh.position.z = floorMesh.position.z + (i % 2 === 0 ? -0.5 : 0.5);
                 mesh.position.y = floorMesh.position.y + 0.1;
-                
+
                 mesh.rotation.y = 0;
                 animatePerson(mesh, 'idle');
             });
@@ -2676,12 +2842,12 @@ function updateEvacuation(evacState, bModel, b3D, N, h, isLeft) {
         } else {
             // Piso entero actual para mostrar en las métricas
             evacState.currentFloor = Math.ceil(currentFloorFloat);
-            
+
             const floorIdxLower = Math.floor(currentFloorFloat); // piso de abajo (0 a N)
             const floorIdxUpper = Math.ceil(currentFloorFloat);  // piso de arriba (1 a N)
-            
+
             const frac = currentFloorFloat - floorIdxLower; // Fracción decimal (0 a 1)
-            
+
             let xPosLower = 0, yPosLower = 0, zPosLower = 0;
             if (floorIdxLower > 0 && floorIdxLower <= b3D.floors.length) {
                 const lowerMesh = b3D.floors[floorIdxLower - 1];
@@ -2689,7 +2855,7 @@ function updateEvacuation(evacState, bModel, b3D, N, h, isLeft) {
                 yPosLower = lowerMesh.position.y;
                 zPosLower = lowerMesh.position.z;
             }
-            
+
             let xPosUpper = 0, yPosUpper = 0, zPosUpper = 0;
             if (floorIdxUpper > 0 && floorIdxUpper <= b3D.floors.length) {
                 const upperMesh = b3D.floors[floorIdxUpper - 1];
@@ -2697,20 +2863,20 @@ function updateEvacuation(evacState, bModel, b3D, N, h, isLeft) {
                 yPosUpper = upperMesh.position.y;
                 zPosUpper = upperMesh.position.z;
             }
-            
+
             // Interpolación lineal
             const xPos = xPosLower * (1 - frac) + xPosUpper * frac;
             const yPos = yPosLower * (1 - frac) + yPosUpper * frac + 0.1;
             const zPos = zPosLower * (1 - frac) + zPosUpper * frac;
-            
+
             evacState.meshes.forEach((mesh, i) => {
                 mesh.position.x = xPos + (i < 2 ? -0.5 : 0.5);
                 mesh.position.z = zPos + (i % 2 === 0 ? -0.5 : 0.5);
                 mesh.position.y = yPos;
-                
+
                 mesh.rotation.y = isLeft ? Math.PI / 4 : -Math.PI / 4;
                 animatePerson(mesh, 'running');
-                
+
                 const cycle = Math.floor(currentTime * 4) % 2;
                 const evacColor = cycle === 0 ? 0xffaa00 : 0xffff00;
                 mesh.userData.mats[0].color.setHex(evacColor);
@@ -2727,13 +2893,13 @@ function initParticles() {
 
     for (let i = 0; i < particlesCount; i++) {
         // Inicializar fuera de escena
-        positions[i*3] = 0;
-        positions[i*3+1] = -100;
-        positions[i*3+2] = 0;
+        positions[i * 3] = 0;
+        positions[i * 3 + 1] = -100;
+        positions[i * 3 + 2] = 0;
 
-        colors[i*3] = 0.6;
-        colors[i*3+1] = 0.6;
-        colors[i*3+2] = 0.6;
+        colors[i * 3] = 0.6;
+        colors[i * 3 + 1] = 0.6;
+        colors[i * 3 + 2] = 0.6;
 
         particlesData.push({
             velocity: new THREE.Vector3(0, 0, 0),
@@ -2764,9 +2930,9 @@ function spawnParticles(x, y, z, count = 10) {
 
     for (let i = 0; i < particlesCount; i++) {
         if (particlesData[i].life <= 0) {
-            positions[i*3] = x + (Math.random() - 0.5) * 3;
-            positions[i*3+1] = y + (Math.random() - 0.5) * 0.5;
-            positions[i*3+2] = z + (Math.random() - 0.5) * 3;
+            positions[i * 3] = x + (Math.random() - 0.5) * 3;
+            positions[i * 3 + 1] = y + (Math.random() - 0.5) * 0.5;
+            positions[i * 3 + 2] = z + (Math.random() - 0.5) * 3;
 
             particlesData[i].velocity.set(
                 (Math.random() - 0.5) * 1.5,
@@ -2775,7 +2941,7 @@ function spawnParticles(x, y, z, count = 10) {
             );
             particlesData[i].maxLife = Math.random() * 40 + 20; // 0.2 a 0.6s
             particlesData[i].life = particlesData[i].maxLife;
-            
+
             spawned++;
             if (spawned >= count) break;
         }
@@ -2789,9 +2955,9 @@ function updateParticles() {
     for (let i = 0; i < particlesCount; i++) {
         if (particlesData[i].life > 0) {
             // Aplicar velocidad
-            positions[i*3] += particlesData[i].velocity.x * 0.016;
-            positions[i*3+1] += particlesData[i].velocity.y * 0.016;
-            positions[i*3+2] += particlesData[i].velocity.z * 0.016;
+            positions[i * 3] += particlesData[i].velocity.x * 0.016;
+            positions[i * 3 + 1] += particlesData[i].velocity.y * 0.016;
+            positions[i * 3 + 2] += particlesData[i].velocity.z * 0.016;
 
             // Desaceleración y gravedad leve
             particlesData[i].velocity.y -= 0.1 * 0.016;
@@ -2799,9 +2965,9 @@ function updateParticles() {
             particlesData[i].velocity.z *= 0.98;
 
             particlesData[i].life -= 1;
-            
+
             if (particlesData[i].life <= 0) {
-                positions[i*3+1] = -100; // mover abajo
+                positions[i * 3 + 1] = -100; // mover abajo
             }
         }
     }
@@ -2816,7 +2982,7 @@ function createTextSprite(text, colorStr) {
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = 'rgba(0, 0, 0, 0)';
     ctx.fillRect(0, 0, 128, 64);
-    
+
     // Configurar tipografía y contorno para legibilidad
     ctx.font = 'Bold 32px sans-serif';
     ctx.fillStyle = colorStr;
@@ -2826,7 +2992,7 @@ function createTextSprite(text, colorStr) {
     ctx.lineWidth = 4;
     ctx.strokeText(text, 64, 32);
     ctx.fillText(text, 64, 32);
-    
+
     const texture = new THREE.CanvasTexture(canvas);
     const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false });
     const sprite = new THREE.Sprite(spriteMaterial);
@@ -2876,7 +3042,7 @@ function updateBuildingCmCr(bData, bW, bD, activeDir) {
 
         const headLength = Math.min(0.4, length * 0.4);
         const headWidth = Math.min(0.2, length * 0.2);
-        
+
         const arrow = new THREE.ArrowHelper(
             dir,
             origin,
@@ -2902,7 +3068,7 @@ function rebuild3DStructures() {
     // Crear grupos
     buildings3D.b2001.group = new THREE.Group();
     buildings3D.b2019.group = new THREE.Group();
-    
+
     // Dimensiones en planta de los edificios dinámicas según la distancia y número de columnas
     const numColsX = parseInt(document.getElementById("num-cols-x").value) || 2;
     const numColsY = parseInt(document.getElementById("num-cols-y").value) || 2;
@@ -2936,7 +3102,7 @@ function rebuild3DStructures() {
         groundPlane.receiveShadow = true;
         scene.add(groundPlane);
     }
-    
+
     if (gridHelper) {
         scene.remove(gridHelper);
         const gridGridSize = Math.max(40, xOffset * 2 + bW + 20);
@@ -3030,9 +3196,9 @@ function rebuild3DStructures() {
         // Crear columnas de entrepiso dinámicas
         const colOffsets = [];
         for (let ix = 0; ix < numColsX; ix++) {
-            const x = numColsX > 1 ? -bW/2 + (ix / (numColsX - 1)) * bW : 0;
+            const x = numColsX > 1 ? -bW / 2 + (ix / (numColsX - 1)) * bW : 0;
             for (let iy = 0; iy < numColsY; iy++) {
-                const z = numColsY > 1 ? -bD/2 + (iy / (numColsY - 1)) * bD : 0;
+                const z = numColsY > 1 ? -bD / 2 + (iy / (numColsY - 1)) * bD : 0;
                 colOffsets.push({ x: x, z: z, ix: ix, iy: iy });
             }
         }
@@ -3041,7 +3207,7 @@ function rebuild3DStructures() {
         // Leer valores de sección para Three.js
         const customSectionsCheck = document.getElementById("custom-sections-enable");
         const useCustom = customSectionsCheck ? customSectionsCheck.checked : false;
-        
+
         let colW, colD, beamW, beamH;
         if (useCustom) {
             colW = (parseFloat(document.getElementById("col-width").value) || 35) / 100;
@@ -3060,7 +3226,7 @@ function rebuild3DStructures() {
             const storyCols = [];
             for (let c = 0; c < totalColsPerStory; c++) {
                 const colGeom = new THREE.BoxGeometry(colW, h, colD);
-                
+
                 // Material inicial seguro (Verde)
                 const colMat = new THREE.MeshStandardMaterial({
                     color: varToHexColor('--color-safe'),
@@ -3070,27 +3236,27 @@ function rebuild3DStructures() {
                 const colMesh = new THREE.Mesh(colGeom, colMat);
                 colMesh.castShadow = true;
                 colMesh.receiveShadow = true;
-                
+
                 // Posicionar a la mitad de la altura de la planta
                 colMesh.position.set(colOffsets[c].x, (lvl + 0.5) * h, colOffsets[c].z);
-                
+
                 // Crear anillos de rótulas plásticas (Torus) en los extremos
                 const torusRadius = Math.sqrt(colW * colW + colD * colD) / 2 + 0.015;
                 const torusTube = 0.025;
                 const ringGeom = new THREE.TorusGeometry(torusRadius, torusTube, 8, 24);
-                
+
                 const dummyMat = new THREE.MeshStandardMaterial({ visible: false });
-                
+
                 const bottomHinge = new THREE.Mesh(ringGeom, dummyMat);
-                bottomHinge.position.set(0, -h/2 + 0.08, 0);
+                bottomHinge.position.set(0, -h / 2 + 0.08, 0);
                 bottomHinge.rotation.x = Math.PI / 2;
                 colMesh.add(bottomHinge);
-                
+
                 const topHinge = new THREE.Mesh(ringGeom, dummyMat);
-                topHinge.position.set(0, h/2 - 0.08, 0);
+                topHinge.position.set(0, h / 2 - 0.08, 0);
                 topHinge.rotation.x = Math.PI / 2;
                 colMesh.add(topHinge);
-                
+
                 bData.group.add(colMesh);
                 storyCols.push({
                     mesh: colMesh,
@@ -3118,10 +3284,10 @@ function rebuild3DStructures() {
             for (let lvl = 0; lvl < N; lvl++) {
                 const floorMesh = bData.floors[lvl];
                 for (let iy = 0; iy < numColsY; iy++) {
-                    const z = numColsY > 1 ? -bD/2 + (iy / (numColsY - 1)) * bD : 0;
+                    const z = numColsY > 1 ? -bD / 2 + (iy / (numColsY - 1)) * bD : 0;
                     for (let ix = 0; ix < numColsX - 1; ix++) {
-                        const xStart = -bW/2 + (ix / (numColsX - 1)) * bW;
-                        const xEnd = -bW/2 + ((ix + 1) / (numColsX - 1)) * bW;
+                        const xStart = -bW / 2 + (ix / (numColsX - 1)) * bW;
+                        const xEnd = -bW / 2 + ((ix + 1) / (numColsX - 1)) * bW;
                         const xCenter = (xStart + xEnd) / 2;
 
                         const beamMesh = new THREE.Mesh(beamGeomX, beamMat);
@@ -3146,10 +3312,10 @@ function rebuild3DStructures() {
             for (let lvl = 0; lvl < N; lvl++) {
                 const floorMesh = bData.floors[lvl];
                 for (let ix = 0; ix < numColsX; ix++) {
-                    const x = numColsX > 1 ? -bW/2 + (ix / (numColsX - 1)) * bW : 0;
+                    const x = numColsX > 1 ? -bW / 2 + (ix / (numColsX - 1)) * bW : 0;
                     for (let iy = 0; iy < numColsY - 1; iy++) {
-                        const zStart = -bD/2 + (iy / (numColsY - 1)) * bD;
-                        const zEnd = -bD/2 + ((iy + 1) / (numColsY - 1)) * bD;
+                        const zStart = -bD / 2 + (iy / (numColsY - 1)) * bD;
+                        const zEnd = -bD / 2 + ((iy + 1) / (numColsY - 1)) * bD;
                         const zCenter = (zStart + zEnd) / 2;
 
                         const beamMesh = new THREE.Mesh(beamGeomY, beamMat);
@@ -3212,7 +3378,7 @@ function update3DPhysics() {
 
     // Desplazamiento actual del terreno (vibración visual del suelo)
     const groundDisp = groundAccel[simStepIndex] * 0.8; // amplificar visualmente el sismo
-    
+
     if (isX) {
         groundPlane.position.x = groundDisp;
         groundPlane.position.z = 0;
@@ -3228,7 +3394,7 @@ function update3DPhysics() {
 
     // Actualizar Edificio 2001
     updateBuilding3DPhysics(eq2001, buildings3D.b2001, -xOffset, groundDisp, activeDir);
-    
+
     // Actualizar Edificio 2019
     updateBuilding3DPhysics(eq2019, buildings3D.b2019, xOffset, groundDisp, activeDir);
 
@@ -3267,7 +3433,7 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
         // Animación de colapso progresivo
         // Haremos que las losas caigan verticalmente con gravedad simulada
         const collapseSpeed = 0.08;
-        
+
         // Encontrar primer piso fallado (donde daño es máximo)
         let failedLevel = 0;
         let maxD = 0;
@@ -3281,15 +3447,15 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
         // Simular caída libre para todas las losas por encima del piso fallado
         for (let lvl = failedLevel; lvl < N; lvl++) {
             const floorMesh = b3D.floors[lvl];
-            
+
             // Destino de caída es la losa inferior
-            const targetY = (lvl === 0) ? 0.1 : b3D.floors[lvl-1].position.y + 0.15;
-            
+            const targetY = (lvl === 0) ? 0.1 : b3D.floors[lvl - 1].position.y + 0.15;
+
             if (floorMesh.position.y > targetY) {
                 floorMesh.position.y -= collapseSpeed;
                 floorMesh.position.x += (Math.random() - 0.5) * 0.05; // vibración de escombros
                 floorMesh.position.z += (Math.random() - 0.5) * 0.05;
-                
+
                 // Partículas de polvo en la caída
                 if (Math.random() < 0.3) {
                     spawnParticles(
@@ -3307,7 +3473,7 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
                 col.mesh.scale.y = Math.max(0.1, col.mesh.scale.y - 0.05);
                 col.mesh.rotation.z += (col.offsetX > 0 ? 0.03 : -0.03);
                 col.mesh.material.color.setHex(0x111111); // Negro de escombros quemados/destruidos
-                
+
                 // Ocultar rótulas plásticas en colapso
                 if (col.bottomHinge) col.bottomHinge.visible = false;
                 if (col.topHinge) col.topHinge.visible = false;
@@ -3324,7 +3490,7 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
     for (let lvl = 0; lvl < N; lvl++) {
         // Desplazamiento del nivel actual
         const d_curr = bModel.x[lvl] * 6.0; // amplificado para visibilidad en 3D
-        const d_prev = (lvl === 0) ? 0 : bModel.x[lvl-1] * 6.0;
+        const d_prev = (lvl === 0) ? 0 : bModel.x[lvl - 1] * 6.0;
 
         // Ángulo de rotación del nivel actual (amplificado para visibilidad)
         const theta_curr = (d_curr * ecc) / rp;
@@ -3363,10 +3529,10 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
 
             // Calcular derivas reales (físicas, no amplificadas) de esta columna particular
             const theta_curr_phys = (bModel.x[lvl] * ecc) / rp;
-            const theta_prev_phys = (lvl === 0) ? 0 : (bModel.x[lvl-1] * ecc) / rp;
+            const theta_prev_phys = (lvl === 0) ? 0 : (bModel.x[lvl - 1] * ecc) / rp;
 
-            const x_trans_p_phys = isX ? (lvl === 0 ? 0 : bModel.x[lvl-1]) : 0;
-            const z_trans_p_phys = isX ? 0 : (lvl === 0 ? 0 : bModel.x[lvl-1]);
+            const x_trans_p_phys = isX ? (lvl === 0 ? 0 : bModel.x[lvl - 1]) : 0;
+            const z_trans_p_phys = isX ? 0 : (lvl === 0 ? 0 : bModel.x[lvl - 1]);
             const x_trans_c_phys = isX ? bModel.x[lvl] : 0;
             const z_trans_c_phys = isX ? 0 : bModel.x[lvl];
 
@@ -3457,31 +3623,31 @@ function toggleSimulation() {
     const mobRun = document.getElementById("mobile-btn-run");
     const mobPause = document.getElementById("mobile-btn-pause");
     const mobReset = document.getElementById("mobile-btn-reset");
-    
+
     if (!isPlaying) {
         // INICIAR
         isPlaying = true;
         isPaused = false;
-        
+
         btnRun.innerHTML = '<i class="fa-solid fa-stop"></i> Detener';
         btnRun.classList.replace("btn-primary", "btn-danger");
         btnPause.disabled = false;
         document.getElementById("btn-reset").disabled = true;
-        
+
         if (mobRun) {
             mobRun.innerHTML = '<i class="fa-solid fa-stop"></i>';
             mobRun.classList.replace("btn-primary", "btn-danger");
         }
         if (mobPause) mobPause.disabled = false;
         if (mobReset) mobReset.disabled = true;
-        
+
         // Bloquear controles de configuración
         toggleInputControls(true);
 
         // Iniciar loop
         simStepIndex = 0;
         currentTime = 0;
-        
+
         simInterval = setInterval(simulationLoop, 10); // 10ms por paso (100 fps de física)
     } else {
         // DETENER
@@ -3493,15 +3659,15 @@ function stopSimulation() {
     isPlaying = false;
     isPaused = false;
     clearInterval(simInterval);
-    
+
     const btnRun = document.getElementById("btn-run");
     btnRun.innerHTML = '<i class="fa-solid fa-play"></i> Iniciar Simulación';
     btnRun.classList.replace("btn-danger", "btn-primary");
-    
+
     document.getElementById("btn-pause").disabled = true;
     document.getElementById("btn-pause").innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
     document.getElementById("btn-reset").disabled = false;
-    
+
     // Sincronizar botones móviles
     const mobRun = document.getElementById("mobile-btn-run");
     if (mobRun) {
@@ -3515,7 +3681,7 @@ function stopSimulation() {
     }
     const mobReset = document.getElementById("mobile-btn-reset");
     if (mobReset) mobReset.disabled = false;
-    
+
     toggleInputControls(false);
     updateCalculationReport();
 }
@@ -3546,13 +3712,13 @@ function resetSimulation() {
     document.getElementById("metric-time").innerHTML = `0.00 <span class="unit">s</span>`;
     document.getElementById("metric-phase").textContent = "En reposo";
     document.getElementById("metric-phase").className = "text-green";
-    
+
     // Resetear textos de métricas
     document.getElementById("drift-2001").textContent = "0.00%";
     document.getElementById("drift-2019").textContent = "0.00%";
     document.getElementById("damage-2001").textContent = "0.00%";
     document.getElementById("damage-2019").textContent = "0.00%";
-    
+
     const status1 = document.getElementById("status-2001");
     status1.textContent = "Estable";
     status1.className = "metric-status";
@@ -3620,19 +3786,19 @@ function simulationLoop() {
 function getEvacStatusText(evacState) {
     const mode = document.getElementById("evacuation-mode").value;
     if (mode === "off") return `<span style="color: var(--text-muted);">Desactivada</span>`;
-    
+
     if (evacState.trapped) {
         return `<span style="color: #ff4d4d; font-weight: bold;" class="animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i> Atrapados (Piso ${evacState.currentFloor})</span>`;
     }
     if (evacState.escaped) {
         return `<span style="color: var(--color-safe); font-weight: bold;"><i class="fa-solid fa-circle-check"></i> A salvo</span>`;
     }
-    
+
     let startThreshold = (mode === "during") ? 10.0 : 30.0;
     if (currentTime < startThreshold) {
         return `<span style="color: var(--text-muted);"><i class="fa-regular fa-clock"></i> Esperando (Piso ${evacState.currentFloor})</span>`;
     }
-    
+
     return `<span style="color: #ffb703; font-weight: bold;" class="animate-pulse"><i class="fa-solid fa-person-running"></i> Piso ${evacState.currentFloor}</span>`;
 }
 
@@ -3642,7 +3808,7 @@ function updateMetricsUI() {
     // Fase del sismo
     const phaseSpan = document.getElementById("metric-phase");
     const hasSecond = document.getElementById("double-earthquake").checked;
-    
+
     if (currentTime < 2) {
         phaseSpan.textContent = "Iniciando Sismo 1 (M7.1)";
         phaseSpan.className = "text-yellow";
@@ -3672,7 +3838,7 @@ function updateMetricsUI() {
     // Métricas del Edificio 2001
     const drift1 = (eq2001.maxDriftRatio * 100).toFixed(2) + "%";
     document.getElementById("drift-2001").textContent = drift1;
-    
+
     const damage1 = (Math.max(...eq2001.D_max) * 100).toFixed(1) + "%";
     document.getElementById("damage-2001").textContent = damage1;
 
@@ -3700,7 +3866,7 @@ function updateMetricsUI() {
     // Métricas del Edificio 2019
     const drift2 = (eq2019.maxDriftRatio * 100).toFixed(2) + "%";
     document.getElementById("drift-2019").textContent = drift2;
-    
+
     const damage2 = (Math.max(...eq2019.D_max) * 100).toFixed(1) + "%";
     document.getElementById("damage-2019").textContent = damage2;
 
