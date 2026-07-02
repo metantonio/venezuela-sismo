@@ -187,6 +187,14 @@ function initUI() {
         });
     }
 
+    const showFlexureCheck = document.getElementById("show-flexure-deformation");
+    if (showFlexureCheck) {
+        showFlexureCheck.addEventListener("change", () => {
+            rebuild3DStructures();
+            resetSimulation();
+        });
+    }
+
     // 2019 Sliders
     setupSlider("covenin19-a0");
     setupSlider("covenin19-a1");
@@ -2260,8 +2268,15 @@ function initThreeJS() {
             if (!b3D.columns) return;
             b3D.columns.forEach((storyCols, lvl) => {
                 storyCols.forEach((col, idx) => {
-                    targets.push(col.mesh);
-                    colMap.set(col.mesh, { buildingName: bName, level: lvl, index: idx, colData: col });
+                    if (col.meshes && Array.isArray(col.meshes)) {
+                        col.meshes.forEach(segMesh => {
+                            targets.push(segMesh);
+                            colMap.set(segMesh, { buildingName: bName, level: lvl, index: idx, colData: col });
+                        });
+                    } else if (col.mesh) {
+                        targets.push(col.mesh);
+                        colMap.set(col.mesh, { buildingName: bName, level: lvl, index: idx, colData: col });
+                    }
                 });
             });
         };
@@ -3221,24 +3236,34 @@ function rebuild3DStructures() {
             beamH = colorTheme === '2019' ? 0.45 : 0.35;
         }
 
+        const flexureCheck = document.getElementById("show-flexure-deformation");
+        const useFlexure = flexureCheck ? flexureCheck.checked : false;
+
         // Columnas
         for (let lvl = 0; lvl < N; lvl++) {
             const storyCols = [];
             for (let c = 0; c < totalColsPerStory; c++) {
-                const colGeom = new THREE.BoxGeometry(colW, h, colD);
+                const numSegs = useFlexure ? 5 : 1;
+                const hSeg = h / numSegs;
+                const segGeom = new THREE.BoxGeometry(colW, hSeg, colD);
 
-                // Material inicial seguro (Verde)
+                // Material inicial seguro (Verde) único para esta columna (compartido por sus segmentos)
                 const colMat = new THREE.MeshStandardMaterial({
                     color: varToHexColor('--color-safe'),
                     roughness: 0.4
                 });
 
-                const colMesh = new THREE.Mesh(colGeom, colMat);
-                colMesh.castShadow = true;
-                colMesh.receiveShadow = true;
-
-                // Posicionar a la mitad de la altura de la planta
-                colMesh.position.set(colOffsets[c].x, (lvl + 0.5) * h, colOffsets[c].z);
+                const segments = [];
+                for (let s = 0; s < numSegs; s++) {
+                    const segMesh = new THREE.Mesh(segGeom, colMat);
+                    segMesh.castShadow = true;
+                    segMesh.receiveShadow = true;
+                    // Posicionar a la altura correspondiente del segmento inicialmente
+                    const xi = (s + 0.5) / numSegs;
+                    segMesh.position.set(colOffsets[c].x, lvl * h + xi * h, colOffsets[c].z);
+                    bData.group.add(segMesh);
+                    segments.push(segMesh);
+                }
 
                 // Crear anillos de rótulas plásticas (Torus) en los extremos
                 const torusRadius = Math.sqrt(colW * colW + colD * colD) / 2 + 0.015;
@@ -3248,18 +3273,18 @@ function rebuild3DStructures() {
                 const dummyMat = new THREE.MeshStandardMaterial({ visible: false });
 
                 const bottomHinge = new THREE.Mesh(ringGeom, dummyMat);
-                bottomHinge.position.set(0, -h / 2 + 0.08, 0);
+                bottomHinge.position.set(0, -hSeg / 2 + 0.08, 0);
                 bottomHinge.rotation.x = Math.PI / 2;
-                colMesh.add(bottomHinge);
+                segments[0].add(bottomHinge);
 
                 const topHinge = new THREE.Mesh(ringGeom, dummyMat);
-                topHinge.position.set(0, h / 2 - 0.08, 0);
+                topHinge.position.set(0, hSeg / 2 - 0.08, 0);
                 topHinge.rotation.x = Math.PI / 2;
-                colMesh.add(topHinge);
+                segments[numSegs - 1].add(topHinge);
 
-                bData.group.add(colMesh);
                 storyCols.push({
-                    mesh: colMesh,
+                    meshes: segments,
+                    material: colMat,
                     offsetX: colOffsets[c].x,
                     offsetZ: colOffsets[c].z,
                     level: lvl,
@@ -3273,59 +3298,100 @@ function rebuild3DStructures() {
             bData.columns.push(storyCols);
         }
 
+        bData.beamsX = [];
+        bData.beamsY = [];
+
         // Crear vigas longitudinales (eje X)
         if (numColsX > 1) {
-            const beamGeomX = new THREE.BoxGeometry(sX, beamH, beamW); // longitud, peralte, ancho
+            const numSegs = useFlexure ? 5 : 1;
+            const Lseg = sX / numSegs;
+            const beamGeomX = new THREE.BoxGeometry(Lseg, beamH, beamW); // longitud, peralte, ancho
             const beamMat = new THREE.MeshStandardMaterial({
                 color: colorTheme === '2001' ? 0x273549 : 0x182030,
                 roughness: 0.6
             });
 
             for (let lvl = 0; lvl < N; lvl++) {
+                const storyBeams = [];
                 const floorMesh = bData.floors[lvl];
                 for (let iy = 0; iy < numColsY; iy++) {
                     const z = numColsY > 1 ? -bD / 2 + (iy / (numColsY - 1)) * bD : 0;
                     for (let ix = 0; ix < numColsX - 1; ix++) {
                         const xStart = -bW / 2 + (ix / (numColsX - 1)) * bW;
-                        const xEnd = -bW / 2 + ((ix + 1) / (numColsX - 1)) * bW;
-                        const xCenter = (xStart + xEnd) / 2;
 
-                        const beamMesh = new THREE.Mesh(beamGeomX, beamMat);
-                        // Posicionar relativa a la losa (su centro Y está en (lvl+1)*h, Z en 0, X en 0)
-                        beamMesh.position.set(xCenter, -0.1 - beamH / 2, z); // 0.1 es la mitad del espesor de la losa (0.2)
-                        beamMesh.castShadow = true;
-                        beamMesh.receiveShadow = true;
-                        floorMesh.add(beamMesh);
+                        const segments = [];
+                        for (let s = 0; s < numSegs; s++) {
+                            const segMesh = new THREE.Mesh(beamGeomX, beamMat);
+                            segMesh.castShadow = true;
+                            segMesh.receiveShadow = true;
+
+                            // Posición local inicial
+                            const eta = (s + 0.5) / numSegs;
+                            const x_s = xStart + eta * sX;
+                            segMesh.position.set(x_s, -0.1 - beamH / 2, z);
+                            floorMesh.add(segMesh);
+                            segments.push(segMesh);
+                        }
+
+                        storyBeams.push({
+                            meshes: segments,
+                            ix: ix,
+                            iy: iy,
+                            level: lvl,
+                            span: sX,
+                            xStart: xStart,
+                            z: z
+                        });
                     }
                 }
+                bData.beamsX.push(storyBeams);
             }
         }
 
         // Crear vigas transversales (eje Y)
         if (numColsY > 1) {
-            const beamGeomY = new THREE.BoxGeometry(beamW, beamH, sY); // ancho, peralte, longitud
+            const numSegs = useFlexure ? 5 : 1;
+            const Lseg = sY / numSegs;
+            const beamGeomY = new THREE.BoxGeometry(beamW, beamH, Lseg); // ancho, peralte, longitud
             const beamMat = new THREE.MeshStandardMaterial({
                 color: colorTheme === '2001' ? 0x273549 : 0x182030,
                 roughness: 0.6
             });
 
             for (let lvl = 0; lvl < N; lvl++) {
+                const storyBeams = [];
                 const floorMesh = bData.floors[lvl];
                 for (let ix = 0; ix < numColsX; ix++) {
                     const x = numColsX > 1 ? -bW / 2 + (ix / (numColsX - 1)) * bW : 0;
                     for (let iy = 0; iy < numColsY - 1; iy++) {
                         const zStart = -bD / 2 + (iy / (numColsY - 1)) * bD;
-                        const zEnd = -bD / 2 + ((iy + 1) / (numColsY - 1)) * bD;
-                        const zCenter = (zStart + zEnd) / 2;
 
-                        const beamMesh = new THREE.Mesh(beamGeomY, beamMat);
-                        // Posicionar relativa a la losa
-                        beamMesh.position.set(x, -0.1 - beamH / 2, zCenter);
-                        beamMesh.castShadow = true;
-                        beamMesh.receiveShadow = true;
-                        floorMesh.add(beamMesh);
+                        const segments = [];
+                        for (let s = 0; s < numSegs; s++) {
+                            const segMesh = new THREE.Mesh(beamGeomY, beamMat);
+                            segMesh.castShadow = true;
+                            segMesh.receiveShadow = true;
+
+                            // Posición local inicial
+                            const eta = (s + 0.5) / numSegs;
+                            const z_s = zStart + eta * sY;
+                            segMesh.position.set(x, -0.1 - beamH / 2, z_s);
+                            floorMesh.add(segMesh);
+                            segments.push(segMesh);
+                        }
+
+                        storyBeams.push({
+                            meshes: segments,
+                            ix: ix,
+                            iy: iy,
+                            level: lvl,
+                            span: sY,
+                            zStart: zStart,
+                            x: x
+                        });
                     }
                 }
+                bData.beamsY.push(storyBeams);
             }
         }
     };
@@ -3416,6 +3482,9 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
     const h = bModel.h;
     const isX = (activeDir === 'X');
 
+    const flexureCheck = document.getElementById("show-flexure-deformation");
+    const useFlexure = flexureCheck ? flexureCheck.checked : false;
+
     // Calcular dimensiones en planta y actualizar CM/CR
     const numColsX = parseInt(document.getElementById("num-cols-x").value) || 2;
     const numColsY = parseInt(document.getElementById("num-cols-y").value) || 2;
@@ -3470,9 +3539,11 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
             // Columnas del piso fallado colapsan (escala vertical va a cero y se rotan)
             const cols = b3D.columns[lvl];
             cols.forEach(col => {
-                col.mesh.scale.y = Math.max(0.1, col.mesh.scale.y - 0.05);
-                col.mesh.rotation.z += (col.offsetX > 0 ? 0.03 : -0.03);
-                col.mesh.material.color.setHex(0x111111); // Negro de escombros quemados/destruidos
+                col.meshes.forEach(segMesh => {
+                    segMesh.scale.y = Math.max(0.1, segMesh.scale.y - 0.05);
+                    segMesh.rotation.z += (col.offsetX > 0 ? 0.03 : -0.03);
+                });
+                col.material.color.setHex(0x111111); // Negro de escombros quemados/destruidos
 
                 // Ocultar rótulas plásticas en colapso
                 if (col.bottomHinge) col.bottomHinge.visible = false;
@@ -3527,6 +3598,12 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
             const x_top = x_trans_curr + ox * Math.cos(theta_curr) - oz * Math.sin(theta_curr);
             const z_top = z_trans_curr + ox * Math.sin(theta_curr) + oz * Math.cos(theta_curr);
 
+            // Guardar posiciones para uso de las vigas
+            col.x_bottom_curr = x_bottom;
+            col.z_bottom_curr = z_bottom;
+            col.x_top_curr = x_top;
+            col.z_top_curr = z_top;
+
             // Calcular derivas reales (físicas, no amplificadas) de esta columna particular
             const theta_curr_phys = (bModel.x[lvl] * ecc) / rp;
             const theta_prev_phys = (lvl === 0) ? 0 : (bModel.x[lvl - 1] * ecc) / rp;
@@ -3547,7 +3624,7 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
             const colDriftRatio = Math.sqrt(drift_x_phys * drift_x_phys + drift_z_phys * drift_z_phys) / h;
             col.maxDriftRatio = Math.max(col.maxDriftRatio || 0, colDriftRatio);
 
-            // Determinar color de esta columna según su propia deriva (torsión castiga unas columnas más que otras)
+            // Determinar color de esta columna según su propia deriva
             let colColor;
             if (colDriftRatio < 0.015) {
                 colColor = varToHexColor('--color-safe');
@@ -3565,7 +3642,7 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
                 colColor = 0x222222; // fallo local de la columna
             }
 
-            col.mesh.material.color.setHex(colColor);
+            col.material.color.setHex(colColor);
 
             // Actualizar visualización de Rótulas Plásticas
             if (col.bottomHinge && col.topHinge) {
@@ -3585,20 +3662,137 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
                 }
             }
 
-            // Posicionar columna en el punto medio deformado
-            col.mesh.position.set(
-                (x_bottom + x_top) / 2,
-                (lvl + 0.5) * h,
-                (z_bottom + z_top) / 2
-            );
-
-            // Orientar la columna a lo largo del tramo deformado (sway en X y Z)
+            // Mover y deformar las columnas según la opción de flexión avanzada
             const dx = x_top - x_bottom;
             const dz = z_top - z_bottom;
-            col.mesh.rotation.z = -Math.atan2(dx, h);
-            col.mesh.rotation.x = Math.atan2(dz, h);
-            col.mesh.rotation.y = (theta_prev + theta_curr) / 2;
+
+            if (useFlexure) {
+                const numSegs = col.meshes.length;
+                col.meshes.forEach((segMesh, s) => {
+                    const xi = (s + 0.5) / numSegs;
+                    // Curva cúbica de flexión (doble curvatura)
+                    const f_xi = 3 * xi * xi - 2 * xi * xi * xi;
+                    // Derivada (pendiente)
+                    const slope_xi = 6 * xi * (1 - xi);
+
+                    const x_s = x_bottom + dx * f_xi;
+                    const z_s = z_bottom + dz * f_xi;
+                    const y_s = lvl * h + xi * h;
+
+                    segMesh.position.set(x_s, y_s, z_s);
+
+                    // Pendientes en X y Z
+                    const dx_dy = (dx / h) * slope_xi;
+                    const dz_dy = (dz / h) * slope_xi;
+
+                    segMesh.rotation.z = -Math.atan(dx_dy);
+                    segMesh.rotation.x = Math.atan(dz_dy);
+                    segMesh.rotation.y = theta_prev + (theta_curr - theta_prev) * xi;
+                });
+            } else {
+                // Comportamiento rígido clásico (muy rápido, 1 segmento)
+                const segMesh = col.meshes[0];
+                if (segMesh) {
+                    segMesh.position.set(
+                        (x_bottom + x_top) / 2,
+                        (lvl + 0.5) * h,
+                        (z_bottom + z_top) / 2
+                    );
+                    segMesh.rotation.z = -Math.atan2(dx, h);
+                    segMesh.rotation.x = Math.atan2(dz, h);
+                    segMesh.rotation.y = (theta_prev + theta_curr) / 2;
+                }
+            }
         });
+
+        // Configuración de vigas
+        const colorTheme = (bModel === eq2001) ? '2001' : '2019';
+        const customSectionsCheck = document.getElementById("custom-sections-enable");
+        const useCustom = customSectionsCheck ? customSectionsCheck.checked : false;
+        let beamH;
+        if (useCustom) {
+            beamH = (parseFloat(document.getElementById("beam-depth").value) || 45) / 100;
+        } else {
+            beamH = (colorTheme === '2019') ? 0.45 : 0.35;
+        }
+
+        // Actualizar vigas en X (longitudinales)
+        if (b3D.beamsX && b3D.beamsX[lvl]) {
+            const beams = b3D.beamsX[lvl];
+            beams.forEach(beam => {
+                const L = beam.span;
+                if (useFlexure) {
+                    const colA = cols[beam.ix * numColsY + beam.iy];
+                    const colB = cols[(beam.ix + 1) * numColsY + beam.iy];
+
+                    const dxA = colA.x_top_curr - colA.x_bottom_curr;
+                    const dxB = colB.x_top_curr - colB.x_bottom_curr;
+
+                    const phiA = dxA / h;
+                    const phiB = dxB / h;
+
+                    beam.meshes.forEach((segMesh, s) => {
+                        const eta = (s + 0.5) / 5;
+                        const x_s = beam.xStart + eta * L;
+                        // Deflexión de Hermite local
+                        const y_s = -0.1 - beamH / 2 + L * (phiA * eta * Math.pow(1 - eta, 2) - phiB * Math.pow(eta, 2) * (1 - eta));
+                        // Pendiente local
+                        const slope = phiA * (1 - 4 * eta + 3 * eta * eta) - phiB * (2 * eta - 3 * eta * eta);
+
+                        segMesh.position.set(x_s, y_s, beam.z);
+                        segMesh.rotation.z = Math.atan(slope);
+                        segMesh.rotation.x = 0;
+                        segMesh.rotation.y = 0;
+                    });
+                } else {
+                    const segMesh = beam.meshes[0];
+                    if (segMesh) {
+                        const xCenter = beam.xStart + L / 2;
+                        segMesh.position.set(xCenter, -0.1 - beamH / 2, beam.z);
+                        segMesh.rotation.set(0, 0, 0);
+                    }
+                }
+            });
+        }
+
+        // Actualizar vigas en Y (transversales)
+        if (b3D.beamsY && b3D.beamsY[lvl]) {
+            const beams = b3D.beamsY[lvl];
+            beams.forEach(beam => {
+                const L = beam.span;
+                if (useFlexure) {
+                    const colA = cols[beam.ix * numColsY + beam.iy];
+                    const colB = cols[beam.ix * numColsY + (beam.iy + 1)];
+
+                    const dzA = colA.z_top_curr - colA.z_bottom_curr;
+                    const dzB = colB.z_top_curr - colB.z_bottom_curr;
+
+                    const phiA = dzA / h;
+                    const phiB = dzB / h;
+
+                    beam.meshes.forEach((segMesh, s) => {
+                        const eta = (s + 0.5) / 5;
+                        const z_s = beam.zStart + eta * L;
+                        // Deflexión de Hermite local
+                        const y_s = -0.1 - beamH / 2 + L * (phiA * eta * Math.pow(1 - eta, 2) - phiB * Math.pow(eta, 2) * (1 - eta));
+                        // Pendiente local
+                        const slope = phiA * (1 - 4 * eta + 3 * eta * eta) - phiB * (2 * eta - 3 * eta * eta);
+
+                        segMesh.position.set(beam.x, y_s, z_s);
+                        segMesh.rotation.x = -Math.atan(slope);
+                        segMesh.rotation.z = 0;
+                        segMesh.rotation.y = 0;
+                    });
+                } else {
+                    const segMesh = beam.meshes[0];
+                    if (segMesh) {
+                        const zCenter = beam.zStart + L / 2;
+                        segMesh.position.set(beam.x, -0.1 - beamH / 2, zCenter);
+                        segMesh.rotation.set(0, 0, 0);
+                    }
+                }
+            });
+        }
     }
 }
 
