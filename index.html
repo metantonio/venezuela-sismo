@@ -140,10 +140,10 @@
                             <label for="building-use">Uso del Edificio <span class="help-icon"
                                     data-tooltip="Grupo A (α=0.50): escuelas, hospitales, etc. Grupo B (α=0.25): residenciales, comerciales, etc. Influye en la combinación sísmica D + α·L.">?</span>:</label>
                             <select id="building-use">
-                                <option value="residential" selected>Residencial / Oficina (α=0.25, CV=175 kgf/m²)
-                                </option>
+                                <option value="residential" selected>Residencial / Oficina (α=0.25, CV=175 kgf/m²)</option>
                                 <option value="public">Público / Comercial (α=0.50, CV=300 kgf/m²)</option>
                                 <option value="industrial">Almacenes / Bibliotecas (α=0.50, CV=500 kgf/m²)</option>
+                                <option value="critical">Hospital / Vital / Crítico (α=0.50, CV=300 kgf/m²)</option>
                             </select>
                         </div>
 
@@ -260,12 +260,14 @@
                                 data-tooltip="Perfil del suelo según la velocidad promedio de propagación de ondas de corte en los primeros 30 metros (Vs30, Clase A a E).">?</span></label>
                         <select id="covenin19-soil-class">
                             <option value="A">A: Roca muy dura ($V_{s30} > 1500$ m/s)</option>
-                            <option value="B">B: Roca dura ($850 < V_{s30} \le 1300$ m/s)</option>
+                            <option value="AB">AB: Roca competente ($1100 < V_{s30} \le 1500$ m/s)</option>
+                            <option value="B">B: Roca dura ($850 < V_{s30} \le 1100$ m/s)</option>
                             <option value="BC">BC: Roca/Suelo denso ($650 < V_{s30} \le 850$ m/s)</option>
-                            <option value="C" selected>C: Suelo muy denso/Roca blanda ($400 < V_{s30} \le 650$
-                                    m/s)</option>
+                            <option value="C" selected>C: Suelo muy denso/Roca blanda ($400 < V_{s30} \le 650$ m/s)</option>
+                            <option value="CD">CD: Suelo denso/rígido ($300 < V_{s30} \le 400$ m/s)</option>
                             <option value="D">D: Suelo rígido/medio ($200 < V_{s30} \le 300$ m/s)</option>
-                            <option value="E">E: Suelo blando/arcilloso ($120 < V_{s30} \le 170$ m/s)</option>
+                            <option value="DE">DE: Suelo blando firme ($150 < V_{s30} \le 200$ m/s)</option>
+                            <option value="E">E: Suelo blando/arcilloso ($V_{s30} \le 150$ m/s)</option>
                         </select>
                     </div>
 

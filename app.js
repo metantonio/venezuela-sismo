@@ -383,6 +383,45 @@ function initUI() {
 
 // --- FÓRMULAS SÍSMICAS COVENIN 1756 ---
 
+// Factores de corrección phi para COVENIN 1756:2001 (Tabla 6.1)
+function getCorrectionFactorPhi2001(zone, soil) {
+    if (soil === 'S1') {
+        if (zone >= 5) return 1.00;
+        if (zone === 4) return 0.90;
+        if (zone === 3) return 0.85;
+        if (zone === 2) return 0.80;
+        return 0.75;
+    } else if (soil === 'S2') {
+        if (zone >= 5) return 1.00;
+        if (zone === 4) return 0.95;
+        if (zone === 3) return 0.90;
+        if (zone === 2) return 0.85;
+        return 0.80;
+    } else if (soil === 'S3') {
+        if (zone >= 5) return 1.00;
+        if (zone === 4) return 1.00;
+        if (zone === 3) return 1.00;
+        if (zone === 2) return 0.90;
+        return 0.85;
+    } else if (soil === 'S4') {
+        if (zone >= 5) return 0.90;
+        if (zone === 4) return 0.95;
+        if (zone === 3) return 1.00;
+        if (zone === 2) return 1.00;
+        return 0.90;
+    }
+    return 1.00;
+}
+
+// Factores de importancia alpha para COVENIN 1756-1:2019 (Sección 4.3)
+function getImportanceFactor2019(useVal) {
+    if (useVal === "residential") return 1.00; // Grupo B2 (General)
+    if (useVal === "public") return 1.15;      // Grupo B1 (Público/Esencial)
+    if (useVal === "industrial") return 1.15;  // Grupo B1 (Almacenes)
+    if (useVal === "critical") return 1.30;    // Grupo A (Vital/Crítico)
+    return 1.00;
+}
+
 // COVENIN 1756:2001
 function getSpectrum2001(T, params) {
     const Ao = params.Ao;
@@ -416,8 +455,18 @@ function getSpectrum2001(T, params) {
 
     let Ad;
     if (T < T_plus) {
-        // Tramo ascendente
-        Ad = (alpha * phi * Ao) / (1 + (T / T_plus) * (R / beta - 1));
+        // Tramo de transición para períodos cortos (T < T+)
+        // El factor de reducción varía linealmente de 1 a R: Rp = 1 + (T / T_plus) * (R - 1)
+        const Rp = 1 + (T / T_plus) * (R - 1);
+        
+        // Espectro elástico elástico A(T) con meseta a partir de T_o
+        let elasticA;
+        if (T < T_o) {
+            elasticA = alpha * phi * Ao * (1 + (T / T_o) * (beta - 1));
+        } else {
+            elasticA = alpha * phi * beta * Ao;
+        }
+        Ad = elasticA / Rp;
     } else if (T <= T_star) {
         // Meseta
         Ad = (alpha * phi * beta * Ao) / R;
@@ -427,7 +476,7 @@ function getSpectrum2001(T, params) {
     }
 
     // Límite inferior de diseño
-    const minAd = (alpha * Ao) / R;
+    const minAd = (alpha * phi * Ao) / R;
     return Math.max(Ad, minAd);
 }
 
@@ -440,21 +489,23 @@ function getSpectrum2019(T, params) {
     const R = params.R;
     const rho = params.rho;
     const Fi = params.Fi;
-    const soilClass = params.soilClass; // 'A', 'B', 'BC', 'C', 'D', 'E'
+    const soilClass = params.soilClass; // 'A', 'AB', 'B', 'BC', 'C', 'CD', 'D', 'DE', 'E'
 
-    // Factores de sitio sugeridos según Clase de Sitio (Tablas 8, 9, 10 simplificadas)
+    // Factores de sitio según Clase de Sitio (Tablas 8, 9, 10 de COVENIN 1756-1:2019)
     let Fac, Fvc, Fdc, q;
     switch (soilClass) {
-        case 'A': Fac = 0.8; Fvc = 0.8; Fdc = 0.8; q = 1.5; break;
-        case 'B': Fac = 0.9; Fvc = 0.9; Fdc = 0.9; q = 1.5; break;
-        case 'BC': Fac = 1.0; Fvc = 1.0; Fdc = 1.0; q = 1.7; break;
-        case 'C': Fac = 1.2; Fvc = 1.4; Fdc = 1.4; q = 1.7; break;
-        case 'D': Fac = 1.5; Fvc = 1.8; Fdc = 1.8; q = 1.9; break;
-        case 'E': Fac = 2.0; Fvc = 2.4; Fdc = 2.4; q = 2.0; break;
-        default: Fac = 1.2; Fvc = 1.4; Fdc = 1.4; q = 1.7;
+        case 'A': Fac = 0.80; Fvc = 0.80; Fdc = 0.85; q = 1.5; break;
+        case 'AB': Fac = 0.85; Fvc = 0.85; Fdc = 0.90; q = 1.5; break;
+        case 'B': Fac = 0.90; Fvc = 0.90; Fdc = 0.95; q = 1.5; break;
+        case 'BC': Fac = 1.00; Fvc = 1.00; Fdc = 1.00; q = 1.7; break;
+        case 'C': Fac = 1.30; Fvc = 1.40; Fdc = 1.20; q = 1.7; break;
+        case 'CD': Fac = 1.60; Fvc = 1.80; Fdc = 1.40; q = 1.9; break;
+        case 'D': Fac = 1.90; Fvc = 2.30; Fdc = 1.70; q = 1.9; break;
+        case 'DE': Fac = 2.40; Fvc = 3.30; Fdc = 2.25; q = 2.0; break;
+        case 'E': Fac = 2.70; Fvc = 3.30; Fdc = 2.65; q = 2.0; break;
+        default: Fac = 1.30; Fvc = 1.40; Fdc = 1.20; q = 1.7;
     }
 
-    // Asumimos factores adicionales H (profundidad) y T (topográfico) unitarios
     const Fa = Fac;
     const Fv = Fvc;
     const Fd = Fdc;
@@ -464,7 +515,7 @@ function getSpectrum2019(T, params) {
     const beta_star = 2.4; // Amplificación espectral elástica típica
 
     // Periodos característicos
-    const TC = 2.4 * (AV / AA);
+    const TC = (1.0 / 2.4) * (AV / AA);
     const TB = 0.20 * TC;
     const TA = 0.05;
     const TD = TL * (Fd / Fv);
@@ -653,6 +704,9 @@ function getDetailedWeightBreakdown() {
         alpha = 0.50;
     } else if (use === 'industrial') {
         liveLoadVal = 500.0;
+        alpha = 0.50;
+    } else if (use === 'critical') {
+        liveLoadVal = 300.0;
         alpha = 0.50;
     }
     const w_liveLoad = area * liveLoadVal;
@@ -1105,19 +1159,21 @@ function generateSpectraAndEarthquake() {
         case 2: Ao01 = 0.15; break;
         case 1: Ao01 = 0.10; break;
     }
+    const soil01 = document.getElementById("covenin01-soil").value;
     const params01 = {
         Ao: Ao01,
         alpha: parseFloat(document.getElementById("covenin01-importance").value),
-        phi: 1.0,
+        phi: getCorrectionFactorPhi2001(z01, soil01),
         R: parseFloat(document.getElementById("covenin01-r").value),
-        soil: document.getElementById("covenin01-soil").value
+        soil: soil01
     };
 
+    const useVal = document.getElementById("building-use").value;
     const params19 = {
         Ao: parseFloat(document.getElementById("covenin19-a0").value),
         A1: parseFloat(document.getElementById("covenin19-a1").value),
         TL: 4.0,
-        alpha: 1.0,
+        alpha: getImportanceFactor2019(useVal),
         R: parseFloat(document.getElementById("covenin19-r").value),
         rho: parseFloat(document.getElementById("covenin19-rho").value),
         Fi: parseFloat(document.getElementById("covenin19-fi").value),
@@ -1125,11 +1181,9 @@ function generateSpectraAndEarthquake() {
     };
 
     // Resumen de Parámetros de Entrada HTML
-    const useVal = document.getElementById("building-use").value;
-    let useText = "Residencial / Comercial";
-    if (useVal === "critical") useText = "A (Crítico)";
-    else if (useVal === "essential") useText = "B1 (Esencial)";
-    else useText = "B2 (General)";
+    let useText = "B2 (General)";
+    if (useVal === "critical") useText = "A (Vital / Crítico)";
+    else if (useVal === "public" || useVal === "industrial") useText = "B1 (Esencial)";
 
     let customSectionsHTML = "";
     if (customSections.enable) {
