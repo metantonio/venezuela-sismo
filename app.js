@@ -2019,14 +2019,12 @@ function drawSpectraChart(p01, p19, T_fund_x, T_fund_y) {
     const ctx = document.getElementById("spectra-chart").getContext("2d");
 
     // Generar datos para las curvas
-    const periods = [];
     const data2001 = [];
     const data2019 = [];
 
     for (let t = 0.01; t <= 4.0; t += 0.02) {
-        periods.push(t.toFixed(2));
-        data2001.push(getSpectrum2001(t, p01));
-        data2019.push(getSpectrum2019(t, p19));
+        data2001.push({ x: t, y: getSpectrum2001(t, p01) });
+        data2019.push({ x: t, y: getSpectrum2019(t, p19) });
     }
 
     if (spectraChartInstance) {
@@ -2042,8 +2040,7 @@ function drawSpectraChart(p01, p19, T_fund_x, T_fund_y) {
 
             const drawLine = (T_val, label, color) => {
                 if (T_val) {
-                    const targetVal = T_val.toFixed(2);
-                    const xPos = xAxis.getPixelForValue(targetVal);
+                    const xPos = xAxis.getPixelForValue(T_val);
 
                     if (xPos >= xAxis.left && xPos <= xAxis.right) {
                         ctx.save();
@@ -2073,7 +2070,6 @@ function drawSpectraChart(p01, p19, T_fund_x, T_fund_y) {
     spectraChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: periods,
             datasets: [
                 {
                     label: 'COVENIN 1756:2001',
@@ -2099,9 +2095,12 @@ function drawSpectraChart(p01, p19, T_fund_x, T_fund_y) {
             animation: { duration: 0 },
             scales: {
                 x: {
+                    type: 'linear',
                     title: { display: true, text: 'Período de Vibración T (s)', color: '#94a3b8' },
                     grid: { color: 'rgba(255,255,255,0.05)' },
-                    ticks: { color: '#94a3b8', maxTicksLimit: 15 }
+                    ticks: { color: '#94a3b8' },
+                    min: 0,
+                    max: 4.0
                 },
                 y: {
                     title: { display: true, text: 'Aceleración Espectral de Diseño Ad (g)', color: '#94a3b8' },
