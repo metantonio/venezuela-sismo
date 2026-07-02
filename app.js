@@ -367,6 +367,7 @@ function initUI() {
             if (printDateEl) {
                 printDateEl.textContent = new Date().toLocaleString("es-VE");
             }
+            updateCalculationReport();
             window.print();
         });
     }
@@ -1828,6 +1829,77 @@ function updateCalculationReport() {
                 </div>
             </div>
         `;
+    }
+
+    // Intentar capturar los gráficos para anexarlos a la memoria de cálculo
+    try {
+        const spectraCanvas = document.getElementById("spectra-chart");
+        const accelCanvas = document.getElementById("accel-chart");
+        const dispCanvas = document.getElementById("disp-chart");
+        const hyst2001Canvas = document.getElementById("hysteresis-2001-chart");
+        const hyst2019Canvas = document.getElementById("hysteresis-2019-chart");
+
+        const hasSpectra = spectraCanvas && spectraCanvas.width > 0;
+        const hasSimResults = simStepIndex > 0 && accelCanvas && accelCanvas.width > 0 && dispCanvas && dispCanvas.width > 0 && hyst2001Canvas && hyst2019Canvas;
+
+        if (hasSpectra || hasSimResults) {
+            html += `
+                <div class="print-charts-section">
+                    <h4 style="color: var(--color-2019); margin-bottom: 16px; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fa-solid fa-chart-area"></i> Registro Gráfico de Resultados
+                    </h4>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
+                        A continuación se presenta el registro visual de los espectros de diseño empleados, los registros en el tiempo y el comportamiento de histéresis no-lineal.
+                    </p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+            `;
+
+            if (hasSpectra) {
+                html += `
+                        <div class="print-chart-card">
+                            <h5>Espectros de Respuesta de Diseño (COVENIN 1756)</h5>
+                            <img src="${spectraCanvas.toDataURL()}" style="max-height: 280px;" />
+                        </div>
+                `;
+            }
+
+            if (hasSimResults) {
+                html += `
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="print-chart-card">
+                                <h5>Aceleración del Terreno (a<sub>g</sub>)</h5>
+                                <img src="${accelCanvas.toDataURL()}" style="max-height: 180px;" />
+                            </div>
+                            <div class="print-chart-card">
+                                <h5>Registro de Desplazamientos del Techo (x<sub>N</sub>)</h5>
+                                <img src="${dispCanvas.toDataURL()}" style="max-height: 180px;" />
+                            </div>
+                        </div>
+
+                        <div class="print-chart-card">
+                            <h5>Curvas de Histéresis del Primer Piso (Cortante de Piso vs Deriva de Piso)</h5>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div style="text-align: center;">
+                                    <img src="${hyst2001Canvas.toDataURL()}" style="max-height: 200px;" />
+                                    <div style="font-size: 11px; margin-top: 4px; color: var(--color-2001); font-weight: bold;">COVENIN 2001</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <img src="${hyst2019Canvas.toDataURL()}" style="max-height: 200px;" />
+                                    <div style="font-size: 11px; margin-top: 4px; color: var(--color-2019); font-weight: bold;">COVENIN 2019</div>
+                                </div>
+                            </div>
+                        </div>
+                `;
+            }
+
+            html += `
+                    </div>
+                </div>
+            `;
+        }
+    } catch (e) {
+        console.error("Error al exportar gráficos de Chart.js:", e);
     }
 
     reportDiv.innerHTML = html;
