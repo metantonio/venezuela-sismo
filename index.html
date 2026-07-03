@@ -774,11 +774,11 @@
                                                     de
                                                     aceleración)</strong>. Sin embargo, la resistencia lateral ante la
                                                 fluencia
-                                                ($V_y$) y la rigidez inicial de diseño de los entrepisos se definen y
+                                                (V<sub>y</sub>) y la rigidez inicial de diseño de los entrepisos se definen y
                                                 calibran
                                                 a partir del <strong>espectro de diseño</strong> de cada norma para el
                                                 período
-                                                fundamental calculado del edificio ($T_1$), acoplando el análisis
+                                                fundamental calculado del edificio (T<sub>1</sub>), acoplando el análisis
                                                 espectral
                                                 con la integración en el dominio del tiempo.</p>
                                         </div>
@@ -793,7 +793,7 @@
                                                 esto se emplea la Transformada de Box-Muller para producir ruido blanco
                                                 gaussiano, el cual luego pasa por un <strong>Filtro de
                                                     Kanai-Tajimi</strong> para moldear su frecuencia dominante según el
-                                                período espectral del suelo seleccionado ($T_{soil}$). Finalmente, se
+                                                período espectral del suelo seleccionado (T<sub>soil</sub>). Finalmente, se
                                                 modula en amplitud usando una envolvente de Jennings para simular el
                                                 inicio, fase fuerte y atenuación del sismo. Esto implica que la señal en
                                                 el tiempo varía en cada ejecución, manteniendo constantes únicamente su
@@ -804,15 +804,15 @@
                                     <div class="simplification-item">
                                         <i class="fa-solid fa-bolt" style="color: #facc15;"></i>
                                         <div class="simplification-content">
-                                            <h5>Relación entre Magnitud ($M_w$ 7.1 vs. 7.5) e Intensidad (PGA)</h5>
+                                            <h5>Relación entre Magnitud (M<sub>w</sub> 7.1 vs. 7.5) e Intensidad (PGA)</h5>
                                             <p>El simulador representa la diferencia de magnitud entre el <strong>Sismo
-                                                    1 ($M_w$ 7.1)</strong> y el <strong>Sismo 2 ($M_w$ 7.5)</strong> a
+                                                    1 (M<sub>w</sub> 7.1)</strong> y el <strong>Sismo 2 (M<sub>w</sub> 7.5)</strong> a
                                                 través del escalamiento de la aceleración pico del terreno (PGA) y el
                                                 daño acumulado. En la física sísmica, un sismo de mayor magnitud libera
                                                 significativamente más energía y genera aceleraciones de pico más altas
                                                 en el sitio. Esto se modela aplicando un <strong>factor de amplificación
-                                                    de 1.5</strong> en el PGA del segundo evento ($\text{PGA}_2 = 1.5
-                                                \times \text{PGA}_1$). Adicionalmente, el sismo sucesivo aprovecha el
+                                                    de 1.5</strong> en el PGA del segundo evento (PGA<sub>2</sub> = 1.5
+                                                &times; PGA<sub>1</sub>). Adicionalmente, el sismo sucesivo aprovecha el
                                                 ablandamiento y daño estructural (índice de Park-Ang) acumulado durante
                                                 el primer evento, simulando de manera muy realista cómo la pérdida de
                                                 rigidez inicial hace al edificio mucho más vulnerable al embate de una
@@ -982,7 +982,7 @@
                                     <div class="simplification-item">
                                         <i class="fa-solid fa-calculator" style="color: var(--color-2019);"></i>
                                         <div class="simplification-content">
-                                            <h5>1. Excentricidad Estática o Teórica ($e_s$)</h5>
+                                            <h5>1. Excentricidad Estática o Teórica (e<sub>s</sub>)</h5>
                                             <p>Es la distancia física real entre el baricentro de las cargas de la losa
                                                 (CM, gobernado por la distribución de tabiques, losas, equipos) y el
                                                 centro de cortante de los elementos verticales de soporte (CR, gobernado
@@ -999,11 +999,11 @@
                                     <div class="simplification-item">
                                         <i class="fa-solid fa-shuffle" style="color: var(--color-2019);"></i>
                                         <div class="simplification-content">
-                                            <h5>2. Excentricidad Accidental ($e_a$) obligatoria</h5>
+                                            <h5>2. Excentricidad Accidental (e<sub>a</sub>) obligatoria</h5>
                                             <p>Debido a la incertidumbre en la posición real de las cargas vivas,
                                                 variación del módulo de elasticidad del concreto, y efectos torsionales
                                                 dinámicos no modelados, las normas exigen considerar una excentricidad
-                                                accidental mínima. En la norma venezolana **COVENIN 1756**, se fija
+                                                accidental mínima. En la norma venezolana <strong>COVENIN 1756</strong>, se fija
                                                 típicamente en:</p>
                                             <p
                                                 style="font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 4px; margin-top: 4px; white-space: nowrap; overflow-x: auto; border: 1px solid rgba(255,255,255,0.05); color: #fff;">
@@ -1012,14 +1012,14 @@
                                             </p>
                                             <p style="margin-top: 4px;">Donde <em>L</em> es la dimensión de la planta
                                                 del edificio medida en dirección perpendicular a la acción sísmica
-                                                aplicada. Para un edificio simétrico ($e_s = 0$), el valor mínimo de
+                                                aplicada. Para un edificio simétrico (e<sub>s</sub> = 0), el valor mínimo de
                                                 diseño a introducir es esta excentricidad accidental (ej. 5% a 6%).</p>
                                         </div>
                                     </div>
                                     <div class="simplification-item">
                                         <i class="fa-solid fa-chart-bar" style="color: var(--color-2019);"></i>
                                         <div class="simplification-content">
-                                            <h5>3. Excentricidad de Diseño ($e_d$) para Análisis Estático</h5>
+                                            <h5>3. Excentricidad de Diseño (e<sub>d</sub>) para Análisis Estático</h5>
                                             <p>Al realizar análisis estáticos equivalentes, la excentricidad teórica se
                                                 amplifica dinámicamente para proteger los elementos extremos. Se
                                                 calculan dos hipótesis de diseño en cada eje:</p>
@@ -1111,7 +1111,7 @@
                                         <h4>COVENIN 1756:2001 (Norma Tradicional)</h4>
                                         <ul>
                                             <li><strong>Espectro de Diseño:</strong> Basado en factores de aceleración
-                                                de zona tradicional ($A_0 = 0.30$ para Caracas, Zona 5) y formas
+                                                de zona tradicional (A<sub>0</sub> = 0.30 para Caracas, Zona 5) y formas
                                                 espectrales rígidas (suelos S1, S2, S3 o S4).</li>
                                             <li><strong>Límite de Deriva de Colapso:</strong> Establecido de forma
                                                 simplificada en un <strong>3.5%</strong> para el análisis dinámico no
@@ -1128,7 +1128,7 @@
                                         <ul>
                                             <li><strong>Espectro de Diseño:</strong> Emplea una formulación moderna
                                                 basada en mapas de microzonificación e intensidades de aceleración
-                                                espectral para períodos cortos ($A_0$) y de 1 segundo ($A_1$),
+                                                espectral para períodos cortos (A<sub>0</sub>) y de 1 segundo (A<sub>1</sub>),
                                                 permitiendo una mayor definición del tipo de sitio.</li>
                                             <li><strong>Límite de Deriva de Colapso:</strong> Ampliado a un
                                                 <strong>4.5%</strong>, debido a los mayores requerimientos de ductilidad
