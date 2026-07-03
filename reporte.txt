@@ -136,4 +136,12 @@ CONCLUSIONES TÉCNICAS:
    demanda de diseño normativa reglamentaria; (b) El doblete sísmico (choques sucesivos a t=0s y t=40s)
    no permite a la estructura disipar la energía acumulada ni recuperar su rango elástico,
    induciendo una fatiga de bajo ciclo destructiva en los elementos de concreto armado.
+5. Necesidad de Cambios Normativos y Revisión Estructural: Estos resultados justifican la
+   introducción de cambios sustanciales en la normativa sísmica y una revisión profunda a todas
+   las edificaciones existentes en las zonas de alta sismicidad, debido a que la aceleración máxima
+   histórica estimada ha aumentado. Para estas corridas se utilizó un valor extremo de 0.60g (que
+   representa un 50% de incremento sobre el máximo normado de 0.40g para Zona 7); sin embargo,
+   diversos estudios geofísicos independientes afirman que la aceleración real pudo estar entre
+   0.68g y 0.85g. Al no haber aún una homologación o confirmación oficial por parte de FUNVISIS,
+   la simulación se ejecutó preventivamente con el citado incremento del 50%.
 =========================================================================

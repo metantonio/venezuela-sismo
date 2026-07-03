@@ -858,6 +858,14 @@ function main() {
     report += "   demanda de diseño normativa reglamentaria; (b) El doblete sísmico (choques sucesivos a t=0s y t=40s)\n";
     report += "   no permite a la estructura disipar la energía acumulada ni recuperar su rango elástico,\n";
     report += "   induciendo una fatiga de bajo ciclo destructiva en los elementos de concreto armado.\n";
+    report += "5. Necesidad de Cambios Normativos y Revisión Estructural: Estos resultados justifican la\n";
+    report += "   introducción de cambios sustanciales en la normativa sísmica y una revisión profunda a todas\n";
+    report += "   las edificaciones existentes en las zonas de alta sismicidad, debido a que la aceleración máxima\n";
+    report += "   histórica estimada ha aumentado. Para estas corridas se utilizó un valor extremo de 0.60g (que\n";
+    report += "   representa un 50% de incremento sobre el máximo normado de 0.40g para Zona 7); sin embargo,\n";
+    report += "   diversos estudios geofísicos independientes afirman que la aceleración real pudo estar entre\n";
+    report += "   0.68g y 0.85g. Al no haber aún una homologación o confirmación oficial por parte de FUNVISIS,\n";
+    report += "   la simulación se ejecutó preventivamente con el citado incremento del 50%.\n";
     report += "=========================================================================\n";
 
     fs.writeFileSync('reporte.txt', report, 'utf8');
