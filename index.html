@@ -532,6 +532,7 @@
                         Recientes</button>
                     <button class="tab-btn" data-tab="tab-info"><i class="fa-solid fa-circle-info"></i> Info
                         Técnica</button>
+                    <button class="tab-btn" data-tab="tab-vargas"><i class="fa-solid fa-square-poll-vertical"></i> Simulaciones Vargas</button>
                 </nav>
 
                 <!-- TAB CONTENT -->
@@ -1158,6 +1159,323 @@
                                     style="display: inline-flex; width: auto; align-items: center; gap: 8px; text-decoration: none; padding: 10px 20px; font-size: 13px; font-weight: 600; border-radius: 8px; margin: 0 auto; transition: all 0.2s;">
                                     <i class="fa-brands fa-github"></i> Registrar sugerencia en GitHub Issues
                                 </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VARGAS SIMULATIONS RESULTS TAB -->
+                    <div id="tab-vargas" class="tab-content">
+                        <div class="tab-info-container">
+                            <div class="info-section">
+                                <h3 style="color: var(--color-2019); display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-solid fa-square-poll-vertical"></i> Simulaciones de Monte Carlo - Escenario Vargas (2026)
+                                </h3>
+                                <p style="line-height: 1.6; color: var(--text-muted); font-size: 13.5px; margin-bottom: 20px;">
+                                    Resultados obtenidos al ejecutar un lote de <strong>77 simulaciones dinámicas no-lineales</strong> (11 corridas de ruido blanco independiente por cada número de pisos) bajo el escenario extremo del Terremoto de Vargas (24/Jun/2026). El sismo simula dos choques sucesivos: Sismo 1 (M7.1, PGA = 0.40g) y Sismo 2 (M7.5, PGA = 0.60g a los 40s) actuando sobre el eje principal X de la edificación en Caraballeda (Suelo rígido/medio - S3 / Clase Sitio D).
+                                </p>
+
+                                <div class="grid-columns-report" style="display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 20px; margin-bottom: 24px;">
+                                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px;">
+                                        <h5 style="color: #ffb703; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Detalles del Escenario</h5>
+                                        <ul style="padding-left: 18px; margin: 0; font-size: 12.5px; color: var(--text-light); line-height: 1.6;">
+                                            <li><strong>Aceleración Roca (Ao):</strong> 0.40g</li>
+                                            <li><strong>Acel. Espectral (A1):</strong> 0.40g</li>
+                                            <li><strong>Doble Terremoto:</strong> Sí (S1 + S2)</li>
+                                            <li><strong>Dirección del Sismo:</strong> Eje X</li>
+                                        </ul>
+                                    </div>
+                                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px;">
+                                        <h5 style="color: #ffb703; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Estructura de Ensayo</h5>
+                                        <ul style="padding-left: 18px; margin: 0; font-size: 12.5px; color: var(--text-light); line-height: 1.6;">
+                                            <li><strong>Pórtico:</strong> 5x4 cols (separación 4m)</li>
+                                            <li><strong>Secciones:</strong> C 45x50cm, V 30x45cm</li>
+                                            <li><strong>Inercia:</strong> Inercia agrietada (SCWB)</li>
+                                            <li><strong>Acero Columna:</strong> Longitudinal = 33 cm²</li>
+                                            <li><strong>Acero Viga:</strong> Sup = 16 cm², Inf = 8 cm²</li>
+                                        </ul>
+                                    </div>
+                                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px;">
+                                        <h5 style="color: #ffb703; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Losa, Cargas y Uso</h5>
+                                        <ul style="padding-left: 18px; margin: 0; font-size: 12.5px; color: var(--text-light); line-height: 1.6;">
+                                            <li><strong>Losa de Entrepiso:</strong> Maciza de espesor = 15 cm</li>
+                                            <li><strong>Peso Losa (P.P.):</strong> 360 kgf/m²</li>
+                                            <li><strong>Carga Muerta Extra:</strong> 250 kgf/m² (acabados/tabiques)</li>
+                                            <li><strong>Tipo de Uso:</strong> Residencial (Carga Viva = 175 kgf/m²)</li>
+                                            <li><strong>Combinación Sísmica:</strong> 1.0D + 0.25L</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="info-section">
+                                <div class="grid-columns-report" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: start;">
+                                    <div>
+                                        <h3 style="color: var(--color-2019); font-size: 15px; margin-bottom: 12px;">📊 Tabla Comparativa de Colapso</h3>
+                                        <table class="calc-table" style="margin-top: 0; width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 15%;">Número de Pisos</th>
+                                                    <th style="width: 30%;">Norma COVENIN 1756:2001 (Tradicional)</th>
+                                                    <th style="width: 30%;">Norma COVENIN 1756:2019 (Moderna)</th>
+                                                    <th style="width: 25%;">Reducción del Riesgo</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="calc-param-name">4 Pisos</td>
+                                                    <td class="calc-value" style="color: #ff4d4d; font-weight: 600;">100.0% (11/11 colapsos)</td>
+                                                    <td class="calc-value" style="color: #ffb703; font-weight: 600;">45.5% (5/11 colapsos)</td>
+                                                    <td class="calc-unit" style="color: #00f5d4; font-weight: 600;">-54.5% de colapsos</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="calc-param-name">5 Pisos</td>
+                                                    <td class="calc-value" style="color: #ff4d4d; font-weight: 600;">100.0% (11/11 colapsos)</td>
+                                                    <td class="calc-value" style="color: #ffb703; font-weight: 600;">63.6% (7/11 colapsos)</td>
+                                                    <td class="calc-unit" style="color: #00f5d4; font-weight: 600;">-36.4% de colapsos</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="calc-param-name">6 Pisos</td>
+                                                    <td class="calc-value" style="color: #ff4d4d; font-weight: 600;">100.0% (11/11 colapsos)</td>
+                                                    <td class="calc-value" style="color: #ffb703; font-weight: 600;">36.4% (4/11 colapsos)</td>
+                                                    <td class="calc-unit" style="color: #00f5d4; font-weight: 600;">-63.6% de colapsos</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="calc-param-name">7 Pisos</td>
+                                                    <td class="calc-value" style="color: #ff4d4d; font-weight: 600;">100.0% (11/11 colapsos)</td>
+                                                    <td class="calc-value" style="color: #ffb703; font-weight: 600;">72.7% (8/11 colapsos)</td>
+                                                    <td class="calc-unit" style="color: #00f5d4; font-weight: 600;">-27.3% de colapsos</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="calc-param-name">8 Pisos</td>
+                                                    <td class="calc-value" style="color: #ffb703; font-weight: 600;">90.9% (10/11 colapsos)</td>
+                                                    <td class="calc-value" style="color: #ffb703; font-weight: 600;">63.6% (7/11 colapsos)</td>
+                                                    <td class="calc-unit" style="color: #00f5d4; font-weight: 600;">-27.3% de colapsos</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="calc-param-name">9 Pisos</td>
+                                                    <td class="calc-value" style="color: #ffb703; font-weight: 600;">81.8% (9/11 colapsos)</td>
+                                                    <td class="calc-value" style="color: #ffb703; font-weight: 600;">63.6% (7/11 colapsos)</td>
+                                                    <td class="calc-unit" style="color: #00f5d4; font-weight: 600;">-18.2% de colapsos</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="calc-param-name">10 Pisos</td>
+                                                    <td class="calc-value" style="color: #ffb703; font-weight: 600;">81.8% (9/11 colapsos)</td>
+                                                    <td class="calc-value" style="color: #2ec4b6; font-weight: 600;">54.5% (6/11 colapsos)</td>
+                                                    <td class="calc-unit" style="color: #00f5d4; font-weight: 600;">-27.3% de colapsos</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div style="background: rgba(20, 22, 29, 0.4); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box;">
+                                        <h3 style="color: var(--color-2019); font-size: 15px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                            <i class="fa-solid fa-chart-column"></i> Gráfico de Probabilidad de Colapso (%)
+                                        </h3>
+                                        <div style="flex: 1; position: relative; width: 100%; min-height: 250px;">
+                                            <canvas id="vargas-chart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- LEYENDA Y ANÁLISIS FÍSICO-ESTRUCTURAL -->
+                            <div class="info-section" style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px;">
+                                <h4 style="color: var(--color-2019); font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-solid fa-circle-info"></i> Leyenda del Comportamiento &amp; Análisis Dinámico
+                                </h4>
+                                <div class="grid-columns-report" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 12.5px; line-height: 1.6;">
+                                    <div>
+                                        <h5 style="color: #ffb703; margin-bottom: 6px; font-size: 12px;">Leyenda de Variables</h5>
+                                        <ul style="padding-left: 18px; margin: 0; color: var(--text-muted); line-height: 1.6;">
+                                            <li><strong>Probabilidad de Colapso (%):</strong> Frecuencia relativa de corridas donde la estructura supera el límite de estabilidad (daño acumulado &gt; 0.99 o deriva inelástica admisible).</li>
+                                            <li><strong>Norma 2001 (Límite Deriva = 3.5%):</strong> Diseño menos dúctil ($R=6$, sin control de regularidad/redundancia), falla temprana por degradación de rigidez.</li>
+                                            <li><strong>Norma 2019 (Límite Deriva = 4.5%):</strong> Diseño de ductilidad optimizada (ND3), detallado superior de confinamiento que mitiga la degradación a la mitad.</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h5 style="color: #ffb703; margin-bottom: 6px; font-size: 12px;">¿A qué se debe este comportamiento?</h5>
+                                        <ul style="padding-left: 18px; margin: 0; color: var(--text-muted); line-height: 1.6;">
+                                            <li><strong>Efecto Rigidez-Demanda (4-5 pisos):</strong> Son edificios rígidos con períodos naturales cortos ($T_1 \approx 0.32\text{s} - 0.40\text{s}$). Atraen aceleraciones muy altas del sismo. No obstante, la ductilidad moderna en la norma 2019 absorbe la energía plásticamente disminuyendo el colapso al 45.5% en 4 pisos.</li>
+                                            <li><strong>Sintonización y Suelo (6-7 s):</strong> El aluvión profundo de Caraballeda filtra el sismo a frecuencias lentas. Los 6 pisos ($T_1 \approx 0.48\text{s}$) se desintonizan parcialmente (solo 36.4% colapso), mientras que los 7 pisos ($T_1 \approx 0.56\text{s}$) entran en mayor resonancia constructiva (72.7% colapso).</li>
+                                            <li><strong>Efectos de Segundo Orden P-Delta (8-10 pisos):</strong> A mayor altura, el período se alarga alejándose de algunas aceleraciones pico del suelo, pero el desplazamiento inelástico acumulado y la gravedad desestabilizan las columnas (P-Delta), estabilizando el colapso en un ~54%-63% en la norma 2019.</li>
+                                            <li><strong>Colapsos Residuales (Norma 2019):</strong> Ocurren porque la aceleración de 0.60g del segundo choque supera la aceleración histórica máxima registrada para la región, y al ser un doblete sísmico sucesivo, la estructura no alcanza a disipar la energía plástica del primer sismo, acumulando fatiga de bajo ciclo catastrófica.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="info-section">
+                                <h3 style="color: var(--color-2019); font-size: 15px; margin-bottom: 15px;">🔍 Detalle Técnico por Configuración de Altura</h3>
+                                <div class="grid-columns-report" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                    
+                                    <!-- Tarjeta 4 Pisos -->
+                                    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.06); padding: 16px; border-radius: 8px;">
+                                        <h4 style="color: #00b4d8; font-size: 14px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; display: flex; justify-content: space-between;">
+                                            <span>Edificio de 4 Pisos (Vargas)</span>
+                                            <span style="font-size: 10px; background: rgba(0, 180, 216, 0.1); padding: 2px 6px; border-radius: 4px; color: #00b4d8;">T₁ ≈ 0.32 s</span>
+                                        </h4>
+                                        <div style="font-size: 12.5px; line-height: 1.6;">
+                                            <p><strong>COVENIN 2001 (Tradicional):</strong></p>
+                                            <ul style="margin: 4px 0 10px 0; padding-left: 20px; color: var(--text-muted);">
+                                                <li>Colapso en el <strong>100.0%</strong> de las corridas.</li>
+                                                <li>Tiempo de colapso rápido: <strong>35.19 s</strong> promedio.</li>
+                                                <li>Deriva máxima registrada: <strong>3.47%</strong>.</li>
+                                            </ul>
+                                            <p><strong>COVENIN 2019 (Moderna):</strong></p>
+                                            <ul style="margin: 4px 0 0 0; padding-left: 20px; color: var(--text-muted);">
+                                                <li>Colapso en el <strong>45.5%</strong> de las corridas.</li>
+                                                <li>Falla retrasada hasta <strong>50.89 s</strong> promedio.</li>
+                                                <li>Deriva máxima registrada: <strong>4.50%</strong>.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tarjeta 5 Pisos -->
+                                    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.06); padding: 16px; border-radius: 8px;">
+                                        <h4 style="color: #00b4d8; font-size: 14px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; display: flex; justify-content: space-between;">
+                                            <span>Edificio de 5 Pisos (Vargas)</span>
+                                            <span style="font-size: 10px; background: rgba(0, 180, 216, 0.1); padding: 2px 6px; border-radius: 4px; color: #00b4d8;">T₁ ≈ 0.40 s</span>
+                                        </h4>
+                                        <div style="font-size: 12.5px; line-height: 1.6;">
+                                            <p><strong>COVENIN 2001 (Tradicional):</strong></p>
+                                            <ul style="margin: 4px 0 10px 0; padding-left: 20px; color: var(--text-muted);">
+                                                <li>Colapso en el <strong>100.0%</strong> de las corridas.</li>
+                                                <li>Tiempo de colapso rápido: <strong>32.37 s</strong> promedio.</li>
+                                                <li>Deriva máxima registrada: <strong>3.53%</strong>.</li>
+                                            </ul>
+                                            <p><strong>COVENIN 2019 (Moderna):</strong></p>
+                                            <ul style="margin: 4px 0 0 0; padding-left: 20px; color: var(--text-muted);">
+                                                <li>Colapso en el <strong>63.6%</strong> de las corridas.</li>
+                                                <li>Falla retrasada hasta <strong>48.35 s</strong> promedio.</li>
+                                                <li>Deriva máxima registrada: <strong>4.59%</strong>.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tarjeta 6 Pisos -->
+                                    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.06); padding: 16px; border-radius: 8px;">
+                                        <h4 style="color: #00b4d8; font-size: 14px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; display: flex; justify-content: space-between;">
+                                            <span>Edificio de 6 Pisos (Vargas)</span>
+                                            <span style="font-size: 10px; background: rgba(0, 180, 216, 0.1); padding: 2px 6px; border-radius: 4px; color: #00b4d8;">T₁ ≈ 0.48 s</span>
+                                        </h4>
+                                        <div style="font-size: 12.5px; line-height: 1.6;">
+                                            <p><strong>COVENIN 2001 (Tradicional):</strong></p>
+                                            <ul style="margin: 4px 0 10px 0; padding-left: 20px; color: var(--text-muted);">
+                                                <li>Colapso en el <strong>100.0%</strong> de las corridas.</li>
+                                                <li>Tiempo de colapso rápido: <strong>34.79 s</strong> promedio.</li>
+                                                <li>Deriva máxima registrada: <strong>3.56%</strong>.</li>
+                                            </ul>
+                                            <p><strong>COVENIN 2019 (Moderna):</strong></p>
+                                            <ul style="margin: 4px 0 0 0; padding-left: 20px; color: var(--text-muted);">
+                                                <li>Colapso de solo el <strong>36.4%</strong> de las corridas (excelente comportamiento).</li>
+                                                <li>Falla retrasada hasta <strong>45.88 s</strong> promedio.</li>
+                                                <li>Deriva máxima registrada: <strong>4.56%</strong>.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tarjeta 7 Pisos -->
+                                    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.06); padding: 16px; border-radius: 8px;">
+                                        <h4 style="color: #00b4d8; font-size: 14px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; display: flex; justify-content: space-between;">
+                                            <span>Edificio de 7 Pisos (Vargas)</span>
+                                            <span style="font-size: 10px; background: rgba(0, 180, 216, 0.1); padding: 2px 6px; border-radius: 4px; color: #00b4d8;">T₁ ≈ 0.56 s</span>
+                                        </h4>
+                                        <div style="font-size: 12.5px; line-height: 1.6;">
+                                            <p><strong>COVENIN 2001 (Tradicional):</strong></p>
+                                            <ul style="margin: 4px 0 10px 0; padding-left: 20px; color: var(--text-muted);">
+                                                <li>Colapso en el <strong>100.0%</strong> de las corridas.</li>
+                                                <li>Tiempo de colapso rápido: <strong>22.91 s</strong> promedio.</li>
+                                                <li>Deriva máxima registrada: <strong>3.56%</strong>.</li>
+                                            </ul>
+                                            <p><strong>COVENIN 2019 (Moderna):</strong></p>
+                                            <ul style="margin: 4px 0 0 0; padding-left: 20px; color: var(--text-muted);">
+                                                <li>Colapso en el <strong>72.7%</strong> de las corridas.</li>
+                                                <li>Falla retrasada hasta <strong>33.60 s</strong> promedio.</li>
+                                                <li>Deriva máxima registrada: <strong>4.54%</strong>.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tarjeta 8 Pisos -->
+                                    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.06); padding: 16px; border-radius: 8px;">
+                                        <h4 style="color: #00b4d8; font-size: 14px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; display: flex; justify-content: space-between;">
+                                            <span>Edificio de 8 Pisos (Vargas)</span>
+                                            <span style="font-size: 10px; background: rgba(0, 180, 216, 0.1); padding: 2px 6px; border-radius: 4px; color: #00b4d8;">T₁ ≈ 0.64 s</span>
+                                        </h4>
+                                        <div style="font-size: 12.5px; line-height: 1.6;">
+                                            <p><strong>COVENIN 2001 (Tradicional):</strong></p>
+                                            <ul style="margin: 4px 0 10px 0; padding-left: 20px; color: var(--text-muted);">
+                                                <li>Colapso en el <strong>90.9%</strong> de las corridas.</li>
+                                                <li>Tiempo de colapso rápido: <strong>32.17 s</strong> promedio.</li>
+                                                <li>Deriva máxima registrada: <strong>3.60%</strong>.</li>
+                                            </ul>
+                                            <p><strong>COVENIN 2019 (Moderna):</strong></p>
+                                            <ul style="margin: 4px 0 0 0; padding-left: 20px; color: var(--text-muted);">
+                                                <li>Colapso en el <strong>63.6%</strong> de las corridas.</li>
+                                                <li>Falla retrasada hasta <strong>29.83 s</strong> promedio.</li>
+                                                <li>Deriva máxima registrada: <strong>4.53%</strong>.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tarjeta 9 Pisos -->
+                                    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.06); padding: 16px; border-radius: 8px;">
+                                        <h4 style="color: #00b4d8; font-size: 14px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; display: flex; justify-content: space-between;">
+                                            <span>Edificio de 9 Pisos (Vargas)</span>
+                                            <span style="font-size: 10px; background: rgba(0, 180, 216, 0.1); padding: 2px 6px; border-radius: 4px; color: #00b4d8;">T₁ ≈ 0.72 s</span>
+                                        </h4>
+                                        <div style="font-size: 12.5px; line-height: 1.6;">
+                                            <p><strong>COVENIN 2001 (Tradicional):</strong></p>
+                                            <ul style="margin: 4px 0 10px 0; padding-left: 20px; color: var(--text-muted);">
+                                                <li>Colapso en el <strong>81.8%</strong> de las corridas.</li>
+                                                <li>Tiempo de colapso rápido: <strong>34.61 s</strong> promedio.</li>
+                                                <li>Deriva máxima registrada: <strong>3.53%</strong>.</li>
+                                            </ul>
+                                            <p><strong>COVENIN 2019 (Moderna):</strong></p>
+                                            <ul style="margin: 4px 0 0 0; padding-left: 20px; color: var(--text-muted);">
+                                                <li>Colapso en el <strong>63.6%</strong> de las corridas.</li>
+                                                <li>Tiempo de colapso: <strong>45.23 s</strong> promedio.</li>
+                                                <li>Deriva máxima registrada: <strong>4.58%</strong>.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tarjeta 10 Pisos -->
+                                    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.06); padding: 16px; border-radius: 8px; grid-column: span 2;">
+                                        <h4 style="color: #00b4d8; font-size: 14px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; display: flex; justify-content: space-between;">
+                                            <span>Edificio de 10 Pisos (Vargas)</span>
+                                            <span style="font-size: 10px; background: rgba(0, 180, 216, 0.1); padding: 2px 6px; border-radius: 4px; color: #00b4d8;">T₁ ≈ 0.80 s</span>
+                                        </h4>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 12.5px; line-height: 1.6;">
+                                            <div>
+                                                <p><strong>COVENIN 2001 (Tradicional):</strong></p>
+                                                <ul style="margin: 4px 0 0 0; padding-left: 20px; color: var(--text-muted);">
+                                                    <li>Colapso en el <strong>81.8%</strong> de las corridas.</li>
+                                                    <li>Tiempo de colapso: <strong>35.02 s</strong> promedio.</li>
+                                                    <li>Deriva máxima registrada: <strong>3.52%</strong>.</li>
+                                                </ul>
+                                            </div>
+                                            <div>
+                                                <p><strong>COVENIN 2019 (Moderna):</strong></p>
+                                                <ul style="margin: 4px 0 0 0; padding-left: 20px; color: var(--text-muted);">
+                                                    <li>Colapso en el <strong>54.5%</strong> de las corridas.</li>
+                                                    <li>Falla retrasada hasta <strong>40.38 s</strong> promedio.</li>
+                                                    <li>Deriva máxima registrada: <strong>4.51%</strong>.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="info-section" style="background: rgba(0, 245, 212, 0.03); border: 1px solid rgba(0, 245, 212, 0.15); border-left: 4px solid #00f5d4; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                                <h3 style="color: #00f5d4; margin-bottom: 8px; font-size: 14px;"><i class="fa-solid fa-graduation-cap"></i> Principales Conclusiones de Ingeniería</h3>
+                                <ul style="padding-left: 18px; margin: 0; font-size: 13px; color: var(--text-light); line-height: 1.6;">
+                                    <li><strong>Reducción Generalizada de Riesgo:</strong> La aplicación de los controles de redundancia, irregularidad y límites de deriva de COVENIN 1756:2019 disminuye sustancialmente la tasa de colapso de las edificaciones de concreto ante sismos extremos repetitivos.</li>
+                                    <li><strong>Efecto de Sintonización Sísmica:</strong> El mejor comportamiento de la estructura de 6 pisos (36.4% de colapso frente al 72.7% en 7 pisos) ilustra la influencia de los períodos dinámicos propios. Al alejarse de la frecuencia de resonancia pura con el suelo profundo aluvial, se reducen las fuerzas inerciales destructivas.</li>
+                                    <li><strong>Ventana del Factor de Seguridad Humano:</strong> El retraso sistemático del colapso (desde ~30-35 segundos en la norma 2001 hasta ~45-50 segundos en la 2019) incrementa significativamente la probabilidad de evacuación exitosa de los ocupantes, cumpliendo con el objetivo fundamental de la ingeniería sismorresistente moderna: la salvaguarda de vidas.</li>
+                                    <li><strong>Causa de Colapso Residual (Norma 2019):</strong> La ocurrencia de fallas bajo la norma moderna se explica porque la aceleración del terreno simulada (hasta 0.60g) superó con creces la demanda histórica reglamentaria de la zona, agravado por el fenómeno del doblete sísmico (choques sucesivos) que fatiga el concreto armado e impide la completa disipación de la energía.</li>
+                                </ul>
                             </div>
                         </div>
                     </div>

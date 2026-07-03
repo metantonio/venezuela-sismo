@@ -24,6 +24,7 @@ let accelChartInstance = null;
 let dispChartInstance = null;
 let hyst2001ChartInstance = null;
 let hyst2019ChartInstance = null;
+let vargasChartInstance = null;
 
 // Escena de Three.js
 let scene, camera, renderer, controls;
@@ -94,6 +95,11 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (e) {
         console.error('[animate3D]', e);
     }
+    try {
+        initVargasChart();
+    } catch (e) {
+        console.error('[initVargasChart]', e);
+    }
 });
 
 
@@ -125,6 +131,8 @@ function initUI() {
                 if (container && container.children.length === 0) {
                     fetchRecentEarthquakes();
                 }
+            } else if (tabId === "tab-vargas" && vargasChartInstance) {
+                vargasChartInstance.resize();
             }
         });
     });
@@ -4323,4 +4331,81 @@ function fetchRecentEarthquakes() {
                 </div>
             `;
         });
+}
+
+function initVargasChart() {
+    const ctx = document.getElementById('vargas-chart');
+    if (!ctx) return;
+
+    vargasChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['4 Pisos', '5 Pisos', '6 Pisos', '7 Pisos', '8 Pisos', '9 Pisos', '10 Pisos'],
+            datasets: [
+                {
+                    label: 'COVENIN 1756:2001',
+                    data: [100.0, 100.0, 100.0, 100.0, 90.9, 81.8, 81.8],
+                    backgroundColor: 'rgba(0, 180, 216, 0.65)',
+                    borderColor: '#00b4d8',
+                    borderWidth: 1.5,
+                    borderRadius: 4
+                },
+                {
+                    label: 'COVENIN 1756:2019',
+                    data: [45.5, 63.6, 36.4, 72.7, 63.6, 63.6, 54.5],
+                    backgroundColor: 'rgba(255, 0, 127, 0.65)',
+                    borderColor: '#ff007f',
+                    borderWidth: 1.5,
+                    borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: '#94a3b8',
+                        font: { family: 'Inter', size: 11 }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return ` ${context.dataset.label}: ${context.raw}% de colapsos`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: {
+                        color: '#94a3b8',
+                        font: { family: 'Inter', size: 11 }
+                    }
+                },
+                y: {
+                    min: 0,
+                    max: 100,
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: {
+                        color: '#94a3b8',
+                        font: { family: 'Inter', size: 11 },
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Probabilidad de Colapso',
+                        color: '#94a3b8',
+                        font: { family: 'Inter', size: 11 }
+                    }
+                }
+            }
+        }
+    });
 }
