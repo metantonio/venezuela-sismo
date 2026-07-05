@@ -18,7 +18,12 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="index.css?v=903">
+    <link rel="stylesheet" href="index.css?v=904">
+    <!-- Leaflet.js Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <!-- CDNs de Librerías -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -536,6 +541,8 @@
                         Técnica</button>
                     <button class="tab-btn" data-tab="tab-vargas"><i class="fa-solid fa-square-poll-vertical"></i>
                         Simulaciones Conclusiones</button>
+                    <button class="tab-btn" data-tab="tab-damage-map"><i class="fa-solid fa-map-location-dot"></i>
+                        Mapa de Daño</button>
                 </nav>
 
                 <!-- TAB CONTENT -->
@@ -1671,6 +1678,110 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- DAMAGE MAP TAB -->
+                    <div id="tab-damage-map" class="tab-content">
+                        <div class="tab-info-container">
+                            <div class="info-section">
+                                <h3 style="color: var(--color-2019); display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                    <i class="fa-solid fa-map-location-dot"></i> Mapa Satelital de Daño Sísmico — La Guaira / Caraballeda
+                                </h3>
+                                <p style="line-height: 1.6; color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+                                    Visualización georreferenciada de la <strong>probabilidad de daño y colapso</strong>
+                                    basada en edificaciones reales afectadas por el doblete sísmico del 24 de junio de 2026
+                                    en el estado La Guaira. Los nombres y estados de las edificaciones provienen de
+                                    reportes de prensa confirmados. La probabilidad de colapso se asigna según el número
+                                    de pisos de cada edificación, de acuerdo con las 77 simulaciones dinámicas no-lineales
+                                    de Monte Carlo del escenario Vargas.
+                                </p>
+
+                                <!-- DISCLAIMER -->
+                                <div style="background: rgba(255, 183, 3, 0.05); border: 1px solid rgba(255, 183, 3, 0.15); border-left: 4px solid #ffb703; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 12px; line-height: 1.5;">
+                                    <span style="color: #ffb703; font-weight: 600; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                        <i class="fa-solid fa-triangle-exclamation"></i> Nota Importante
+                                    </span>
+                                    <p style="margin: 0; color: var(--text-muted);">
+                                        Los nombres de las edificaciones corresponden a <strong>estructuras reales confirmadas como colapsadas o dañadas</strong>
+                                        según reportes de prensa y análisis post-sismo. Las coordenadas geográficas son <strong>aproximadas</strong>,
+                                        basadas en la ubicación del sector reportado (no en la dirección exacta). La probabilidad de colapso
+                                        se asigna por número de pisos según las simulaciones del escenario Vargas.
+                                        <strong>Esto no constituye un diagnóstico estructural individual.</strong>
+                                    </p>
+                                </div>
+
+                                <!-- TOGGLE NORMA -->
+                                <div class="damage-map-controls">
+                                    <div class="damage-map-toggle" id="damage-map-toggle">
+                                        <button class="toggle-btn active" data-norm="2001">
+                                            <span class="toggle-dot" style="background: var(--color-2001);"></span>
+                                            COVENIN 1756:2001
+                                        </button>
+                                        <button class="toggle-btn" data-norm="2019">
+                                            <span class="toggle-dot" style="background: var(--color-2019);"></span>
+                                            COVENIN 1756:2019
+                                        </button>
+                                    </div>
+                                    <div class="damage-map-norm-label" id="damage-map-norm-label">
+                                        Mostrando: <strong>Norma COVENIN 1756:2001</strong> (Tradicional)
+                                    </div>
+                                </div>
+
+                                <!-- MAPA -->
+                                <div id="damage-map-container" class="damage-map-container">
+                                    <!-- Leaflet map rendered here -->
+                                </div>
+
+                                <!-- LEYENDA -->
+                                <div class="damage-map-legend" id="damage-map-legend">
+                                    <div class="legend-title-map"><i class="fa-solid fa-palette"></i> Probabilidad de Colapso</div>
+                                    <div class="legend-row-map">
+                                        <span class="legend-dot-map" style="background: #2ec4b6;"></span>
+                                        <span>Baja (&lt; 40%)</span>
+                                    </div>
+                                    <div class="legend-row-map">
+                                        <span class="legend-dot-map" style="background: #ffb703;"></span>
+                                        <span>Media (40% – 60%)</span>
+                                    </div>
+                                    <div class="legend-row-map">
+                                        <span class="legend-dot-map" style="background: #fb8500;"></span>
+                                        <span>Alta (60% – 80%)</span>
+                                    </div>
+                                    <div class="legend-row-map">
+                                        <span class="legend-dot-map" style="background: #e63946;"></span>
+                                        <span>Muy Alta (80% – 100%)</span>
+                                    </div>
+                                    <div class="legend-row-map">
+                                        <span class="legend-dot-map" style="background: #111; border: 2px solid #e63946; animation: pulse-legend 1.5s infinite;"></span>
+                                        <span>Colapso Seguro (100%)</span>
+                                    </div>
+                                </div>
+
+                                <!-- TABLA RESUMEN -->
+                                <div style="margin-top: 24px;">
+                                    <h4 style="color: var(--color-2019); font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                        <i class="fa-solid fa-table-list"></i> Resumen de Edificaciones Evaluadas
+                                    </h4>
+                                    <div style="overflow-x: auto;">
+                                        <table class="calc-table" id="damage-map-summary-table" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 5%;">#</th>
+                                                    <th style="width: 25%;">Edificación</th>
+                                                    <th style="width: 10%;">Pisos</th>
+                                                    <th style="width: 20%;">P. Colapso 2001</th>
+                                                    <th style="width: 20%;">P. Colapso 2019</th>
+                                                    <th style="width: 20%;">Estado</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="damage-map-table-body">
+                                                <!-- Filled by JS -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- STATE AND METRICS BOARD -->
@@ -1734,7 +1845,7 @@
     </div>
 
     <!-- Custom JavaScript -->
-    <script src="app.js?v=903"></script>
+    <script src="app.js?v=908"></script>
 </body>
 
 </html>
