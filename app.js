@@ -7158,8 +7158,8 @@ function initDamageMap() {
             marker.setPopupContent(createPopupContent(building));
         });
 
-        // Update table
-        populateTable(norm);
+        // Update table & filters
+        applyFilters();
     }
 
     const toggleContainer = document.getElementById('damage-map-toggle');
@@ -7184,22 +7184,96 @@ function initDamageMap() {
         });
     }
 
-    // --- Summary Table ---
-    function populateTable(norm) {
+    // --- Search & Filter Logic ---
+    const searchInput = document.getElementById('damage-map-search');
+    const statusSelect = document.getElementById('damage-map-status-filter');
+    const countBadge = document.getElementById('damage-map-count-badge');
+
+    function applyFilters() {
+        const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+        const selectedStatus = statusSelect ? statusSelect.value : 'all';
+
+        const filtered = buildings.filter(b => {
+            // Text search match (name, zone, address)
+            const matchText = !query || 
+                b.name.toLowerCase().includes(query) || 
+                (b.zone && b.zone.toLowerCase().includes(query)) ||
+                (b.address && b.address.toLowerCase().includes(query));
+
+            // Status filter match
+            let matchStatus = true;
+            const prob = currentNorm === '2001' ? b.p2001 : b.p2019;
+
+            if (selectedStatus === 'collapsed') {
+                matchStatus = b.status === 'collapsed' || prob >= 100;
+            } else if (selectedStatus === 'damaged') {
+                matchStatus = b.status === 'damaged' || (prob >= 40 && prob < 100);
+            } else if (selectedStatus === 'survived') {
+                matchStatus = b.status === 'survived' || prob < 40;
+            }
+
+            return matchText && matchStatus;
+        });
+
+        // Sync map markers visibility
+        const filteredIds = new Set(filtered.map(b => b.id || b.name));
+        markers.forEach(({ marker, building }) => {
+            const id = building.id || building.name;
+            if (filteredIds.has(id)) {
+                if (!map.hasLayer(marker)) marker.addTo(map);
+            } else {
+                map.removeLayer(marker);
+            }
+        });
+
+        // Update table
+        populateTable(currentNorm, filtered);
+
+        // Update count badge
+        if (countBadge) {
+            countBadge.textContent = `${filtered.length} de ${buildings.length} edificaciones`;
+        }
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+    }
+    if (statusSelect) {
+        statusSelect.addEventListener('change', applyFilters);
+    }
+
+    // --- Summary Table Rendering ---
+    function populateTable(norm, list = buildings) {
         const tbody = document.getElementById('damage-map-table-body');
         if (!tbody) return;
 
-        tbody.innerHTML = buildings.map((b, i) => {
+        if (list.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px;">
+                        <i class="fa-solid fa-building-circle-exclamation" style="font-size: 22px; margin-bottom: 8px; display: block; color: var(--color-2001);"></i>
+                        No se encontraron edificaciones que coincidan con la búsqueda o filtro seleccionado.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = list.map((b, i) => {
             const prob = norm === '2001' ? b.p2001 : b.p2019;
             const status = getStatusLabel(prob, b.status);
             const color2001 = getColor(b.p2001);
             const color2019 = getColor(b.p2019);
+            const zoneHtml = b.zone ? `<span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px;">📍 ${b.zone}</span>` : '';
 
             return `
-                <tr>
+                <tr class="damage-table-row" data-index="${i}" style="transition: background 0.15s ease;">
                     <td class="calc-param-name">${i + 1}</td>
-                    <td class="calc-value" style="text-align: left; font-weight: 500;">${b.name}</td>
-                    <td class="calc-value">${b.floors}</td>
+                    <td class="calc-value" style="text-align: left; font-weight: 500;">
+                        <span style="font-weight: 600; color: #fff;">${b.name}</span>
+                        ${zoneHtml}
+                    </td>
+                    <td class="calc-value">${b.floors}P</td>
                     <td class="calc-value" style="color: ${color2001}; font-weight: 600;">${b.p2001.toFixed(1)}%</td>
                     <td class="calc-value" style="color: ${color2019}; font-weight: 600;">${b.p2019.toFixed(1)}%</td>
                     <td class="calc-unit">
@@ -7210,10 +7284,32 @@ function initDamageMap() {
                 </tr>
             `;
         }).join('');
+
+        // Click row to center map on building & open popup
+        tbody.querySelectorAll('.damage-table-row').forEach((row) => {
+            row.style.cursor = 'pointer';
+            row.addEventListener('click', () => {
+                const idx = parseInt(row.getAttribute('data-index'), 10);
+                const b = list[idx];
+                if (!b) return;
+
+                map.setView([b.lat, b.lng], 16, { animate: true });
+                const targetMarker = markers.find(m => (m.building.id || m.building.name) === (b.id || b.name));
+                if (targetMarker) {
+                    targetMarker.marker.openPopup();
+                }
+
+                // Scroll map smoothly into view if needed
+                const mapEl = document.getElementById('damage-map-container');
+                if (mapEl) {
+                    mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+        });
     }
 
-    // Initial table population
-    populateTable('2001');
+    // Initial load
+    applyFilters();
 
     // Fit bounds to show all markers
     const group = L.featureGroup(markers.map(m => m.marker));

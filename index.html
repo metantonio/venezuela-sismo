@@ -1758,19 +1758,41 @@
 
                                 <!-- TABLA RESUMEN -->
                                 <div style="margin-top: 24px;">
-                                    <h4 style="color: var(--color-2019); font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                                        <i class="fa-solid fa-table-list"></i> Resumen de Edificaciones Evaluadas
-                                    </h4>
-                                    <div style="overflow-x: auto;">
+                                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px;">
+                                        <h4 style="color: var(--color-2019); font-size: 15px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                            <i class="fa-solid fa-table-list"></i> Resumen de Edificaciones Evaluadas
+                                            <span id="damage-map-count-badge" style="font-size: 11px; background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 600;">
+                                                198 edificaciones
+                                            </span>
+                                        </h4>
+
+                                        <!-- CONTROLES DE BÚSQUEDA Y FILTRADO -->
+                                        <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%; max-width: 560px;">
+                                            <div style="position: relative; flex: 1; min-width: 220px;">
+                                                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px;"></i>
+                                                <input type="text" id="damage-map-search" placeholder="Buscar edificación o sector (ej. OPPPE, Caribe, Solymar)..." 
+                                                       style="width: 100%; padding: 8px 12px 8px 34px; background: rgba(20, 25, 40, 0.6); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #fff; font-size: 13px; outline: none; transition: border-color 0.2s;"
+                                                       onfocus="this.style.borderColor='#00f2fe'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.15)'">
+                                            </div>
+                                            <select id="damage-map-status-filter" style="padding: 8px 12px; background: rgba(20, 25, 40, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #fff; font-size: 13px; outline: none; cursor: pointer;">
+                                                <option value="all">Todos los Estados</option>
+                                                <option value="collapsed">🔴 Colapsadas (Colapso Total)</option>
+                                                <option value="damaged">🟠 Daño Severo / Moderado</option>
+                                                <option value="survived">🟢 Resistieron / Leve</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div style="overflow-x: auto; max-height: 480px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
                                         <table class="calc-table" id="damage-map-summary-table" style="width: 100%;">
-                                            <thead>
+                                            <thead style="position: sticky; top: 0; background: rgba(15, 20, 32, 0.95); backdrop-filter: blur(8px); z-index: 5;">
                                                 <tr>
                                                     <th style="width: 5%;">#</th>
-                                                    <th style="width: 25%;">Edificación</th>
+                                                    <th style="width: 30%;">Edificación / Ubicación</th>
                                                     <th style="width: 10%;">Pisos</th>
-                                                    <th style="width: 20%;">P. Colapso 2001</th>
-                                                    <th style="width: 20%;">P. Colapso 2019</th>
-                                                    <th style="width: 20%;">Estado</th>
+                                                    <th style="width: 18%;">P. Colapso 2001</th>
+                                                    <th style="width: 18%;">P. Colapso 2019</th>
+                                                    <th style="width: 19%;">Estado</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="damage-map-table-body">
@@ -1845,7 +1867,7 @@
     </div>
 
     <!-- Custom JavaScript -->
-    <script src="app.js?v=908"></script>
+    <script src="app.js?v=909"></script>
 </body>
 
 </html>
