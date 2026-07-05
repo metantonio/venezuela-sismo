@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -27,8 +27,6 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true   # Auto-habilita Pages si no está activo
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -38,3 +36,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
