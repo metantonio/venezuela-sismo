@@ -59,7 +59,7 @@
                     </h3>
                     <p
                         style="font-size: 11px; margin-top: 0; margin-bottom: 10px; color: var(--text-muted); line-height: 1.4;">
-                        Carga el caso de Vargas (24/Jun/2026, 0.45g-0.60g): pórticos de 5x4 separados a 4m, secciones
+                        Carga el caso de Vargas (24/Jun/2026, 0.40g-0.60g): pórticos de 5x4 separados a 4m, secciones
                         SCWB, residencial, losa de 15cm y excentricidad del 5%.
                     </p>
                     <button id="btn-preset-vargas" class="btn btn-secondary"
@@ -1683,27 +1683,37 @@
                     <div id="tab-damage-map" class="tab-content">
                         <div class="tab-info-container">
                             <div class="info-section">
-                                <h3 style="color: var(--color-2019); display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                                    <i class="fa-solid fa-map-location-dot"></i> Mapa Satelital de Daño Sísmico — La Guaira / Caraballeda
+                                <h3
+                                    style="color: var(--color-2019); display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                    <i class="fa-solid fa-map-location-dot"></i> Mapa Satelital de Daño Sísmico — La
+                                    Guaira / Caraballeda
                                 </h3>
-                                <p style="line-height: 1.6; color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+                                <p
+                                    style="line-height: 1.6; color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
                                     Visualización georreferenciada de la <strong>probabilidad de daño y colapso</strong>
-                                    basada en edificaciones reales afectadas por el doblete sísmico del 24 de junio de 2026
+                                    basada en edificaciones reales afectadas por el doblete sísmico del 24 de junio de
+                                    2026
                                     en el estado La Guaira. Los nombres y estados de las edificaciones provienen de
                                     reportes de prensa confirmados. La probabilidad de colapso se asigna según el número
-                                    de pisos de cada edificación, de acuerdo con las 77 simulaciones dinámicas no-lineales
+                                    de pisos de cada edificación, de acuerdo con las 77 simulaciones dinámicas
+                                    no-lineales
                                     de Monte Carlo del escenario Vargas.
                                 </p>
 
                                 <!-- DISCLAIMER -->
-                                <div style="background: rgba(255, 183, 3, 0.05); border: 1px solid rgba(255, 183, 3, 0.15); border-left: 4px solid #ffb703; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 12px; line-height: 1.5;">
-                                    <span style="color: #ffb703; font-weight: 600; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                <div
+                                    style="background: rgba(255, 183, 3, 0.05); border: 1px solid rgba(255, 183, 3, 0.15); border-left: 4px solid #ffb703; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 12px; line-height: 1.5;">
+                                    <span
+                                        style="color: #ffb703; font-weight: 600; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
                                         <i class="fa-solid fa-triangle-exclamation"></i> Nota Importante
                                     </span>
                                     <p style="margin: 0; color: var(--text-muted);">
-                                        Los nombres de las edificaciones corresponden a <strong>estructuras reales confirmadas como colapsadas o dañadas</strong>
-                                        según reportes de prensa y análisis post-sismo. Las coordenadas geográficas son <strong>aproximadas</strong>,
-                                        basadas en la ubicación del sector reportado (no en la dirección exacta). La probabilidad de colapso
+                                        Los nombres de las edificaciones corresponden a <strong>estructuras reales
+                                            confirmadas como colapsadas o dañadas</strong>
+                                        según reportes de prensa y análisis post-sismo. Las coordenadas geográficas son
+                                        <strong>aproximadas</strong>,
+                                        basadas en la ubicación del sector reportado (no en la dirección exacta). La
+                                        probabilidad de colapso
                                         se asigna por número de pisos según las simulaciones del escenario Vargas.
                                         <strong>Esto no constituye un diagnóstico estructural individual.</strong>
                                     </p>
@@ -1733,7 +1743,8 @@
 
                                 <!-- LEYENDA -->
                                 <div class="damage-map-legend" id="damage-map-legend">
-                                    <div class="legend-title-map"><i class="fa-solid fa-palette"></i> Probabilidad de Colapso</div>
+                                    <div class="legend-title-map"><i class="fa-solid fa-palette"></i> Probabilidad de
+                                        Colapso</div>
                                     <div class="legend-row-map">
                                         <span class="legend-dot-map" style="background: #2ec4b6;"></span>
                                         <span>Baja (&lt; 40%)</span>
@@ -1751,30 +1762,39 @@
                                         <span>Muy Alta (80% – 100%)</span>
                                     </div>
                                     <div class="legend-row-map">
-                                        <span class="legend-dot-map" style="background: #111; border: 2px solid #e63946; animation: pulse-legend 1.5s infinite;"></span>
+                                        <span class="legend-dot-map"
+                                            style="background: #111; border: 2px solid #e63946; animation: pulse-legend 1.5s infinite;"></span>
                                         <span>Colapso Seguro (100%)</span>
                                     </div>
                                 </div>
 
                                 <!-- TABLA RESUMEN -->
                                 <div style="margin-top: 24px;">
-                                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px;">
-                                        <h4 style="color: var(--color-2019); font-size: 15px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                    <div
+                                        style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px;">
+                                        <h4
+                                            style="color: var(--color-2019); font-size: 15px; margin: 0; display: flex; align-items: center; gap: 8px;">
                                             <i class="fa-solid fa-table-list"></i> Resumen de Edificaciones Evaluadas
-                                            <span id="damage-map-count-badge" style="font-size: 11px; background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 600;">
+                                            <span id="damage-map-count-badge"
+                                                style="font-size: 11px; background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 600;">
                                                 198 edificaciones
                                             </span>
                                         </h4>
 
                                         <!-- CONTROLES DE BÚSQUEDA Y FILTRADO -->
-                                        <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%; max-width: 560px;">
+                                        <div
+                                            style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%; max-width: 560px;">
                                             <div style="position: relative; flex: 1; min-width: 220px;">
-                                                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px;"></i>
-                                                <input type="text" id="damage-map-search" placeholder="Buscar edificación o sector (ej. OPPPE, Caribe, Solymar)..." 
-                                                       style="width: 100%; padding: 8px 12px 8px 34px; background: rgba(20, 25, 40, 0.6); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #fff; font-size: 13px; outline: none; transition: border-color 0.2s;"
-                                                       onfocus="this.style.borderColor='#00f2fe'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.15)'">
+                                                <i class="fa-solid fa-magnifying-glass"
+                                                    style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px;"></i>
+                                                <input type="text" id="damage-map-search"
+                                                    placeholder="Buscar edificación o sector (ej. OPPPE, Caribe, Solymar)..."
+                                                    style="width: 100%; padding: 8px 12px 8px 34px; background: rgba(20, 25, 40, 0.6); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #fff; font-size: 13px; outline: none; transition: border-color 0.2s;"
+                                                    onfocus="this.style.borderColor='#00f2fe'"
+                                                    onblur="this.style.borderColor='rgba(255, 255, 255, 0.15)'">
                                             </div>
-                                            <select id="damage-map-status-filter" style="padding: 8px 12px; background: rgba(20, 25, 40, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #fff; font-size: 13px; outline: none; cursor: pointer;">
+                                            <select id="damage-map-status-filter"
+                                                style="padding: 8px 12px; background: rgba(20, 25, 40, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #fff; font-size: 13px; outline: none; cursor: pointer;">
                                                 <option value="all">Todos los Estados</option>
                                                 <option value="collapsed">🔴 Colapsadas (Colapso Total)</option>
                                                 <option value="damaged">🟠 Daño Severo / Moderado</option>
@@ -1783,9 +1803,11 @@
                                         </div>
                                     </div>
 
-                                    <div style="overflow-x: auto; max-height: 480px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                    <div
+                                        style="overflow-x: auto; max-height: 480px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
                                         <table class="calc-table" id="damage-map-summary-table" style="width: 100%;">
-                                            <thead style="position: sticky; top: 0; background: rgba(15, 20, 32, 0.95); backdrop-filter: blur(8px); z-index: 5;">
+                                            <thead
+                                                style="position: sticky; top: 0; background: rgba(15, 20, 32, 0.95); backdrop-filter: blur(8px); z-index: 5;">
                                                 <tr>
                                                     <th style="width: 5%;">#</th>
                                                     <th style="width: 30%;">Edificación / Ubicación</th>
