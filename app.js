@@ -1115,6 +1115,367 @@ class BuildingModel {
     }
 }
 
+// --- TABLA DE CABILLAS VENEZOLANAS (COVENIN) ---
+const CABILLAS_VE = [
+    { name: '3/8"', desig: 3, diam_cm: 0.953, area_cm2: 0.71 },
+    { name: '1/2"', desig: 4, diam_cm: 1.27, area_cm2: 1.27 },
+    { name: '5/8"', desig: 5, diam_cm: 1.588, area_cm2: 1.98 },
+    { name: '3/4"', desig: 6, diam_cm: 1.905, area_cm2: 2.85 },
+    { name: '7/8"', desig: 7, diam_cm: 2.222, area_cm2: 3.88 },
+    { name: '1"',   desig: 8, diam_cm: 2.54,  area_cm2: 5.07 },
+    { name: '1 3/8"', desig: 11, diam_cm: 3.581, area_cm2: 10.07 }
+];
+
+/**
+ * Selecciona la combinación óptima de cabillas venezolanas para un área de acero requerida.
+ * Verifica que las barras quepan físicamente en la sección.
+ * @param {number} As_req - Área de acero requerida (cm²)
+ * @param {number} bw - Ancho de la viga (cm)
+ * @param {number} cover - Recubrimiento (cm), default 4.0
+ * @param {number} db_st - Diámetro del estribo (cm), default 0.953 (#3)
+ * @returns {{ desc: string, area: number, n: number, db: number, bars: Array }} Combinación seleccionada
+ */
+function selectRebarCombo(As_req, bw, cover = 4.0, db_st = 0.953) {
+    const availW = bw - 2 * cover - 2 * db_st;
+    const gap = 2.5; // cm separación libre mínima entre barras
+    let best = null;
+
+    // Intentar con un solo diámetro (de menor a mayor)
+    for (const bar of CABILLAS_VE) {
+        if (bar.desig < 4) continue; // Mín #4 (1/2") para longitudinal
+        const maxFit = Math.floor((availW + gap) / (bar.diam_cm + gap));
+        const nNeed = Math.ceil(As_req / bar.area_cm2);
+        if (nNeed >= 2 && nNeed <= maxFit) {
+            const opt = { desc: `${nNeed} Ø ${bar.name} (#${bar.desig})`, area: nNeed * bar.area_cm2, n: nNeed, db: bar.diam_cm, bars: [{ ...bar, count: nNeed }] };
+            if (!best || opt.area < best.area) best = opt;
+        }
+    }
+
+    // Si no cabe con un solo diámetro, probar combinación de 2 diámetros (2da capa)
+    if (!best) {
+        for (let i = CABILLAS_VE.length - 1; i >= 1; i--) {
+            const big = CABILLAS_VE[i];
+            if (big.desig < 4) continue;
+            const maxBig = Math.floor((availW + gap) / (big.diam_cm + gap));
+            for (let nB = Math.min(maxBig, 5); nB >= 2; nB--) {
+                const areaB = nB * big.area_cm2;
+                if (areaB >= As_req) continue;
+                const rem = As_req - areaB;
+                for (let j = CABILLAS_VE.length - 1; j >= 1; j--) {
+                    const sm = CABILLAS_VE[j];
+                    if (sm.desig < 4) continue;
+                    const nS = Math.ceil(rem / sm.area_cm2);
+                    const maxSm = Math.floor((availW + gap) / (sm.diam_cm + gap));
+                    if (nS >= 1 && nS <= maxSm) {
+                        const total = areaB + nS * sm.area_cm2;
+                        const opt = { desc: `${nB} Ø ${big.name} + ${nS} Ø ${sm.name}`, area: total, n: nB + nS, db: big.diam_cm, bars: [{ ...big, count: nB }, { ...sm, count: nS }], twoLayers: true };
+                        if (!best || total < best.area) { best = opt; }
+                        break;
+                    }
+                }
+                if (best) break;
+            }
+            if (best) break;
+        }
+    }
+    return best || { desc: 'N/A (sección insuficiente)', area: 0, n: 0, db: 0, bars: [] };
+}
+
+/**
+ * Genera un SVG inline con vista longitudinal, sección transversal A-A, y detalle de estribo con gancho 135°.
+ */
+function generateBeamSVG(bw, h, d, L_cm, cover, nBotBars, nTopBars, s_conf, s_center, h_conf, db_st, dirLabel) {
+    const W = 700, H = 400;
+    // -- Vista Longitudinal --
+    const lx = 50, ly = 35, lw = 430, lh = 110;
+    const scaleL = lw / L_cm;
+    const confPx = Math.min(h_conf * scaleL, lw * 0.35);
+    const sConfPx = Math.max(s_conf * scaleL, 3);
+    const sCenterPx = Math.max(s_center * scaleL, 6);
+    const colStub = 18;
+    const btY = ly + 10, bbY = ly + lh - 10;
+
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;background:rgba(0,0,0,0.35);border-radius:10px;border:1px solid rgba(255,255,255,0.08);margin:12px 0;">
+    <style>
+        .bf{fill:rgba(120,130,140,0.13);stroke:#8899aa;stroke-width:1.4}
+        .bl{stroke:#ff6b6b;stroke-width:2.2;stroke-linecap:round}
+        .bc{fill:#ff6b6b;stroke:#fff;stroke-width:.5}
+        .bct{fill:#ff9f43;stroke:#fff;stroke-width:.5}
+        .sl{stroke:#00f2fe;stroke-width:.9;opacity:.85}
+        .sr{fill:none;stroke:#00f2fe;stroke-width:1.6}
+        .cz{fill:rgba(255,107,107,0.07)}
+        .dl{stroke:#666;stroke-width:.5;stroke-dasharray:3,2}
+        .dt{fill:#999;font:600 8.5px 'Inter',sans-serif;text-anchor:middle}
+        .lt{fill:#fff;font:600 10px 'Inter',sans-serif}
+        .st{fill:#aaa;font:400 7.5px 'Inter',sans-serif}
+        .tt{fill:#ffb703;font:700 10.5px 'Inter',sans-serif;text-anchor:middle}
+        .hl{stroke:#00f2fe;stroke-width:1.6;fill:none;stroke-linecap:round}
+        .cf{fill:rgba(255,183,3,0.1);stroke:#ffb703;stroke-width:1;stroke-dasharray:4,2}
+    </style>`;
+
+    // Título dirección
+    svg += `<text x="${lx+lw/2}" y="16" class="tt">${dirLabel}</text>`;
+
+    // Vista longitudinal
+    svg += `<text x="${lx+lw/2}" y="${ly-6}" class="tt" font-size="9">VISTA LONGITUDINAL</text>`;
+    // Columnas
+    svg += `<rect x="${lx-colStub}" y="${ly-5}" width="${colStub}" height="${lh+10}" class="cf" rx="2"/>`;
+    svg += `<rect x="${lx+lw}" y="${ly-5}" width="${colStub}" height="${lh+10}" class="cf" rx="2"/>`;
+    // Viga
+    svg += `<rect x="${lx}" y="${ly}" width="${lw}" height="${lh}" class="bf" rx="1"/>`;
+    // Zonas confinadas
+    svg += `<rect x="${lx}" y="${ly}" width="${confPx}" height="${lh}" class="cz"/>`;
+    svg += `<rect x="${lx+lw-confPx}" y="${ly}" width="${confPx}" height="${lh}" class="cz"/>`;
+    // Barras longitudinales
+    svg += `<line x1="${lx}" y1="${btY}" x2="${lx+lw}" y2="${btY}" class="bl"/>`;
+    svg += `<line x1="${lx}" y1="${bbY}" x2="${lx+lw}" y2="${bbY}" class="bl"/>`;
+    // Etiquetas barras
+    svg += `<text x="${lx+lw/2}" y="${btY-4}" class="st" text-anchor="middle">As' (compresión)</text>`;
+    svg += `<text x="${lx+lw/2}" y="${bbY+11}" class="st" text-anchor="middle">As (tracción)</text>`;
+
+    // Estribos
+    let x = lx + Math.max(4, 5 * scaleL);
+    while (x < lx + confPx) { svg += `<line x1="${x}" y1="${ly+4}" x2="${x}" y2="${ly+lh-4}" class="sl"/>`; x += sConfPx; }
+    while (x < lx + lw - confPx) { svg += `<line x1="${x}" y1="${ly+4}" x2="${x}" y2="${ly+lh-4}" class="sl" opacity=".5"/>`; x += sCenterPx; }
+    while (x < lx + lw - 4) { svg += `<line x1="${x}" y1="${ly+4}" x2="${x}" y2="${ly+lh-4}" class="sl"/>`; x += sConfPx; }
+
+    // Corte A-A indicador
+    const cutX = lx + lw * 0.28;
+    svg += `<line x1="${cutX}" y1="${ly-8}" x2="${cutX}" y2="${ly+lh+8}" stroke="#ffb703" stroke-width=".7" stroke-dasharray="6,3"/>`;
+    svg += `<text x="${cutX-7}" y="${ly-10}" fill="#ffb703" font-size="8" font-family="Inter" font-weight="bold">A</text>`;
+    svg += `<text x="${cutX+3}" y="${ly+lh+16}" fill="#ffb703" font-size="8" font-family="Inter" font-weight="bold">A</text>`;
+
+    // Cotas - zona confinada izquierda
+    const dY = ly + lh + 22;
+    svg += `<line x1="${lx}" y1="${dY}" x2="${lx+confPx}" y2="${dY}" class="dl"/>`;
+    svg += `<line x1="${lx}" y1="${dY-4}" x2="${lx}" y2="${dY+4}" class="dl"/>`;
+    svg += `<line x1="${lx+confPx}" y1="${dY-4}" x2="${lx+confPx}" y2="${dY+4}" class="dl"/>`;
+    svg += `<text x="${lx+confPx/2}" y="${dY+12}" class="dt">2h=${(2*h/100).toFixed(2)}m</text>`;
+    svg += `<text x="${lx+confPx/2}" y="${dY+22}" class="st" text-anchor="middle">s=${s_conf.toFixed(0)}cm</text>`;
+    // Zona central
+    const cS = lx + confPx, cE = lx + lw - confPx;
+    svg += `<line x1="${cS}" y1="${dY}" x2="${cE}" y2="${dY}" class="dl"/>`;
+    svg += `<text x="${(cS+cE)/2}" y="${dY+12}" class="dt">Zona central</text>`;
+    svg += `<text x="${(cS+cE)/2}" y="${dY+22}" class="st" text-anchor="middle">s=${s_center.toFixed(0)}cm</text>`;
+    // Zona confinada derecha
+    svg += `<line x1="${cE}" y1="${dY}" x2="${lx+lw}" y2="${dY}" class="dl"/>`;
+    svg += `<line x1="${cE}" y1="${dY-4}" x2="${cE}" y2="${dY+4}" class="dl"/>`;
+    svg += `<line x1="${lx+lw}" y1="${dY-4}" x2="${lx+lw}" y2="${dY+4}" class="dl"/>`;
+    svg += `<text x="${(cE+lx+lw)/2}" y="${dY+12}" class="dt">2h</text>`;
+    // Cota total
+    const tDY = dY + 33;
+    svg += `<line x1="${lx}" y1="${tDY}" x2="${lx+lw}" y2="${tDY}" class="dl"/>`;
+    svg += `<line x1="${lx}" y1="${tDY-4}" x2="${lx}" y2="${tDY+4}" class="dl"/>`;
+    svg += `<line x1="${lx+lw}" y1="${tDY-4}" x2="${lx+lw}" y2="${tDY+4}" class="dl"/>`;
+    svg += `<text x="${lx+lw/2}" y="${tDY+13}" class="dt">L = ${(L_cm/100).toFixed(2)} m</text>`;
+
+    // -- Sección Transversal A-A --
+    const secScale = Math.min(120 / bw, 170 / h) * 0.75;
+    const sw = bw * secScale, sh = h * secScale;
+    const sx = 540, sy = 30;
+    const scx = sx + 70, scy = sy + 90;
+    const rx = scx - sw/2, ry = scy - sh/2;
+    const covPx = cover * secScale, stPx = db_st * secScale;
+
+    svg += `<text x="${scx}" y="${sy+4}" class="tt" font-size="9">SECCIÓN A-A</text>`;
+    svg += `<rect x="${rx}" y="${ry}" width="${sw}" height="${sh}" class="bf" rx="2"/>`;
+    // Estribo
+    const esx = rx + covPx, esy = ry + covPx, esw = sw - 2*covPx, esh = sh - 2*covPx;
+    svg += `<rect x="${esx}" y="${esy}" width="${esw}" height="${esh}" class="sr" rx="3"/>`;
+    // Ganchos 135° (esquinas superiores)
+    const hkL = 10;
+    svg += `<line x1="${esx}" y1="${esy+3}" x2="${esx+hkL*.71}" y2="${esy+3+hkL*.71}" class="hl"/>`;
+    svg += `<line x1="${esx+esw}" y1="${esy+3}" x2="${esx+esw-hkL*.71}" y2="${esy+3+hkL*.71}" class="hl"/>`;
+    // Ganchos 135° (esquinas inferiores)
+    svg += `<line x1="${esx}" y1="${esy+esh-3}" x2="${esx+hkL*.71}" y2="${esy+esh-3-hkL*.71}" class="hl"/>`;
+    svg += `<line x1="${esx+esw}" y1="${esy+esh-3}" x2="${esx+esw-hkL*.71}" y2="${esy+esh-3-hkL*.71}" class="hl"/>`;
+
+    // Barras inferiores (tracción)
+    const r = Math.max(3.5, 5 * secScale / h);
+    const botCy = ry + sh - covPx - stPx - r - 1;
+    const bStartX = esx + r + 3, bEndX = esx + esw - r - 3;
+    const bSpacing = nBotBars > 1 ? (bEndX - bStartX) / (nBotBars - 1) : 0;
+    for (let i = 0; i < nBotBars; i++) {
+        const cx = nBotBars === 1 ? (bStartX + bEndX)/2 : bStartX + i * bSpacing;
+        svg += `<circle cx="${cx}" cy="${botCy}" r="${r}" class="bc"/>`;
+    }
+    // Barras superiores (compresión)
+    const topCy = ry + covPx + stPx + r + 1;
+    const tSpacing = nTopBars > 1 ? (bEndX - bStartX) / (nTopBars - 1) : 0;
+    for (let i = 0; i < nTopBars; i++) {
+        const cx = nTopBars === 1 ? (bStartX + bEndX)/2 : bStartX + i * tSpacing;
+        svg += `<circle cx="${cx}" cy="${topCy}" r="${r}" class="bct"/>`;
+    }
+
+    // Cotas de sección
+    svg += `<line x1="${rx}" y1="${ry+sh+12}" x2="${rx+sw}" y2="${ry+sh+12}" class="dl"/>`;
+    svg += `<text x="${scx}" y="${ry+sh+22}" class="dt">${bw} cm</text>`;
+    svg += `<text x="${rx+sw+14}" y="${scy+3}" class="dt" text-anchor="start" transform="rotate(-90,${rx+sw+14},${scy})">${h} cm</text>`;
+    // Recubrimiento
+    svg += `<text x="${rx+covPx/2}" y="${scy}" class="st" text-anchor="middle" transform="rotate(-90,${rx+covPx/2},${scy})">${cover}cm</text>`;
+
+    // -- Detalle de Estribo --
+    const dx = sx + 10, dy = sy + sh * secScale + 130;
+    svg += `<text x="${dx+55}" y="${dy-5}" class="tt" font-size="9">DETALLE ESTRIBO</text>`;
+    svg += `<text x="${dx+55}" y="${dy+7}" class="st" text-anchor="middle">Gancho sísmico 135°</text>`;
+    const dex = dx + 5, dey = dy + 16, dew = 100, deh = 55;
+    svg += `<rect x="${dex}" y="${dey}" width="${dew}" height="${deh}" class="sr" rx="5"/>`;
+    const hk = 16;
+    // 4 ganchos en cada esquina
+    svg += `<line x1="${dex}" y1="${dey+4}" x2="${dex+hk*.71}" y2="${dey+4+hk*.71}" class="hl"/>`;
+    svg += `<line x1="${dex+dew}" y1="${dey+4}" x2="${dex+dew-hk*.71}" y2="${dey+4+hk*.71}" class="hl"/>`;
+    svg += `<line x1="${dex}" y1="${dey+deh-4}" x2="${dex+hk*.71}" y2="${dey+deh-4-hk*.71}" class="hl"/>`;
+    svg += `<line x1="${dex+dew}" y1="${dey+deh-4}" x2="${dex+dew-hk*.71}" y2="${dey+deh-4-hk*.71}" class="hl"/>`;
+    svg += `<text x="${dex+dew+10}" y="${dey+18}" class="st" text-anchor="start">135°</text>`;
+    svg += `<text x="${dex+dew+10}" y="${dey+30}" class="st" text-anchor="start">Ext: 6d_b</text>`;
+    svg += `<text x="${dex+dew/2}" y="${dey+deh+14}" class="dt">Estribo #3 (3/8")</text>`;
+
+    // Leyenda
+    svg += `<rect x="12" y="${H-28}" width="9" height="9" class="cz" stroke="#ff6b6b" stroke-width=".6"/>`;
+    svg += `<text x="24" y="${H-20}" class="st">Zona Confinada (2h)</text>`;
+    svg += `<line x1="120" y1="${H-24}" x2="135" y2="${H-24}" class="sl"/>`;
+    svg += `<text x="140" y="${H-20}" class="st" text-anchor="start">Estribos</text>`;
+    svg += `<line x1="186" y1="${H-24}" x2="201" y2="${H-24}" class="bl"/>`;
+    svg += `<text x="206" y="${H-20}" class="st" text-anchor="start">Acero Long.</text>`;
+    svg += `<circle cx="268" cy="${H-24}" r="3" class="bc"/><text x="276" y="${H-20}" class="st" text-anchor="start">Tracción</text>`;
+    svg += `<circle cx="324" cy="${H-24}" r="3" class="bct"/><text x="332" y="${H-20}" class="st" text-anchor="start">Compresión</text>`;
+
+    svg += `</svg>`;
+    return svg;
+}
+
+/**
+ * Calcula el diseño completo de una viga por teoría de rotura y genera HTML + SVG.
+ * Maneja una dirección (X o Y).
+ */
+function computeBeamDesign(bw, h, fc, fy, As_placed, AsPrime_placed, L_cm, V_story_kgf, h_story_cm, nBays, dirLabel) {
+    const cover = 4.0; // cm
+    const d = h - cover; // cm (peralte efectivo)
+    const dPrime = cover; // cm
+    const db_st = 0.953; // diámetro estribo #3 (cm)
+    const fy_st = 2800; // kgf/cm² (fy estribos, típico ASTM A-36 liso o fy menor)
+
+    // --- β1 ---
+    let beta1 = 0.85;
+    if (fc > 280) beta1 = Math.max(0.65, 0.85 - 0.05 * (fc - 280) / 70);
+
+    // --- Cuantía balanceada y máxima ---
+    const rho_b = 0.85 * beta1 * (fc / fy) * (6000 / (6000 + fy));
+    const rho_max = 0.75 * rho_b; // ACI / COVENIN 1753
+    const rho_min = Math.max((0.8 * Math.sqrt(fc)) / fy, 14.0 / fy);
+    const As_min = rho_min * bw * d;
+    const As_max = rho_max * bw * d;
+
+    // --- Cuantía colocada ---
+    const rho_placed = As_placed / (bw * d);
+
+    // --- Capacidad nominal a flexión (Mn) - acero inferior (tracción) ---
+    const a = As_placed * fy / (0.85 * fc * bw);
+    const c = a / beta1;
+    const Mn = As_placed * fy * (d - a / 2) / 100; // kgf·m
+    const phiMn = 0.9 * Mn; // kgf·m
+
+    // --- Capacidad por acero superior (momento negativo) ---
+    const aPrime = AsPrime_placed * fy / (0.85 * fc * bw);
+    const MnPrime = AsPrime_placed * fy * (d - aPrime / 2) / 100;
+    const phiMnPrime = 0.9 * MnPrime;
+
+    // --- Momento probable (Mpr) para diseño por capacidad ---
+    const a_pr = As_placed * 1.25 * fy / (0.85 * fc * bw);
+    const Mpr_pos = As_placed * 1.25 * fy * (d - a_pr / 2) / 100;
+    const a_pr_neg = AsPrime_placed * 1.25 * fy / (0.85 * fc * bw);
+    const Mpr_neg = AsPrime_placed * 1.25 * fy * (d - a_pr_neg / 2) / 100;
+
+    // --- Demanda de momento sísmico (estimación simplificada por portal) ---
+    // Mu_sismo ≈ V_story × h / (2 × n_bays)
+    const Mu_sismo = (V_story_kgf * h_story_cm / 100) / (2 * Math.max(nBays, 1)); // kgf·m
+    // Mu_gravedad ≈ wu × L² / 12 (extremos, carga uniforme)
+    // Estimamos wu como peso propio de la viga (simplificación)
+    const wu_beam = bw * h * 2400 / 1e4; // kgf/m (peso propio de la sección completa)
+    const Mu_grav = 1.2 * wu_beam * (L_cm / 100) * (L_cm / 100) / 12; // kgf·m
+    const Mu_total = Mu_sismo + Mu_grav;
+
+    // --- Verificación flexión ---
+    const flexionOK = phiMn >= Mu_total;
+    const cuantiaOK = rho_placed >= rho_min && rho_placed <= rho_max;
+    const ductilityRatio = c / d;
+    const ductilityOK = ductilityRatio <= 0.375; // c/d ≤ 0.375 para sección controlada por tracción
+
+    // --- Cortante ---
+    // Vu por capacidad = (Mpr+ + Mpr-) / Ln + wu × Ln / 2
+    const Ln_m = L_cm / 100;
+    const Vu_cap = (Mpr_pos + Mpr_neg) / Ln_m + 1.2 * wu_beam * Ln_m / 2; // kgf
+    const Vc = 0.53 * Math.sqrt(fc) * bw * d; // kgf
+    const phi_v = 0.85;
+    const Vu_design = Vu_cap;
+    const Vs_req = Math.max(0, Vu_design / phi_v - Vc);
+    const Av = 2 * 0.71; // 2 ramas #3 = 1.42 cm²
+
+    // Separación requerida por cortante
+    const s_shear = Vs_req > 0 ? (Av * fy * d / Vs_req) : 999;
+
+    // --- Estribos zona confinada (COVENIN 1756:2001) ---
+    const db_long_placed = Math.max(1.27, ...([As_placed, AsPrime_placed].map(() => 1.27))); // estimación
+    // Buscar diámetro real de la barra longitudinal más grande colocada
+    let db_long_est = 1.27; // fallback #4
+    const asPerBar = As_placed / Math.max(2, Math.ceil(As_placed / 5.07));
+    for (const bar of CABILLAS_VE) {
+        if (bar.area_cm2 >= asPerBar * 0.8) { db_long_est = bar.diam_cm; break; }
+    }
+
+    const s_conf_2001 = Math.min(d / 4, 8 * db_long_est, 24 * db_st, 30);
+    const s_conf_2019 = Math.min(d / 4, 6 * db_long_est, 15);
+    const s_center = Math.min(d / 2, s_shear);
+    const h_conf = 2 * h; // longitud de zona confinada = 2h
+
+    // --- Acero requerido (diseño correcto) ---
+    // As_req por flexión: Mu / (φ × fy × (d - a/2))
+    // Iteración simplificada: As_req ≈ Mu × 100 / (0.9 × fy × (d - (Mu × 100 / (0.9 × fy × 0.85 × fc × bw)) × fy / (2 × 0.85 × fc * bw)))
+    // Usar fórmula directa: As = 0.85 × fc × bw / fy × (d - √(d² - 2×Mu×100/(0.85×φ×fc×bw)))
+    const Mu_design = Mu_total; // kgf·m
+    const disc = d * d - 2 * Mu_design * 100 / (0.85 * 0.9 * fc * bw);
+    let As_req_flex = disc >= 0 ? (0.85 * fc * bw / fy) * (d - Math.sqrt(disc)) : As_min;
+    As_req_flex = Math.max(As_req_flex, As_min);
+
+    // Acero requerido para momento negativo (mínimo 50% del positivo por sismo)
+    let AsPrime_req = Math.max(0.5 * As_req_flex, As_min);
+
+    // Seleccionar barras comerciales
+    const rebarBot = selectRebarCombo(As_req_flex, bw, cover, db_st);
+    const rebarTop = selectRebarCombo(AsPrime_req, bw, cover, db_st);
+    const rebarBotPlaced = selectRebarCombo(As_placed, bw, cover, db_st);
+    const rebarTopPlaced = selectRebarCombo(AsPrime_placed, bw, cover, db_st);
+
+    // Estribos finales (mín entre requerido por cortante y confinamiento)
+    const s_final_2001_conf = Math.min(s_conf_2001, s_shear);
+    const s_final_2019_conf = Math.min(s_conf_2019, s_shear);
+
+    return {
+        // Geometría
+        bw, h, d, L_cm, cover, beta1,
+        // Cuantías
+        rho_b, rho_max, rho_min, rho_placed,
+        As_min, As_max, As_placed, AsPrime_placed,
+        // Flexión
+        a, c, Mn, phiMn, MnPrime, phiMnPrime,
+        Mpr_pos, Mpr_neg,
+        Mu_sismo, Mu_grav, Mu_total,
+        flexionOK, cuantiaOK, ductilityRatio, ductilityOK,
+        // Cortante
+        Vu_cap, Vc, Vs_req, Vu_design, s_shear, Av,
+        // Estribos
+        s_conf_2001, s_conf_2019, s_center, h_conf,
+        s_final_2001_conf, s_final_2019_conf,
+        db_st, db_long_est,
+        // Diseño requerido
+        As_req_flex, AsPrime_req,
+        rebarBot, rebarTop,
+        rebarBotPlaced, rebarTopPlaced,
+        // Barras para SVG
+        nBotBars: rebarBot.n, nTopBars: rebarTop.n
+    };
+}
+
 // --- GENERACIÓN DE ESPECTROS Y ARCHIVO DE SISMO (MAIN ENGINE) ---
 function generateSpectraAndEarthquake() {
     const N = parseInt(document.getElementById("num-stories").value);
@@ -1854,7 +2215,281 @@ function generateSpectraAndEarthquake() {
                 </table>
             </div>
         `;
+
+        // --- VERIFICACIÓN Y DISEÑO DE VIGAS POR TEORÍA DE ROTURA ---
+        const nBaysX = numColsX - 1;
+        const nBaysY = numColsY - 1;
+        const L_x_cm = sX * 100; // luz libre en X (cm)
+        const L_y_cm = sY * 100; // luz libre en Y (cm)
+        const h_story_cm = storyHeight * 100;
+
+        // Cortante basal de primer piso para estimación de demanda
+        const Vb_2001 = eq2001.V_design_x ? eq2001.V_design_x[0] : 0;
+        const Vb_2019 = eq2019.V_design_x ? eq2019.V_design_x[0] : 0;
+        const V_avg = (Vb_2001 + Vb_2019) / 2; // kgf promedio para estimación
+
+        // Calcular diseño para dirección X
+        const beamX = computeBeamDesign(
+            customSections.beamWidth, customSections.beamDepth,
+            customSections.fcBeam, customSections.fyBeam,
+            customSections.beamAs, customSections.beamAsPrime,
+            L_x_cm, V_avg, h_story_cm, nBaysX,
+            `VIGA DIRECCIÓN X (Luz: ${sX.toFixed(2)} m)`
+        );
+
+        // Si las luces son distintas, calcular también Y
+        const twoDirections = Math.abs(sX - sY) > 0.01;
+        let beamY = null;
+        if (twoDirections) {
+            beamY = computeBeamDesign(
+                customSections.beamWidth, customSections.beamDepth,
+                customSections.fcBeam, customSections.fyBeam,
+                customSections.beamAs, customSections.beamAsPrime,
+                L_y_cm, V_avg, h_story_cm, nBaysY,
+                `VIGA DIRECCIÓN Y (Luz: ${sY.toFixed(2)} m)`
+            );
+        }
+
+        // --- Generar HTML para cada dirección ---
+        function beamDesignHTML(bd, dirName) {
+            const statusIcon = (ok) => ok
+                ? `<span style="color: var(--color-safe); font-weight: bold;"><i class="fa-solid fa-circle-check"></i> Cumple</span>`
+                : `<span style="color: var(--color-damage); font-weight: bold;"><i class="fa-solid fa-triangle-exclamation"></i> No Cumple</span>`;
+
+            const svgDrawing = generateBeamSVG(
+                bd.bw, bd.h, bd.d, bd.L_cm, bd.cover,
+                bd.nBotBars, bd.nTopBars,
+                bd.s_conf_2019, bd.s_center, bd.h_conf, bd.db_st,
+                dirName
+            );
+
+            return `
+                <div style="margin-top: 16px; padding: 16px; background: rgba(0,0,0,0.15); border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
+                    <h5 style="color: #00f2fe; margin-bottom: 10px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-arrows-left-right"></i> ${dirName}
+                    </h5>
+
+                    <!-- Tabla de Verificación por Teoría de Rotura (Flexión) -->
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5;">
+                        <strong>Verificación a Flexión</strong> — Capacidad nominal vs demanda última.
+                    </p>
+                    <table class="calc-table" style="margin-bottom: 16px;">
+                        <thead>
+                            <tr>
+                                <th>Parámetro</th>
+                                <th>Fórmula</th>
+                                <th>Valor</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="calc-param-name">β₁</td>
+                                <td class="calc-formula">0.85 para f'c ≤ 280</td>
+                                <td class="calc-value">${bd.beta1.toFixed(3)}</td>
+                                <td class="calc-unit">-</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">Cuantía balanceada (ρ<sub>b</sub>)</td>
+                                <td class="calc-formula">0.85×β₁×(f'c/fy)×(6000/(6000+fy))</td>
+                                <td class="calc-value">${(bd.rho_b * 100).toFixed(3)}%</td>
+                                <td class="calc-unit">-</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">Cuantía máxima (ρ<sub>max</sub>)</td>
+                                <td class="calc-formula">0.75 × ρ<sub>b</sub></td>
+                                <td class="calc-value">${(bd.rho_max * 100).toFixed(3)}% → A<sub>s,máx</sub>= ${bd.As_max.toFixed(2)} cm²</td>
+                                <td class="calc-unit">-</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">Cuantía colocada (ρ)</td>
+                                <td class="calc-formula">A<sub>s</sub> / (b × d)</td>
+                                <td class="calc-value" style="font-weight:bold; color: ${bd.cuantiaOK ? 'var(--color-safe)' : 'var(--color-damage)'};">${(bd.rho_placed * 100).toFixed(3)}%</td>
+                                <td class="calc-value">${statusIcon(bd.cuantiaOK)}</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">Profundidad bloque (a)</td>
+                                <td class="calc-formula">A<sub>s</sub>×f<sub>y</sub> / (0.85×f'c×b)</td>
+                                <td class="calc-value">${bd.a.toFixed(2)} cm</td>
+                                <td class="calc-unit">-</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">Eje neutro (c)</td>
+                                <td class="calc-formula">a / β₁</td>
+                                <td class="calc-value">${bd.c.toFixed(2)} cm (c/d = ${bd.ductilityRatio.toFixed(3)})</td>
+                                <td class="calc-value">${statusIcon(bd.ductilityOK)} ${bd.ductilityOK ? '(Tracción)' : '(⚠️ Compresión)'}</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">Momento Nominal (M<sub>n</sub>)</td>
+                                <td class="calc-formula">A<sub>s</sub>×f<sub>y</sub>×(d - a/2)</td>
+                                <td class="calc-value" style="font-weight:bold;">${bd.Mn.toFixed(0)} kgf·m</td>
+                                <td class="calc-unit">-</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">φM<sub>n</sub> (Capacidad reducida)</td>
+                                <td class="calc-formula">φ=0.90 × M<sub>n</sub></td>
+                                <td class="calc-value" style="font-weight:bold; color: ${bd.flexionOK ? 'var(--color-safe)' : 'var(--color-damage)'};">${bd.phiMn.toFixed(0)} kgf·m</td>
+                                <td class="calc-unit">-</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">M<sub>u</sub> demandado (sismo + gravedad)</td>
+                                <td class="calc-formula">M<sub>sismo</sub> + M<sub>grav</sub></td>
+                                <td class="calc-value">${bd.Mu_total.toFixed(0)} kgf·m (${bd.Mu_sismo.toFixed(0)} + ${bd.Mu_grav.toFixed(0)})</td>
+                                <td class="calc-unit">-</td>
+                            </tr>
+                            <tr style="background: rgba(255,255,255,0.03);">
+                                <td class="calc-param-name" style="font-weight:bold;">VERIFICACIÓN FLEXIÓN</td>
+                                <td class="calc-formula">φM<sub>n</sub> ≥ M<sub>u</sub></td>
+                                <td class="calc-value" style="font-weight:bold; color: ${bd.flexionOK ? 'var(--color-safe)' : 'var(--color-damage)'};">
+                                    ${bd.phiMn.toFixed(0)} ${bd.flexionOK ? '≥' : '<'} ${bd.Mu_total.toFixed(0)}
+                                </td>
+                                <td class="calc-value">${statusIcon(bd.flexionOK)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Tabla de Cortante y Estribos -->
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5;">
+                        <strong>Verificación a Cortante y Diseño de Estribos</strong> — Diseño por capacidad con momentos probables (1.25f<sub>y</sub>).
+                    </p>
+                    <table class="calc-table" style="margin-bottom: 16px;">
+                        <thead>
+                            <tr>
+                                <th>Parámetro</th>
+                                <th>Fórmula / Método</th>
+                                <th>Valor</th>
+                                <th>Unidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="calc-param-name">M<sub>pr</sub> positivo</td>
+                                <td class="calc-formula">A<sub>s</sub> × 1.25f<sub>y</sub> × (d - a<sub>pr</sub>/2)</td>
+                                <td class="calc-value">${bd.Mpr_pos.toFixed(0)}</td>
+                                <td class="calc-unit">kgf·m</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">M<sub>pr</sub> negativo</td>
+                                <td class="calc-formula">A'<sub>s</sub> × 1.25f<sub>y</sub> × (d - a'<sub>pr</sub>/2)</td>
+                                <td class="calc-value">${bd.Mpr_neg.toFixed(0)}</td>
+                                <td class="calc-unit">kgf·m</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">V<sub>u</sub> (capacidad)</td>
+                                <td class="calc-formula">(M<sub>pr+</sub> + M<sub>pr-</sub>)/L<sub>n</sub> + 1.2w<sub>u</sub>L<sub>n</sub>/2</td>
+                                <td class="calc-value" style="font-weight:bold;">${bd.Vu_design.toFixed(0)}</td>
+                                <td class="calc-unit">kgf</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">V<sub>c</sub> (aporte concreto)</td>
+                                <td class="calc-formula">0.53×√f'c×b×d</td>
+                                <td class="calc-value">${bd.Vc.toFixed(0)}</td>
+                                <td class="calc-unit">kgf</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">V<sub>s</sub> requerido</td>
+                                <td class="calc-formula">V<sub>u</sub>/φ - V<sub>c</sub> (φ=0.85)</td>
+                                <td class="calc-value">${bd.Vs_req.toFixed(0)}</td>
+                                <td class="calc-unit">kgf</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">Sep. por cortante</td>
+                                <td class="calc-formula">A<sub>v</sub>×f<sub>y</sub>×d / V<sub>s</sub> (A<sub>v</sub> = ${bd.Av.toFixed(2)} cm²)</td>
+                                <td class="calc-value">${bd.s_shear > 900 ? '∞ (V<sub>c</sub> suficiente)' : bd.s_shear.toFixed(1) + ' cm'}</td>
+                                <td class="calc-unit">cm</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Tabla de Confinamiento -->
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5;">
+                        <strong>Separación de Estribos en Zonas de Confinamiento</strong> — Primer estribo a 5 cm de la cara de la columna.
+                    </p>
+                    <table class="calc-table" style="margin-bottom: 16px;">
+                        <thead>
+                            <tr>
+                                <th>Zona</th>
+                                <th>COVENIN 2001</th>
+                                <th>COVENIN 2019</th>
+                                <th>Longitud</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="calc-param-name"><strong>Zona Confinada</strong> (extremos)</td>
+                                <td class="calc-value">s ≤ min(d/4, 8d<sub>b</sub>, 24d<sub>est</sub>, 30cm) = <strong>${bd.s_final_2001_conf.toFixed(1)} cm</strong></td>
+                                <td class="calc-value">s ≤ min(d/4, 6d<sub>b</sub>, 15cm) = <strong>${bd.s_final_2019_conf.toFixed(1)} cm</strong></td>
+                                <td class="calc-value">2h = ${(bd.h_conf / 100).toFixed(2)} m</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name"><strong>Zona Central</strong></td>
+                                <td class="calc-value" colspan="2">s ≤ d/2 = <strong>${bd.s_center.toFixed(1)} cm</strong></td>
+                                <td class="calc-value">Resto del claro</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Tabla de Acero Requerido vs Colocado -->
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5;">
+                        <strong>Acero Requerido vs Colocado</strong> — Diseño correcto según normas COVENIN.
+                    </p>
+                    <table class="calc-table" style="margin-bottom: 16px;">
+                        <thead>
+                            <tr>
+                                <th>Cara</th>
+                                <th>A<sub>s</sub> Requerido</th>
+                                <th>Barras Sugeridas (Diseño)</th>
+                                <th>A<sub>s</sub> Colocado</th>
+                                <th>Barras Colocadas</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="calc-param-name"><strong>Tracción</strong> (inferior)</td>
+                                <td class="calc-value">${bd.As_req_flex.toFixed(2)} cm²</td>
+                                <td class="calc-value" style="color: #00f2fe;">${bd.rebarBot.desc} (${bd.rebarBot.area.toFixed(2)} cm²)</td>
+                                <td class="calc-value" style="font-weight:bold; color: ${bd.As_placed >= bd.As_req_flex ? 'var(--color-safe)' : 'var(--color-damage)'};">${bd.As_placed.toFixed(2)} cm²</td>
+                                <td class="calc-value">${bd.rebarBotPlaced.desc} (${bd.rebarBotPlaced.area.toFixed(2)} cm²)</td>
+                                <td class="calc-value">${statusIcon(bd.As_placed >= bd.As_req_flex)}</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name"><strong>Compresión</strong> (superior)</td>
+                                <td class="calc-value">${bd.AsPrime_req.toFixed(2)} cm²</td>
+                                <td class="calc-value" style="color: #00f2fe;">${bd.rebarTop.desc} (${bd.rebarTop.area.toFixed(2)} cm²)</td>
+                                <td class="calc-value" style="font-weight:bold; color: ${bd.AsPrime_placed >= bd.AsPrime_req ? 'var(--color-safe)' : 'var(--color-damage)'};">${bd.AsPrime_placed.toFixed(2)} cm²</td>
+                                <td class="calc-value">${bd.rebarTopPlaced.desc} (${bd.rebarTopPlaced.area.toFixed(2)} cm²)</td>
+                                <td class="calc-value">${statusIcon(bd.AsPrime_placed >= bd.AsPrime_req)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Plano SVG -->
+                    ${svgDrawing}
+                </div>
+            `;
+        }
+
+        reportHTML += `
+            <div style="margin-top: 24px; margin-bottom: 24px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
+                <h4 style="color: #00f2fe; margin-bottom: 10px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <i class="fa-solid fa-ruler-combined"></i> Verificación y Diseño de Vigas — Teoría de Rotura
+                </h4>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                    Comprobación de la viga configurada por <strong>teoría de rotura</strong> (flexión y cortante) y diseño correcto de estribos según
+                    <strong>COVENIN 1756:2001</strong> y <strong>COVENIN 1756:2019</strong>. Incluye selección de cabillas comerciales venezolanas (COVENIN)
+                    que cumplan con el área requerida y quepan físicamente en la sección.
+                    Sección: <strong>${customSections.beamWidth}×${customSections.beamDepth} cm</strong> |
+                    f'c: <strong>${customSections.fcBeam} kgf/cm²</strong> |
+                    fy: <strong>${customSections.fyBeam} kgf/cm²</strong>
+                </p>
+
+                ${beamDesignHTML(beamX, `VIGA DIR. X — Luz: ${sX.toFixed(2)} m`)}
+                ${twoDirections ? beamDesignHTML(beamY, `VIGA DIR. Y — Luz: ${sY.toFixed(2)} m`) : ''}
+            </div>
+        `;
     }
+
 
     // Inyectar el reporte de cálculos dinámicamente en el DOM
     initialReportHTML = reportHTML;
