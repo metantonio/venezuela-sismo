@@ -785,8 +785,8 @@ class BuildingModel {
         // Para un edificio de referencia de 25 m² (5m×5m, 4 columnas), el factor es 1.0.
         // Para edificios más grandes, la masa crece proporcionalmente al área de planta.
         // El término 0.3 representa la masa mínima estructural (columnas, vigas, acabados fijos)
-        // independiente del área, y 0.7*(A/25) escala la contribución de la losa y cargas distribuidas.
-        this.m = this.m_ref * (0.3 + 0.7 * (area / 25.0));
+        const autoMassCheck = document.getElementById("auto-mass") ? document.getElementById("auto-mass").checked : true;
+        this.m = autoMassCheck ? this.m_ref : this.m_ref * (0.3 + 0.7 * (area / 25.0));
 
         const CONV = 98066.5;
         const ES_PA = 2.0e6 * CONV;
@@ -1348,7 +1348,7 @@ function generateBeamSVG(bw, h, d, L_cm, cover, nBotBars, nTopBars, s_conf, s_ce
  * Calcula el diseño completo de una viga por teoría de rotura y genera HTML + SVG.
  * Maneja una dirección (X o Y).
  */
-function computeBeamDesign(bw, h, fc, fy, As_placed, AsPrime_placed, L_cm, V_story_kgf, h_story_cm, nBays, dirLabel) {
+function computeBeamDesign(bw, h, fc, fy, As_placed, AsPrime_placed, L_cm, V_story_2001_kgf, V_story_2019_kgf, h_story_cm, nBays, numParallelFrames, s_perp_m, dirLabel) {
     const cover = 4.0; // cm
     const d = h - cover; // cm (peralte efectivo)
     const dPrime = cover; // cm
@@ -1386,17 +1386,41 @@ function computeBeamDesign(bw, h, fc, fy, As_placed, AsPrime_placed, L_cm, V_sto
     const a_pr_neg = AsPrime_placed * 1.25 * fy / (0.85 * fc * bw);
     const Mpr_neg = AsPrime_placed * 1.25 * fy * (d - a_pr_neg / 2) / 100;
 
-    // --- Demanda de momento sísmico (estimación simplificada por portal) ---
-    // Mu_sismo ≈ V_story × h / (2 × n_bays)
-    const Mu_sismo = (V_story_kgf * h_story_cm / 100) / (2 * Math.max(nBays, 1)); // kgf·m
-    // Mu_gravedad ≈ wu × L² / 12 (extremos, carga uniforme)
-    // Estimamos wu como peso propio de la viga (simplificación)
-    const wu_beam = bw * h * 2400 / 1e4; // kgf/m (peso propio de la sección completa)
-    const Mu_grav = 1.2 * wu_beam * (L_cm / 100) * (L_cm / 100) / 12; // kgf·m
-    const Mu_total = Mu_sismo + Mu_grav;
+    // --- Demanda de momento sísmico por pórtico (Método del Portal) para 2001 y 2019 ---
+    // V_frame = Cortante basal total del edificio / Número de pórticos paralelos
+    // Mu_sismo por viga en nudo = V_frame × h / (4 × n_bays)
+    const V_frame_2001 = V_story_2001_kgf / Math.max(1, numParallelFrames);
+    const Mu_sismo_2001 = (V_frame_2001 * (h_story_cm / 100)) / (4 * Math.max(nBays, 1)); // kgf·m
+
+    const V_frame_2019 = V_story_2019_kgf / Math.max(1, numParallelFrames);
+    const Mu_sismo_2019 = (V_frame_2019 * (h_story_cm / 100)) / (4 * Math.max(nBays, 1)); // kgf·m
+
+    // --- Demanda de momento por gravedad con área tributaria ---
+    const slabThick_m = (parseFloat(document.getElementById("slab-thickness")?.value) || 20) / 100;
+    const extraDL = parseFloat(document.getElementById("extra-dead-load")?.value) || 250.0;
+    const beamSelfWeight_kgm = (bw / 100) * (h / 100) * 2400; // kgf/m
+    const slabWeight_kgm = slabThick_m * 2400 * s_perp_m; // kgf/m tributario
+    const extraDL_kgm = extraDL * s_perp_m; // kgf/m tributario
+    const w_D = beamSelfWeight_kgm + slabWeight_kgm + extraDL_kgm; // Carga muerta total (kgf/m)
+
+    // Carga viva (L) según uso
+    const useType = document.getElementById("building-use")?.value || "residencial";
+    let q_L = 175; // residencial default kgf/m²
+    if (useType === "comercial") q_L = 300;
+    else if (useType === "educativo") q_L = 250;
+    const w_L = q_L * s_perp_m; // kgf/m
+
+    // Carga combinada wu = 1.2D + 1.0L (según COVENIN sismorresistente U = 1.2D + 1.0L + E)
+    const wu_total = 1.2 * w_D + 1.0 * w_L; // kgf/m
+    const L_m = L_cm / 100;
+    const Mu_grav = (wu_total * L_m * L_m) / 12; // kgf·m en apoyo
+
+    const Mu_total_2001 = Mu_sismo_2001 + Mu_grav;
+    const Mu_total_2019 = Mu_sismo_2019 + Mu_grav;
 
     // --- Verificación flexión ---
-    const flexionOK = phiMn >= Mu_total;
+    const flexionOK_2001 = phiMn >= Mu_total_2001;
+    const flexionOK_2019 = phiMn >= Mu_total_2019;
     const cuantiaOK = rho_placed >= rho_min && rho_placed <= rho_max;
     const ductilityRatio = c / d;
     const ductilityOK = ductilityRatio <= 0.375; // c/d ≤ 0.375 para sección controlada por tracción
@@ -1404,7 +1428,7 @@ function computeBeamDesign(bw, h, fc, fy, As_placed, AsPrime_placed, L_cm, V_sto
     // --- Cortante ---
     // Vu por capacidad = (Mpr+ + Mpr-) / Ln + wu × Ln / 2
     const Ln_m = L_cm / 100;
-    const Vu_cap = (Mpr_pos + Mpr_neg) / Ln_m + 1.2 * wu_beam * Ln_m / 2; // kgf
+    const Vu_cap = (Mpr_pos + Mpr_neg) / Ln_m + wu_total * Ln_m / 2; // kgf
     const Vc = 0.53 * Math.sqrt(fc) * bw * d; // kgf
     const phi_v = 0.85;
     const Vu_design = Vu_cap;
@@ -1429,10 +1453,7 @@ function computeBeamDesign(bw, h, fc, fy, As_placed, AsPrime_placed, L_cm, V_sto
     const h_conf = 2 * h; // longitud de zona confinada = 2h
 
     // --- Acero requerido (diseño correcto) ---
-    // As_req por flexión: Mu / (φ × fy × (d - a/2))
-    // Iteración simplificada: As_req ≈ Mu × 100 / (0.9 × fy × (d - (Mu × 100 / (0.9 × fy × 0.85 × fc × bw)) × fy / (2 × 0.85 × fc * bw)))
-    // Usar fórmula directa: As = 0.85 × fc × bw / fy × (d - √(d² - 2×Mu×100/(0.85×φ×fc×bw)))
-    const Mu_design = Mu_total; // kgf·m
+    const Mu_design = Math.max(Mu_total_2001, Mu_total_2019); // kgf·m
     const disc = d * d - 2 * Mu_design * 100 / (0.85 * 0.9 * fc * bw);
     let As_req_flex = disc >= 0 ? (0.85 * fc * bw / fy) * (d - Math.sqrt(disc)) : As_min;
     As_req_flex = Math.max(As_req_flex, As_min);
@@ -1459,8 +1480,10 @@ function computeBeamDesign(bw, h, fc, fy, As_placed, AsPrime_placed, L_cm, V_sto
         // Flexión
         a, c, Mn, phiMn, MnPrime, phiMnPrime,
         Mpr_pos, Mpr_neg,
-        Mu_sismo, Mu_grav, Mu_total,
-        flexionOK, cuantiaOK, ductilityRatio, ductilityOK,
+        Mu_sismo_2001, Mu_sismo_2019, Mu_grav,
+        Mu_total_2001, Mu_total_2019,
+        flexionOK_2001, flexionOK_2019,
+        cuantiaOK, ductilityRatio, ductilityOK,
         // Cortante
         Vu_cap, Vc, Vs_req, Vu_design, s_shear, Av,
         // Estribos
@@ -2223,17 +2246,20 @@ function generateSpectraAndEarthquake() {
         const L_y_cm = sY * 100; // luz libre en Y (cm)
         const h_story_cm = storyHeight * 100;
 
-        // Cortante basal de primer piso para estimación de demanda
-        const Vb_2001 = eq2001.V_design_x ? eq2001.V_design_x[0] : 0;
-        const Vb_2019 = eq2019.V_design_x ? eq2019.V_design_x[0] : 0;
-        const V_avg = (Vb_2001 + Vb_2019) / 2; // kgf promedio para estimación
+        // Cortante basal de primer piso en Newtons (N), convertir a kgf dividiendo por G (9.81)
+        const Vb_x_2001_kgf = (eq2001.V_design_x ? eq2001.V_design_x[0] : 0) / G;
+        const Vb_x_2019_kgf = (eq2019.V_design_x ? eq2019.V_design_x[0] : 0) / G;
+
+        const Vb_y_2001_kgf = (eq2001.V_design_y ? eq2001.V_design_y[0] : 0) / G;
+        const Vb_y_2019_kgf = (eq2019.V_design_y ? eq2019.V_design_y[0] : 0) / G;
 
         // Calcular diseño para dirección X
         const beamX = computeBeamDesign(
             customSections.beamWidth, customSections.beamDepth,
             customSections.fcBeam, customSections.fyBeam,
             customSections.beamAs, customSections.beamAsPrime,
-            L_x_cm, V_avg, h_story_cm, nBaysX,
+            L_x_cm, Vb_x_2001_kgf, Vb_x_2019_kgf, h_story_cm, nBaysX,
+            numColsY, sY,
             `VIGA DIRECCIÓN X (Luz: ${sX.toFixed(2)} m)`
         );
 
@@ -2245,7 +2271,8 @@ function generateSpectraAndEarthquake() {
                 customSections.beamWidth, customSections.beamDepth,
                 customSections.fcBeam, customSections.fyBeam,
                 customSections.beamAs, customSections.beamAsPrime,
-                L_y_cm, V_avg, h_story_cm, nBaysY,
+                L_y_cm, Vb_y_2001_kgf, Vb_y_2019_kgf, h_story_cm, nBaysY,
+                numColsX, sX,
                 `VIGA DIRECCIÓN Y (Luz: ${sY.toFixed(2)} m)`
             );
         }
@@ -2271,79 +2298,57 @@ function generateSpectraAndEarthquake() {
 
                     <!-- Tabla de Verificación por Teoría de Rotura (Flexión) -->
                     <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5;">
-                        <strong>Verificación a Flexión</strong> — Capacidad nominal vs demanda última.
+                        <strong>Verificación a Flexión por Teoría de Rotura</strong> — Capacidad nominal (φM<sub>n</sub>) vs demandas por norma.
                     </p>
                     <table class="calc-table" style="margin-bottom: 16px;">
                         <thead>
                             <tr>
-                                <th>Parámetro</th>
-                                <th>Fórmula</th>
-                                <th>Valor</th>
-                                <th>Estado</th>
+                                <th>Parámetro de Control</th>
+                                <th>Fórmula / Método</th>
+                                <th>COVENIN 2001</th>
+                                <th>COVENIN 2019</th>
+                                <th>Unidad</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="calc-param-name">β₁</td>
-                                <td class="calc-formula">0.85 para f'c ≤ 280</td>
-                                <td class="calc-value">${bd.beta1.toFixed(3)}</td>
-                                <td class="calc-unit">-</td>
-                            </tr>
-                            <tr>
-                                <td class="calc-param-name">Cuantía balanceada (ρ<sub>b</sub>)</td>
-                                <td class="calc-formula">0.85×β₁×(f'c/fy)×(6000/(6000+fy))</td>
-                                <td class="calc-value">${(bd.rho_b * 100).toFixed(3)}%</td>
-                                <td class="calc-unit">-</td>
-                            </tr>
-                            <tr>
-                                <td class="calc-param-name">Cuantía máxima (ρ<sub>max</sub>)</td>
-                                <td class="calc-formula">0.75 × ρ<sub>b</sub></td>
-                                <td class="calc-value">${(bd.rho_max * 100).toFixed(3)}% → A<sub>s,máx</sub>= ${bd.As_max.toFixed(2)} cm²</td>
-                                <td class="calc-unit">-</td>
-                            </tr>
-                            <tr>
-                                <td class="calc-param-name">Cuantía colocada (ρ)</td>
-                                <td class="calc-formula">A<sub>s</sub> / (b × d)</td>
-                                <td class="calc-value" style="font-weight:bold; color: ${bd.cuantiaOK ? 'var(--color-safe)' : 'var(--color-damage)'};">${(bd.rho_placed * 100).toFixed(3)}%</td>
-                                <td class="calc-value">${statusIcon(bd.cuantiaOK)}</td>
-                            </tr>
-                            <tr>
-                                <td class="calc-param-name">Profundidad bloque (a)</td>
-                                <td class="calc-formula">A<sub>s</sub>×f<sub>y</sub> / (0.85×f'c×b)</td>
-                                <td class="calc-value">${bd.a.toFixed(2)} cm</td>
-                                <td class="calc-unit">-</td>
-                            </tr>
-                            <tr>
-                                <td class="calc-param-name">Eje neutro (c)</td>
-                                <td class="calc-formula">a / β₁</td>
-                                <td class="calc-value">${bd.c.toFixed(2)} cm (c/d = ${bd.ductilityRatio.toFixed(3)})</td>
-                                <td class="calc-value">${statusIcon(bd.ductilityOK)} ${bd.ductilityOK ? '(Tracción)' : '(⚠️ Compresión)'}</td>
-                            </tr>
-                            <tr>
                                 <td class="calc-param-name">Momento Nominal (M<sub>n</sub>)</td>
                                 <td class="calc-formula">A<sub>s</sub>×f<sub>y</sub>×(d - a/2)</td>
-                                <td class="calc-value" style="font-weight:bold;">${bd.Mn.toFixed(0)} kgf·m</td>
-                                <td class="calc-unit">-</td>
+                                <td class="calc-value" colspan="2" style="font-weight:bold; text-align:center;">${bd.Mn.toFixed(0)}</td>
+                                <td class="calc-unit">kgf·m</td>
                             </tr>
                             <tr>
-                                <td class="calc-param-name">φM<sub>n</sub> (Capacidad reducida)</td>
-                                <td class="calc-formula">φ=0.90 × M<sub>n</sub></td>
-                                <td class="calc-value" style="font-weight:bold; color: ${bd.flexionOK ? 'var(--color-safe)' : 'var(--color-damage)'};">${bd.phiMn.toFixed(0)} kgf·m</td>
-                                <td class="calc-unit">-</td>
+                                <td class="calc-param-name">Capacidad Reducida (φM<sub>n</sub>)</td>
+                                <td class="calc-formula">φ = 0.90 × M<sub>n</sub></td>
+                                <td class="calc-value" colspan="2" style="font-weight:bold; color: #00f2fe; text-align:center;">${bd.phiMn.toFixed(0)}</td>
+                                <td class="calc-unit">kgf·m</td>
                             </tr>
                             <tr>
-                                <td class="calc-param-name">M<sub>u</sub> demandado (sismo + gravedad)</td>
+                                <td class="calc-param-name">Momento por Sismo (M<sub>sismo</sub>)</td>
+                                <td class="calc-formula">V<sub>pórtico</sub> × h / (4 × N<sub>vanos</sub>)</td>
+                                <td class="calc-value">${bd.Mu_sismo_2001.toFixed(0)}</td>
+                                <td class="calc-value">${bd.Mu_sismo_2019.toFixed(0)}</td>
+                                <td class="calc-unit">kgf·m</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">Momento por Gravedad (M<sub>grav</sub>)</td>
+                                <td class="calc-formula">w<sub>u</sub> × L² / 12 (1.2D + 1.0L)</td>
+                                <td class="calc-value" colspan="2" style="text-align:center;">${bd.Mu_grav.toFixed(0)}</td>
+                                <td class="calc-unit">kgf·m</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name">Momento Último (M<sub>u</sub>)</td>
                                 <td class="calc-formula">M<sub>sismo</sub> + M<sub>grav</sub></td>
-                                <td class="calc-value">${bd.Mu_total.toFixed(0)} kgf·m (${bd.Mu_sismo.toFixed(0)} + ${bd.Mu_grav.toFixed(0)})</td>
-                                <td class="calc-unit">-</td>
+                                <td class="calc-value" style="font-weight:bold;">${bd.Mu_total_2001.toFixed(0)}</td>
+                                <td class="calc-value" style="font-weight:bold;">${bd.Mu_total_2019.toFixed(0)}</td>
+                                <td class="calc-unit">kgf·m</td>
                             </tr>
                             <tr style="background: rgba(255,255,255,0.03);">
-                                <td class="calc-param-name" style="font-weight:bold;">VERIFICACIÓN FLEXIÓN</td>
+                                <td class="calc-param-name" style="font-weight:bold;">Estado de Verificación</td>
                                 <td class="calc-formula">φM<sub>n</sub> ≥ M<sub>u</sub></td>
-                                <td class="calc-value" style="font-weight:bold; color: ${bd.flexionOK ? 'var(--color-safe)' : 'var(--color-damage)'};">
-                                    ${bd.phiMn.toFixed(0)} ${bd.flexionOK ? '≥' : '<'} ${bd.Mu_total.toFixed(0)}
-                                </td>
-                                <td class="calc-value">${statusIcon(bd.flexionOK)}</td>
+                                <td class="calc-value">${statusIcon(bd.flexionOK_2001)}</td>
+                                <td class="calc-value">${statusIcon(bd.flexionOK_2019)}</td>
+                                <td class="calc-unit">-</td>
                             </tr>
                         </tbody>
                     </table>
