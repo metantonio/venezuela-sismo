@@ -473,9 +473,11 @@
                         <div style="margin-top: 8px; text-align: left;">
                             <label for="sismo1-pga"
                                 style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">
-                                Acel. PGA: <span id="sismo1-pga-val" style="color: #00f2fe; font-weight: 700;">0.40g</span>
+                                Acel. PGA: <span id="sismo1-pga-val"
+                                    style="color: #00f2fe; font-weight: 700;">0.40g</span>
                             </label>
-                            <input type="range" id="sismo1-pga" min="0.10" max="1.05" value="0.40" step="0.05" style="width: 100%;">
+                            <input type="range" id="sismo1-pga" min="0.10" max="1.05" value="0.40" step="0.05"
+                                style="width: 100%;">
                         </div>
                     </div>
                     <div class="m-box second-sismo-box">
@@ -493,9 +495,11 @@
                         <div style="margin-top: 8px; text-align: left;">
                             <label for="sismo2-pga"
                                 style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">
-                                Acel. PGA: <span id="sismo2-pga-val" style="color: #ff6b6b; font-weight: 700;">0.60g</span>
+                                Acel. PGA: <span id="sismo2-pga-val"
+                                    style="color: #ff6b6b; font-weight: 700;">0.60g</span>
                             </label>
-                            <input type="range" id="sismo2-pga" min="0.10" max="1.05" value="0.60" step="0.05" style="width: 100%;">
+                            <input type="range" id="sismo2-pga" min="0.10" max="1.05" value="0.60" step="0.05"
+                                style="width: 100%;">
                         </div>
                     </div>
                 </div>
@@ -895,13 +899,20 @@
                                             <p>Al activar "Secciones Físicas", la inercia de las columnas se calcula
                                                 usando la sección transformada total (concreto + acero simétrico), y la
                                                 de las vigas empleando la sección agrietada transformada en flexión
-                                                simple. Para la masa sísmica de diseño, cuando está activado el 
-                                                <strong>"Autocálculo de Masa Sísmica"</strong>, se utiliza la masa real física exacta calculada
-                                                a partir de los espesores de losa, secciones de columnas/vigas y cargas permanentes y variables. 
-                                                Si el autocálculo se desactiva, se toma el valor manual del usuario como referencia y se escala
-                                                según la relación tributaria <strong>m = m<sub>ref</sub> &times; (0.3 + 0.7 &times; Área / 25)</strong>.
-                                                Esto garantiza que no ocurra un doble escalamiento de masa por área y que el cortante basal y momentos 
-                                                de diseño en vigas correspondan estrictamente a la realidad física de la estructura.</p>
+                                                simple. Para la masa sísmica de diseño, cuando está activado el
+                                                <strong>"Autocálculo de Masa Sísmica"</strong>, se utiliza la masa real
+                                                física exacta calculada
+                                                a partir de los espesores de losa, secciones de columnas/vigas y cargas
+                                                permanentes y variables.
+                                                Si el autocálculo se desactiva, se toma el valor manual del usuario como
+                                                referencia y se escala
+                                                según la relación tributaria <strong>m = m<sub>ref</sub> &times; (0.3 +
+                                                    0.7 &times; Área / 25)</strong>.
+                                                Esto garantiza que no ocurra un doble escalamiento de masa por área y
+                                                que el cortante basal y momentos
+                                                de diseño en vigas correspondan estrictamente a la realidad física de la
+                                                estructura.
+                                            </p>
                                         </div>
                                     </div>
 
@@ -1659,13 +1670,17 @@
                                         controles de redundancia, irregularidad y límites de deriva de COVENIN 1756:2019
                                         disminuye sustancialmente la tasa de colapso de las edificaciones de concreto
                                         ante sismos extremos repetitivos.</li>
-                                    <li><strong>Efecto de Sintonización Sísmica:</strong> El excelente comportamiento de las
-                                        estructuras de 4 a 6 pisos (0.0% de colapso frente a tasas de hasta 18.2% en 7 u 8 pisos) ilustra la
+                                    <li><strong>Efecto de Sintonización Sísmica:</strong> El excelente comportamiento de
+                                        las
+                                        estructuras de 4 a 6 pisos (0.0% de colapso frente a tasas de hasta 18.2% en 7 u
+                                        8 pisos) ilustra la
                                         influencia de los períodos dinámicos propios. Al alejarse de la frecuencia de
                                         resonancia pura con el suelo profundo aluvial, se reducen las fuerzas inerciales
                                         destructivas.</li>
-                                    <li><strong>Ventana del Factor de Seguridad Humano:</strong> La prevención total del colapso
-                                        en edificios de hasta 6 pisos, y el retraso sistemático del colapso en edificios de 7 a 10 pisos,
+                                    <li><strong>Ventana del Factor de Seguridad Humano (Norma del 2019):</strong> La
+                                        prevención total del colapso
+                                        en edificios de hasta 6 pisos, y el retraso sistemático del colapso en edificios
+                                        de 7 a 10 pisos,
                                         incrementa significativamente la probabilidad de evacuación exitosa de los
                                         ocupantes, cumpliendo con el objetivo fundamental de la ingeniería
                                         sismorresistente moderna: la salvaguarda de vidas. Sin embargo,
@@ -1680,16 +1695,28 @@
                                         (hasta 0.60g) superó con creces la demanda histórica reglamentaria de la zona,
                                         agravado por el fenómeno del doblete sísmico (choques sucesivos) que fatiga el
                                         concreto armado e impide la completa disipación de la energía.</li>
+                                    <li><strong>Vulnerabilidad de la Infraestructura Real:</strong> Es crucial destacar
+                                        que la inmensa mayoría de las edificaciones existentes en el litoral central de
+                                        Venezuela fueron construidas, en el mejor de los casos, bajo la norma COVENIN
+                                        1756:2001 (o incluso bajo códigos anteriores como el de 1982). Como muestran las
+                                        simulaciones, bajo la norma 2001 la probabilidad de colapso asciende
+                                        drásticamente (desde 54.5% en 5 pisos hasta 100.0% en 10 pisos) ante este
+                                        escenario extremo. Esto evidencia la extrema susceptibilidad de la
+                                        infraestructura actual y explica el alto índice de colapso observado en la
+                                        realidad.</li>
                                     <li><strong>Necesidad de Cambios Normativos y Revisión Estructural:</strong> Estos
                                         resultados justifican la introducción de cambios sustanciales en la normativa
-                                        sísmica y una revisión profunda a todas las edificaciones existentes en las
-                                        zonas de alta sismicidad, debido a que la aceleración máxima histórica estimada
-                                        ha aumentado. Para estas corridas se utilizó un valor extremo de 0.60g (que
-                                        representa un 50% de incremento sobre el máximo normado de 0.40g para Zona 7);
-                                        sin embargo, diversos estudios geofísicos independientes afirman que la
-                                        aceleración real pudo estar entre 0.68g y 0.85g. Al no haber aún una
-                                        homologación o confirmación oficial por parte de FUNVISIS, la simulación se
-                                        ejecutó preventivamente con el citado incremento del 50%.</li>
+                                        sísmica y una revisión profunda con fines de adecuación y reforzamiento
+                                        estructural en
+                                        las edificaciones existentes en zonas de alta sismicidad. Dado que la
+                                        aceleración máxima
+                                        histórica estimada ha aumentado, el uso preventivo de un valor extremo de 0.60g
+                                        (50% de
+                                        incremento sobre el máximo normado de 0.40g para Zona 7) permite dimensionar el
+                                        riesgo real,
+                                        el cual concuerda con estudios geofísicos independientes que estiman
+                                        aceleraciones de entre
+                                        0.68g y 0.85g para eventos extremos en el litoral central.</li>
                                 </ul>
                             </div>
                         </div>
@@ -1888,71 +1915,76 @@
                     </div>
                 </section>
 
-        <!-- FLOATING CONTROLS FOR MOBILE -->
-        <div class="mobile-floating-controls">
-            <button id="mobile-btn-run" class="btn btn-primary btn-round" title="Iniciar Simulación">
-                <i class="fa-solid fa-play"></i>
-            </button>
-            <button id="mobile-btn-pause" class="btn btn-secondary btn-round" disabled title="Pausar">
-                <i class="fa-solid fa-pause"></i>
-            </button>
-            <button id="mobile-btn-reset" class="btn btn-danger btn-round" title="Reiniciar">
-                <i class="fa-solid fa-rotate-left"></i>
-            </button>
-        </div>
-    </main>
-
-    <!-- FLOATING FEEDBACK BUTTON -->
-    <button id="floating-feedback-btn" class="floating-feedback-btn" title="Enviar Feedback / Sugerencias">
-        <i class="fa-solid fa-comment-dots"></i>
-        <span>Feedback</span>
-    </button>
-
-    <!-- FEEDBACK MODAL DIALOG -->
-    <div id="feedback-modal-overlay" class="feedback-modal-overlay">
-        <div class="feedback-modal-card">
-            <div class="feedback-modal-header">
-                <h3><i class="fa-solid fa-paper-plane" style="color: #00f2fe;"></i> Enviar Comentarios</h3>
-                <button id="feedback-modal-close" class="feedback-close-btn">&times;</button>
-            </div>
-            <p class="feedback-modal-sub">
-                Ayúdanos a mejorar VZLA-SISMO. Tus sugerencias son recibidas directamente.
-            </p>
-            <form id="feedback-form" autocomplete="off">
-                <div class="feedback-form-group">
-                    <label for="fb-name">Nombre / Alias <span style="font-size: 10px; color: var(--text-muted);">(Opcional)</span></label>
-                    <input type="text" id="fb-name" placeholder="Ej. Ing. Carlos">
-                </div>
-
-                <div class="feedback-form-group">
-                    <label for="fb-email">Correo Electrónico <span style="font-size: 10px; color: var(--text-muted);">(Opcional)</span></label>
-                    <input type="email" id="fb-email" placeholder="tu-correo@ejemplo.com">
-                </div>
-
-                <div class="feedback-form-group">
-                    <label for="fb-message">Mensaje / Sugerencia <span style="color: #e63946;">*</span></label>
-                    <textarea id="fb-message" rows="4" required placeholder="Escribe tus comentarios o sugerencias sobre el simulador..."></textarea>
-                    
-                    <!-- URL BLOCK WARNING NOTICE -->
-                    <div id="fb-url-warning" class="fb-url-warning" style="display: none;">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                        <span>Por seguridad no se permiten enlaces ni direcciones URL (http://, .com, etc.) en el mensaje.</span>
-                    </div>
-                </div>
-
-                <div id="fb-status-msg" class="fb-status-msg"></div>
-
-                <div class="feedback-modal-footer">
-                    <button type="button" id="feedback-cancel-btn" class="btn btn-secondary">Cancelar</button>
-                    <button type="submit" id="feedback-submit-btn" class="btn btn-primary">
-                        <i class="fa-solid fa-paper-plane"></i> Enviar Feedback
+                <!-- FLOATING CONTROLS FOR MOBILE -->
+                <div class="mobile-floating-controls">
+                    <button id="mobile-btn-run" class="btn btn-primary btn-round" title="Iniciar Simulación">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                    <button id="mobile-btn-pause" class="btn btn-secondary btn-round" disabled title="Pausar">
+                        <i class="fa-solid fa-pause"></i>
+                    </button>
+                    <button id="mobile-btn-reset" class="btn btn-danger btn-round" title="Reiniciar">
+                        <i class="fa-solid fa-rotate-left"></i>
                     </button>
                 </div>
-            </form>
-        </div>
-    </div>
+            </main>
 
-    <!-- Custom JavaScript -->
-    <script src="app.js?v=926"></script>
+            <!-- FLOATING FEEDBACK BUTTON -->
+            <button id="floating-feedback-btn" class="floating-feedback-btn" title="Enviar Feedback / Sugerencias">
+                <i class="fa-solid fa-comment-dots"></i>
+                <span>Feedback</span>
+            </button>
+
+            <!-- FEEDBACK MODAL DIALOG -->
+            <div id="feedback-modal-overlay" class="feedback-modal-overlay">
+                <div class="feedback-modal-card">
+                    <div class="feedback-modal-header">
+                        <h3><i class="fa-solid fa-paper-plane" style="color: #00f2fe;"></i> Enviar Comentarios</h3>
+                        <button id="feedback-modal-close" class="feedback-close-btn">&times;</button>
+                    </div>
+                    <p class="feedback-modal-sub">
+                        Ayúdanos a mejorar VZLA-SISMO. Tus sugerencias son recibidas directamente.
+                    </p>
+                    <form id="feedback-form" autocomplete="off">
+                        <div class="feedback-form-group">
+                            <label for="fb-name">Nombre / Alias <span
+                                    style="font-size: 10px; color: var(--text-muted);">(Opcional)</span></label>
+                            <input type="text" id="fb-name" placeholder="Ej. Ing. Carlos">
+                        </div>
+
+                        <div class="feedback-form-group">
+                            <label for="fb-email">Correo Electrónico <span
+                                    style="font-size: 10px; color: var(--text-muted);">(Opcional)</span></label>
+                            <input type="email" id="fb-email" placeholder="tu-correo@ejemplo.com">
+                        </div>
+
+                        <div class="feedback-form-group">
+                            <label for="fb-message">Mensaje / Sugerencia <span style="color: #e63946;">*</span></label>
+                            <textarea id="fb-message" rows="4" required
+                                placeholder="Escribe tus comentarios o sugerencias sobre el simulador..."></textarea>
+
+                            <!-- URL BLOCK WARNING NOTICE -->
+                            <div id="fb-url-warning" class="fb-url-warning" style="display: none;">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <span>Por seguridad no se permiten enlaces ni direcciones URL (http://, .com, etc.) en
+                                    el mensaje.</span>
+                            </div>
+                        </div>
+
+                        <div id="fb-status-msg" class="fb-status-msg"></div>
+
+                        <div class="feedback-modal-footer">
+                            <button type="button" id="feedback-cancel-btn" class="btn btn-secondary">Cancelar</button>
+                            <button type="submit" id="feedback-submit-btn" class="btn btn-primary">
+                                <i class="fa-solid fa-paper-plane"></i> Enviar Feedback
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Custom JavaScript -->
+            <script src="app.js?v=926"></script>
 </body>
+
 </html>
