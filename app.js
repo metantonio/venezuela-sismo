@@ -4997,7 +4997,7 @@ function initVargasChart() {
             datasets: [
                 {
                     label: 'COVENIN 1756:2001',
-                    data: [100.0, 100.0, 100.0, 100.0, 90.9, 81.8, 81.8],
+                    data: [9.1, 54.5, 54.5, 63.6, 63.6, 90.9, 100.0],
                     backgroundColor: 'rgba(0, 180, 216, 0.65)',
                     borderColor: '#00b4d8',
                     borderWidth: 1.5,
@@ -5005,7 +5005,7 @@ function initVargasChart() {
                 },
                 {
                     label: 'COVENIN 1756:2019',
-                    data: [45.5, 63.6, 36.4, 72.7, 63.6, 63.6, 54.5],
+                    data: [0.0, 0.0, 0.0, 9.1, 18.2, 63.6, 81.8],
                     backgroundColor: 'rgba(255, 0, 127, 0.65)',
                     borderColor: '#ff007f',
                     borderWidth: 1.5,
