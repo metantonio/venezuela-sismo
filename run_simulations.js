@@ -268,8 +268,7 @@ class BuildingModel {
         const bD = sY_val * ((numColsY || 2) - 1);
         const area = bW * bD;
         const rp = Math.sqrt((bW * bW + bD * bD) / 12) || 2.0;
-
-        this.m = this.m_ref * (0.3 + 0.7 * (area / 25.0));
+        this.m = this.m_ref;
 
         const CONV = 98066.5;
         const ES_PA = 2.0e6 * CONV;
