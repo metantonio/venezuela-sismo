@@ -342,7 +342,7 @@ class BuildingModel {
             this.Mn_beam = As_beam_cm2 * fy_beam * (d_cm - a_beam / 2.0);
             this.Mn_beam /= 100.0;
 
-            const Pu_approx = (this.m * N * 9.80665 / CONV) / this.numCols * 0.5;
+            const Pu_approx = (this.m * N) / this.numCols * 0.5;
             const As_col_cm2 = customSections.colAs;
             const hc_cm = customSections.colDepth;
             const bc_cm = customSections.colWidth;

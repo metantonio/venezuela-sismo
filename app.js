@@ -67,6 +67,22 @@ let selectionHighlightMesh = null;
 let selectionHighlightOutline = null;
 let initialReportHTML = "";
 
+// Datos globales del diseño de vigas (para visualización 3D post-simulación)
+let lastBeamDesignX = null;
+let lastBeamDesignY = null;
+let lastStructuralConfig = null; // { nBaysX, nBaysY, numColsX, numColsY, sX, sY, storyHeight }
+
+// Estados interactivos para visualización 3D de vigas
+let beamViewMode = 'xray'; // 'solid' o 'xray'
+let hoverBeamX_t = null; // t de hover en viga X (null si no hay hover)
+let hoverBeamY_t = null; // t de hover en viga Y (null si no hay hover)
+let beamAnimTime = 0;    // tiempo de animación local para oscilación
+let beamAnimActive = true; // animación activa por defecto
+let beamRotX = { X: -0.15, Y: -0.15 }; // rotación en pitch para viga X e Y
+let beamRotY = { X: 0.35, Y: 0.35 };   // rotación en yaw para viga X e Y
+let beamPanX = { X: 0, Y: 0 };         // desplazamiento en X de la cámara (panning)
+let beamPanY = { X: 0, Y: 0 };         // desplazamiento en Y de la cámara (panning)
+
 // --- INICIALIZACIÓN ---
 document.addEventListener("DOMContentLoaded", () => {
     try {
@@ -868,7 +884,7 @@ class BuildingModel {
 
             // Momento nominal de la COLUMNA (aproximación simplificada con carga axial):
             // Pu estimada = peso tributario por columna (masa × g / numCols × N/2 pisos sobre el nudo promedio)
-            const Pu_approx = (this.m * N * 9.80665 / CONV) / this.numCols * 0.5; // kgf (carga axial promedio)
+            const Pu_approx = (this.m * N) / this.numCols * 0.5; // kgf (carga axial promedio)
             const As_col_cm2 = customSections.colAs;
             const hc_cm = customSections.colDepth;
             const bc_cm = customSections.colWidth;
@@ -1345,6 +1361,874 @@ function generateBeamSVG(bw, h, d, L_cm, cover, nBotBars, nTopBars, s_conf, s_ce
 }
 
 /**
+ * Renderiza la visualización 3D isométrica de la viga después de la simulación sísmica.
+ * Muestra la deformación real bajo el sismo simulado (no de diseño), con código de colores
+ * por daño, grietas de flexión, rótulas plásticas, y diagrama de momentos.
+ *
+ * @param {string} canvasId - ID del canvas donde dibujar
+ * @param {object} beamData - Resultados de computeBeamDesign (beamX o beamY)
+ * @param {object} model2001 - Instancia BuildingModel COVENIN 2001
+ * @param {object} model2019 - Instancia BuildingModel COVENIN 2019
+ * @param {object} structConf - { nBaysX, nBaysY, numColsX, numColsY, sX, sY, storyHeight, h_story_cm }
+ * @param {string} dirLabel - 'X' o 'Y'
+ */
+function renderBeam3DCanvas(canvasId, beamData, model2001, model2019, structConf, dirLabel) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    const baseW = 780;
+    const baseH = 420;
+    const dpr = window.devicePixelRatio || 1;
+
+    // Configurar el backing store de forma única si no coincide con dpr
+    if (canvas.width !== Math.round(baseW * dpr) || canvas.height !== Math.round(baseH * dpr)) {
+        canvas.width = Math.round(baseW * dpr);
+        canvas.height = Math.round(baseH * dpr);
+        const ctx = canvas.getContext('2d');
+        ctx.resetTransform();
+        ctx.scale(dpr, dpr);
+    }
+
+    // Inicializar listener de eventos de mouse solo una vez por canvas
+    if (!canvas.dataset.hasEvents) {
+        canvas.dataset.hasEvents = 'true';
+        canvas.dataset.isDragging = 'false';
+
+        // Prevenir context menu para permitir drag con botón derecho
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        canvas.addEventListener('mousedown', (e) => {
+            canvas.dataset.isDragging = 'true';
+            canvas.dataset.dragButton = e.button; // 0 para izquierdo, 2 para derecho
+            canvas.dataset.startX = e.clientX;
+            canvas.dataset.startY = e.clientY;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            // Convertir coordenadas de mouse de CSS a espacio lógico 780x420
+            const mouseX = (e.clientX - rect.left) * (baseW / rect.width);
+            const mouseY = (e.clientY - rect.top) * (baseH / rect.height);
+
+            // Forzar redibujo inmediato
+            if (canvas.dataset.isDragging === 'true') {
+                const deltaX = e.clientX - parseFloat(canvas.dataset.startX);
+                const deltaY = e.clientY - parseFloat(canvas.dataset.startY);
+
+                const isPan = (canvas.dataset.dragButton === '2') || e.shiftKey;
+
+                if (isPan) {
+                    // Acción de Panning (traslación)
+                    beamPanX[dirLabel] += deltaX * 0.8;
+                    beamPanY[dirLabel] += deltaY * 0.8;
+                } else {
+                    // Acción de Rotación (orbitar)
+                    beamRotY[dirLabel] += deltaX * 0.008;
+                    beamRotX[dirLabel] = Math.max(-1.2, Math.min(1.2, beamRotX[dirLabel] - deltaY * 0.008));
+                }
+
+                canvas.dataset.startX = e.clientX;
+                canvas.dataset.startY = e.clientY;
+
+                // Ocultar hover mientras se arrastra
+                if (dirLabel === 'X') hoverBeamX_t = null;
+                else hoverBeamY_t = null;
+            } else {
+                // Detección de hover (proyectar mouse sobre la viga centro)
+                const ox = 30;
+                const oy2001 = 40; // coordenada vertical base (y=0) para 2001
+                const oy2019 = -80; // y=0 para 2019
+                const beamLenDraw = 300;
+                const beamHDraw = 40;
+                const beamWDraw = 20;
+
+                const rotX = beamRotX[dirLabel];
+                const rotY = beamRotY[dirLabel];
+                const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+                const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+
+                // Proyectar un punto 3D con rotación
+                function project3D(x, y, z) {
+                    const cx = beamLenDraw / 2;
+                    const cy = beamHDraw / 2;
+                    const cz = beamWDraw / 2;
+
+                    // Trasladar al origen de rotación
+                    let px = x - cx;
+                    let py = y - cy;
+                    let pz = z - cz;
+
+                    // Rotar en Y (yaw)
+                    let x1 = px * cosY - pz * sinY;
+                    let z1 = px * sinY + pz * cosY;
+
+                    // Rotar en X (pitch)
+                    let y2 = py * cosX - z1 * sinX;
+                    let z2 = py * sinX + z1 * cosX;
+
+                    // Trasladar de vuelta
+                    const rx = x1 + cx;
+                    const ry = y2 + cy;
+                    const rz = z2 + cz;
+
+                    // Proyección isométrica estándar
+                    const isoAngle = Math.PI / 6;
+                    return {
+                        sx: (rx - rz) * Math.cos(isoAngle),
+                        sy: (rx + rz) * Math.sin(isoAngle) - ry
+                    };
+                }
+
+                const centerX = baseW * 0.38;
+                const centerY = baseH * 0.52;
+
+                let bestT = null;
+                let activeModel = null;
+
+                for (const modelKey of ['2001', '2019']) {
+                    const oy = (modelKey === '2001') ? oy2001 : oy2019;
+
+                    // Línea central original de la viga
+                    const pStart = project3D(ox, oy + beamHDraw / 2, beamWDraw / 2);
+                    const pEnd = project3D(ox + beamLenDraw, oy + beamHDraw / 2, beamWDraw / 2);
+
+                    const ax = centerX + pStart.sx;
+                    const ay = centerY + pStart.sy;
+                    const bx = centerX + pEnd.sx;
+                    const by = centerY + pEnd.sy;
+
+                    const dx = bx - ax;
+                    const dy = by - ay;
+                    const len2 = dx * dx + dy * dy;
+                    let t = 0;
+                    if (len2 > 0) {
+                        t = ((mouseX - ax) * dx + (mouseY - ay) * dy) / len2;
+                    }
+                    t = Math.max(0, Math.min(1, t));
+
+                    const projX = ax + t * dx;
+                    const projY = ay + t * dy;
+
+                    const dist = Math.hypot(mouseX - projX, mouseY - projY);
+                    if (dist < 35) {
+                        bestT = t;
+                        activeModel = modelKey;
+                        break;
+                    }
+                }
+
+                if (dirLabel === 'X') {
+                    hoverBeamX_t = bestT !== null ? { t: bestT, model: activeModel, mx: mouseX, my: mouseY } : null;
+                } else {
+                    hoverBeamY_t = bestT !== null ? { t: bestT, model: activeModel, mx: mouseX, my: mouseY } : null;
+                }
+            }
+
+            // Redibujo inmediato si la animación está inactiva
+            if (!beamAnimActive) {
+                draw();
+            }
+        });
+
+        const stopDrag = () => {
+            canvas.dataset.isDragging = 'false';
+        };
+        canvas.addEventListener('mouseup', stopDrag);
+        canvas.addEventListener('mouseleave', () => {
+            stopDrag();
+            if (dirLabel === 'X') hoverBeamX_t = null;
+            else hoverBeamY_t = null;
+
+            if (!beamAnimActive) {
+                draw();
+            }
+        });
+    }
+
+    const ctx = canvas.getContext('2d');
+    const W = baseW;
+    const H = baseH;
+
+    function draw() {
+        const dpr = window.devicePixelRatio || 1;
+        ctx.save();
+        ctx.clearRect(0, 0, W, H);
+
+        // --- Calcular momentos REALES del sismo simulado ---
+        const isX = (dirLabel === 'X');
+        const nBays = isX ? structConf.nBaysX : structConf.nBaysY;
+        const numParallelFrames = isX ? structConf.numColsY : structConf.numColsX;
+        const h_story_m = structConf.h_story_cm / 100;
+
+        function getPeakBaseShear(model) {
+            if (!model || !model.history || !model.history.groundShear || model.history.groundShear.length === 0) return 0;
+            let maxV = 0;
+            for (let i = 0; i < model.history.groundShear.length; i++) {
+                const absV = Math.abs(model.history.groundShear[i]);
+                if (absV > maxV) maxV = absV;
+            }
+            return maxV; // Newtons
+        }
+
+        const Vb_real_2001_N = getPeakBaseShear(model2001);
+        const Vb_real_2019_N = getPeakBaseShear(model2019);
+        const Vb_real_2001_kgf = Vb_real_2001_N / G;
+        const Vb_real_2019_kgf = Vb_real_2019_N / G;
+
+        const V_frame_real_2001 = Vb_real_2001_kgf / Math.max(1, numParallelFrames);
+        const V_frame_real_2019 = Vb_real_2019_kgf / Math.max(1, numParallelFrames);
+
+        const Mu_sismo_real_2001 = (V_frame_real_2001 * h_story_m) / (4 * Math.max(nBays, 1));
+        const Mu_sismo_real_2019 = (V_frame_real_2019 * h_story_m) / (4 * Math.max(nBays, 1));
+
+        const Mu_real_2001 = Mu_sismo_real_2001 + beamData.Mu_grav;
+        const Mu_real_2019 = Mu_sismo_real_2019 + beamData.Mu_grav;
+
+        // Daño del primer piso (Park-Ang)
+        const D_2001 = (model2001 && model2001.D) ? model2001.D[0] : 0;
+        const D_2019 = (model2019 && model2019.D) ? model2019.D[0] : 0;
+
+        // Drift real máximo
+        const drift_2001 = model2001 ? model2001.maxDriftRatio : 0;
+        const drift_2019 = model2019 ? model2019.maxDriftRatio : 0;
+
+        // DCR
+        const DCR_2001 = beamData.phiMn > 0 ? Mu_real_2001 / beamData.phiMn : 999;
+        const DCR_2019 = beamData.phiMn > 0 ? Mu_real_2019 / beamData.phiMn : 999;
+
+        const collapsed_2001 = model2001 ? model2001.isCollapsed : false;
+        const collapsed_2019 = model2019 ? model2019.isCollapsed : false;
+
+        // --- PROYECCIÓN 3D ROTADA ---
+        const rotX = beamRotX[dirLabel];
+        const rotY = beamRotY[dirLabel];
+        const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+        const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+
+        const beamLenDraw = 300;
+        const beamHDraw = 40;
+        const beamWDraw = 20;
+        const colStub = 35;
+
+        const centerX = W * 0.38;
+        const centerY = H * 0.52;
+
+        function project3D(x, y, z) {
+            const cx = beamLenDraw / 2;
+            const cy = beamHDraw / 2;
+            const cz = beamWDraw / 2;
+
+            // Trasladar al origen de rotación
+            let px = x - cx;
+            let py = y - cy;
+            let pz = z - cz;
+
+            // Rotar en Y (yaw)
+            let x1 = px * cosY - pz * sinY;
+            let z1 = px * sinY + pz * cosY;
+
+            // Rotar en X (pitch)
+            let y2 = py * cosX - z1 * sinX;
+            let z2 = py * sinX + z1 * cosX;
+
+            // Trasladar de vuelta
+            const rx = x1 + cx;
+            const ry = y2 + cy;
+            const rz = z2 + cz;
+
+            // Proyección isométrica estándar (y positiva va Hacia Arriba)
+            const isoAngle = Math.PI / 6;
+            return {
+                sx: (rx - rz) * Math.cos(isoAngle) + beamPanX[dirLabel],
+                sy: (rx + rz) * Math.sin(isoAngle) - ry + beamPanY[dirLabel]
+            };
+        }
+
+        // --- Funciones de color ---
+        function damageColor(D) {
+            if (D >= 1.0) return { r: 180, g: 20, b: 20 };
+            if (D >= 0.8) return { r: 220, g: 40, b: 30 };
+            if (D >= 0.5) return { r: 240, g: 140, b: 30 };
+            if (D >= 0.2) return { r: 200, g: 200, b: 40 };
+            return { r: 40, g: 180, b: 100 };
+        }
+
+        // Fondo
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+        bgGrad.addColorStop(0, '#0a0e1a');
+        bgGrad.addColorStop(1, '#121626');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        // Grid de fondo isométrico sutil
+        ctx.strokeStyle = 'rgba(100, 120, 160, 0.05)';
+        ctx.lineWidth = 0.5;
+        for (let g = -400; g < 800; g += 30) {
+            const p1 = project3D(g, -110, -200);
+            const p2 = project3D(g, -110, 400);
+            ctx.beginPath();
+            ctx.moveTo(centerX + p1.sx, centerY + p1.sy);
+            ctx.lineTo(centerX + p2.sx, centerY + p2.sy);
+            ctx.stroke();
+            const p3 = project3D(-200, -110, g);
+            const p4 = project3D(600, -110, g);
+            ctx.beginPath();
+            ctx.moveTo(centerX + p3.sx, centerY + p3.sy);
+            ctx.lineTo(centerX + p4.sx, centerY + p4.sy);
+            ctx.stroke();
+        }
+
+        // === FUNCIÓN: Dibujar un prisma 3D rotado ===
+        function drawPrism(x, y, z, w, h, d, fillColor, strokeColor, opacity) {
+            const corners = [
+                project3D(x, y, z),           // 0: front-bot-left
+                project3D(x + w, y, z),       // 1: front-bot-right
+                project3D(x + w, y + h, z),   // 2: front-top-right
+                project3D(x, y + h, z),       // 3: front-top-left
+                project3D(x, y, z + d),       // 4: back-bot-left
+                project3D(x + w, y, z + d),   // 5: back-bot-right
+                project3D(x + w, y + h, z + d), // 6: back-top-right
+                project3D(x, y + h, z + d),   // 7: back-top-left
+            ];
+
+            ctx.globalAlpha = opacity || 1.0;
+
+            // Top face (y + h)
+            ctx.beginPath();
+            ctx.moveTo(centerX + corners[3].sx, centerY + corners[3].sy);
+            ctx.lineTo(centerX + corners[2].sx, centerY + corners[2].sy);
+            ctx.lineTo(centerX + corners[6].sx, centerY + corners[6].sy);
+            ctx.lineTo(centerX + corners[7].sx, centerY + corners[7].sy);
+            ctx.closePath();
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+
+            // Front face (z=0)
+            ctx.beginPath();
+            ctx.moveTo(centerX + corners[0].sx, centerY + corners[0].sy);
+            ctx.lineTo(centerX + corners[1].sx, centerY + corners[1].sy);
+            ctx.lineTo(centerX + corners[2].sx, centerY + corners[2].sy);
+            ctx.lineTo(centerX + corners[3].sx, centerY + corners[3].sy);
+            ctx.closePath();
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+            ctx.stroke();
+
+            // Right face (x + w)
+            ctx.beginPath();
+            ctx.moveTo(centerX + corners[1].sx, centerY + corners[1].sy);
+            ctx.lineTo(centerX + corners[5].sx, centerY + corners[5].sy);
+            ctx.lineTo(centerX + corners[6].sx, centerY + corners[6].sy);
+            ctx.lineTo(centerX + corners[2].sx, centerY + corners[2].sy);
+            ctx.closePath();
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.globalAlpha = 1.0;
+        }
+
+        // === FUNCIÓN: Dibujar un estribo 3D ===
+        function drawStirrup(x, y, z_start, z_end, h, w, color, opacity) {
+            ctx.globalAlpha = opacity || 1.0;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.0;
+
+            const corners = [
+                project3D(x, y, z_start),
+                project3D(x, y, z_end),
+                project3D(x, y + h, z_end),
+                project3D(x, y + h, z_start)
+            ];
+
+            ctx.beginPath();
+            ctx.moveTo(centerX + corners[0].sx, centerY + corners[0].sy);
+            ctx.lineTo(centerX + corners[1].sx, centerY + corners[1].sy);
+            ctx.lineTo(centerX + corners[2].sx, centerY + corners[2].sy);
+            ctx.lineTo(centerX + corners[3].sx, centerY + corners[3].sy);
+            ctx.closePath();
+            ctx.stroke();
+            ctx.globalAlpha = 1.0;
+        }
+
+        // *** Dibujar para cada modelo ***
+        function drawBeamForModel(D_val, DCR, Mu_real, drift, collapsed, modelLabel, modelColor, offsetX, offsetY) {
+            const ox = offsetX;
+            const oy = offsetY;
+
+            // Oscilación dinámica sinusoidal si está animado
+            const osc = beamAnimActive ? Math.sin(beamAnimTime + ox * 0.15 + oy * 0.25) : 1.0;
+            const defScale = Math.min(drift * 1200, 32) * osc;
+
+            // 1. STUBS DE COLUMNA en los extremos
+            drawPrism(ox - colStub / 2, oy - colStub, 2, colStub, beamHDraw + colStub * 2, beamWDraw - 4,
+                'rgba(65, 70, 85, 0.75)', 'rgba(150, 160, 180, 0.2)', 0.9);
+            drawPrism(ox + beamLenDraw - colStub / 2, oy - colStub, 2, colStub, beamHDraw + colStub * 2, beamWDraw - 4,
+                'rgba(65, 70, 85, 0.75)', 'rgba(150, 160, 180, 0.2)', 0.9);
+
+            // 2. RENDERING DEL CUERPO DE LA VIGA
+            const D_clamped = Math.min(Math.max(D_val, 0), 1);
+            const segments = 24;
+            const segW = beamLenDraw / segments;
+
+            if (beamViewMode === 'solid') {
+                for (let s = 0; s < segments; s++) {
+                    const t = (s + 0.5) / segments;
+                    const parabola = 4 * t * (1 - t);
+                    const yDef = defScale * parabola;
+
+                    const endProximity = 1 - 4 * Math.pow(t - 0.5, 2);
+                    const localD = D_clamped * (0.6 + 0.4 * endProximity);
+                    const col = damageColor(Math.min(localD * 1.25, 1));
+                    const fillStr = `rgba(${col.r}, ${col.g}, ${col.b}, 0.85)`;
+                    const strokeStr = `rgba(${Math.round(col.r * 0.6)}, ${Math.round(col.g * 0.6)}, ${Math.round(col.b * 0.6)}, 0.35)`;
+
+                    drawPrism(ox + s * segW, oy + yDef, 0, segW + 0.5, beamHDraw, beamWDraw,
+                        fillStr, strokeStr, 1.0);
+                }
+            } else {
+                // Modo Rayos-X
+                for (let s = 0; s < segments; s++) {
+                    const t = (s + 0.5) / segments;
+                    const parabola = 4 * t * (1 - t);
+                    const yDef = defScale * parabola;
+
+                    drawPrism(ox + s * segW, oy + yDef, 0, segW + 0.5, beamHDraw, beamWDraw,
+                        'rgba(50, 70, 100, 0.07)', 'rgba(120, 140, 180, 0.12)', 1.0);
+                }
+
+                const rCover = 4.0;
+                const zMin = rCover;
+                const zMax = beamWDraw - rCover;
+
+                ctx.save();
+                ctx.lineWidth = 1.8;
+
+                ctx.strokeStyle = '#4cc9f0';
+                ctx.shadowColor = '#4cc9f0';
+                ctx.shadowBlur = 5;
+                const nTop = Math.max(2, beamData.rebarTopPlaced.n);
+                for (let i = 0; i < nTop; i++) {
+                    const z = zMin + (i / (nTop - 1)) * (zMax - zMin);
+                    ctx.beginPath();
+                    for (let s = 0; s <= segments; s++) {
+                        const t = s / segments;
+                        const parabola = 4 * t * (1 - t);
+                        const yDef = defScale * parabola;
+                        const p = project3D(ox + t * beamLenDraw, oy + yDef + beamHDraw - rCover, z);
+                        if (s === 0) ctx.moveTo(centerX + p.sx, centerY + p.sy);
+                        else ctx.lineTo(centerX + p.sx, centerY + p.sy);
+                    }
+                    ctx.stroke();
+                }
+
+                ctx.strokeStyle = '#ff6b35';
+                ctx.shadowColor = '#ff6b35';
+                ctx.shadowBlur = 5;
+                const nBot = Math.max(2, beamData.rebarBotPlaced.n);
+                for (let i = 0; i < nBot; i++) {
+                    const z = zMin + (i / (nBot - 1)) * (zMax - zMin);
+                    ctx.beginPath();
+                    for (let s = 0; s <= segments; s++) {
+                        const t = s / segments;
+                        const parabola = 4 * t * (1 - t);
+                        const yDef = defScale * parabola;
+                        const p = project3D(ox + t * beamLenDraw, oy + yDef + rCover, z);
+                        if (s === 0) ctx.moveTo(centerX + p.sx, centerY + p.sy);
+                        else ctx.lineTo(centerX + p.sx, centerY + p.sy);
+                    }
+                    ctx.stroke();
+                }
+                ctx.restore();
+
+                const h_conf_px = 2 * beamHDraw;
+                const s_conf_px = Math.max(6, beamHDraw * (beamData.s_final_2019_conf / beamData.h));
+                const s_center_px = Math.max(12, beamHDraw * (beamData.s_center / beamData.h));
+
+                let currX = 5;
+                while (currX < beamLenDraw - 5) {
+                    const t = currX / beamLenDraw;
+                    const parabola = 4 * t * (1 - t);
+                    const yDef = defScale * parabola;
+
+                    const isConfined = (currX <= h_conf_px) || (currX >= beamLenDraw - h_conf_px);
+                    const stirrupColor = isConfined ? 'rgba(0, 242, 254, 0.65)' : 'rgba(200, 210, 230, 0.3)';
+
+                    drawStirrup(ox + currX, oy + yDef + 2, rCover - 1, beamWDraw - rCover + 1,
+                        beamHDraw - 4, beamWDraw - rCover * 2 + 2, stirrupColor, 0.85);
+
+                    currX += isConfined ? s_conf_px : s_center_px;
+                }
+
+                for (let s = 0; s < segments; s++) {
+                    const t = (s + 0.5) / segments;
+                    const parabola = 4 * t * (1 - t);
+                    const yDef = defScale * parabola;
+
+                    drawPrism(ox + s * segW, oy + yDef, 0, segW + 0.5, beamHDraw, beamWDraw,
+                        'rgba(50, 70, 100, 0.03)', 'rgba(120, 140, 180, 0.08)', 0.25);
+                }
+            }
+
+            // 3. FISURAS DE FLEXIÓN
+            if (D_clamped > 0.05) {
+                const numCracks = Math.floor(D_clamped * 14) + 2;
+                ctx.strokeStyle = `rgba(30, 0, 0, ${Math.min(D_clamped * 0.8, 0.75)})`;
+
+                for (let cr = 0; cr < numCracks; cr++) {
+                    let crackT;
+                    if (cr < numCracks * 0.45) {
+                        crackT = 0.02 + (cr / (numCracks * 0.45)) * 0.22;
+                    } else if (cr > numCracks * 0.55) {
+                        crackT = 0.78 + ((cr - numCracks * 0.55) / (numCracks * 0.45)) * 0.2;
+                    } else {
+                        crackT = 0.24 + Math.random() * 0.52;
+                    }
+
+                    const crX = ox + crackT * beamLenDraw;
+                    const crYDef = defScale * 4 * crackT * (1 - crackT);
+                    const crackLen = beamHDraw * (0.22 + D_clamped * 0.6);
+                    const crackAngle = (Math.random() - 0.5) * 0.3;
+
+                    const p_start = project3D(crX, oy + crYDef + 2, beamWDraw * 0.25);
+                    const p_end = project3D(crX + crackAngle * 8, oy + crYDef + crackLen, beamWDraw * 0.25);
+
+                    ctx.lineWidth = 0.5 + D_clamped * 1.8;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX + p_start.sx, centerY + p_start.sy);
+                    ctx.lineTo(centerX + p_end.sx, centerY + p_end.sy);
+                    ctx.stroke();
+                }
+            }
+
+            // 4. RÓTULAS PLÁSTICAS
+            if (DCR > 1.0) {
+                const hingeRadius = 5 + Math.min((DCR - 1) * 3, 9);
+                const hingeColor = collapsed ? 'rgba(220, 20, 20, 0.9)' : 'rgba(255, 110, 20, 0.85)';
+
+                const pL = project3D(ox + 4, oy + beamHDraw / 2 + defScale * 0, beamWDraw / 2);
+                ctx.beginPath();
+                ctx.arc(centerX + pL.sx, centerY + pL.sy, hingeRadius, 0, Math.PI * 2);
+                ctx.fillStyle = hingeColor;
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.0;
+                ctx.stroke();
+
+                const pR = project3D(ox + beamLenDraw - 4, oy + beamHDraw / 2 + defScale * 0, beamWDraw / 2);
+                ctx.beginPath();
+                ctx.arc(centerX + pR.sx, centerY + pR.sy, hingeRadius, 0, Math.PI * 2);
+                ctx.fillStyle = hingeColor;
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.4;
+                for (const p of [pL, pR]) {
+                    const cx_h = centerX + p.sx;
+                    const cy_h = centerY + p.sy;
+                    const r2 = hingeRadius * 0.4;
+                    ctx.beginPath();
+                    ctx.moveTo(cx_h - r2, cy_h - r2); ctx.lineTo(cx_h + r2, cy_h + r2);
+                    ctx.moveTo(cx_h + r2, cy_h - r2); ctx.lineTo(cx_h - r2, cy_h + r2);
+                    ctx.stroke();
+                }
+            }
+
+            // 5. DIAGRAMA DE MOMENTO real
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(0, 180, 255, 0.65)';
+            ctx.lineWidth = 1.8;
+            const momScale = Math.min(32, beamHDraw * 0.65);
+
+            for (let i = 0; i <= 40; i++) {
+                const t = i / 40;
+                const xM = ox + t * beamLenDraw;
+
+                const M_sismo_norm = 1.0 * (1 - 2 * Math.abs(t - 0.5));
+                const M_grav_norm = 4 * t * (1 - t) * (beamData.Mu_grav / Math.max(Mu_real, 1));
+                const M_total = M_sismo_norm + M_grav_norm;
+                const yM = oy + beamHDraw + 8 + M_total * momScale;
+                const yDef = defScale * 4 * t * (1 - t);
+
+                const p = project3D(xM, yM + yDef * 0.3, beamWDraw + 4);
+                if (i === 0) ctx.moveTo(centerX + p.sx, centerY + p.sy);
+                else ctx.lineTo(centerX + p.sx, centerY + p.sy);
+            }
+            ctx.stroke();
+
+            const labelP = project3D(ox + beamLenDraw / 2, oy + beamHDraw + 20, beamWDraw / 2);
+            ctx.font = 'bold 11px "Inter", system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = modelColor;
+            ctx.fillText(modelLabel, centerX + labelP.sx, centerY + labelP.sy);
+
+            if (collapsed) {
+                const colP = project3D(ox + beamLenDraw / 2, oy + beamHDraw + 34, beamWDraw / 2);
+                ctx.font = 'bold 12px "Inter", system-ui, sans-serif';
+                ctx.fillStyle = '#ff3333';
+                ctx.fillText('⚠ COLAPSO', centerX + colP.sx, centerY + colP.sy);
+            }
+        }
+
+        drawBeamForModel(D_2001, DCR_2001, Mu_real_2001, drift_2001, collapsed_2001,
+            'COVENIN 1756:2001', '#ff6b35', 30, 40);
+        drawBeamForModel(D_2019, DCR_2019, Mu_real_2019, drift_2019, collapsed_2019,
+            'COVENIN 1756:2019', '#4cc9f0', 30, -80);
+
+        // --- INTERACTIVIDAD: DIBUJAR INDICADOR DE HOVER ---
+        const activeHover = (dirLabel === 'X') ? hoverBeamX_t : hoverBeamY_t;
+        const isDragging = canvas.dataset.isDragging === 'true';
+
+        if (activeHover && activeHover.model && !isDragging) {
+            const hT = activeHover.t;
+            const hModel = activeHover.model;
+            const oy = (hModel === '2001') ? 40 : -80;
+            const bModel = (hModel === '2001') ? model2001 : model2019;
+            const Mu_real_model = (hModel === '2001') ? Mu_real_2001 : Mu_real_2019;
+            const D_val = (hModel === '2001') ? D_2001 : D_2019;
+
+            const osc = beamAnimActive ? Math.sin(beamAnimTime + 30 * 0.15 + oy * 0.25) : 1.0;
+            const defScale = Math.min((bModel ? bModel.maxDriftRatio : 0) * 1200, 32) * osc;
+            const yDef = defScale * 4 * hT * (1 - hT);
+
+            const pBeam = project3D(30 + hT * beamLenDraw, oy + yDef + beamHDraw / 2, beamWDraw / 2);
+            const bx = centerX + pBeam.sx;
+            const by = centerY + pBeam.sy;
+
+            ctx.strokeStyle = '#ffb703';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(bx, by, 4, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(255, 183, 3, 0.4)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(bx, by);
+            ctx.lineTo(activeHover.mx, activeHover.my);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            const localPosM = (beamData.L_cm / 100) * hT;
+            const M_sismo_norm = 1.0 * (1 - 2 * Math.abs(hT - 0.5));
+            const M_grav_norm = 4 * hT * (1 - hT) * (beamData.Mu_grav / Math.max(Mu_real_model, 1));
+            const localMu = (M_sismo_norm + M_grav_norm) * Mu_real_model;
+
+            const endProximity = 1 - 4 * Math.pow(hT - 0.5, 2);
+            const localD = Math.min(1.0, D_val * (0.6 + 0.4 * endProximity));
+
+            const ttW = 160;
+            const ttH = 82;
+            let ttx = activeHover.mx + 12;
+            let tty = activeHover.my - 40;
+
+            if (ttx + ttW > W) ttx = activeHover.mx - ttW - 12;
+            if (tty + ttH > H) tty = H - ttH - 12;
+            if (tty < 10) tty = 10;
+
+            ctx.fillStyle = 'rgba(10, 12, 22, 0.95)';
+            ctx.strokeStyle = '#ffb703';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.roundRect(ttx, tty, ttW, ttH, 6);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = 'bold 9px "Inter", sans-serif';
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'left';
+            ctx.fillText(`COVENIN ${hModel} - Pos: ${localPosM.toFixed(2)}m`, ttx + 8, tty + 14);
+
+            ctx.font = '8px "Inter", sans-serif';
+            ctx.fillStyle = 'rgba(220, 230, 255, 0.7)';
+            ctx.fillText(`Momento Sísmico: ${Math.round(localMu).toLocaleString()} kgf·m`, ttx + 8, tty + 28);
+            ctx.fillText(`Capacidad φMn: ${Math.round(beamData.phiMn).toLocaleString()} kgf·m`, ttx + 8, tty + 40);
+            ctx.fillText(`DCR Local: ${(localMu / Math.max(1, beamData.phiMn)).toFixed(2)}`, ttx + 8, tty + 52);
+            
+            const stateText = localD >= 0.8 ? 'COLAPSO/FRACTURA' : localD >= 0.5 ? 'SEVERO' : localD >= 0.2 ? 'AGRIETADO' : 'ELÁSTICO';
+            ctx.font = 'bold 8px "Inter", sans-serif';
+            ctx.fillStyle = localD >= 0.5 ? '#ff3333' : localD >= 0.2 ? '#ffb703' : '#4cc9f0';
+            ctx.fillText(`Estado: ${stateText} (${(localD*100).toFixed(1)}%)`, ttx + 8, tty + 66);
+        }
+
+        // --- PANEL DE MÉTRICAS ---
+        const panelX = W * 0.68;
+        const panelY = 16;
+        const panelW = W * 0.3;
+        ctx.fillStyle = 'rgba(20, 25, 45, 0.85)';
+        ctx.strokeStyle = 'rgba(100, 140, 200, 0.25)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.roundRect(panelX, panelY, panelW, H - 32, 8); ctx.fill(); ctx.stroke();
+
+        ctx.font = 'bold 11px "Inter", sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'left';
+        ctx.fillText('COMPORTAMIENTO REAL', panelX + 12, panelY + 22);
+        ctx.font = '9px "Inter", sans-serif';
+        ctx.fillStyle = 'rgba(200, 210, 230, 0.6)';
+        ctx.fillText(`Sismo Simulado — Dir. ${dirLabel}`, panelX + 12, panelY + 36);
+
+        // Línea separadora
+        ctx.strokeStyle = 'rgba(100, 140, 200, 0.2)';
+        ctx.beginPath();
+        ctx.moveTo(panelX + 10, panelY + 44);
+        ctx.lineTo(panelX + panelW - 10, panelY + 44);
+        ctx.stroke();
+
+        // Métricas por modelo
+        function drawMetricRow(label, val2001, val2019, unit, y, highlight) {
+            ctx.font = '9px "Inter", sans-serif';
+            ctx.fillStyle = 'rgba(200, 210, 230, 0.5)';
+            ctx.textAlign = 'left';
+            ctx.fillText(label, panelX + 12, y);
+
+            ctx.font = highlight ? 'bold 11px "Inter", sans-serif' : '10px "Inter", sans-serif';
+            ctx.fillStyle = '#ff6b35';
+            ctx.textAlign = 'right';
+            ctx.fillText(val2001, panelX + panelW * 0.52, y);
+
+            ctx.fillStyle = '#4cc9f0';
+            ctx.fillText(val2019, panelX + panelW * 0.82, y);
+
+            ctx.font = '8px "Inter", sans-serif';
+            ctx.fillStyle = 'rgba(200, 210, 230, 0.35)';
+            ctx.textAlign = 'left';
+            ctx.fillText(unit, panelX + panelW * 0.84, y);
+        }
+
+        // Header de columnas
+        let my = panelY + 62;
+        ctx.font = 'bold 8px "Inter", sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#ff6b35';
+        ctx.fillText('2001', panelX + panelW * 0.52, my);
+        ctx.fillStyle = '#4cc9f0';
+        ctx.fillText('2019', panelX + panelW * 0.82, my);
+        my += 18;
+
+        drawMetricRow('Mu real sismo', Mu_sismo_real_2001.toFixed(0), Mu_sismo_real_2019.toFixed(0), 'kgf·m', my, false);
+        my += 16;
+        drawMetricRow('Mu real total', Mu_real_2001.toFixed(0), Mu_real_2019.toFixed(0), 'kgf·m', my, true);
+        my += 16;
+        drawMetricRow('φMn capacidad', beamData.phiMn.toFixed(0), beamData.phiMn.toFixed(0), 'kgf·m', my, false);
+        my += 20;
+
+        // DCR con barra visual
+        drawMetricRow('DCR', DCR_2001.toFixed(2), DCR_2019.toFixed(2), '', my, true);
+        my += 8;
+
+        // Barra DCR 2001
+        const barX = panelX + 12;
+        const barW = panelW - 24;
+        const barH = 6;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+        ctx.beginPath(); ctx.roundRect(barX, my, barW, barH, 3); ctx.fill();
+        const fill2001 = Math.min(DCR_2001 / 2, 1);
+        ctx.fillStyle = DCR_2001 > 1 ? 'rgba(255, 60, 40, 0.8)' : 'rgba(40, 200, 100, 0.7)';
+        ctx.beginPath(); ctx.roundRect(barX, my, barW * fill2001, barH, 3); ctx.fill();
+        my += barH + 4;
+
+        // Barra DCR 2019
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+        ctx.beginPath(); ctx.roundRect(barX, my, barW, barH, 3); ctx.fill();
+        const fill2019 = Math.min(DCR_2019 / 2, 1);
+        ctx.fillStyle = DCR_2019 > 1 ? 'rgba(255, 60, 40, 0.8)' : 'rgba(40, 200, 100, 0.7)';
+        ctx.beginPath(); ctx.roundRect(barX, my, barW * fill2019, barH, 3); ctx.fill();
+        my += barH + 16;
+
+        // Separador
+        ctx.strokeStyle = 'rgba(100, 140, 200, 0.15)';
+        ctx.beginPath(); ctx.moveTo(panelX + 10, my); ctx.lineTo(panelX + panelW - 10, my); ctx.stroke();
+        my += 14;
+
+        drawMetricRow('Daño Park-Ang', D_2001.toFixed(3), D_2019.toFixed(3), '', my, false);
+        my += 16;
+        drawMetricRow('Deriva máx', (drift_2001 * 100).toFixed(2) + '%', (drift_2019 * 100).toFixed(2) + '%', '', my, false);
+        my += 16;
+        drawMetricRow('Mu diseño', beamData.Mu_total_2001.toFixed(0), beamData.Mu_total_2019.toFixed(0), 'kgf·m', my, false);
+        my += 16;
+        drawMetricRow('Mu sismo diseño', beamData.Mu_sismo_2001.toFixed(0), beamData.Mu_sismo_2019.toFixed(0), 'kgf·m', my, false);
+        my += 20;
+
+        // Comparación diseño vs real
+        ctx.strokeStyle = 'rgba(100, 140, 200, 0.15)';
+        ctx.beginPath(); ctx.moveTo(panelX + 10, my); ctx.lineTo(panelX + panelW - 10, my); ctx.stroke();
+        my += 14;
+
+        ctx.font = 'bold 9px "Inter", sans-serif';
+        ctx.fillStyle = 'rgba(255, 200, 50, 0.8)';
+        ctx.textAlign = 'left';
+        ctx.fillText('Amplificación Real / Diseño', panelX + 12, my);
+        my += 16;
+
+        const amp2001 = beamData.Mu_sismo_2001 > 0 ? (Mu_sismo_real_2001 / beamData.Mu_sismo_2001).toFixed(1) + '×' : 'N/A';
+        const amp2019 = beamData.Mu_sismo_2019 > 0 ? (Mu_sismo_real_2019 / beamData.Mu_sismo_2019).toFixed(1) + '×' : 'N/A';
+        drawMetricRow('Factor real/diseño', amp2001, amp2019, '', my, true);
+        my += 22;
+
+        // --- LEYENDA DE DAÑO ---
+        ctx.font = 'bold 9px "Inter", sans-serif';
+        ctx.fillStyle = 'rgba(200, 210, 230, 0.6)';
+        ctx.textAlign = 'left';
+        ctx.fillText('LEYENDA DE DAÑO', panelX + 12, my);
+        my += 14;
+
+        const legendItems = [
+            { label: 'Elástico (D < 0.2)', color: 'rgb(40, 200, 100)' },
+            { label: 'Fluencia (D < 0.5)', color: 'rgb(200, 200, 40)' },
+            { label: 'Severo (D < 0.8)', color: 'rgb(240, 140, 30)' },
+            { label: 'Colapso (D ≥ 0.8)', color: 'rgb(220, 40, 30)' },
+        ];
+
+        for (const item of legendItems) {
+            ctx.fillStyle = item.color;
+            ctx.beginPath();
+            ctx.roundRect(panelX + 12, my - 6, 10, 10, 2);
+            ctx.fill();
+            ctx.font = '8px "Inter", sans-serif';
+            ctx.fillStyle = 'rgba(200, 210, 230, 0.6)';
+            ctx.fillText(item.label, panelX + 28, my + 2);
+            my += 14;
+        }
+
+        // --- Título general arriba ---
+        ctx.font = 'bold 12px "Inter", system-ui, sans-serif';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.textAlign = 'left';
+        ctx.fillText(`Viga Dir. ${dirLabel} — Comportamiento bajo Sismo Real`, 14, 20);
+        ctx.font = '10px "Inter", system-ui, sans-serif';
+        ctx.fillStyle = 'rgba(200, 210, 230, 0.5)';
+        ctx.fillText(`Sección: ${beamData.bw}×${beamData.h} cm  |  Luz: ${(beamData.L_cm / 100).toFixed(2)} m`, 14, 36);
+
+        // Ícono de nota sobre sismo
+        ctx.font = '8px "Inter", system-ui, sans-serif';
+        ctx.fillStyle = 'rgba(255, 200, 50, 0.5)';
+        ctx.fillText('⚡ Drag izquierdo: rotar | Drag derecho o Shift: desplazar | Posicione para info.', 14, H - 10);
+
+        ctx.restore();
+    }
+
+    // Loop de animación local
+    function animLoop() {
+        if (!beamAnimActive) return;
+        beamAnimTime += 0.04;
+        draw();
+        requestAnimationFrame(animLoop);
+    }
+
+    if (beamAnimActive) {
+        animLoop();
+    } else {
+        draw();
+    }
+}
+
+/**
  * Calcula el diseño completo de una viga por teoría de rotura y genera HTML + SVG.
  * Maneja una dirección (X o Y).
  */
@@ -1619,7 +2503,7 @@ function generateSpectraAndEarthquake() {
             <h4 style="color: #ffb703; margin-bottom: 10px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
                 <i class="fa-solid fa-file-invoice"></i> Parámetros de Entrada de la Estructura
             </h4>
-            <div class="grid-columns-report" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 12px;">
+            <div class="grid-columns-report" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 12px;">
                 <div>
                     <h5 style="color: #fff; margin-bottom: 6px; font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;">Geometría, Losa y Secciones</h5>
                     <table class="calc-table" style="margin-top: 0;">
@@ -2277,6 +3161,11 @@ function generateSpectraAndEarthquake() {
             );
         }
 
+        // Guardar datos globalmente para la visualización 3D post-simulación
+        lastBeamDesignX = beamX;
+        lastBeamDesignY = beamY;
+        lastStructuralConfig = { nBaysX, nBaysY, numColsX, numColsY, sX, sY, storyHeight, h_story_cm };
+
         // --- Generar HTML para cada dirección ---
         function beamDesignHTML(bd, dirName) {
             const statusIcon = (ok) => ok
@@ -2516,8 +3405,87 @@ function updateCalculationReport() {
 
     // Si la simulación ha iniciado, añadir el reporte de columnas
     if (simStepIndex > 0) {
+        let maxV_2001 = 0;
+        if (eq2001 && eq2001.history && eq2001.history.groundShear) {
+            maxV_2001 = Math.max(...eq2001.history.groundShear.map(Math.abs)) / G;
+        }
+        let maxV_2019 = 0;
+        if (eq2019 && eq2019.history && eq2019.history.groundShear) {
+            maxV_2019 = Math.max(...eq2019.history.groundShear.map(Math.abs)) / G;
+        }
+
+        // Cortantes basales de diseño (convertidos a kgf)
+        const Vd_x_2001 = eq2001 && eq2001.V_design_x ? eq2001.V_design_x[0] / G : 0;
+        const Vd_y_2001 = eq2001 && eq2001.V_design_y ? eq2001.V_design_y[0] / G : 0;
+        const Vd_x_2019 = eq2019 && eq2019.V_design_x ? eq2019.V_design_x[0] / G : 0;
+        const Vd_y_2019 = eq2019 && eq2019.V_design_y ? eq2019.V_design_y[0] / G : 0;
+
         html += `
             <div style="margin-top: 32px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+                <h4 style="color: #ffb703; margin-bottom: 12px; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <i class="fa-solid fa-gauge-high"></i> Comportamiento Sísmico Global Registrado (Sismo Real)
+                </h4>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
+                    Este cuadro resume los valores globales pico medidos durante la simulación dinámica bajo el terremoto real (acelerograma con la PGA seleccionada) y los compara con las fuerzas de diseño normativas de partida. Todas las fuerzas se reportan en <strong>kilogramos-fuerza (kgf)</strong>, unidad estándar en la ingeniería estructural venezolana.
+                </p>
+
+                <table class="calc-table" style="margin-bottom: 24px; width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Parámetro Estructural Global</th>
+                            <th>Unidad</th>
+                            <th>COVENIN 1756:2001</th>
+                            <th>COVENIN 1756:2019</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="calc-param-name">Corte Basal de Diseño (Eje X)</td>
+                            <td class="calc-unit">kgf</td>
+                            <td class="calc-value" style="font-weight: bold; color: var(--color-2001);">${Math.round(Vd_x_2001).toLocaleString()}</td>
+                            <td class="calc-value" style="font-weight: bold; color: var(--color-2019);">${Math.round(Vd_x_2019).toLocaleString()}</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Corte Basal de Diseño (Eje Y)</td>
+                            <td class="calc-unit">kgf</td>
+                            <td class="calc-value" style="font-weight: bold; color: var(--color-2001);">${Math.round(Vd_y_2001).toLocaleString()}</td>
+                            <td class="calc-value" style="font-weight: bold; color: var(--color-2019);">${Math.round(Vd_y_2019).toLocaleString()}</td>
+                        </tr>
+                        <tr style="background: rgba(255, 183, 3, 0.08); border-top: 1.5px solid rgba(255, 183, 3, 0.3); border-bottom: 1.5px solid rgba(255, 183, 3, 0.3);">
+                            <td class="calc-param-name" style="font-weight: bold; color: #ffb703;">Corte Basal Máximo Registrado (Sismo Real)</td>
+                            <td class="calc-unit" style="font-weight: bold; color: #ffb703;">kgf</td>
+                            <td class="calc-value" style="font-weight: bold; color: #ffb703;">${Math.round(maxV_2001).toLocaleString()}</td>
+                            <td class="calc-value" style="font-weight: bold; color: #ffb703;">${Math.round(maxV_2019).toLocaleString()}</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Relación Demanda Real / Diseño (Eje X)</td>
+                            <td class="calc-unit">-</td>
+                            <td class="calc-value" style="font-weight: bold; color: ${maxV_2001 / Math.max(1, Vd_x_2001) > 1.0 ? 'var(--color-damage)' : 'var(--color-safe)'};">${Vd_x_2001 > 0 ? (maxV_2001 / Vd_x_2001).toFixed(2) : 'N/A'}</td>
+                            <td class="calc-value" style="font-weight: bold; color: ${maxV_2019 / Math.max(1, Vd_x_2019) > 1.0 ? 'var(--color-damage)' : 'var(--color-safe)'};">${Vd_x_2019 > 0 ? (maxV_2019 / Vd_x_2019).toFixed(2) : 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Deriva Máxima de Entrepiso Registrada</td>
+                            <td class="calc-unit">%</td>
+                            <td class="calc-value" style="font-weight: bold; color: ${eq2001.maxDriftRatio > eq2001.driftCollapseLimit ? 'var(--color-damage)' : 'var(--color-safe)'};">${(eq2001.maxDriftRatio * 100).toFixed(3)}%</td>
+                            <td class="calc-value" style="font-weight: bold; color: ${eq2019.maxDriftRatio > eq2019.driftCollapseLimit ? 'var(--color-damage)' : 'var(--color-safe)'};">${(eq2019.maxDriftRatio * 100).toFixed(3)}%</td>
+                        </tr>
+                        <tr>
+                            <td class="calc-param-name">Límite Normativo de Deriva (Colapso)</td>
+                            <td class="calc-unit">%</td>
+                            <td class="calc-value" style="color: var(--text-muted);">${(eq2001.driftCollapseLimit * 100).toFixed(1)}%</td>
+                            <td class="calc-value" style="color: var(--text-muted);">${(eq2019.driftCollapseLimit * 100).toFixed(1)}%</td>
+                        </tr>
+                        <tr style="background: rgba(255,255,255,0.02); border-top: 1px dashed rgba(255,255,255,0.1);">
+                            <td class="calc-param-name" style="font-weight: bold;">Estado Final Estructural</td>
+                            <td class="calc-unit">-</td>
+                            <td class="calc-value" style="font-weight: bold; color: ${eq2001.isCollapsed ? 'var(--color-damage)' : 'var(--color-safe)'};">${eq2001.isCollapsed ? 'COLAPSO' : 'ESTABLE'}</td>
+                            <td class="calc-value" style="font-weight: bold; color: ${eq2019.isCollapsed ? 'var(--color-damage)' : 'var(--color-safe)'};">${eq2019.isCollapsed ? 'COLAPSO' : 'ESTABLE'}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 24px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
                 <h4 style="color: var(--color-2019); margin-bottom: 12px; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
                     <i class="fa-solid fa-circle-notch"></i> Resumen de Derivas Locales y Rótulas en Columnas
                 </h4>
@@ -2525,7 +3493,7 @@ function updateCalculationReport() {
                     Este cuadro detalla el estado final y la deriva de entrepiso máxima registrada en cada columna de forma individual. Nótese que debido al efecto de la excentricidad torsional, las columnas de un mismo piso pueden experimentar derivas distintas.
                 </p>
                 
-                <div class="grid-columns-report" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="grid-columns-report" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
                     <!-- Edificio 2001 -->
                     <div>
                         <h5 style="color: var(--color-2001); margin-bottom: 8px; font-size: 13px; font-weight: 600;">
@@ -2544,6 +3512,52 @@ function updateCalculationReport() {
                 </div>
             </div>
         `;
+    }
+
+    // --- VISUALIZACIÓN 3D DEL COMPORTAMIENTO REAL DE LA VIGA ---
+    if (simStepIndex > 0 && lastBeamDesignX && lastStructuralConfig && eq2001 && eq2019) {
+        html += `
+            <div style="margin-top: 32px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+                <h4 style="color: #ffb703; margin-bottom: 12px; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <i class="fa-solid fa-cube"></i> Comportamiento Real de la Viga bajo Sismo Simulado
+                </h4>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
+                    Visualización isométrica 3D del estado de la viga bajo el sismo real simulado, contrastando el comportamiento
+                    de la estructura diseñada según COVENIN 2001 y COVENIN 2019. Posicione el cursor sobre la viga para explorar momentos reales, DCR local y daño en cualquier punto.
+                </p>
+
+                <!-- Controles interactivos de visualización -->
+                <div style="display: flex; gap: 10px; margin-bottom: 16px; justify-content: center; align-items: center; flex-wrap: wrap; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Visualización:</span>
+                    <button class="btn" style="width: auto; padding: 4px 10px; font-size: 11px; border-radius: 4px; background: ${beamViewMode === 'xray' ? 'var(--color-2019)' : 'rgba(255,255,255,0.08)'}; color: ${beamViewMode === 'xray' ? '#000000' : '#ffffff'}; font-weight: 600; cursor: pointer; border: none;" onclick="changeBeamViewMode('xray')">
+                        <i class="fa-solid fa-eye-slash"></i> Rayos-X (Acero y Estribos)
+                    </button>
+                    <button class="btn" style="width: auto; padding: 4px 10px; font-size: 11px; border-radius: 4px; background: ${beamViewMode === 'solid' ? 'var(--color-2019)' : 'rgba(255,255,255,0.08)'}; color: ${beamViewMode === 'solid' ? '#000000' : '#ffffff'}; font-weight: 600; cursor: pointer; border: none;" onclick="changeBeamViewMode('solid')">
+                        <i class="fa-solid fa-shapes"></i> Superficie Sólida (Daño)
+                    </button>
+                    <span style="width: 15px; height: 12px; border-right: 1px solid rgba(255,255,255,0.15);"></span>
+                    <button class="btn" style="width: auto; padding: 4px 10px; font-size: 11px; border-radius: 4px; background: ${beamAnimActive ? '#ffb703' : 'rgba(255,255,255,0.08)'}; color: ${beamAnimActive ? '#000000' : '#ffffff'}; font-weight: 600; cursor: pointer; border: none;" onclick="toggleBeamAnimation()">
+                        <i class="fa-solid ${beamAnimActive ? 'fa-pause' : 'fa-play'}"></i> ${beamAnimActive ? 'Pausar Vibración' : 'Animar Vibración'}
+                    </button>
+                    <button class="btn" style="width: auto; padding: 4px 10px; font-size: 11px; border-radius: 4px; background: rgba(255,255,255,0.08); color: #ffffff; font-weight: 600; cursor: pointer; border: none;" onclick="resetBeamView()">
+                        <i class="fa-solid fa-rotate-left"></i> Restablecer Vista
+                    </button>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <canvas id="beam3d-canvas-x" width="780" height="420" style="width:100%;max-width:780px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);display:block;margin:0 auto;"></canvas>
+                </div>
+        `;
+
+        if (lastBeamDesignY) {
+            html += `
+                <div style="margin-top: 12px;">
+                    <canvas id="beam3d-canvas-y" width="780" height="420" style="width:100%;max-width:780px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);display:block;margin:0 auto;"></canvas>
+                </div>
+            `;
+        }
+
+        html += `</div>`;
     }
 
     // Intentar capturar los gráficos para anexarlos a la memoria de cálculo
@@ -2618,6 +3632,39 @@ function updateCalculationReport() {
     }
 
     reportDiv.innerHTML = html;
+
+    // Renderizar los canvas 3D de vigas después de que el DOM se actualice
+    if (simStepIndex > 0 && lastBeamDesignX && lastStructuralConfig && eq2001 && eq2019) {
+        requestAnimationFrame(() => {
+            try {
+                renderBeam3DCanvas('beam3d-canvas-x', lastBeamDesignX, eq2001, eq2019, lastStructuralConfig, 'X');
+                if (lastBeamDesignY) {
+                    renderBeam3DCanvas('beam3d-canvas-y', lastBeamDesignY, eq2001, eq2019, lastStructuralConfig, 'Y');
+                }
+            } catch (e) {
+                console.error('Error renderizando visualización 3D de vigas:', e);
+            }
+        });
+    }
+}
+
+// Funciones globales para cambiar vista de vigas 3D e iniciar/pausar animación
+function changeBeamViewMode(mode) {
+    beamViewMode = mode;
+    updateCalculationReport();
+}
+
+function toggleBeamAnimation() {
+    beamAnimActive = !beamAnimActive;
+    updateCalculationReport();
+}
+
+function resetBeamView() {
+    beamRotX = { X: -0.15, Y: -0.15 };
+    beamRotY = { X: 0.35, Y: 0.35 };
+    beamPanX = { X: 0, Y: 0 };
+    beamPanY = { X: 0, Y: 0 };
+    updateCalculationReport();
 }
 
 function generateColumnsTableHTML(b3D, bModel) {
