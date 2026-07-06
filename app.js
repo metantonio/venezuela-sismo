@@ -214,6 +214,10 @@ function initUI() {
     setupSlider("covenin19-a0");
     setupSlider("covenin19-a1");
 
+    // Sliders de Aceleración PGA Sismos
+    setupSlider("sismo1-pga", "g");
+    setupSlider("sismo2-pga", "g");
+
     // Sliders de Secciones Personalizadas
     setupSlider("col-width", " cm");
     setupSlider("col-depth", " cm");
@@ -358,6 +362,8 @@ function initUI() {
             setSelect("covenin19-soil-class", "D"); // Suelo rígido/medio (alluvial fan profundo)
             setSlider("covenin19-a0", 0.40);
             setSlider("covenin19-a1", 0.40);
+            setSlider("sismo1-pga", 0.40, "g");
+            setSlider("sismo2-pga", 0.60, "g");
             setCheck("double-earthquake", true);
             setSelect("sismo1-direction", "X");
             setSelect("sismo2-direction", "X");
@@ -1693,9 +1699,9 @@ function generateSpectraAndEarthquake() {
         case 'S4': T_soil = 1.3; break;
     }
 
-    // PGAs: Sismo 1 (M7.1) = Ao01 * g (ej. 0.30g). Sismo 2 (M7.5) = 1.5 * PGA1 (ej. 0.45g)
-    const pga1 = params19.Ao; // usamos Ao en roca de 2019 para calibrar la aceleración base (ej. 0.30g)
-    const pga2 = pga1 * 1.5; // M7.5 es más fuerte
+    // PGAs configurables por el usuario: Sismo 1 (ej. 0.40g) y Sismo 2 (ej. 0.60g)
+    const pga1 = parseFloat(document.getElementById("sismo1-pga")?.value) || 0.40;
+    const pga2 = parseFloat(document.getElementById("sismo2-pga")?.value) || 0.60;
     const hasSecond = document.getElementById("double-earthquake").checked;
 
     generateSyntheticEarthquake(T_soil, pga1, pga2, hasSecond);

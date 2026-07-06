@@ -470,6 +470,13 @@
                                 <option value="Y">Eje Y (Transv.)</option>
                             </select>
                         </div>
+                        <div style="margin-top: 8px; text-align: left;">
+                            <label for="sismo1-pga"
+                                style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">
+                                Acel. PGA: <span id="sismo1-pga-val" style="color: #00f2fe; font-weight: 700;">0.40g</span>
+                            </label>
+                            <input type="range" id="sismo1-pga" min="0.10" max="1.05" value="0.40" step="0.05" style="width: 100%;">
+                        </div>
                     </div>
                     <div class="m-box second-sismo-box">
                         <span class="m-title">Sismo 2 (t=40s)</span>
@@ -482,6 +489,13 @@
                                 <option value="X" selected>Eje X (Long.)</option>
                                 <option value="Y">Eje Y (Transv.)</option>
                             </select>
+                        </div>
+                        <div style="margin-top: 8px; text-align: left;">
+                            <label for="sismo2-pga"
+                                style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">
+                                Acel. PGA: <span id="sismo2-pga-val" style="color: #ff6b6b; font-weight: 700;">0.60g</span>
+                            </label>
+                            <input type="range" id="sismo2-pga" min="0.10" max="1.05" value="0.60" step="0.05" style="width: 100%;">
                         </div>
                     </div>
                 </div>
@@ -1937,6 +1951,6 @@
     </div>
 
     <!-- Custom JavaScript -->
-    <script src="app.js?v=914"></script>
+    <script src="app.js?v=915"></script>
 </body>
 </html>
