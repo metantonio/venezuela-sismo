@@ -7081,26 +7081,30 @@ function initDamageMap() {
     }).addTo(map);
 
     // --- Color coding by building status and probability ---
-    function getColor(b) {
-        if (typeof b === 'number') {
-            const prob = b;
+    function getColor(input, norm = currentNorm) {
+        if (input === null || input === undefined) return '#ffb703';
+        if (typeof input === 'number') {
+            const prob = input;
             if (prob >= 100) return '#111111';
             if (prob >= 80)  return '#e63946';
             if (prob >= 60)  return '#fb8500';
             if (prob >= 40)  return '#ffb703';
             return '#2ec4b6';
         }
-        if (b.status === 'collapsed') return '#111111';
-        if (b.status === 'damaged')   return '#fb8500'; // Naranja para estructuras en pie con daño
-        if (b.status === 'survived')  return '#2ec4b6';
+        if (typeof input === 'object') {
+            if (input.status === 'collapsed') return '#111111';
+            if (input.status === 'damaged')   return '#fb8500'; // Naranja para estructuras en pie con daño
+            if (input.status === 'survived')  return '#2ec4b6';
 
-        const prob = currentNorm === '2001' ? b.p2001 : b.p2019;
-        if (prob === null || prob === undefined) return '#fb8500';
-        if (prob >= 100) return '#111111';
-        if (prob >= 80)  return '#e63946';
-        if (prob >= 60)  return '#fb8500';
-        if (prob >= 40)  return '#ffb703';
-        return '#2ec4b6';
+            const prob = norm === '2001' ? input.p2001 : input.p2019;
+            if (prob === null || prob === undefined) return '#fb8500';
+            if (prob >= 100) return '#111111';
+            if (prob >= 80)  return '#e63946';
+            if (prob >= 60)  return '#fb8500';
+            if (prob >= 40)  return '#ffb703';
+            return '#2ec4b6';
+        }
+        return '#ffb703';
     }
 
     function getStatusLabel(b) {
@@ -7315,8 +7319,8 @@ function initDamageMap() {
 
         tbody.innerHTML = list.map((b, i) => {
             const status = getStatusLabel(b);
-            const color2001 = getColor(b.p2001);
-            const color2019 = getColor(b.p2019);
+            const color2001 = getColor(b.p2001 !== null ? b.p2001 : b, '2001');
+            const color2019 = getColor(b.p2019 !== null ? b.p2019 : b, '2019');
             const zoneHtml = b.zone ? `<span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px;">📍 ${b.zone}</span>` : '';
 
             const floorsCell = b.has_real_floors ? `${b.floors}P` : `<span style="color: var(--text-muted); font-size: 11px;" title="Pisos no especificados en el reporte real">N/D</span>`;
