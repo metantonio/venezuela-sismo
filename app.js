@@ -7019,11 +7019,49 @@ function initDamageMap() {
         }
 ];
 
-    // Enrich with collapse probabilities
+    // Enrich with collapse probabilities and floor validation
+    // Known structural floor counts (measured from structural drawings or field surveys)
+    const knownFloorBuildings = new Set([
+        'OPPPE 26', 'OPPPE 27', 'OPPE 30', 'Hotel Eduard\'s', 'Rita Sol', 'Ritamar', 'Bravamar', 
+        'Vallarta', 'Petunia', 'Coral Park', 'Coral Mar', 'Puerto Coral', 'Coral Beach', 
+        'Meliá Caribe', 'Punta Brisas', 'Punto Piedra', 'Aguamarina', 'Paseo del Mar', 
+        'Aduana de La Guaira', 'Torre Administrativa', 'Cumanaguto', 'Hugo Chávez', 'Oasis Beach', 
+        'Mar Azul', 'Cimaventura', 'Belo Horizonte', 'Catia Mar', 'Carmen de Uria', 'Uria Mar'
+    ]);
+
     buildings.forEach(b => {
+        // Check if building has an exact known floor count or if it was estimated
+        const hasKnownFloors = knownFloorBuildings.has(b.name) || 
+                              [...knownFloorBuildings].some(k => b.name.includes(k));
+        b.has_real_floors = hasKnownFloors;
+
         const data = collapseData[b.floors] || collapseData[5];
-        b.p2001 = data.p2001;
-        b.p2019 = data.p2019;
+
+        if (b.status === 'collapsed') {
+            b.p2001 = 100.0;
+            b.p2019 = data ? data.p2019 : 63.6;
+            b.p2001Str = '100.0%';
+            b.p2019Str = `${b.p2019.toFixed(1)}%`;
+        } else if (b.status === 'damaged') {
+            // Confirmado en pie con daño parcial/severo (NO colapsó)
+            if (hasKnownFloors) {
+                b.p2001 = Math.min(data ? data.p2001 : 60.0, 75.0);
+                b.p2019 = data ? data.p2019 : 40.0;
+                b.p2001Str = `${b.p2001.toFixed(1)}%`;
+                b.p2019Str = `${b.p2019.toFixed(1)}%`;
+            } else {
+                // Sin número de pisos especificado en el reporte real: marcar N/D
+                b.p2001 = null;
+                b.p2019 = null;
+                b.p2001Str = 'N/D';
+                b.p2019Str = 'N/D';
+            }
+        } else {
+            b.p2001 = data ? data.p2001 : 40.0;
+            b.p2019 = data ? data.p2019 : 30.0;
+            b.p2001Str = `${b.p2001.toFixed(1)}%`;
+            b.p2019Str = `${b.p2019.toFixed(1)}%`;
+        }
     });
 
     // --- Create Leaflet Map ---
@@ -7042,8 +7080,22 @@ function initDamageMap() {
         attribution: 'Map data &copy; Google Maps'
     }).addTo(map);
 
-    // --- Color coding by probability ---
-    function getColor(prob) {
+    // --- Color coding by building status and probability ---
+    function getColor(b) {
+        if (typeof b === 'number') {
+            const prob = b;
+            if (prob >= 100) return '#111111';
+            if (prob >= 80)  return '#e63946';
+            if (prob >= 60)  return '#fb8500';
+            if (prob >= 40)  return '#ffb703';
+            return '#2ec4b6';
+        }
+        if (b.status === 'collapsed') return '#111111';
+        if (b.status === 'damaged')   return '#fb8500'; // Naranja para estructuras en pie con daño
+        if (b.status === 'survived')  return '#2ec4b6';
+
+        const prob = currentNorm === '2001' ? b.p2001 : b.p2019;
+        if (prob === null || prob === undefined) return '#fb8500';
         if (prob >= 100) return '#111111';
         if (prob >= 80)  return '#e63946';
         if (prob >= 60)  return '#fb8500';
@@ -7051,13 +7103,16 @@ function initDamageMap() {
         return '#2ec4b6';
     }
 
-    function getStatusLabel(prob, buildingStatus) {
-        // If we have a confirmed real status, use it
+    function getStatusLabel(b) {
+        const buildingStatus = typeof b === 'object' ? b.status : arguments[1];
         if (buildingStatus === 'collapsed') return { text: 'COLAPSÓ', cls: 'popup-status-collapsed', icon: 'fa-house-chimney-crack' };
-        if (buildingStatus === 'damaged')   return { text: 'DAÑO SEVERO', cls: 'popup-status-damaged', icon: 'fa-house-crack' };
-        // Fallback to probability-based
+        if (buildingStatus === 'damaged')   return { text: 'DAÑO SEVERO (EN PIE)', cls: 'popup-status-damaged', icon: 'fa-house-crack' };
+        if (buildingStatus === 'survived')  return { text: 'RESISTIÓ', cls: 'popup-status-survived', icon: 'fa-shield-halved' };
+
+        const prob = typeof b === 'object' ? (currentNorm === '2001' ? b.p2001 : b.p2019) : b;
+        if (prob === null || prob === undefined) return { text: 'DAÑO SEVERO (EN PIE)', cls: 'popup-status-damaged', icon: 'fa-house-crack' };
         if (prob >= 100) return { text: 'COLAPSÓ', cls: 'popup-status-collapsed', icon: 'fa-house-chimney-crack' };
-        if (prob >= 70)  return { text: 'DAÑO SEVERO', cls: 'popup-status-collapsed', icon: 'fa-house-crack' };
+        if (prob >= 70)  return { text: 'DAÑO SEVERO', cls: 'popup-status-damaged', icon: 'fa-house-crack' };
         if (prob >= 40)  return { text: 'DAÑO MODERADO', cls: 'popup-status-damaged', icon: 'fa-exclamation-triangle' };
         return { text: 'RESISTIÓ', cls: 'popup-status-survived', icon: 'fa-shield-halved' };
     }
@@ -7067,16 +7122,19 @@ function initDamageMap() {
     const markers = [];
 
     function createPopupContent(b) {
-        const prob = currentNorm === '2001' ? b.p2001 : b.p2019;
-        const otherProb = currentNorm === '2001' ? b.p2019 : b.p2001;
-        const status = getStatusLabel(prob, b.status);
-        const color = getColor(prob);
+        const status = getStatusLabel(b);
+        const color = getColor(b);
         const normLabel = currentNorm === '2001' ? 'COVENIN 2001' : 'COVENIN 2019';
         const otherNormLabel = currentNorm === '2001' ? 'COVENIN 2019' : 'COVENIN 2001';
+
+        const probStr = currentNorm === '2001' ? b.p2001Str : b.p2019Str;
+        const otherProbStr = currentNorm === '2001' ? b.p2019Str : b.p2001Str;
+        const floorsDisplay = b.has_real_floors ? `${b.floors} Pisos` : 'N/D (Reporte Ciudadano)';
+
         const confirmedBadge = b.real
             ? `<div style="font-size: 9px; color: var(--text-muted); margin-top: 4px; text-align: center;">
                  <i class="fa-solid fa-circle-check" style="color: ${b.status === 'collapsed' ? '#e63946' : '#ffb703'};"></i>
-                 Estado confirmado por reportes
+                 Estado real comprobado por reporte
                </div>`
             : '';
 
@@ -7087,20 +7145,17 @@ function initDamageMap() {
             </div>
             <div class="popup-row">
                 <span class="popup-row-label">Pisos</span>
-                <span class="popup-row-value">${b.floors}</span>
+                <span class="popup-row-value">${floorsDisplay}</span>
             </div>
             <div class="popup-row">
                 <span class="popup-row-label">${normLabel}</span>
-                <span class="popup-row-value" style="color: ${color};">${prob.toFixed(1)}%</span>
+                <span class="popup-row-value" style="color: ${color};">${probStr}</span>
             </div>
             <div class="popup-row">
                 <span class="popup-row-label">${otherNormLabel}</span>
-                <span class="popup-row-value" style="color: var(--text-muted);">${otherProb.toFixed(1)}%</span>
+                <span class="popup-row-value" style="color: var(--text-muted);">${otherProbStr}</span>
             </div>
-            <div class="popup-progress-bar">
-                <div class="popup-progress-fill" style="width: ${prob}%; background: ${color};"></div>
-            </div>
-            <div style="text-align: center; margin-top: 4px;">
+            <div style="text-align: center; margin-top: 6px;">
                 <span class="popup-status-badge ${status.cls}">
                     <i class="fa-solid ${status.icon}"></i> ${status.text}
                 </span>
@@ -7110,8 +7165,7 @@ function initDamageMap() {
     }
 
     buildings.forEach((b, idx) => {
-        const prob = b.p2001; // Start with norm 2001
-        const color = getColor(prob);
+        const color = getColor(b);
         const isCollapsed = b.status === 'collapsed';
 
         const marker = L.circleMarker([b.lat, b.lng], {
@@ -7129,7 +7183,8 @@ function initDamageMap() {
             maxWidth: 260
         });
 
-        marker.bindTooltip(`${b.name} (${b.floors}P)`, {
+        const tooltipFloors = b.has_real_floors ? `${b.floors}P` : 'N/D';
+        marker.bindTooltip(`${b.name} (${tooltipFloors})`, {
             direction: 'top',
             offset: [0, -10],
             className: 'damage-tooltip'
@@ -7143,8 +7198,7 @@ function initDamageMap() {
     function updateMarkersForNorm(norm) {
         currentNorm = norm;
         markers.forEach(({ marker, building }) => {
-            const prob = norm === '2001' ? building.p2001 : building.p2019;
-            const color = getColor(prob);
+            const color = getColor(building);
             const isCollapsed = building.status === 'collapsed';
 
             marker.setStyle({
@@ -7260,11 +7314,14 @@ function initDamageMap() {
         }
 
         tbody.innerHTML = list.map((b, i) => {
-            const prob = norm === '2001' ? b.p2001 : b.p2019;
-            const status = getStatusLabel(prob, b.status);
+            const status = getStatusLabel(b);
             const color2001 = getColor(b.p2001);
             const color2019 = getColor(b.p2019);
             const zoneHtml = b.zone ? `<span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px;">📍 ${b.zone}</span>` : '';
+
+            const floorsCell = b.has_real_floors ? `${b.floors}P` : `<span style="color: var(--text-muted); font-size: 11px;" title="Pisos no especificados en el reporte real">N/D</span>`;
+            const p2001Cell = b.p2001 !== null ? `${b.p2001.toFixed(1)}%` : `<span style="color: #ffb703; font-size: 11px;" title="Estructura en pie (Daño sin colapso)">N/D</span>`;
+            const p2019Cell = b.p2019 !== null ? `${b.p2019.toFixed(1)}%` : `<span style="color: #ffb703; font-size: 11px;" title="Estructura en pie (Daño sin colapso)">N/D</span>`;
 
             return `
                 <tr class="damage-table-row" data-index="${i}" style="transition: background 0.15s ease;">
@@ -7273,9 +7330,9 @@ function initDamageMap() {
                         <span style="font-weight: 600; color: #fff;">${b.name}</span>
                         ${zoneHtml}
                     </td>
-                    <td class="calc-value">${b.floors}P</td>
-                    <td class="calc-value" style="color: ${color2001}; font-weight: 600;">${b.p2001.toFixed(1)}%</td>
-                    <td class="calc-value" style="color: ${color2019}; font-weight: 600;">${b.p2019.toFixed(1)}%</td>
+                    <td class="calc-value">${floorsCell}</td>
+                    <td class="calc-value" style="color: ${b.p2001 !== null ? color2001 : '#ffb703'}; font-weight: 600;">${p2001Cell}</td>
+                    <td class="calc-value" style="color: ${b.p2019 !== null ? color2019 : '#ffb703'}; font-weight: 600;">${p2019Cell}</td>
                     <td class="calc-unit">
                         <span class="popup-status-badge ${status.cls}" style="margin: 0; font-size: 9px;">
                             <i class="fa-solid ${status.icon}"></i> ${status.text}
