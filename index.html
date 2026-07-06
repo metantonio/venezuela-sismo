@@ -889,16 +889,19 @@
                                     </div>
 
                                     <div class="simplification-item">
-                                        <i class="fa-solid fa-ruler-combined"></i>
+                                        <i class="fa-solid fa-weight-hanging" style="color: #38bdf8;"></i>
                                         <div class="simplification-content">
-                                            <h5>Inercias de Secciones Físicas y Masa de Diseño</h5>
+                                            <h5>Inercias de Secciones Físicas y Masa Real de Diseño</h5>
                                             <p>Al activar "Secciones Físicas", la inercia de las columnas se calcula
                                                 usando la sección transformada total (concreto + acero simétrico), y la
                                                 de las vigas empleando la sección agrietada transformada en flexión
-                                                simple. La masa de diseño se escala de forma realista según el área
-                                                tributaria de la losa usando la relación <strong>m = m<sub>ref</sub>
-                                                    &times; (0.3 + 0.7 &times; Área / 25)</strong>, donde 0.3 representa
-                                                el peso estructural fijo y 0.7 la losa y cargas variables asociadas.</p>
+                                                simple. Para la masa sísmica de diseño, cuando está activado el 
+                                                <strong>"Autocálculo de Masa Sísmica"</strong>, se utiliza la masa real física exacta calculada
+                                                a partir de los espesores de losa, secciones de columnas/vigas y cargas permanentes y variables. 
+                                                Si el autocálculo se desactiva, se toma el valor manual del usuario como referencia y se escala
+                                                según la relación tributaria <strong>m = m<sub>ref</sub> &times; (0.3 + 0.7 &times; Área / 25)</strong>.
+                                                Esto garantiza que no ocurra un doble escalamiento de masa por área y que el cortante basal y momentos 
+                                                de diseño en vigas correspondan estrictamente a la realidad física de la estructura.</p>
                                         </div>
                                     </div>
 
@@ -1951,6 +1954,6 @@
     </div>
 
     <!-- Custom JavaScript -->
-    <script src="app.js?v=924"></script>
+    <script src="app.js?v=925"></script>
 </body>
 </html>
