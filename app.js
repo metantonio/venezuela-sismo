@@ -7315,3 +7315,142 @@ function initDamageMap() {
     const group = L.featureGroup(markers.map(m => m.marker));
     map.fitBounds(group.getBounds().pad(0.1));
 }
+
+// --- Floating Feedback Modal & Anti-URL FormSubmit.co Integration ---
+function initFeedbackSystem() {
+    const triggerBtn = document.getElementById('floating-feedback-btn');
+    const modalOverlay = document.getElementById('feedback-modal-overlay');
+    const closeBtn = document.getElementById('feedback-modal-close');
+    const cancelBtn = document.getElementById('feedback-cancel-btn');
+    const form = document.getElementById('feedback-form');
+    const messageInput = document.getElementById('fb-message');
+    const urlWarning = document.getElementById('fb-url-warning');
+    const submitBtn = document.getElementById('feedback-submit-btn');
+    const statusMsg = document.getElementById('fb-status-msg');
+
+    if (!triggerBtn || !modalOverlay || !form) return;
+
+    // Open Modal
+    triggerBtn.addEventListener('click', () => {
+        modalOverlay.classList.add('active');
+    });
+
+    // Close Modal
+    const closeModal = () => {
+        modalOverlay.classList.remove('active');
+        if (statusMsg) statusMsg.style.display = 'none';
+    };
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) closeModal();
+    });
+
+    // Anti-URL Detection Regex (Detects http, https, www, .com, .net, .org, .co, etc.)
+    const urlPattern = /(https?:\/\/|www\.|[a-zA-Z0-9-]+\.(com|net|org|io|gov|edu|co|app|dev|me|site|online|xyz|info|ve|es|uk|de|tk|ga))/i;
+
+    function checkMessageForURLs() {
+        const text = messageInput ? messageInput.value : '';
+        const containsUrl = urlPattern.test(text);
+
+        if (containsUrl) {
+            if (urlWarning) urlWarning.style.display = 'flex';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.5';
+                submitBtn.style.cursor = 'not-allowed';
+            }
+            return true;
+        } else {
+            if (urlWarning) urlWarning.style.display = 'none';
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+            }
+            return false;
+        }
+    }
+
+    if (messageInput) {
+        messageInput.addEventListener('input', checkMessageForURLs);
+    }
+
+    // Form Submission via AJAX to FormSubmit.co
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (checkMessageForURLs()) {
+            alert('Por seguridad no se permiten enlaces ni direcciones URL en el mensaje.');
+            return;
+        }
+
+        const name = document.getElementById('fb-name')?.value || 'Anónimo';
+        const email = document.getElementById('fb-email')?.value || 'No provisto';
+        const message = messageInput ? messageInput.value : '';
+
+        if (!message.trim()) return;
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
+
+        try {
+            const response = await fetch('https://formsubmit.co/ajax/00c51e35972f9569444e92fc37f83cce', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    _subject: 'Nuevo Feedback - VZLA SISMO 3D',
+                    _template: 'table',
+                    _captcha: 'false',
+                    Nombre: name,
+                    Correo: email,
+                    Mensaje: message,
+                    Pagina: window.location.href,
+                    Fecha: new Date().toLocaleString()
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok || result.success === 'true' || result.success === true) {
+                if (statusMsg) {
+                    statusMsg.className = 'fb-status-msg success';
+                    statusMsg.innerHTML = '<i class="fa-solid fa-circle-check"></i> ¡Muchas gracias! Tu feedback ha sido enviado con éxito.';
+                }
+                form.reset();
+                if (urlWarning) urlWarning.style.display = 'none';
+                setTimeout(() => {
+                    closeModal();
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviar Feedback';
+                    }
+                }, 2500);
+            } else {
+                throw new Error(result.message || 'Error en el servidor de envío');
+            }
+        } catch (err) {
+            console.error('Error al enviar feedback:', err);
+            if (statusMsg) {
+                statusMsg.className = 'fb-status-msg error';
+                statusMsg.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Ocurrió un error al enviar. Por favor intenta nuevamente.';
+            }
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Reintentar Enviar';
+            }
+        }
+    });
+}
+
+// Auto-initialize feedback system on load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFeedbackSystem);
+} else {
+    initFeedbackSystem();
+}
+

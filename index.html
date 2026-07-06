@@ -18,7 +18,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="index.css?v=904">
+    <link rel="stylesheet" href="index.css?v=905">
     <!-- Leaflet.js Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -1872,24 +1872,71 @@
                     </div>
                 </section>
 
-                <!-- FLOATING CONTROLS FOR MOBILE -->
-                <div class="mobile-floating-controls">
-                    <button id="mobile-btn-run" class="btn btn-primary btn-round" title="Iniciar Simulación">
-                        <i class="fa-solid fa-play"></i>
-                    </button>
-                    <button id="mobile-btn-pause" class="btn btn-secondary btn-round" disabled title="Pausar">
-                        <i class="fa-solid fa-pause"></i>
-                    </button>
-                    <button id="mobile-btn-reset" class="btn btn-danger btn-round" title="Reiniciar">
-                        <i class="fa-solid fa-rotate-left"></i>
+        <!-- FLOATING CONTROLS FOR MOBILE -->
+        <div class="mobile-floating-controls">
+            <button id="mobile-btn-run" class="btn btn-primary btn-round" title="Iniciar Simulación">
+                <i class="fa-solid fa-play"></i>
+            </button>
+            <button id="mobile-btn-pause" class="btn btn-secondary btn-round" disabled title="Pausar">
+                <i class="fa-solid fa-pause"></i>
+            </button>
+            <button id="mobile-btn-reset" class="btn btn-danger btn-round" title="Reiniciar">
+                <i class="fa-solid fa-rotate-left"></i>
+            </button>
+        </div>
+    </main>
+
+    <!-- FLOATING FEEDBACK BUTTON -->
+    <button id="floating-feedback-btn" class="floating-feedback-btn" title="Enviar Feedback / Sugerencias">
+        <i class="fa-solid fa-comment-dots"></i>
+        <span>Feedback</span>
+    </button>
+
+    <!-- FEEDBACK MODAL DIALOG -->
+    <div id="feedback-modal-overlay" class="feedback-modal-overlay">
+        <div class="feedback-modal-card">
+            <div class="feedback-modal-header">
+                <h3><i class="fa-solid fa-paper-plane" style="color: #00f2fe;"></i> Enviar Comentarios</h3>
+                <button id="feedback-modal-close" class="feedback-close-btn">&times;</button>
+            </div>
+            <p class="feedback-modal-sub">
+                Ayúdanos a mejorar VZLA-SISMO. Tus sugerencias son recibidas directamente.
+            </p>
+            <form id="feedback-form" autocomplete="off">
+                <div class="feedback-form-group">
+                    <label for="fb-name">Nombre / Alias <span style="font-size: 10px; color: var(--text-muted);">(Opcional)</span></label>
+                    <input type="text" id="fb-name" placeholder="Ej. Ing. Carlos">
+                </div>
+
+                <div class="feedback-form-group">
+                    <label for="fb-email">Correo Electrónico <span style="font-size: 10px; color: var(--text-muted);">(Opcional)</span></label>
+                    <input type="email" id="fb-email" placeholder="tu-correo@ejemplo.com">
+                </div>
+
+                <div class="feedback-form-group">
+                    <label for="fb-message">Mensaje / Sugerencia <span style="color: #e63946;">*</span></label>
+                    <textarea id="fb-message" rows="4" required placeholder="Escribe tus comentarios o sugerencias sobre el simulador..."></textarea>
+                    
+                    <!-- URL BLOCK WARNING NOTICE -->
+                    <div id="fb-url-warning" class="fb-url-warning" style="display: none;">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>Por seguridad no se permiten enlaces ni direcciones URL (http://, .com, etc.) en el mensaje.</span>
+                    </div>
+                </div>
+
+                <div id="fb-status-msg" class="fb-status-msg"></div>
+
+                <div class="feedback-modal-footer">
+                    <button type="button" id="feedback-cancel-btn" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" id="feedback-submit-btn" class="btn btn-primary">
+                        <i class="fa-solid fa-paper-plane"></i> Enviar Feedback
                     </button>
                 </div>
-            </main>
+            </form>
         </div>
     </div>
 
     <!-- Custom JavaScript -->
-    <script src="app.js?v=909"></script>
+    <script src="app.js?v=912"></script>
 </body>
-
 </html>
