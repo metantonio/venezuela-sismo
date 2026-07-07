@@ -2410,5 +2410,27 @@ select:focus {
     }
 }
 
+/* Custom accelerogram upload style override */
+.custom-file-upload-btn {
+    width: auto !important;
+    margin: 0;
+    padding: 6px 12px;
+    font-size: 10.5px;
+    background: rgba(255, 183, 3, 0.12) !important;
+    color: #ffb703 !important;
+    border: 1px solid rgba(255, 183, 3, 0.25) !important;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+.custom-file-upload-btn:hover {
+    background: rgba(255, 183, 3, 0.22) !important;
+    border-color: rgba(255, 183, 3, 0.4) !important;
+}
+
 
 

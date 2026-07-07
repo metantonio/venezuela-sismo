@@ -13,6 +13,9 @@ let dt = 0.01; // paso de tiempo del solver (s)
 let totalDuration = 80; // duración total (s)
 let timeSeries = []; // array de tiempos
 let groundAccel = []; // array de aceleración del terreno (g)
+let customGroundAccel = null;  // array de aceleraciones cargado e interpolado (en g)
+let customDuration = 80;       // duración del sismo personalizado
+let customAccelFileName = "";  // nombre del archivo cargado
 
 // Estructuras de los edificios
 let eq2001 = null;
@@ -286,7 +289,8 @@ function initUI() {
         "covenin01-zone", "covenin01-soil", "covenin01-r", "covenin01-importance",
         "covenin19-soil-class", "covenin19-r", "covenin19-rho", "covenin19-fi",
         "analysis-mode", "degradation-severity", "double-earthquake",
-        "sismo1-direction", "sismo2-direction", "building-use", "evacuation-mode"
+        "sismo1-direction", "sismo2-direction", "building-use", "evacuation-mode",
+        "earthquake-input-type", "custom-direction"
     ];
     selects.forEach(id => {
         const el = document.getElementById(id);
@@ -383,6 +387,9 @@ function initUI() {
             setCheck("double-earthquake", true);
             setSelect("sismo1-direction", "X");
             setSelect("sismo2-direction", "X");
+            setSelect("earthquake-input-type", "synthetic");
+            toggleEarthquakeInputType();
+            resetCustomAccelerogramState();
 
             // Sincronizar visibilidad de paneles de masa
             const manualMassCont = document.getElementById("manual-mass-container");
@@ -416,6 +423,9 @@ function initUI() {
     if (mobPause) mobPause.addEventListener("click", pauseSimulation);
     const mobReset = document.getElementById("mobile-btn-reset");
     if (mobReset) mobReset.addEventListener("click", resetSimulation);
+
+    // Sincronizar estado inicial de la carga de sismos personalizados
+    toggleEarthquakeInputType();
 }
 
 // --- FÓRMULAS SÍSMICAS COVENIN 1756 ---
@@ -2956,23 +2966,33 @@ function generateSpectraAndEarthquake() {
     eq2019 = new BuildingModel(N, storyHeight, storyMass, targetT1, designAd2019_x, designAd2019_y, analysisMode, degSeverity, numColsX, numColsY, sX, sY, customSections, 2019);
 
     // --- 4. Generar la Serie de Tiempo del Sismo Sucesivo ---
-    // Determinamos el período del suelo para sintonizar la frecuencia del sismo
-    // COVENIN 2001 suelo determina T*
-    // S1: 0.4s, S2: 0.7s, S3: 1.0s, S4: 1.3s
-    let T_soil = 0.7;
-    switch (params01.soil) {
-        case 'S1': T_soil = 0.4; break;
-        case 'S2': T_soil = 0.7; break;
-        case 'S3': T_soil = 1.0; break;
-        case 'S4': T_soil = 1.3; break;
+    const inputType = document.getElementById("earthquake-input-type").value;
+    if (inputType === "custom" && customGroundAccel) {
+        groundAccel = [...customGroundAccel];
+        totalDuration = customDuration;
+    } else {
+        if (inputType === "custom") {
+            console.warn("No custom accelerogram file loaded, falling back to synthetic.");
+        }
+        // Determinamos el período del suelo para sintonizar la frecuencia del sismo
+        // COVENIN 2001 suelo determina T*
+        // S1: 0.4s, S2: 0.7s, S3: 1.0s, S4: 1.3s
+        let T_soil = 0.7;
+        switch (params01.soil) {
+            case 'S1': T_soil = 0.4; break;
+            case 'S2': T_soil = 0.7; break;
+            case 'S3': T_soil = 1.0; break;
+            case 'S4': T_soil = 1.3; break;
+        }
+
+        // PGAs configurables por el usuario: Sismo 1 (ej. 0.40g) y Sismo 2 (ej. 0.60g)
+        const pga1 = parseFloat(document.getElementById("sismo1-pga")?.value) || 0.40;
+        const pga2 = parseFloat(document.getElementById("sismo2-pga")?.value) || 0.60;
+        const hasSecond = document.getElementById("double-earthquake").checked;
+
+        generateSyntheticEarthquake(T_soil, pga1, pga2, hasSecond);
+        totalDuration = 80;
     }
-
-    // PGAs configurables por el usuario: Sismo 1 (ej. 0.40g) y Sismo 2 (ej. 0.60g)
-    const pga1 = parseFloat(document.getElementById("sismo1-pga")?.value) || 0.40;
-    const pga2 = parseFloat(document.getElementById("sismo2-pga")?.value) || 0.60;
-    const hasSecond = document.getElementById("double-earthquake").checked;
-
-    generateSyntheticEarthquake(T_soil, pga1, pga2, hasSecond);
 
     // Llenar el vector de tiempos
     timeSeries = [];
@@ -3665,6 +3685,157 @@ function resetBeamView() {
     beamPanX = { X: 0, Y: 0 };
     beamPanY = { X: 0, Y: 0 };
     updateCalculationReport();
+}
+
+function getActiveSismoDirection(timeVal) {
+    const inputType = document.getElementById("earthquake-input-type").value;
+    if (inputType === "custom") {
+        return document.getElementById("custom-direction").value;
+    }
+    const hasSecond = document.getElementById("double-earthquake").checked;
+    const sismo1Dir = document.getElementById("sismo1-direction").value;
+    const sismo2Dir = document.getElementById("sismo2-direction").value;
+    return (hasSecond && (timeVal >= 40.0)) ? sismo2Dir : sismo1Dir;
+}
+
+function toggleEarthquakeInputType() {
+    const inputType = document.getElementById("earthquake-input-type").value;
+    const customContainer = document.getElementById("custom-accelerogram-container");
+    const syntheticContainer = document.getElementById("synthetic-seismic-inputs");
+
+    if (inputType === "custom") {
+        customContainer.style.display = "block";
+        syntheticContainer.style.display = "none";
+    } else {
+        customContainer.style.display = "none";
+        syntheticContainer.style.display = "block";
+    }
+    if (!isPlaying) {
+        generateSpectraAndEarthquake();
+    }
+}
+
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    customAccelFileName = file.name;
+    document.getElementById("file-upload-status").textContent = file.name;
+    document.getElementById("file-upload-status").style.color = "#ffb703";
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        parseAccelerogramFile(text);
+    };
+    reader.readAsText(file);
+}
+
+function parseAccelerogramFile(text) {
+    const lines = text.split(/\r?\n/);
+    const parsedData = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line || line.startsWith('#') || line.startsWith('%') || line.startsWith('//')) {
+            continue;
+        }
+
+        const tokens = line.split(/[\s,;]+/).map(parseFloat).filter(v => !isNaN(v));
+        if (tokens.length > 0) {
+            parsedData.push(tokens);
+        }
+    }
+
+    if (parsedData.length === 0) {
+        alert("El archivo no contiene datos numéricos válidos o legibles.");
+        resetCustomAccelerogramState();
+        return;
+    }
+
+    const numCols = parsedData[0].length;
+    let rawTimes = [];
+    let rawAccels = [];
+
+    if (numCols >= 2) {
+        document.getElementById("custom-dt-container").style.display = "none";
+        parsedData.forEach(row => {
+            rawTimes.push(row[0]);
+            rawAccels.push(row[1]);
+        });
+    } else {
+        document.getElementById("custom-dt-container").style.display = "block";
+        const fileDt = parseFloat(document.getElementById("custom-file-dt").value) || 0.02;
+        parsedData.forEach((row, idx) => {
+            rawTimes.push(idx * fileDt);
+            rawAccels.push(row[0]);
+        });
+
+        // Registrar listener al input de dt si no tiene ya uno
+        const dtInput = document.getElementById("custom-file-dt");
+        if (!dtInput.dataset.hasListener) {
+            dtInput.dataset.hasListener = 'true';
+            dtInput.addEventListener("change", () => {
+                parseAccelerogramFile(text);
+            });
+        }
+    }
+
+    // Conversión inteligente de unidades y obtención de PGA real
+    let maxAbs = 0;
+    rawAccels.forEach(val => {
+        const absVal = Math.abs(val);
+        if (absVal > maxAbs) maxAbs = absVal;
+    });
+
+    let unitInfo = "g";
+    if (maxAbs > 3.0) {
+        rawAccels = rawAccels.map(val => val / G);
+        maxAbs /= G;
+        unitInfo = "m/s² (convertida a g)";
+    }
+
+    const fileDuration = rawTimes[rawTimes.length - 1];
+    customDuration = fileDuration;
+
+    // Interpolación lineal a dt = 0.01 s
+    const targetDt = 0.01;
+    const numSteps = Math.max(100, Math.round(fileDuration / targetDt));
+    customGroundAccel = new Array(numSteps);
+
+    let idx = 0;
+    for (let i = 0; i < numSteps; i++) {
+        const t = i * targetDt;
+        while (idx < rawTimes.length - 1 && rawTimes[idx + 1] < t) {
+            idx++;
+        }
+        if (idx >= rawTimes.length - 1) {
+            customGroundAccel[i] = rawAccels[rawAccels.length - 1];
+        } else {
+            const t0 = rawTimes[idx];
+            const t1 = rawTimes[idx + 1];
+            const a0 = rawAccels[idx];
+            const a1 = rawAccels[idx + 1];
+            const factor = (t0 === t1) ? 0 : (t - t0) / (t1 - t0);
+            customGroundAccel[i] = a0 + factor * (a1 - a0);
+        }
+    }
+
+    const statusText = `OK: ${fileDuration.toFixed(1)}s | dt=${(fileDuration/rawAccels.length).toFixed(3)}s | PGA=${maxAbs.toFixed(2)}g (${unitInfo})`;
+    document.getElementById("file-upload-status").textContent = statusText;
+    document.getElementById("file-upload-status").style.color = "#4cc9f0";
+
+    generateSpectraAndEarthquake();
+}
+
+function resetCustomAccelerogramState() {
+    customGroundAccel = null;
+    customDuration = 80;
+    customAccelFileName = "";
+    document.getElementById("file-upload-status").textContent = "Ningún archivo";
+    document.getElementById("file-upload-status").style.color = "var(--text-muted)";
+    document.getElementById("custom-dt-container").style.display = "none";
+    generateSpectraAndEarthquake();
 }
 
 function generateColumnsTableHTML(b3D, bModel) {
@@ -5139,10 +5310,6 @@ function rebuild3DStructures() {
             const numSegs = useFlexure ? 5 : 1;
             const Lseg = sX / numSegs;
             const beamGeomX = new THREE.BoxGeometry(Lseg, beamH, beamW); // longitud, peralte, ancho
-            const beamMat = new THREE.MeshStandardMaterial({
-                color: colorTheme === '2001' ? 0x273549 : 0x182030,
-                roughness: 0.6
-            });
 
             for (let lvl = 0; lvl < N; lvl++) {
                 const storyBeams = [];
@@ -5151,6 +5318,12 @@ function rebuild3DStructures() {
                     const z = numColsY > 1 ? -bD / 2 + (iy / (numColsY - 1)) * bD : 0;
                     for (let ix = 0; ix < numColsX - 1; ix++) {
                         const xStart = -bW / 2 + (ix / (numColsX - 1)) * bW;
+
+                        // Material individual por viga
+                        const beamMat = new THREE.MeshStandardMaterial({
+                            color: colorTheme === '2001' ? 0x273549 : 0x182030,
+                            roughness: 0.6
+                        });
 
                         const segments = [];
                         for (let s = 0; s < numSegs; s++) {
@@ -5168,6 +5341,7 @@ function rebuild3DStructures() {
 
                         storyBeams.push({
                             meshes: segments,
+                            material: beamMat,
                             ix: ix,
                             iy: iy,
                             level: lvl,
@@ -5186,10 +5360,6 @@ function rebuild3DStructures() {
             const numSegs = useFlexure ? 5 : 1;
             const Lseg = sY / numSegs;
             const beamGeomY = new THREE.BoxGeometry(beamW, beamH, Lseg); // ancho, peralte, longitud
-            const beamMat = new THREE.MeshStandardMaterial({
-                color: colorTheme === '2001' ? 0x273549 : 0x182030,
-                roughness: 0.6
-            });
 
             for (let lvl = 0; lvl < N; lvl++) {
                 const storyBeams = [];
@@ -5198,6 +5368,12 @@ function rebuild3DStructures() {
                     const x = numColsX > 1 ? -bW / 2 + (ix / (numColsX - 1)) * bW : 0;
                     for (let iy = 0; iy < numColsY - 1; iy++) {
                         const zStart = -bD / 2 + (iy / (numColsY - 1)) * bD;
+
+                        // Material individual por viga
+                        const beamMat = new THREE.MeshStandardMaterial({
+                            color: colorTheme === '2001' ? 0x273549 : 0x182030,
+                            roughness: 0.6
+                        });
 
                         const segments = [];
                         for (let s = 0; s < numSegs; s++) {
@@ -5215,6 +5391,7 @@ function rebuild3DStructures() {
 
                         storyBeams.push({
                             meshes: segments,
+                            material: beamMat,
                             ix: ix,
                             iy: iy,
                             level: lvl,
@@ -5268,11 +5445,8 @@ function varToHexColor(varName) {
 
 // ACTUALIZACIÓN DE LA GEOMETRÍA 3D POR SWAY SÍSMICO Y DAÑO
 function update3DPhysics() {
-    const hasSecond = document.getElementById("double-earthquake").checked;
-    const sismo1Dir = document.getElementById("sismo1-direction").value;
-    const sismo2Dir = document.getElementById("sismo2-direction").value;
     const activeTime = simStepIndex * dt;
-    const activeDir = (hasSecond && (activeTime >= 40.0)) ? sismo2Dir : sismo1Dir;
+    const activeDir = getActiveSismoDirection(activeTime);
     const isX = (activeDir === 'X');
 
     // Desplazamiento actual del terreno (vibración visual del suelo)
@@ -5382,6 +5556,18 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
                 if (col.bottomHinge) col.bottomHinge.visible = false;
                 if (col.topHinge) col.topHinge.visible = false;
             });
+
+            // Vigas de ese nivel también se vuelven negras/apagadas
+            if (b3D.beamsX && b3D.beamsX[lvl]) {
+                b3D.beamsX[lvl].forEach(beam => {
+                    if (beam.material) beam.material.color.setHex(0x111111);
+                });
+            }
+            if (b3D.beamsY && b3D.beamsY[lvl]) {
+                b3D.beamsY[lvl].forEach(beam => {
+                    if (beam.material) beam.material.color.setHex(0x111111);
+                });
+            }
         }
         return;
     }
@@ -5456,6 +5642,7 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
             const drift_z_phys = z_t_phys - z_b_phys;
             const colDriftRatio = Math.sqrt(drift_x_phys * drift_x_phys + drift_z_phys * drift_z_phys) / h;
             col.maxDriftRatio = Math.max(col.maxDriftRatio || 0, colDriftRatio);
+            col.currentDriftRatio = colDriftRatio;
 
             // Determinar color de esta columna según su propia deriva
             let colColor;
@@ -5554,10 +5741,25 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
             const beams = b3D.beamsX[lvl];
             beams.forEach(beam => {
                 const L = beam.span;
-                if (useFlexure) {
-                    const colA = cols[beam.ix * numColsY + beam.iy];
-                    const colB = cols[(beam.ix + 1) * numColsY + beam.iy];
+                const colA = cols[beam.ix * numColsY + beam.iy];
+                const colB = cols[(beam.ix + 1) * numColsY + beam.iy];
 
+                // Calcular drift de viga basado en las columnas que conecta
+                const beamDrift = Math.max(colA.currentDriftRatio || 0, colB.currentDriftRatio || 0);
+
+                let beamColor;
+                if (beamDrift < 0.015) {
+                    beamColor = varToHexColor('--color-safe');
+                } else if (beamDrift < 0.018) {
+                    beamColor = varToHexColor('--color-warning');
+                } else if (beamDrift < 0.030) {
+                    beamColor = varToHexColor('--color-damage');
+                } else {
+                    beamColor = 0x222222; // fallo local de la viga
+                }
+                if (beam.material) beam.material.color.setHex(beamColor);
+
+                if (useFlexure) {
                     const dxA = colA.x_top_curr - colA.x_bottom_curr;
                     const dxB = colB.x_top_curr - colB.x_bottom_curr;
 
@@ -5593,10 +5795,25 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
             const beams = b3D.beamsY[lvl];
             beams.forEach(beam => {
                 const L = beam.span;
-                if (useFlexure) {
-                    const colA = cols[beam.ix * numColsY + beam.iy];
-                    const colB = cols[beam.ix * numColsY + (beam.iy + 1)];
+                const colA = cols[beam.ix * numColsY + beam.iy];
+                const colB = cols[beam.ix * numColsY + (beam.iy + 1)];
 
+                // Calcular drift de viga basado en las columnas que conecta
+                const beamDrift = Math.max(colA.currentDriftRatio || 0, colB.currentDriftRatio || 0);
+
+                let beamColor;
+                if (beamDrift < 0.015) {
+                    beamColor = varToHexColor('--color-safe');
+                } else if (beamDrift < 0.018) {
+                    beamColor = varToHexColor('--color-warning');
+                } else if (beamDrift < 0.030) {
+                    beamColor = varToHexColor('--color-damage');
+                } else {
+                    beamColor = 0x222222; // fallo local de la viga
+                }
+                if (beam.material) beam.material.color.setHex(beamColor);
+
+                if (useFlexure) {
                     const dzA = colA.z_top_curr - colA.z_bottom_curr;
                     const dzB = colB.z_top_curr - colB.z_bottom_curr;
 
@@ -5772,6 +5989,7 @@ function toggleInputControls(disable) {
         "concrete-fc-col", "concrete-fc-beam", "steel-fy-col", "steel-fy-beam",
         "col-as", "beam-as", "beam-as-prime",
         "sismo1-direction", "sismo2-direction",
+        "earthquake-input-type", "file-accelerogram", "custom-file-dt", "custom-direction",
         "auto-mass", "building-use", "slab-thickness", "extra-dead-load",
         "evacuation-mode"
     ];
@@ -5792,10 +6010,7 @@ function simulationLoop() {
     currentTime = simStepIndex * dt;
     const a_g = groundAccel[simStepIndex];
 
-    const hasSecond = document.getElementById("double-earthquake").checked;
-    const sismo1Dir = document.getElementById("sismo1-direction").value;
-    const sismo2Dir = document.getElementById("sismo2-direction").value;
-    const activeDir = (hasSecond && (currentTime >= 40.0)) ? sismo2Dir : sismo1Dir;
+    const activeDir = getActiveSismoDirection(currentTime);
 
     // Correr paso dinámico de los edificios
     eq2001.step(a_g, activeDir);

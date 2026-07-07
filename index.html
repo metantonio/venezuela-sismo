@@ -452,54 +452,95 @@
                     </select>
                 </div>
 
-                <div class="checkbox-group">
-                    <input type="checkbox" id="double-earthquake" checked>
-                    <label for="double-earthquake">Simular segundo sismo a los 40s</label>
+                <div class="control-group">
+                    <label for="earthquake-input-type">Origen del Sismo / Acelerograma</label>
+                    <select id="earthquake-input-type" onchange="toggleEarthquakeInputType()" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 6px; font-size: 12px; width: 100%; font-family: 'Inter', sans-serif;">
+                        <option value="synthetic" selected>Sintético (Normativa COVENIN)</option>
+                        <option value="custom">Cargar Registro Personalizado (.csv, .txt)</option>
+                    </select>
                 </div>
 
-                <div class="seismic-m-details">
-                    <div class="m-box">
-                        <span class="m-title">Sismo 1 (t=0s)</span>
-                        <span class="m-val">M 7.1</span>
-                        <div style="margin-top: 6px; text-align: left;">
-                            <label for="sismo1-direction"
-                                style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Dirección:</label>
-                            <select id="sismo1-direction"
-                                style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 4px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
-                                <option value="X" selected>Eje X (Long.)</option>
-                                <option value="Y">Eje Y (Transv.)</option>
-                            </select>
-                        </div>
-                        <div style="margin-top: 8px; text-align: left;">
-                            <label for="sismo1-pga"
-                                style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">
-                                Acel. PGA: <span id="sismo1-pga-val"
-                                    style="color: #00f2fe; font-weight: 700;">0.40g</span>
-                            </label>
-                            <input type="range" id="sismo1-pga" min="0.10" max="1.05" value="0.40" step="0.05"
-                                style="width: 100%;">
-                        </div>
+                <!-- Contenedor para carga de acelerograma personalizado -->
+                <div id="custom-accelerogram-container" style="display: none; background: rgba(255, 183, 3, 0.05); border: 1px dashed rgba(255, 183, 3, 0.2); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                    <label style="font-size: 11px; color: #ffb703; font-weight: 600; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px;">Acelerograma Personalizado</label>
+                    <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4;">
+                        Soporta 1 columna (acel.) o 2 columnas (tiempo, acel.). Valores en fracción de 'g' o en m/s² (conversión automática).
+                    </p>
+                    
+                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                        <label for="file-accelerogram" class="custom-file-upload-btn">
+                            <i class="fa-solid fa-file-upload"></i> Seleccionar Archivo
+                        </label>
+                        <input type="file" id="file-accelerogram" accept=".txt,.csv" style="display: none;" onchange="handleFileSelect(event)">
+                        <span id="file-upload-status" style="font-size: 10px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;">Ningún archivo</span>
                     </div>
-                    <div class="m-box second-sismo-box">
-                        <span class="m-title">Sismo 2 (t=40s)</span>
-                        <span class="m-val text-red">M 7.5</span>
-                        <div style="margin-top: 6px; text-align: left;">
-                            <label for="sismo2-direction"
-                                style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Dirección:</label>
-                            <select id="sismo2-direction"
-                                style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 4px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
-                                <option value="X" selected>Eje X (Long.)</option>
-                                <option value="Y">Eje Y (Transv.)</option>
-                            </select>
+
+                    <div id="custom-dt-container" style="display: none; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 6px;">
+                        <label for="custom-file-dt" style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">
+                            Paso de Tiempo (dt) del Archivo (s):
+                        </label>
+                        <input type="number" id="custom-file-dt" value="0.02" step="0.001" min="0.001" max="0.5" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; width: 80px; font-family: 'Inter', sans-serif;">
+                    </div>
+
+                    <div style="margin-top: 8px;">
+                        <label for="custom-direction" style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Dirección de Aplicación:</label>
+                        <select id="custom-direction" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 4px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                            <option value="X" selected>Eje X (Longitudinal)</option>
+                            <option value="Y">Eje Y (Transversal)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="synthetic-seismic-inputs">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="double-earthquake" checked>
+                        <label for="double-earthquake">Simular segundo sismo a los 40s</label>
+                    </div>
+
+                    <div class="seismic-m-details">
+                        <div class="m-box">
+                            <span class="m-title">Sismo 1 (t=0s)</span>
+                            <span class="m-val">M 7.1</span>
+                            <div style="margin-top: 6px; text-align: left;">
+                                <label for="sismo1-direction"
+                                    style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Dirección:</label>
+                                <select id="sismo1-direction"
+                                    style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 4px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                                    <option value="X" selected>Eje X (Long.)</option>
+                                    <option value="Y">Eje Y (Transv.)</option>
+                                </select>
+                            </div>
+                            <div style="margin-top: 8px; text-align: left;">
+                                <label for="sismo1-pga"
+                                    style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">
+                                    Acel. PGA: <span id="sismo1-pga-val"
+                                        style="color: #00f2fe; font-weight: 700;">0.40g</span>
+                                </label>
+                                <input type="range" id="sismo1-pga" min="0.10" max="1.05" value="0.40" step="0.05"
+                                    style="width: 100%;">
+                            </div>
                         </div>
-                        <div style="margin-top: 8px; text-align: left;">
-                            <label for="sismo2-pga"
-                                style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">
-                                Acel. PGA: <span id="sismo2-pga-val"
-                                    style="color: #ff6b6b; font-weight: 700;">0.60g</span>
-                            </label>
-                            <input type="range" id="sismo2-pga" min="0.10" max="1.05" value="0.60" step="0.05"
-                                style="width: 100%;">
+                        <div class="m-box second-sismo-box">
+                            <span class="m-title">Sismo 2 (t=40s)</span>
+                            <span class="m-val text-red">M 7.5</span>
+                            <div style="margin-top: 6px; text-align: left;">
+                                <label for="sismo2-direction"
+                                    style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Dirección:</label>
+                                <select id="sismo2-direction"
+                                    style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 4px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                                    <option value="X" selected>Eje X (Long.)</option>
+                                    <option value="Y">Eje Y (Transv.)</option>
+                                </select>
+                            </div>
+                            <div style="margin-top: 8px; text-align: left;">
+                                <label for="sismo2-pga"
+                                    style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">
+                                    Acel. PGA: <span id="sismo2-pga-val"
+                                        style="color: #ff6b6b; font-weight: 700;">0.60g</span>
+                                </label>
+                                <input type="range" id="sismo2-pga" min="0.10" max="1.05" value="0.60" step="0.05"
+                                    style="width: 100%;">
+                            </div>
                         </div>
                     </div>
                 </div>
