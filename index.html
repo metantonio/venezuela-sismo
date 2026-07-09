@@ -1084,6 +1084,18 @@
                                                 inelástico a lo largo del sismo.</p>
                                         </div>
                                     </div>
+
+                                    <div class="simplification-item">
+                                        <i class="fa-solid fa-mountain" style="color: #4cc9f0;"></i>
+                                        <div class="simplification-content">
+                                            <h5>Efecto de la Interacción Suelo-Estructura (ISE)</h5>
+                                            <p>Al activar la ISE, se simula la flexibilidad y elasticidad dinámica del suelo de fundación (modelo de resortes en serie acoplados en la base). Esto afecta la simulación de la siguiente manera:
+                                                <strong style="color: #4cc9f0; display: block; margin-top: 4px;">1. Elongación del Período:</strong> Al flexibilizarse la base, el período de vibración fundamental del edificio se alarga (&tilde;T = T<sub>rigid</sub> / &radic;&lambda;<sub>ISE</sub>). Esto desplaza el edificio en el espectro de diseño, reduciendo generalmente la fuerza sísmica de diseño pero aumentando las deformaciones relativas.
+                                                <strong style="color: #4cc9f0; display: block; margin-top: 4px;">2. Mayores Desplazamientos:</strong> La oscilación del edificio ahora suma la deformación interna de la estructura con la traslación y cabeceo (rotación) de la zapata/losa sobre el suelo, aumentando los desplazamientos totales y el balanceo visible en la animación 3D.
+                                                <strong style="color: #4cc9f0; display: block; margin-top: 4px;">3. Amortiguamiento Adicional:</strong> Se añade al resolvedor dinámico el amortiguamiento por radiación de ondas y fricción histerética del suelo de fundación, lo que ayuda a disipar parte de la energía de la sacudida sísmica.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
