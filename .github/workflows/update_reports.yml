@@ -1,0 +1,52 @@
+name: Update Structural Reports
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  update-reports:
+    if: contains(github.event.issue.labels.*.name, 'Reporte de Estructura')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Add Report to app.js
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: node scripts/add_report.js
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app.js
+          git commit -m "auto: agregar reporte de estructura de #${{ github.event.issue.number }}"
+          git push origin HEAD
+
+      - name: Comment and Close Issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '🎉 **¡Reporte procesado con éxito!**\n\nLos datos de la edificación se han validado y agregado automáticamente a `app.js`. El mapa de daños en GitHub Pages se actualizará automáticamente en los próximos minutos.'
+            });
+            github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed'
+            });
