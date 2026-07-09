@@ -555,6 +555,46 @@
                     </select>
                 </div>
 
+                <!-- INTERACCIÓN SUELO-ESTRUCTURA (ISE) -->
+                <div class="control-group" style="margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;">
+                    <div class="checkbox-group" style="margin-bottom: 8px;">
+                        <input type="checkbox" id="ise-enable">
+                        <label for="ise-enable" style="font-weight: 600; color: #4cc9f0;">Habilitar Interacción Suelo-Estructura (ISE)</label>
+                    </div>
+                    
+                    <div id="ise-controls-container" style="display: none; background: rgba(76, 201, 240, 0.03); border: 1px dashed rgba(76, 201, 240, 0.2); border-radius: 8px; padding: 12px; margin-top: 8px;">
+                        <div class="control-group" style="margin-bottom: 8px;">
+                            <label for="ise-foundation-type" style="font-size: 11px; color: var(--text-muted);">Tipo de Cimentación <span class="help-icon" data-tooltip="Losa continua (Platea): rigidez global e inercia total del área del edificio. Zapatas aisladas: reduce el área de contacto efectiva (ej. al 35%) aumentando la flexibilidad.">?</span></label>
+                            <select id="ise-foundation-type" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                                <option value="mat" selected>Platea / Losa de Fundación Continua</option>
+                                <option value="isolated">Zapatas Aisladas (35% área planta)</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                            <div>
+                                <label for="ise-vs" style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Vel. Onda Corte (vs) <span class="help-icon" data-tooltip="Representa la rigidez dinámica del suelo. Valores típicos: Rocas > 700 m/s, Suelos Duros: 300-700 m/s, Suelos Blandos: 150-300 m/s, Suelos Muy Blandos < 150 m/s.">?</span>:</label>
+                                <input type="number" id="ise-vs" value="220" min="50" max="1500" step="10" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                            </div>
+                            <div>
+                                <label for="ise-df" style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Prof. Desplante (Df) <span class="help-icon" data-tooltip="Profundidad a la que se asienta la fundación en metros. Mayor profundidad incrementa significativamente la rigidez de Gazetas por empuje pasivo (empotramiento).">?</span>:</label>
+                                <input type="number" id="ise-df" value="1.50" min="0.00" max="10.00" step="0.25" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <div>
+                                <label for="ise-poisson" style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Poisson Suelo (ν) <span class="help-icon" data-tooltip="Relación de deformación transversal. Valores típicos: Arcillas saturadas (blandas) = 0.40 - 0.49, Arenas/Gravas (medias/duras) = 0.25 - 0.35, Rocas = 0.20 - 0.25.">?</span>:</label>
+                                <input type="number" id="ise-poisson" value="0.35" min="0.15" max="0.49" step="0.05" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                            </div>
+                            <div>
+                                <label for="ise-density" style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Peso Vol. <span class="help-icon" data-tooltip="Densidad aparente del suelo. Valores típicos: Suelos blandos / arcillas = 1500-1800 kgf/m³, Arenas y gravas compactas = 1800-2100 kgf/m³, Rocas = 2200-2500 kgf/m³.">?</span>:</label>
+                                <input type="number" id="ise-density" value="1800" min="1200" max="2500" step="50" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- SIMULATION BUTTONS -->
                 <div class="action-buttons">
                     <button id="btn-run" class="btn btn-primary"><i class="fa-solid fa-play"></i> Iniciar

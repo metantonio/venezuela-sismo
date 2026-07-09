@@ -290,7 +290,7 @@ function initUI() {
         "covenin19-soil-class", "covenin19-r", "covenin19-rho", "covenin19-fi",
         "analysis-mode", "degradation-severity", "double-earthquake",
         "sismo1-direction", "sismo2-direction", "building-use", "evacuation-mode",
-        "earthquake-input-type", "custom-direction"
+        "earthquake-input-type", "custom-direction", "ise-foundation-type"
     ];
     selects.forEach(id => {
         const el = document.getElementById(id);
@@ -300,6 +300,40 @@ function initUI() {
             });
         }
     });
+
+    // Checkbox e Inputs de Interacción Suelo-Estructura (ISE)
+    const iseEnable = document.getElementById("ise-enable");
+    const iseControls = document.getElementById("ise-controls-container");
+    if (iseEnable && iseControls) {
+        iseEnable.addEventListener("change", () => {
+            iseControls.style.display = iseEnable.checked ? "block" : "none";
+            if (!isPlaying) generateSpectraAndEarthquake();
+        });
+        iseControls.style.display = iseEnable.checked ? "block" : "none";
+    }
+
+    const iseInputs = ["ise-vs", "ise-df", "ise-poisson", "ise-density"];
+    iseInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener("change", () => {
+                if (!isPlaying) generateSpectraAndEarthquake();
+            });
+        }
+    });
+
+    const soil01Select = document.getElementById("covenin01-soil");
+    if (soil01Select) {
+        soil01Select.addEventListener("change", () => {
+            syncSoilPropertiesFromNormClass();
+        });
+    }
+    const soil19Select = document.getElementById("covenin19-soil-class");
+    if (soil19Select) {
+        soil19Select.addEventListener("change", () => {
+            syncSoilPropertiesFromNormClass();
+        });
+    }
 
     // Botones
     document.getElementById("btn-run").addEventListener("click", toggleSimulation);
@@ -343,6 +377,7 @@ function initUI() {
             setSlider("col-dist-y", 4.0, " m");
             setSlider("story-height", 3.0, " m");
             setCheck("auto-mass", true);
+
             setSelect("building-use", "residential");
             setSlider("slab-thickness", 15, " cm");
             setSlider("extra-dead-load", 250, " kgf/m²");
@@ -387,9 +422,26 @@ function initUI() {
             setCheck("double-earthquake", true);
             setSelect("sismo1-direction", "X");
             setSelect("sismo2-direction", "X");
+
             setSelect("earthquake-input-type", "synthetic");
             toggleEarthquakeInputType();
             resetCustomAccelerogramState();
+
+            // Configurar Interacción Suelo-Estructura (ISE) por defecto para La Guaira
+            setCheck("ise-enable", true);
+            setSelect("ise-foundation-type", "mat");
+            
+            const vsEl = document.getElementById("ise-vs");
+            const dfEl = document.getElementById("ise-df");
+            const poissonEl = document.getElementById("ise-poisson");
+            const densityEl = document.getElementById("ise-density");
+            if (vsEl) vsEl.value = 220;
+            if (dfEl) dfEl.value = 1.50;
+            if (poissonEl) poissonEl.value = 0.35;
+            if (densityEl) densityEl.value = 1800;
+
+            const iseControls = document.getElementById("ise-controls-container");
+            if (iseControls) iseControls.style.display = "block";
 
             // Sincronizar visibilidad de paneles de masa
             const manualMassCont = document.getElementById("manual-mass-container");
@@ -933,6 +985,22 @@ class BuildingModel {
             this.T1_y = targetT1 * Math.sqrt(massRatio / stiffnessRatio_y);
         }
 
+        // --- CÁLCULO DE INTERACCIÓN SUELO-ESTRUCTURA (ISE) ---
+        const ssiX = calculateSSIReductionFactor(N, this.h, this.m, this.T1_x, numColsX, numColsY, sX_val, sY_val, 'X');
+        const ssiY = calculateSSIReductionFactor(N, this.h, this.m, this.T1_y, numColsX, numColsY, sX_val, sY_val, 'Y');
+        
+        this.ssiX = ssiX;
+        this.ssiY = ssiY;
+
+        if (ssiX.lambda < 1.0) {
+            this.k_init_x *= ssiX.lambda;
+            this.T1_x /= Math.sqrt(ssiX.lambda);
+        }
+        if (ssiY.lambda < 1.0) {
+            this.k_init_y *= ssiY.lambda;
+            this.T1_y /= Math.sqrt(ssiY.lambda);
+        }
+
         const eccVal = parseFloat(document.getElementById("torsional-eccentricity").value) || 0.0;
         this.torsionAmp_x = Math.sqrt(Math.pow(1.0 + (eccVal * bD) / (2.0 * rp), 2) + Math.pow((eccVal * bW) / (2.0 * rp), 2));
         this.torsionAmp_y = Math.sqrt(Math.pow(1.0 + (eccVal * bW) / (2.0 * rp), 2) + Math.pow((eccVal * bD) / (2.0 * rp), 2));
@@ -1002,10 +1070,26 @@ class BuildingModel {
         const w2_y = 2.0 * Math.sqrt(this.k_init_y / this.m) * Math.sin(3.0 * Math.PI / (4.0 * N + 2.0));
 
         const zeta = parseFloat(document.getElementById("damping-ratio").value);
-        this.aM_x = zeta * (2.0 * w1_x * w2_x) / (w1_x + w2_x);
-        this.aK_x = zeta * 2.0 / (w1_x + w2_x);
-        this.aM_y = zeta * (2.0 * w1_y * w2_y) / (w1_y + w2_y);
-        this.aK_y = zeta * 2.0 / (w1_y + w2_y);
+        
+        let zeta_x = zeta;
+        let zeta_y = zeta;
+        if (this.ssiX && this.ssiX.lambda < 1.0) {
+            const T_ratio = 1.0 / Math.sqrt(this.ssiX.lambda);
+            const beta_rd = (1.0 - this.ssiX.lambda) * 0.04;
+            zeta_x = beta_rd + zeta / Math.pow(T_ratio, 3);
+            zeta_x = Math.max(0.01, Math.min(0.20, zeta_x));
+        }
+        if (this.ssiY && this.ssiY.lambda < 1.0) {
+            const T_ratio = 1.0 / Math.sqrt(this.ssiY.lambda);
+            const beta_rd = (1.0 - this.ssiY.lambda) * 0.04;
+            zeta_y = beta_rd + zeta / Math.pow(T_ratio, 3);
+            zeta_y = Math.max(0.01, Math.min(0.20, zeta_y));
+        }
+
+        this.aM_x = zeta_x * (2.0 * w1_x * w2_x) / (w1_x + w2_x);
+        this.aK_x = zeta_x * 2.0 / (w1_x + w2_x);
+        this.aM_y = zeta_y * (2.0 * w1_y * w2_y) / (w1_y + w2_y);
+        this.aK_y = zeta_y * 2.0 / (w1_y + w2_y);
 
         this.aM = this.aM_x;
         this.aK = this.aK_x;
@@ -3143,6 +3227,63 @@ function generateSpectraAndEarthquake() {
             </div>
         `;
 
+        // --- REPORTE DE INTERACCIÓN SUELO-ESTRUCTURA (ISE) ---
+        let iseReportHTML = "";
+        const iseEnable = document.getElementById("ise-enable")?.checked;
+        if (iseEnable && eq2001 && eq2001.ssiX && eq2019 && eq2019.ssiX) {
+            const sX_ssi = eq2001.ssiX;
+            const sY_ssi = eq2001.ssiY;
+
+            iseReportHTML = `
+                <div style="margin-top: 24px; margin-bottom: 24px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
+                    <h4 style="color: #4cc9f0; margin-bottom: 10px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fa-solid fa-mountain"></i> Interacción Suelo-Estructura (ISE) — Elasticidad Dinámica (Gazetas)
+                    </h4>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                        Cálculo de rigideces dinámicas equivalentes de la fundación y amortiguamiento por radiación del suelo. 
+                        Cimentación: <strong>${sX_ssi.foundType === 'mat' ? 'Losa Continua' : 'Zapatas Aisladas'}</strong> |
+                        Vel. Onda Corte: <strong>${sX_ssi.vs} m/s</strong> |
+                        Desplante Df: <strong>${sX_ssi.df.toFixed(2)} m</strong> |
+                        G Suelo: <strong>${Math.round(sX_ssi.G).toLocaleString()} kgf/m²</strong>
+                    </p>
+                    <table class="calc-table">
+                        <thead>
+                            <tr>
+                                <th>Eje Analizado</th>
+                                <th>Dimensiones Base (B × L)</th>
+                                <th>Rigidez Horizontal (Kx)</th>
+                                <th>Rigidez Cabeceo (Kθ)</th>
+                                <th>Rigidez Estructura (K_struc)</th>
+                                <th>Coeficiente λ_ISE</th>
+                                <th>Elongación T_flex / T_rigid</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="calc-param-name"><strong>Eje X (Longitudinal)</strong></td>
+                                <td class="calc-value">${sX_ssi.B.toFixed(1)}m × ${sX_ssi.L.toFixed(1)}m</td>
+                                <td class="calc-value">${Math.round(sX_ssi.Kx).toLocaleString()} kgf/m</td>
+                                <td class="calc-value">${Math.round(sX_ssi.Ktheta).toLocaleString()} kgf·m/rad</td>
+                                <td class="calc-value">${Math.round(sX_ssi.K_struc).toLocaleString()} kgf/m</td>
+                                <td class="calc-value" style="font-weight: bold; color: #4cc9f0;">${sX_ssi.lambda.toFixed(3)}</td>
+                                <td class="calc-value" style="color: #ffb703;">${(1.0 / Math.sqrt(sX_ssi.lambda)).toFixed(2)}x</td>
+                            </tr>
+                            <tr>
+                                <td class="calc-param-name"><strong>Eje Y (Transversal)</strong></td>
+                                <td class="calc-value">${sY_ssi.B.toFixed(1)}m × ${sY_ssi.L.toFixed(1)}m</td>
+                                <td class="calc-value">${Math.round(sY_ssi.Kx).toLocaleString()} kgf/m</td>
+                                <td class="calc-value">${Math.round(sY_ssi.Ktheta).toLocaleString()} kgf·m/rad</td>
+                                <td class="calc-value">${Math.round(sY_ssi.K_struc).toLocaleString()} kgf/m</td>
+                                <td class="calc-value" style="font-weight: bold; color: #4cc9f0;">${sY_ssi.lambda.toFixed(3)}</td>
+                                <td class="calc-value" style="color: #ffb703;">${(1.0 / Math.sqrt(sY_ssi.lambda)).toFixed(2)}x</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        reportHTML += iseReportHTML;
+
         // --- VERIFICACIÓN Y DISEÑO DE VIGAS POR TEORÍA DE ROTURA ---
         const nBaysX = numColsX - 1;
         const nBaysY = numColsY - 1;
@@ -3685,6 +3826,123 @@ function resetBeamView() {
     beamPanX = { X: 0, Y: 0 };
     beamPanY = { X: 0, Y: 0 };
     updateCalculationReport();
+}
+
+function syncSoilPropertiesFromNormClass() {
+    let soil = "S2";
+    const tab2019 = document.querySelector(".tab-btn[data-tab='tab-covenin19']");
+    const isTab2019Active = tab2019 && tab2019.classList.contains("active");
+
+    const vsEl = document.getElementById("ise-vs");
+    const poissonEl = document.getElementById("ise-poisson");
+    const densityEl = document.getElementById("ise-density");
+
+    if (!vsEl || !poissonEl || !densityEl) return;
+
+    if (isTab2019Active) {
+        const soil19 = document.getElementById("covenin19-soil-class")?.value || "D";
+        if (soil19 === 'A' || soil19 === 'AB' || soil19 === 'B') {
+            vsEl.value = 800;
+            poissonEl.value = 0.25;
+            densityEl.value = 2200;
+        } else if (soil19 === 'BC' || soil19 === 'C') {
+            vsEl.value = 400;
+            poissonEl.value = 0.30;
+            densityEl.value = 1900;
+        } else if (soil19 === 'CD' || soil19 === 'D') {
+            vsEl.value = 220;
+            poissonEl.value = 0.35;
+            densityEl.value = 1800;
+        } else { // DE, E
+            vsEl.value = 120;
+            poissonEl.value = 0.40;
+            densityEl.value = 1600;
+        }
+    } else {
+        const soil01 = document.getElementById("covenin01-soil")?.value || "S2";
+        if (soil01 === 'S1') {
+            vsEl.value = 800;
+            poissonEl.value = 0.25;
+            densityEl.value = 2200;
+        } else if (soil01 === 'S2') {
+            vsEl.value = 400;
+            poissonEl.value = 0.30;
+            densityEl.value = 1900;
+        } else if (soil01 === 'S3') {
+            vsEl.value = 220;
+            poissonEl.value = 0.35;
+            densityEl.value = 1800;
+        } else { // S4
+            vsEl.value = 120;
+            poissonEl.value = 0.40;
+            densityEl.value = 1600;
+        }
+    }
+    if (!isPlaying) generateSpectraAndEarthquake();
+}
+
+function calculateSSIReductionFactor(N, h, m, T_rigid, numColsX, numColsY, sX, sY, direction) {
+    const iseEnable = document.getElementById("ise-enable")?.checked;
+    if (!iseEnable) {
+        return { lambda: 1.0 };
+    }
+
+    const vs = parseFloat(document.getElementById("ise-vs")?.value) || 220.0;
+    const df = parseFloat(document.getElementById("ise-df")?.value) || 1.50;
+    const poisson = parseFloat(document.getElementById("ise-poisson")?.value) || 0.35;
+    const density = parseFloat(document.getElementById("ise-density")?.value) || 1800.0;
+    const foundType = document.getElementById("ise-foundation-type")?.value || "mat";
+
+    const numCX = numColsX || 2;
+    const numCY = numColsY || 2;
+    const sX_val = sX || 5.0;
+    const sY_val = sY || 5.0;
+
+    let B, L;
+    if (direction === 'X') {
+        B = sX_val * (numCX - 1);
+        L = sY_val * (numCY - 1);
+    } else {
+        B = sY_val * (numCY - 1);
+        L = sX_val * (numCX - 1);
+    }
+
+    if (B < 2.0) B = 3.0;
+    if (L < 2.0) L = 3.0;
+
+    const G_const = 9.81;
+    const rho = density / G_const;
+    const G_pa = rho * vs * vs;
+    const G = G_pa / G_const;
+
+    const areaMultiplier = (foundType === 'isolated') ? 0.35 : 1.0;
+    const areaFound = B * L * areaMultiplier;
+    
+    const Rx = Math.sqrt(areaFound / Math.PI);
+    const I_base = (Math.pow(B, 3) * L / 12) * areaMultiplier;
+    const Rtheta = Math.pow((4.0 * I_base / Math.PI), 0.25);
+
+    const Kx_surf = (8.0 * G * Rx) / (2.0 - poisson);
+    const Ktheta_surf = (8.0 * G * Math.pow(Rtheta, 3)) / (3.0 * (1.0 - poisson));
+
+    const eh = 1.0 + 0.55 * (df / Rx);
+    const er = 1.0 + 1.2 * (df / Rtheta) * (1.0 + 1.8 * (df / Rtheta));
+
+    const Kx = Kx_surf * eh;
+    const Ktheta = Ktheta_surf * er;
+
+    const M_eff = 0.75 * (N * m);
+    const omega_rigid = (2.0 * Math.PI) / T_rigid;
+    const K_struc = M_eff * omega_rigid * omega_rigid / G_const;
+
+    const h_star = 0.7 * N * h;
+
+    const lambda_ise = 1.0 / (1.0 + (K_struc / Kx) + (K_struc * h_star * h_star / Ktheta));
+    
+    return {
+        lambda: Math.min(1.0, Math.max(0.01, lambda_ise)),
+        B, L, Rx, Rtheta, G, poisson, density, Kx, Ktheta, K_struc, h_star, eh, er, foundType, vs, df
+    };
 }
 
 function getActiveSismoDirection(timeVal) {
@@ -5990,6 +6248,7 @@ function toggleInputControls(disable) {
         "col-as", "beam-as", "beam-as-prime",
         "sismo1-direction", "sismo2-direction",
         "earthquake-input-type", "file-accelerogram", "custom-file-dt", "custom-direction",
+        "ise-enable", "ise-foundation-type", "ise-vs", "ise-df", "ise-poisson", "ise-density",
         "auto-mass", "building-use", "slab-thickness", "extra-dead-load",
         "evacuation-mode"
     ];
