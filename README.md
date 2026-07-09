@@ -3,6 +3,8 @@
 [![GitHub license](https://img.shields.io/github/license/metantonio/venezuela-sismo)](https://github.com/metantonio/venezuela-sismo/blob/master/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/metantonio/venezuela-sismo)](https://github.com/metantonio/venezuela-sismo/issues)
 
+![Portada de VZLA-SISMO 3D](Portada.jpg)
+
 **VENEZUELA-SISMO 3D** es una aplicación web interactiva de ingeniería estructural y sismorresistente diseñada para comparar dinámicamente el comportamiento de edificaciones de concreto armado diseñadas bajo las normativas venezolanas **COVENIN 1756:2001** (Norma Tradicional) y **COVENIN 1756:2019** (Norma Moderna).
 
 La herramienta combina simulaciones dinámicas por el método de Newmark-$\beta$ con una interfaz gráfica en 3D (Three.js) que representa el balanceo, la torsión en planta y el colapso progresivo de las estructuras ante sismos sucesivos de gran magnitud.
