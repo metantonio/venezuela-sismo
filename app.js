@@ -9391,6 +9391,12 @@ function initDamageMap() {
                </div>`
             : '';
 
+        const photoHtml = b.photo
+            ? `<div style="margin-top: 10px; text-align: center; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); cursor: pointer;" onclick="window.open('${b.photo}', '_blank')" title="Haga clic para ampliar la imagen">
+                 <img src="${b.photo}" style="width: 100%; max-height: 140px; object-fit: cover; display: block; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1.0'" alt="Evidencia de daño" />
+               </div>`
+            : '';
+
         return `
             <div class="popup-building-name">
                 <i class="fa-solid fa-building" style="color: ${color};"></i>
@@ -9414,6 +9420,7 @@ function initDamageMap() {
                 </span>
             </div>
             ${confirmedBadge}
+            ${photoHtml}
         `;
     }
 
