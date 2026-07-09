@@ -49,6 +49,14 @@ let evacuation2019 = { meshes: [], currentFloor: 0, startTime: null, escaped: fa
 // Indicadores de Fuerza Cortante Base (Corte Basal)
 let arrow2001 = null;
 let arrow2019 = null;
+let label2001 = null;
+let label2019 = null;
+let canvas2001 = null;
+let canvas2019 = null;
+let ctx2001 = null;
+let ctx2019 = null;
+let texture2001 = null;
+let texture2019 = null;
 
 // Materiales de Rótulas Plásticas
 const hingeYellowMat = new THREE.MeshStandardMaterial({
@@ -4674,6 +4682,8 @@ function deselectColumn() {
 function createBaseShearArrows() {
     if (arrow2001 && arrow2001.parent) arrow2001.parent.remove(arrow2001);
     if (arrow2019 && arrow2019.parent) arrow2019.parent.remove(arrow2019);
+    if (label2001 && label2001.parent) label2001.parent.remove(label2001);
+    if (label2019 && label2019.parent) label2019.parent.remove(label2019);
 
     const dir = new THREE.Vector3(1, 0, 0);
     const origin = new THREE.Vector3(0, 0, 0);
@@ -4687,6 +4697,30 @@ function createBaseShearArrows() {
 
     scene.add(arrow2001);
     scene.add(arrow2019);
+
+    // Inicializar Canvas 2001
+    canvas2001 = document.createElement('canvas');
+    canvas2001.width = 160;
+    canvas2001.height = 48;
+    ctx2001 = canvas2001.getContext('2d');
+    texture2001 = new THREE.CanvasTexture(canvas2001);
+    const mat2001 = new THREE.SpriteMaterial({ map: texture2001, transparent: true, depthTest: false });
+    label2001 = new THREE.Sprite(mat2001);
+    label2001.scale.set(3.0, 0.9, 1);
+    label2001.visible = false;
+    scene.add(label2001);
+
+    // Inicializar Canvas 2019
+    canvas2019 = document.createElement('canvas');
+    canvas2019.width = 160;
+    canvas2019.height = 48;
+    ctx2019 = canvas2019.getContext('2d');
+    texture2019 = new THREE.CanvasTexture(canvas2019);
+    const mat2019 = new THREE.SpriteMaterial({ map: texture2019, transparent: true, depthTest: false });
+    label2019 = new THREE.Sprite(mat2019);
+    label2019.scale.set(3.0, 0.9, 1);
+    label2019.visible = false;
+    scene.add(label2019);
 }
 
 function updateBaseShearArrows(isX, xOffset, bD, groundDisp) {
@@ -4695,6 +4729,8 @@ function updateBaseShearArrows(isX, xOffset, bD, groundDisp) {
     if (!isPlaying) {
         arrow2001.visible = false;
         arrow2019.visible = false;
+        if (label2001) label2001.visible = false;
+        if (label2019) label2019.visible = false;
         return;
     }
 
@@ -4706,19 +4742,21 @@ function updateBaseShearArrows(isX, xOffset, bD, groundDisp) {
     const force2019 = eq2019.currentBaseShear || 0;
 
     // Actualizar flecha 2001 (lado izquierdo, offset negativo)
-    updateSingleBaseShearArrow(arrow2001, force2001, maxExpectedForce2001, -xOffset, bD, isX, groundDisp);
+    updateSingleBaseShearArrow(arrow2001, label2001, canvas2001, ctx2001, texture2001, 0x00ffcc, force2001, maxExpectedForce2001, -xOffset, bD, isX, groundDisp);
 
     // Actualizar flecha 2019 (lado derecho, offset positivo)
-    updateSingleBaseShearArrow(arrow2019, force2019, maxExpectedForce2019, xOffset, bD, isX, groundDisp);
+    updateSingleBaseShearArrow(arrow2019, label2019, canvas2019, ctx2019, texture2019, 0xff007f, force2019, maxExpectedForce2019, xOffset, bD, isX, groundDisp);
 }
 
-function updateSingleBaseShearArrow(arrow, forceVal, maxExpected, xOffsetPos, bD, isX, groundDisp) {
+function updateSingleBaseShearArrow(arrow, labelSprite, canvas, ctx, texture, colorHex, forceVal, maxExpected, xOffsetPos, bD, isX, groundDisp) {
     if (Math.abs(forceVal) < 1.0) {
         arrow.visible = false;
+        if (labelSprite) labelSprite.visible = false;
         return;
     }
 
     arrow.visible = true;
+    if (labelSprite) labelSprite.visible = true;
 
     // Dirección del vector de fuerza
     const dir = new THREE.Vector3(0, 0, 0);
@@ -4741,6 +4779,50 @@ function updateSingleBaseShearArrow(arrow, forceVal, maxExpected, xOffsetPos, bD
     const currentX = xOffsetPos + (isX ? groundDisp : 0);
     const currentZ = (isX ? 0 : groundDisp) + bD / 2 + 1.2;
     arrow.position.set(currentX, 0.3, currentZ);
+
+    // Actualizar texto en canvas
+    if (ctx && canvas && texture) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Fondo semitransparente redondeado
+        ctx.fillStyle = 'rgba(9, 10, 15, 0.85)';
+        const r = 8;
+        ctx.beginPath();
+        ctx.moveTo(r, 0);
+        ctx.lineTo(canvas.width - r, 0);
+        ctx.quadraticCurveTo(canvas.width, 0, canvas.width, r);
+        ctx.lineTo(canvas.width, canvas.height - r);
+        ctx.quadraticCurveTo(canvas.width, canvas.height, canvas.width - r, canvas.height);
+        ctx.lineTo(r, canvas.height);
+        ctx.quadraticCurveTo(0, canvas.height, 0, canvas.height - r);
+        ctx.lineTo(0, r);
+        ctx.quadraticCurveTo(0, 0, r, 0);
+        ctx.closePath();
+        ctx.fill();
+
+        // Borde coloreado
+        const colorString = '#' + colorHex.toString(16).padStart(6, '0');
+        ctx.strokeStyle = colorString;
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        // Texto del Corte Basal
+        ctx.font = 'bold 20px Inter, sans-serif';
+        ctx.fillStyle = colorString;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Conversión a kgf
+        const force_kgf = Math.abs(forceVal) / G;
+        let forceText = Math.round(force_kgf).toLocaleString() + " kgf";
+        
+        ctx.fillText(forceText, canvas.width / 2, canvas.height / 2);
+        texture.needsUpdate = true;
+    }
+
+    if (labelSprite) {
+        labelSprite.position.set(currentX, 1.4, currentZ);
+    }
 }
 // --- INDICADORES DE EJES X / Y ---
 let axisIndicatorsGroup = null;
