@@ -454,37 +454,51 @@
 
                 <div class="control-group">
                     <label for="earthquake-input-type">Origen del Sismo / Acelerograma</label>
-                    <select id="earthquake-input-type" onchange="toggleEarthquakeInputType()" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 6px; font-size: 12px; width: 100%; font-family: 'Inter', sans-serif;">
+                    <select id="earthquake-input-type" onchange="toggleEarthquakeInputType()"
+                        style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 6px; font-size: 12px; width: 100%; font-family: 'Inter', sans-serif;">
                         <option value="synthetic" selected>Sintético (Normativa COVENIN)</option>
                         <option value="custom">Cargar Registro Personalizado (.csv, .txt)</option>
                     </select>
                 </div>
 
                 <!-- Contenedor para carga de acelerograma personalizado -->
-                <div id="custom-accelerogram-container" style="display: none; background: rgba(255, 183, 3, 0.05); border: 1px dashed rgba(255, 183, 3, 0.2); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
-                    <label style="font-size: 11px; color: #ffb703; font-weight: 600; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px;">Acelerograma Personalizado</label>
+                <div id="custom-accelerogram-container"
+                    style="display: none; background: rgba(255, 183, 3, 0.05); border: 1px dashed rgba(255, 183, 3, 0.2); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                    <label
+                        style="font-size: 11px; color: #ffb703; font-weight: 600; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px;">Acelerograma
+                        Personalizado</label>
                     <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4;">
-                        Soporta 1 columna (acel.) o 2 columnas (tiempo, acel.). Valores en fracción de 'g' o en m/s² (conversión automática).
+                        Soporta 1 columna (acel.) o 2 columnas (tiempo, acel.). Valores en fracción de 'g' o en m/s²
+                        (conversión automática).
                     </p>
-                    
+
                     <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
                         <label for="file-accelerogram" class="custom-file-upload-btn">
                             <i class="fa-solid fa-file-upload"></i> Seleccionar Archivo
                         </label>
-                        <input type="file" id="file-accelerogram" accept=".txt,.csv" style="display: none;" onchange="handleFileSelect(event)">
-                        <span id="file-upload-status" style="font-size: 10px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;">Ningún archivo</span>
+                        <input type="file" id="file-accelerogram" accept=".txt,.csv" style="display: none;"
+                            onchange="handleFileSelect(event)">
+                        <span id="file-upload-status"
+                            style="font-size: 10px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;">Ningún
+                            archivo</span>
                     </div>
 
-                    <div id="custom-dt-container" style="display: none; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 6px;">
-                        <label for="custom-file-dt" style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">
+                    <div id="custom-dt-container"
+                        style="display: none; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 6px;">
+                        <label for="custom-file-dt"
+                            style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">
                             Paso de Tiempo (dt) del Archivo (s):
                         </label>
-                        <input type="number" id="custom-file-dt" value="0.02" step="0.001" min="0.001" max="0.5" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; width: 80px; font-family: 'Inter', sans-serif;">
+                        <input type="number" id="custom-file-dt" value="0.02" step="0.001" min="0.001" max="0.5"
+                            style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; width: 80px; font-family: 'Inter', sans-serif;">
                     </div>
 
                     <div style="margin-top: 8px;">
-                        <label for="custom-direction" style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Dirección de Aplicación:</label>
-                        <select id="custom-direction" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 4px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                        <label for="custom-direction"
+                            style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Dirección
+                            de Aplicación:</label>
+                        <select id="custom-direction"
+                            style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 4px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
                             <option value="X" selected>Eje X (Longitudinal)</option>
                             <option value="Y">Eje Y (Transversal)</option>
                         </select>
@@ -556,40 +570,62 @@
                 </div>
 
                 <!-- INTERACCIÓN SUELO-ESTRUCTURA (ISE) -->
-                <div class="control-group" style="margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;">
+                <div class="control-group"
+                    style="margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;">
                     <div class="checkbox-group" style="margin-bottom: 8px;">
                         <input type="checkbox" id="ise-enable">
-                        <label for="ise-enable" style="font-weight: 600; color: #4cc9f0;">Habilitar Interacción Suelo-Estructura (ISE)</label>
+                        <label for="ise-enable" style="font-weight: 600; color: #4cc9f0;">Habilitar Interacción
+                            Suelo-Estructura (ISE)</label>
                     </div>
-                    
-                    <div id="ise-controls-container" style="display: none; background: rgba(76, 201, 240, 0.03); border: 1px dashed rgba(76, 201, 240, 0.2); border-radius: 8px; padding: 12px; margin-top: 8px;">
+
+                    <div id="ise-controls-container"
+                        style="display: none; background: rgba(76, 201, 240, 0.03); border: 1px dashed rgba(76, 201, 240, 0.2); border-radius: 8px; padding: 12px; margin-top: 8px;">
                         <div class="control-group" style="margin-bottom: 8px;">
-                            <label for="ise-foundation-type" style="font-size: 11px; color: var(--text-muted);">Tipo de Cimentación <span class="help-icon" data-tooltip="Losa continua (Platea): rigidez global e inercia total del área del edificio. Zapatas aisladas: reduce el área de contacto efectiva (ej. al 35%) aumentando la flexibilidad.">?</span></label>
-                            <select id="ise-foundation-type" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                            <label for="ise-foundation-type" style="font-size: 11px; color: var(--text-muted);">Tipo de
+                                Cimentación <span class="help-icon"
+                                    data-tooltip="Losa continua (Platea): rigidez global e inercia total del área del edificio. Zapatas aisladas: reduce el área de contacto efectiva (ej. al 35%) aumentando la flexibilidad.">?</span></label>
+                            <select id="ise-foundation-type"
+                                style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
                                 <option value="mat" selected>Platea / Losa de Fundación Continua</option>
                                 <option value="isolated">Zapatas Aisladas (35% área planta)</option>
                             </select>
                         </div>
-                        
+
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
                             <div>
-                                <label for="ise-vs" style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Vel. Onda Corte (vs) <span class="help-icon" data-tooltip="Representa la rigidez dinámica del suelo. Valores típicos: Rocas > 700 m/s, Suelos Duros: 300-700 m/s, Suelos Blandos: 150-300 m/s, Suelos Muy Blandos < 150 m/s.">?</span>:</label>
-                                <input type="number" id="ise-vs" value="220" min="50" max="1500" step="10" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                                <label for="ise-vs"
+                                    style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Vel.
+                                    Onda Corte (vs) <span class="help-icon"
+                                        data-tooltip="Representa la rigidez dinámica del suelo. Valores típicos: Rocas > 700 m/s, Suelos Duros: 300-700 m/s, Suelos Blandos: 150-300 m/s, Suelos Muy Blandos < 150 m/s.">?</span>:</label>
+                                <input type="number" id="ise-vs" value="220" min="50" max="1500" step="10"
+                                    style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
                             </div>
                             <div>
-                                <label for="ise-df" style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Prof. Desplante (Df) <span class="help-icon" data-tooltip="Profundidad a la que se asienta la fundación en metros. Mayor profundidad incrementa significativamente la rigidez de Gazetas por empuje pasivo (empotramiento).">?</span>:</label>
-                                <input type="number" id="ise-df" value="1.50" min="0.00" max="10.00" step="0.25" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                                <label for="ise-df"
+                                    style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Prof.
+                                    Desplante (Df) <span class="help-icon"
+                                        data-tooltip="Profundidad a la que se asienta la fundación en metros. Mayor profundidad incrementa significativamente la rigidez de Gazetas por empuje pasivo (empotramiento).">?</span>:</label>
+                                <input type="number" id="ise-df" value="1.50" min="0.00" max="10.00" step="0.25"
+                                    style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
                             </div>
                         </div>
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                             <div>
-                                <label for="ise-poisson" style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Poisson Suelo (ν) <span class="help-icon" data-tooltip="Relación de deformación transversal. Valores típicos: Arcillas saturadas (blandas) = 0.40 - 0.49, Arenas/Gravas (medias/duras) = 0.25 - 0.35, Rocas = 0.20 - 0.25.">?</span>:</label>
-                                <input type="number" id="ise-poisson" value="0.35" min="0.15" max="0.49" step="0.05" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                                <label for="ise-poisson"
+                                    style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Poisson
+                                    Suelo (ν) <span class="help-icon"
+                                        data-tooltip="Relación de deformación transversal. Valores típicos: Arcillas saturadas (blandas) = 0.40 - 0.49, Arenas/Gravas (medias/duras) = 0.25 - 0.35, Rocas = 0.20 - 0.25.">?</span>:</label>
+                                <input type="number" id="ise-poisson" value="0.35" min="0.15" max="0.49" step="0.05"
+                                    style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
                             </div>
                             <div>
-                                <label for="ise-density" style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Peso Vol. <span class="help-icon" data-tooltip="Densidad aparente del suelo. Valores típicos: Suelos blandos / arcillas = 1500-1800 kgf/m³, Arenas y gravas compactas = 1800-2100 kgf/m³, Rocas = 2200-2500 kgf/m³.">?</span>:</label>
-                                <input type="number" id="ise-density" value="1800" min="1200" max="2500" step="50" style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
+                                <label for="ise-density"
+                                    style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 2px;">Peso
+                                    Vol. <span class="help-icon"
+                                        data-tooltip="Densidad aparente del suelo. Valores típicos: Suelos blandos / arcillas = 1500-1800 kgf/m³, Arenas y gravas compactas = 1800-2100 kgf/m³, Rocas = 2200-2500 kgf/m³.">?</span>:</label>
+                                <input type="number" id="ise-density" value="1800" min="1200" max="2500" step="50"
+                                    style="background: rgba(15,23,42,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; width: 100%; font-family: 'Inter', sans-serif;">
                             </div>
                         </div>
                     </div>
@@ -1089,10 +1125,25 @@
                                         <i class="fa-solid fa-mountain" style="color: #4cc9f0;"></i>
                                         <div class="simplification-content">
                                             <h5>Efecto de la Interacción Suelo-Estructura (ISE)</h5>
-                                            <p>Al activar la ISE, se simula la flexibilidad y elasticidad dinámica del suelo de fundación (modelo de resortes en serie acoplados en la base). Esto afecta la simulación de la siguiente manera:
-                                                <strong style="color: #4cc9f0; display: block; margin-top: 4px;">1. Elongación del Período:</strong> Al flexibilizarse la base, el período de vibración fundamental del edificio se alarga (&tilde;T = T<sub>rigid</sub> / &radic;&lambda;<sub>ISE</sub>). Esto desplaza el edificio en el espectro de diseño, reduciendo generalmente la fuerza sísmica de diseño pero aumentando las deformaciones relativas.
-                                                <strong style="color: #4cc9f0; display: block; margin-top: 4px;">2. Mayores Desplazamientos:</strong> La oscilación del edificio ahora suma la deformación interna de la estructura con la traslación y cabeceo (rotación) de la zapata/losa sobre el suelo, aumentando los desplazamientos totales y el balanceo visible en la animación 3D.
-                                                <strong style="color: #4cc9f0; display: block; margin-top: 4px;">3. Amortiguamiento Adicional:</strong> Se añade al resolvedor dinámico el amortiguamiento por radiación de ondas y fricción histerética del suelo de fundación, lo que ayuda a disipar parte de la energía de la sacudida sísmica.
+                                            <p>Al activar la ISE, se simula la flexibilidad y elasticidad dinámica del
+                                                suelo de fundación (modelo de resortes en serie acoplados en la base).
+                                                Esto afecta la simulación de la siguiente manera:
+                                                <strong style="color: #4cc9f0; display: block; margin-top: 4px;">1.
+                                                    Elongación del Período:</strong> Al flexibilizarse la base, el
+                                                período de vibración fundamental del edificio se alarga (&tilde;T =
+                                                T<sub>rigid</sub> / &radic;&lambda;<sub>ISE</sub>). Esto desplaza el
+                                                edificio en el espectro de diseño, reduciendo generalmente la fuerza
+                                                sísmica de diseño pero aumentando las deformaciones relativas.
+                                                <strong style="color: #4cc9f0; display: block; margin-top: 4px;">2.
+                                                    Mayores Desplazamientos:</strong> La oscilación del edificio ahora
+                                                suma la deformación interna de la estructura con la traslación y cabeceo
+                                                (rotación) de la zapata/losa sobre el suelo, aumentando los
+                                                desplazamientos totales y el balanceo visible en la animación 3D.
+                                                <strong style="color: #4cc9f0; display: block; margin-top: 4px;">3.
+                                                    Amortiguamiento Adicional:</strong> Se añade al resolvedor dinámico
+                                                el amortiguamiento por radiación de ondas y fricción histerética del
+                                                suelo de fundación, lo que ayuda a disipar parte de la energía de la
+                                                sacudida sísmica.
                                             </p>
                                         </div>
                                     </div>
@@ -1835,6 +1886,45 @@
                                     no-lineales
                                     de Monte Carlo del escenario Vargas.
                                 </p>
+
+                                <div style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px;">
+
+                                    <details
+                                        style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--text-muted); width: 100%; max-width: 600px;">
+                                        <summary
+                                            style="cursor: pointer; font-weight: 600; color: #00f2fe; display: flex; align-items: center; gap: 6px; outline: none; user-select: none;">
+                                            <i class="fa-solid fa-code"></i> Ver formato JSON requerido para reportes
+                                        </summary>
+                                        <div style="margin-top: 10px; line-height: 1.5;">
+                                            <p style="margin-bottom: 8px;">Al abrir un Issue en GitHub con la etiqueta
+                                                <code>Reporte de Estructura</code>, incluye los datos de la edificación
+                                                siguiendo este formato estructurado:</p>
+                                            <pre
+                                                style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; padding: 12px; overflow-x: auto; font-family: monospace; font-size: 11px; color: #00ffcc; margin: 0;">{
+  "name": "Nautilus",
+  "zone": "Playa grande",
+  "address": "Av Principal de Playa Grande, Catia La Mar 1162, La Guaira, Venezuela",
+  "lat": 10.61305,
+  "lng": -67.02221,
+  "floors": 7,
+  "status": "collapsed",
+  "damage_level": "total",
+  "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/23f96fbd-0ca2-432c-ac86-5290417463a3.jpeg",
+  "real": true
+}</pre>
+                                        </div>
+
+                                    </details>
+                                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                        <a href="https://github.com/metantonio/venezuela-sismo/issues?q=state%3Aopen%20label%3A%22Reporte%20de%20Estructura%22"
+                                            target="_blank" class="btn btn-primary"
+                                            style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; font-size: 13px; text-decoration: none; border-radius: 8px; font-weight: 600; background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #000; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3); transition: transform 0.2s;"
+                                            onmouseover="this.style.transform='scale(1.02)'"
+                                            onmouseout="this.style.transform='scale(1)'">
+                                            <i class="fa-solid fa-plus-circle"></i> Agregar Reporte de Estructura
+                                        </a>
+                                    </div>
+                                </div>
 
                                 <!-- DISCLAIMER -->
                                 <div
