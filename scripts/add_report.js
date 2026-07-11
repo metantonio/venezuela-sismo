@@ -54,43 +54,25 @@ newBuilding.lat = parseFloat(newBuilding.lat);
 newBuilding.lng = parseFloat(newBuilding.lng);
 newBuilding.floors = parseInt(newBuilding.floors, 10);
 
-// Format new building JSON object matching app.js style
-const newBuildingFormatted = `        {
-                "id": "${newBuilding.id}",
-                "name": "${newBuilding.name.replace(/"/g, '\\"')}",
-                "zone": "${(newBuilding.zone || '').replace(/"/g, '\\"')}",
-                "address": "${(newBuilding.address || '').replace(/"/g, '\\"')}",
-                "lat": ${newBuilding.lat},
-                "lng": ${newBuilding.lng},
-                "floors": ${newBuilding.floors},
-                "status": "${newBuilding.status}",
-                "damage_level": "${newBuilding.damage_level}",
-                "photo": "${(newBuilding.photo || '').replace(/"/g, '\\"')}",
-                "real": ${newBuilding.real}
-        },`;
+// Read buildings.json
+const buildingsJsonPath = path.join(__dirname, '..', 'buildings.json');
+let buildings = [];
 
-// Read app.js
-const appJsPath = path.join(__dirname, '..', 'app.js');
-let appJsContent = fs.readFileSync(appJsPath, 'utf8');
-
-// Find insertion point right after 'const buildings = ['
-const buildingsStartToken = 'const buildings = [';
-const index = appJsContent.indexOf(buildingsStartToken);
-
-if (index === -1) {
-    console.error('Error: No se encontró la declaración "const buildings = [" en app.js.');
+if (fs.existsSync(buildingsJsonPath)) {
+    try {
+        buildings = JSON.parse(fs.readFileSync(buildingsJsonPath, 'utf8'));
+    } catch (e) {
+        console.error('Error al parsear buildings.json:', e.message);
+        process.exit(1);
+    }
+} else {
+    console.error('Error: No se encontró el archivo buildings.json.');
     process.exit(1);
 }
 
-const insertionPoint = index + buildingsStartToken.length;
-
 // Insert new building at the beginning of the array
-appJsContent = 
-    appJsContent.slice(0, insertionPoint) + 
-    '\n' + 
-    newBuildingFormatted + 
-    appJsContent.slice(insertionPoint);
+buildings.unshift(newBuilding);
 
-// Save updated app.js
-fs.writeFileSync(appJsPath, appJsContent, 'utf8');
-console.log(`Éxito: Edificación "${newBuilding.name}" agregada correctamente a app.js con ID: ${newBuilding.id}`);
+// Save updated buildings.json
+fs.writeFileSync(buildingsJsonPath, JSON.stringify(buildings, null, 4), 'utf8');
+console.log(`Éxito: Edificación "${newBuilding.name}" agregada correctamente a buildings.json con ID: ${newBuilding.id}`);
