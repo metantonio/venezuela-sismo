@@ -2019,6 +2019,40 @@
                                                     onfocus="this.style.borderColor='#00f2fe'"
                                                     onblur="this.style.borderColor='rgba(255, 255, 255, 0.15)'">
                                             </div>
+
+                                <!-- LEYENDA FALLAS GEOLÓGICAS (ACTIVACIÓN DINÁMICA) -->
+                                <div class="damage-map-legend" id="legend-geological" style="margin-top: 10px; display: flex;">
+                                    <div class="legend-title-map"><i class="fa-solid fa-bolt" style="color: #ef4444;"></i> Fallas Geológicas (FUNVISIS)</div>
+                                    <div class="legend-row-map">
+                                        <span style="display: inline-block; width: 20px; border-bottom: 3px dashed #f87171; margin-right: 6px; vertical-align: middle;"></span>
+                                        <span>F. de San Sebastián (Principal/Offshore)</span>
+                                    </div>
+                                    <div class="legend-row-map">
+                                        <span style="display: inline-block; width: 20px; border-bottom: 3px dashed #fb923c; margin-right: 6px; vertical-align: middle;"></span>
+                                        <span>F. de Tacagua - El Ávila (Frente Montañoso)</span>
+                                    </div>
+                                    <div class="legend-row-map">
+                                        <span style="display: inline-block; width: 20px; border-bottom: 3px dashed #facc15; margin-right: 6px; vertical-align: middle;"></span>
+                                        <span>F. de Macuto (Costera Secundaria)</span>
+                                    </div>
+                                </div>
+
+                                <!-- LEYENDA INTENSIDADES SÍSMICAS (ACTIVACIÓN DINÁMICA) -->
+                                <div class="damage-map-legend" id="legend-intensities" style="margin-top: 10px; display: flex;">
+                                    <div class="legend-title-map"><i class="fa-solid fa-house-crack" style="color: #fb923c;"></i> Intensidades MMI (Terremoto 1967)</div>
+                                    <div class="legend-row-map">
+                                        <span class="legend-dot-map" style="background: rgba(127, 29, 29, 0.6); border: 1px solid #ef4444;"></span>
+                                        <span>Zona VIII - IX (Caraballeda - Amplificación Severa)</span>
+                                    </div>
+                                    <div class="legend-row-map">
+                                        <span class="legend-dot-map" style="background: rgba(194, 65, 12, 0.5); border: 1px solid #fb923c;"></span>
+                                        <span>Zona VII - VIII (Macuto / Tanaguarena - Daño Alto)</span>
+                                    </div>
+                                    <div class="legend-row-map">
+                                        <span class="legend-dot-map" style="background: rgba(133, 77, 14, 0.4); border: 1px solid #facc15;"></span>
+                                        <span>Zona VI - VII (La Guaira / Maiquetía - Daño Moderado)</span>
+                                    </div>
+                                </div>
                                             <select id="damage-map-status-filter"
                                                 style="padding: 8px 12px; background: rgba(20, 25, 40, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #fff; font-size: 13px; outline: none; cursor: pointer;">
                                                 <option value="all">Todos los Estados</option>

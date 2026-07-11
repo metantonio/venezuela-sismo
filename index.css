@@ -2434,3 +2434,56 @@ select:focus {
 
 
 
+
+
+/* Leaflet Layer Control Dark Theme Overrides */
+.damage-map-container .leaflet-control-layers {
+    background: rgba(15, 23, 42, 0.9) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 8px !important;
+    color: var(--text-primary) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 11px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+    padding: 8px 12px !important;
+    transition: all 0.2s ease;
+}
+
+.damage-map-container .leaflet-control-layers-toggle {
+    background-color: rgba(15, 23, 42, 0.9) !important;
+    border-radius: 8px !important;
+    width: 36px !important;
+    height: 36px !important;
+}
+
+.damage-map-container .leaflet-control-layers-expanded {
+    background: rgba(15, 23, 42, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.damage-map-container .leaflet-control-layers label {
+    margin-bottom: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.damage-map-container .leaflet-control-layers input[type="checkbox"] {
+    cursor: pointer;
+    accent-color: #00f2fe;
+}
+
+/* Custom Tooltip Style for Faults */
+.fault-tooltip {
+    background: rgba(15, 23, 42, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 11px !important;
+    border-radius: 4px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+    font-weight: 500 !important;
+}

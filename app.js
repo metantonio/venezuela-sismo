@@ -6766,6 +6766,177 @@ async function initDamageMap() {
         attribution: 'Map data &copy; Google Maps'
     }).addTo(map);
 
+    // --- Capas de Fallas Geológicas y Zonas de Intensidad (Doublete Sísmico 1967) ---
+    const faultsGroup = L.layerGroup();
+    const impactZonesGroup = L.layerGroup();
+
+    // 1. Fallas Geológicas (FUNVISIS)
+    const sanSebastianCoords = [
+        [10.750, -67.200],
+        [10.730, -66.900],
+        [10.710, -66.600]
+    ];
+    const sanSebastianPoly = L.polyline(sanSebastianCoords, {
+        color: '#f87171',
+        weight: 4,
+        dashArray: '8, 8',
+        opacity: 0.95
+    }).addTo(faultsGroup);
+    sanSebastianPoly.bindPopup(`
+        <div style="font-family:'Inter',sans-serif; font-size:12px; color:#fff;">
+            <strong style="color:#ef4444;"><i class="fa-solid fa-bolt"></i> Sistema de Fallas de San Sebastián</strong><br>
+            <p style="margin:6px 0 0 0; line-height:1.4; color:#94a3b8;">
+                Falla principal transcurrente dextral bajo el mar Caribe. Límite de placas Caribe-Sudamérica. Generadora del sismo de 1967.
+            </p>
+        </div>
+    `);
+    sanSebastianPoly.bindTooltip("Falla de San Sebastián", { sticky: true, className: "fault-tooltip" });
+
+    const tacaguaAvilaCoords = [
+        [10.585, -67.150],
+        [10.592, -66.950],
+        [10.600, -66.750],
+        [10.608, -66.550]
+    ];
+    const tacaguaAvilaPoly = L.polyline(tacaguaAvilaCoords, {
+        color: '#fb923c',
+        weight: 3.5,
+        dashArray: '6, 6',
+        opacity: 0.9
+    }).addTo(faultsGroup);
+    tacaguaAvilaPoly.bindPopup(`
+        <div style="font-family:'Inter',sans-serif; font-size:12px; color:#fff;">
+            <strong style="color:#f97316;"><i class="fa-solid fa-bolt"></i> Falla de Tacagua - El Ávila</strong><br>
+            <p style="margin:6px 0 0 0; line-height:1.4; color:#94a3b8;">
+                Falla activa en las estribaciones norte del macizo de El Ávila. Genera sismicidad local en la zona costera de Vargas.
+            </p>
+        </div>
+    `);
+    tacaguaAvilaPoly.bindTooltip("Falla de Tacagua - El Ávila", { sticky: true, className: "fault-tooltip" });
+
+    const macutoCoords = [
+        [10.612, -66.920],
+        [10.615, -66.830],
+        [10.620, -66.730]
+    ];
+    const macutoPoly = L.polyline(macutoCoords, {
+        color: '#facc15',
+        weight: 3,
+        dashArray: '5, 5',
+        opacity: 0.85
+    }).addTo(faultsGroup);
+    macutoPoly.bindPopup(`
+        <div style="font-family:'Inter',sans-serif; font-size:12px; color:#fff;">
+            <strong style="color:#eab308;"><i class="fa-solid fa-bolt"></i> Falla de Macuto</strong><br>
+            <p style="margin:6px 0 0 0; line-height:1.4; color:#94a3b8;">
+                Falla inversa secundaria paralela a la costa costera de Vargas, asociada al levantamiento del macizo montañoso de El Ávila.
+            </p>
+        </div>
+    `);
+    macutoPoly.bindTooltip("Falla de Macuto", { sticky: true, className: "fault-tooltip" });
+
+    // 2. Zonas de Intensidad (MMI sismo 1967)
+    const caraballedaZone = L.circle([10.6110, -66.8250], {
+        radius: 1350,
+        color: '#ef4444',
+        weight: 1.5,
+        fillColor: '#7f1d1d',
+        fillOpacity: 0.35
+    }).addTo(impactZonesGroup);
+    caraballedaZone.bindPopup(`
+        <div style="font-family:'Inter',sans-serif; font-size:12px; color:#fff;">
+            <strong style="color:#ef4444;"><i class="fa-solid fa-circle-exclamation"></i> Caraballeda: Intensidad VIII - IX (MMI)</strong><br>
+            <p style="margin:6px 0 0 0; line-height:1.4; color:#94a3b8;">
+                <strong>Daño Catastrófico:</strong> El gran espesor de sedimentos aluviales amplificó severamente las ondas sísmicas en el doblete de 1967, provocando colapsos de edificios altos.
+            </p>
+        </div>
+    `);
+
+    const macutoZone = L.circle([10.6130, -66.8800], {
+        radius: 1100,
+        color: '#fb923c',
+        weight: 1.2,
+        fillColor: '#c2410c',
+        fillOpacity: 0.25
+    }).addTo(impactZonesGroup);
+    macutoZone.bindPopup(`
+        <div style="font-family:'Inter',sans-serif; font-size:12px; color:#fff;">
+            <strong style="color:#f97316;"><i class="fa-solid fa-triangle-exclamation"></i> Macuto: Intensidad VII - VIII (MMI)</strong><br>
+            <p style="margin:6px 0 0 0; line-height:1.4; color:#94a3b8;">
+                <strong>Daño Moderado-Alto:</strong> Daños considerables en estructuras de mediana y baja altura fundadas sobre suelos de transición coluvial/aluvial.
+            </p>
+        </div>
+    `);
+
+    const tanaguarenaZone = L.circle([10.6140, -66.7750], {
+        radius: 1100,
+        color: '#fb923c',
+        weight: 1.2,
+        fillColor: '#c2410c',
+        fillOpacity: 0.25
+    }).addTo(impactZonesGroup);
+    tanaguarenaZone.bindPopup(`
+        <div style="font-family:'Inter',sans-serif; font-size:12px; color:#fff;">
+            <strong style="color:#f97316;"><i class="fa-solid fa-triangle-exclamation"></i> Tanaguarena: Intensidad VII - VIII (MMI)</strong><br>
+            <p style="margin:6px 0 0 0; line-height:1.4; color:#94a3b8;">
+                <strong>Daño Moderado-Alto:</strong> Amplificación local moderada debido al abanico aluvial secundario. Se reportaron daños estructurales significativos.
+            </p>
+        </div>
+    `);
+
+    const laGuairaZone = L.circle([10.6010, -66.9350], {
+        radius: 1700,
+        color: '#facc15',
+        weight: 1.0,
+        fillColor: '#854d0e',
+        fillOpacity: 0.2
+    }).addTo(impactZonesGroup);
+    laGuairaZone.bindPopup(`
+        <div style="font-family:'Inter',sans-serif; font-size:12px; color:#fff;">
+            <strong style="color:#eab308;"><i class="fa-solid fa-circle-info"></i> La Guaira y Maiquetía: Intensidad VI - VII (MMI)</strong><br>
+            <p style="margin:6px 0 0 0; line-height:1.4; color:#94a3b8;">
+                <strong>Daño Leve-Moderado:</strong> Al estar fundados mayormente sobre roca o suelos densos superficiales, se limitaron los daños comparado con Caraballeda.
+            </p>
+        </div>
+    `);
+
+    // Añadir al mapa por defecto
+    faultsGroup.addTo(map);
+    impactZonesGroup.addTo(map);
+
+    // Controles de capas
+    const overlayLayers = {
+        '<span style="color:#f87171; font-weight:600;"><i class="fa-solid fa-bolt"></i> Fallas Geológicas (FUNVISIS)</span>': faultsGroup,
+        '<span style="color:#fb923c; font-weight:600;"><i class="fa-solid fa-house-crack"></i> Zonas de Intensidad (MMI 1967)</span>': impactZonesGroup
+    };
+    L.control.layers(null, overlayLayers, {
+        collapsed: false,
+        position: 'topright'
+    }).addTo(map);
+
+    // Eventos de leyendas dinámicas
+    map.on('overlayadd', (e) => {
+        if (e.name.includes("Fallas")) {
+            const el = document.getElementById('legend-geological');
+            if (el) el.style.display = 'flex';
+        }
+        if (e.name.includes("Intensidad")) {
+            const el = document.getElementById('legend-intensities');
+            if (el) el.style.display = 'flex';
+        }
+    });
+
+    map.on('overlayremove', (e) => {
+        if (e.name.includes("Fallas")) {
+            const el = document.getElementById('legend-geological');
+            if (el) el.style.display = 'none';
+        }
+        if (e.name.includes("Intensidad")) {
+            const el = document.getElementById('legend-intensities');
+            if (el) el.style.display = 'none';
+        }
+    });
+
     // --- Color coding by building status and probability ---
     function getColor(input, norm = currentNorm) {
         if (input === null || input === undefined) return '#ffb703';
