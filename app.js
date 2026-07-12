@@ -6769,6 +6769,7 @@ async function initDamageMap() {
     // --- Capas de Fallas Geológicas y Zonas de Intensidad (Doublete Sísmico 1967) ---
     const faultsGroup = L.layerGroup();
     const impactZonesGroup = L.layerGroup();
+    const pgaGroup = L.layerGroup();
 
     // 1. Fallas Geológicas (FUNVISIS)
     const sanSebastianCoords = [
@@ -6849,6 +6850,50 @@ async function initDamageMap() {
     `);
     macutoPoly.bindTooltip("Falla de Macuto", { sticky: true, className: "fault-tooltip" });
 
+    // 3. Aceleración de Suelo Pico (PGA 2026) - Contornos Reales USGS (M 7.5 Yumare)
+    try {
+        const pgaResponse = await fetch('usgs_pga_contours.json');
+        if (pgaResponse.ok) {
+            const pgaContoursData = await pgaResponse.json();
+            L.geoJSON(pgaContoursData, {
+                style: function(feature) {
+                    const val = feature.properties.value; // %g (50, 20, 10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05)
+                    let color = '#60a5fa';
+                    let weight = 2.0;
+                    
+                    if (val >= 50) { color = '#ef4444'; weight = 4.0; } // 0.50g
+                    else if (val >= 20) { color = '#fb923c'; weight = 3.5; } // 0.20g
+                    else if (val >= 10) { color = '#facc15'; weight = 3.0; } // 0.10g
+                    else if (val >= 5) { color = '#4ade80'; weight = 2.5; }  // 0.05g
+                    else if (val >= 2) { color = '#2ec4b6'; weight = 2.0; }  // 0.02g
+                    else if (val >= 1) { color = '#3b82f6'; weight = 1.5; }  // 0.01g
+                    
+                    return {
+                        color: color,
+                        weight: weight,
+                        opacity: 0.85,
+                        dashArray: '4, 4'
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    const val = feature.properties.value;
+                    const pgaValG = (val / 100).toFixed(2);
+                    layer.bindPopup(`
+                        <div style="font-family:'Inter',sans-serif; font-size:12px; color:#fff;">
+                            <strong style="color:#ef4444;"><i class="fa-solid fa-gauge-high"></i> Contorno de PGA: ${pgaValG}g (${val}%g)</strong><br>
+                            <p style="margin:6px 0 0 0; line-height:1.4; color:#94a3b8;">
+                                Aceleración horizontal máxima estimada por la USGS para este límite durante el sismo del 24 de junio de 2026.
+                            </p>
+                        </div>
+                    `);
+                    layer.bindTooltip(`PGA: ${pgaValG}g`, { sticky: true, className: "fault-tooltip" });
+                }
+            }).addTo(pgaGroup);
+        }
+    } catch (err) {
+        console.error('Error al cargar contornos de PGA de la USGS:', err);
+    }
+
     // 2. Zonas de Intensidad (MMI sismo 1967)
     const caraballedaZone = L.circle([10.6110, -66.8250], {
         radius: 1350,
@@ -6921,7 +6966,8 @@ async function initDamageMap() {
     // Controles de capas
     const overlayLayers = {
         '<span style="color:#f87171; font-weight:600;"><i class="fa-solid fa-bolt"></i> Fallas Geológicas (FUNVISIS)</span>': faultsGroup,
-        '<span style="color:#fb923c; font-weight:600;"><i class="fa-solid fa-house-crack"></i> Zonas de Intensidad (MMI 1967)</span>': impactZonesGroup
+        '<span style="color:#fb923c; font-weight:600;"><i class="fa-solid fa-house-crack"></i> Zonas de Intensidad (MMI 1967)</span>': impactZonesGroup,
+        '<span style="color:#e63946; font-weight:600;"><i class="fa-solid fa-gauge-high"></i> Aceleración de Suelo (PGA 2026)</span>': pgaGroup
     };
     L.control.layers(null, overlayLayers, {
         collapsed: false,
@@ -6938,6 +6984,10 @@ async function initDamageMap() {
             const el = document.getElementById('legend-intensities');
             if (el) el.style.display = 'flex';
         }
+        if (e.name.includes("PGA")) {
+            const el = document.getElementById('legend-pga');
+            if (el) el.style.display = 'flex';
+        }
     });
 
     map.on('overlayremove', (e) => {
@@ -6947,6 +6997,10 @@ async function initDamageMap() {
         }
         if (e.name.includes("Intensidad")) {
             const el = document.getElementById('legend-intensities');
+            if (el) el.style.display = 'none';
+        }
+        if (e.name.includes("PGA")) {
+            const el = document.getElementById('legend-pga');
             if (el) el.style.display = 'none';
         }
     });
