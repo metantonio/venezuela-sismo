@@ -4541,7 +4541,7 @@ function initThreeJS() {
                     if (col.meshes && Array.isArray(col.meshes)) {
                         col.meshes.forEach(segMesh => {
                             targets.push(segMesh);
-                            colMap.set(segMesh, { buildingName: bName, level: lvl, index: idx, colData: col });
+                            colMap.set(segMesh, { buildingName: bName, level: lvl, index: idx, colData: col, mesh: segMesh });
                         });
                     } else if (col.mesh) {
                         targets.push(col.mesh);
@@ -4628,7 +4628,7 @@ function selectColumn(info) {
     if (panel) panel.style.display = "block";
     updateSelectedColumnPanel();
 
-    const colMesh = info.colData.mesh;
+    const colMesh = info.mesh || info.colData.mesh || (info.colData.meshes && info.colData.meshes[0]);
 
     // 1. Crear sleeve semi-transparente dorado alrededor de la columna
     const glowMat = new THREE.MeshBasicMaterial({
@@ -5415,11 +5415,148 @@ function updateBuildingCmCr(bData, bW, bD, activeDir) {
     }
 }
 
+// LIBERACIÓN DE MEMORIA GPU EN WEBGL
+function disposeGroup(group) {
+    if (!group) return;
+    group.traverse((node) => {
+        if (node.isMesh || node.isLineSegments || node instanceof THREE.LineSegments) {
+            if (node.geometry) node.geometry.dispose();
+            if (node.material) {
+                if (Array.isArray(node.material)) {
+                    node.material.forEach(mat => mat.dispose());
+                } else {
+                    node.material.dispose();
+                }
+            }
+        }
+    });
+}
+
+// HELPERS PARA GEOMETRÍA DE FISURAS PROGRESIVAS EN COLUMNAS (FLEXIÓN VS CORTANTE)
+function createFlexuralColumnCracks(w, h, d, level) {
+    const vertices = [];
+    const offset = 0.002;
+    
+    if (level === 'minor') {
+        const zf = d/2 + offset;
+        vertices.push(
+            -w/2, -h/2 + 0.08, zf,  w/2, -h/2 + 0.10, zf,
+            -w/2, h/2 - 0.10, zf,   w/2, h/2 - 0.08, zf
+        );
+        const zb = -d/2 - offset;
+        vertices.push(
+            -w/2, -h/2 + 0.10, zb,  w/2, -h/2 + 0.08, zb,
+            -w/2, h/2 - 0.08, zb,   w/2, h/2 - 0.10, zb
+        );
+    } else if (level === 'moderate') {
+        const zf = d/2 + offset;
+        vertices.push(
+            -w/2, -h/2 + 0.18, zf,  w/3, -h/2 + 0.16, zf,
+            -w/3, h/2 - 0.16, zf,   w/2, h/2 - 0.18, zf
+        );
+        const xl = -w/2 - offset;
+        vertices.push(
+            xl, -h/2 + 0.10, -d/2,  xl, -h/2 + 0.10, d/2,
+            xl, h/2 - 0.10, -d/2,   xl, h/2 - 0.10, d/2
+        );
+    } else if (level === 'severe') {
+        const zf = d/2 + offset;
+        vertices.push(
+            -w/2, -h/2 + 0.25, zf,  w/2, -h/2 + 0.22, zf,
+            -w/2, h/2 - 0.22, zf,   w/2, h/2 - 0.25, zf
+        );
+        const xr = w/2 + offset;
+        vertices.push(
+            xr, -h/2 + 0.10, -d/2,  xr, -h/2 + 0.10, d/2,
+            xr, h/2 - 0.10, -d/2,   xr, h/2 - 0.10, d/2
+        );
+    }
+
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    return geom;
+}
+
+function createShearColumnCracks(w, h, d, level) {
+    const vertices = [];
+    const offset = 0.002;
+
+    if (level === 'minor') {
+        const zf = d/2 + offset;
+        vertices.push(-w/2, -h/4, zf, w/2, h/4, zf);
+        const zb = -d/2 - offset;
+        vertices.push(-w/2, -h/4, zb, w/2, h/4, zb);
+    } else if (level === 'moderate') {
+        const zf = d/2 + offset;
+        vertices.push(-w/2, h/4, zf, w/2, -h/4, zf);
+        const zb = -d/2 - offset;
+        vertices.push(-w/2, h/4, zb, w/2, -h/4, zb);
+    } else if (level === 'severe') {
+        const xl = -w/2 - offset;
+        vertices.push(
+            xl, -h/3, -d/2, xl, h/3, d/2,
+            xl, h/3, -d/2, xl, -h/3, d/2
+        );
+        const xr = w/2 + offset;
+        vertices.push(
+            xr, -h/3, -d/2, xr, h/3, d/2,
+            xr, h/3, -d/2, xr, -h/3, d/2
+        );
+    }
+
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    return geom;
+}
+
+// HELPER PARA GEOMETRÍA DE FISURAS EN VIGAS (FLEXIÓN - VERTICALES EN LOS APOYOS)
+function createBeamCracksGeometry(L, H, W, level) {
+    const vertices = [];
+    const offset = 0.002;
+    const yf = W/2 + offset;
+    
+    if (level === 'minor') {
+        vertices.push(
+            -L/2 + 0.15, -H/2, yf,   -L/2 + 0.15, H/3, yf,
+            L/2 - 0.15, -H/2, yf,    L/2 - 0.15, H/3, yf
+        );
+        const yb = -W/2 - offset;
+        vertices.push(
+            -L/2 + 0.15, -H/2, yb,   -L/2 + 0.15, H/3, yb,
+            L/2 - 0.15, -H/2, yb,    L/2 - 0.15, H/3, yb
+        );
+    } else if (level === 'severe') {
+        vertices.push(
+            -L/2 + 0.30, -H/2, yf,   -L/2 + 0.30, H/2, yf,
+            L/2 - 0.30, -H/2, yf,    L/2 - 0.30, H/2, yf
+        );
+        const yb = -W/2 - offset;
+        vertices.push(
+            -L/2 + 0.30, -H/2, yb,   -L/2 + 0.30, H/2, yb,
+            L/2 - 0.30, -H/2, yb,    L/2 - 0.30, H/2, yb
+        );
+    }
+
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    return geom;
+}
+
 // RECONSTRUCCIÓN DE LOS MODELOS 3D DE CADA EDIFICIO
 function rebuild3DStructures() {
-    // Limpiar escena anterior de edificios
-    if (buildings3D.b2001.group) scene.remove(buildings3D.b2001.group);
-    if (buildings3D.b2019.group) scene.remove(buildings3D.b2019.group);
+    if (typeof scene === 'undefined' || !scene) {
+        console.warn('[rebuild3DStructures] La escena 3D no está inicializada (WebGL podría no estar soportado).');
+        return;
+    }
+    // Limpiar escena anterior de edificios con disposición de memoria
+    if (buildings3D.b2001.group) {
+        disposeGroup(buildings3D.b2001.group);
+        scene.remove(buildings3D.b2001.group);
+    }
+    if (buildings3D.b2019.group) {
+        disposeGroup(buildings3D.b2019.group);
+        scene.remove(buildings3D.b2019.group);
+    }
 
     const N = eq2001.N;
     const h = eq2001.h;
@@ -5598,6 +5735,17 @@ function rebuild3DStructures() {
                 });
 
                 const segments = [];
+                // Instanciar geometrías de cracks progresivos
+                const cMinorGeom = colorTheme === '2019'
+                    ? createFlexuralColumnCracks(colW, hSeg, colD, 'minor')
+                    : createShearColumnCracks(colW, hSeg, colD, 'minor');
+                const cModGeom = colorTheme === '2019'
+                    ? createFlexuralColumnCracks(colW, hSeg, colD, 'moderate')
+                    : createShearColumnCracks(colW, hSeg, colD, 'moderate');
+                const cSevGeom = colorTheme === '2019'
+                    ? createFlexuralColumnCracks(colW, hSeg, colD, 'severe')
+                    : createShearColumnCracks(colW, hSeg, colD, 'severe');
+
                 for (let s = 0; s < numSegs; s++) {
                     const segMesh = new THREE.Mesh(segGeom, colMat);
                     segMesh.castShadow = true;
@@ -5605,6 +5753,27 @@ function rebuild3DStructures() {
                     // Posicionar a la altura correspondiente del segmento inicialmente
                     const xi = (s + 0.5) / numSegs;
                     segMesh.position.set(colOffsets[c].x, lvl * h + xi * h, colOffsets[c].z);
+
+                    // Instanciar cracks progresivos para este segmento
+                    const lineMatMinor = new THREE.LineBasicMaterial({ color: 0x111111, transparent: true, opacity: 0 });
+                    const lineMatMod = new THREE.LineBasicMaterial({ color: 0x111111, transparent: true, opacity: 0 });
+                    const lineMatSev = new THREE.LineBasicMaterial({ color: 0x111111, transparent: true, opacity: 0 });
+
+                    const minorMesh = new THREE.LineSegments(cMinorGeom, lineMatMinor);
+                    minorMesh.name = "cracks_minor";
+                    minorMesh.visible = false;
+                    segMesh.add(minorMesh);
+
+                    const modMesh = new THREE.LineSegments(cModGeom, lineMatMod);
+                    modMesh.name = "cracks_moderate";
+                    modMesh.visible = false;
+                    segMesh.add(modMesh);
+
+                    const sevMesh = new THREE.LineSegments(cSevGeom, lineMatSev);
+                    sevMesh.name = "cracks_severe";
+                    sevMesh.visible = false;
+                    segMesh.add(sevMesh);
+
                     bData.group.add(segMesh);
                     segments.push(segMesh);
                 }
@@ -5666,6 +5835,10 @@ function rebuild3DStructures() {
                         });
 
                         const segments = [];
+                        // Instanciar geometrías de cracks de viga X (en los extremos del vano)
+                        const bMinorGeom = createBeamCracksGeometry(sX, beamH, beamW, 'minor');
+                        const bSevGeom = createBeamCracksGeometry(sX, beamH, beamW, 'severe');
+
                         for (let s = 0; s < numSegs; s++) {
                             const segMesh = new THREE.Mesh(beamGeomX, beamMat);
                             segMesh.castShadow = true;
@@ -5675,6 +5848,23 @@ function rebuild3DStructures() {
                             const eta = (s + 0.5) / numSegs;
                             const x_s = xStart + eta * sX;
                             segMesh.position.set(x_s, -0.1 - beamH / 2, z);
+
+                            // Añadir grietas a los segmentos de apoyo de la viga (s === 0 o s === numSegs - 1)
+                            if (s === 0 || s === numSegs - 1) {
+                                const bMatMinor = new THREE.LineBasicMaterial({ color: 0x111111, transparent: true, opacity: 0 });
+                                const bMatSev = new THREE.LineBasicMaterial({ color: 0x111111, transparent: true, opacity: 0 });
+
+                                const bMinorMesh = new THREE.LineSegments(bMinorGeom, bMatMinor);
+                                bMinorMesh.name = "cracks_minor";
+                                bMinorMesh.visible = false;
+                                segMesh.add(bMinorMesh);
+
+                                const bSevMesh = new THREE.LineSegments(bSevGeom, bMatSev);
+                                bSevMesh.name = "cracks_severe";
+                                bSevMesh.visible = false;
+                                segMesh.add(bSevMesh);
+                            }
+
                             floorMesh.add(segMesh);
                             segments.push(segMesh);
                         }
@@ -5716,6 +5906,10 @@ function rebuild3DStructures() {
                         });
 
                         const segments = [];
+                        // Instanciar geometrías de cracks de viga Y (en los extremos del vano)
+                        const bMinorGeom = createBeamCracksGeometry(sY, beamH, beamW, 'minor');
+                        const bSevGeom = createBeamCracksGeometry(sY, beamH, beamW, 'severe');
+
                         for (let s = 0; s < numSegs; s++) {
                             const segMesh = new THREE.Mesh(beamGeomY, beamMat);
                             segMesh.castShadow = true;
@@ -5725,6 +5919,23 @@ function rebuild3DStructures() {
                             const eta = (s + 0.5) / numSegs;
                             const z_s = zStart + eta * sY;
                             segMesh.position.set(x, -0.1 - beamH / 2, z_s);
+
+                            // Añadir grietas a los segmentos de apoyo de la viga (s === 0 o s === numSegs - 1)
+                            if (s === 0 || s === numSegs - 1) {
+                                const bMatMinor = new THREE.LineBasicMaterial({ color: 0x111111, transparent: true, opacity: 0 });
+                                const bMatSev = new THREE.LineBasicMaterial({ color: 0x111111, transparent: true, opacity: 0 });
+
+                                const bMinorMesh = new THREE.LineSegments(bMinorGeom, bMatMinor);
+                                bMinorMesh.name = "cracks_minor";
+                                bMinorMesh.visible = false;
+                                segMesh.add(bMinorMesh);
+
+                                const bSevMesh = new THREE.LineSegments(bSevGeom, bMatSev);
+                                bSevMesh.name = "cracks_severe";
+                                bSevMesh.visible = false;
+                                segMesh.add(bSevMesh);
+                            }
+
                             floorMesh.add(segMesh);
                             segments.push(segMesh);
                         }
@@ -5828,6 +6039,7 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
     const N = bModel.N;
     const h = bModel.h;
     const isX = (activeDir === 'X');
+    const colorTheme = (bModel === eq2019) ? '2019' : '2001';
 
     const flexureCheck = document.getElementById("show-flexure-deformation");
     const useFlexure = flexureCheck ? flexureCheck.checked : false;
@@ -5885,28 +6097,43 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
 
             // Columnas del piso fallado colapsan (escala vertical va a cero y se rotan)
             const cols = b3D.columns[lvl];
+            const showCracksCheck = document.getElementById("show-cracks");
+            const showCracks = showCracksCheck ? showCracksCheck.checked : true;
             cols.forEach(col => {
                 col.meshes.forEach(segMesh => {
                     segMesh.scale.y = Math.max(0.1, segMesh.scale.y - 0.05);
                     segMesh.rotation.z += (col.offsetX > 0 ? 0.03 : -0.03);
-                });
-                col.material.color.setHex(0x111111); // Negro de escombros quemados/destruidos
 
-                // Ocultar rótulas plásticas en colapso
-                if (col.bottomHinge) col.bottomHinge.visible = false;
-                if (col.topHinge) col.topHinge.visible = false;
+                    // En colapso, mostrar grietas permanentemente con color negro profundo
+                    const minor = segMesh.getObjectByName("cracks_minor");
+                    const mod = segMesh.getObjectByName("cracks_moderate");
+                    const sev = segMesh.getObjectByName("cracks_severe");
+                    if (minor && mod && sev) {
+                        minor.visible = showCracks; minor.material.opacity = 0.95; minor.material.color.setHex(0x000000);
+                        mod.visible = showCracks;   mod.material.opacity = 0.95;   mod.material.color.setHex(0x000000);
+                        sev.visible = showCracks;   sev.material.opacity = 0.95;   sev.material.color.setHex(0x000000);
+                    }
+                });
+                col.material.color.setHex(0x111111); // Negro
             });
 
-            // Vigas de ese nivel también se vuelven negras/apagadas
-            if (b3D.beamsX && b3D.beamsX[lvl]) {
-                b3D.beamsX[lvl].forEach(beam => {
-                    if (beam.material) beam.material.color.setHex(0x111111);
+            // Vigas de ese nivel también se vuelven negras/apagadas y muestran grietas completas
+            const setBeamCollapsed = (beam) => {
+                if (beam.material) beam.material.color.setHex(0x111111);
+                beam.meshes.forEach(segMesh => {
+                    const minor = segMesh.getObjectByName("cracks_minor");
+                    const sev = segMesh.getObjectByName("cracks_severe");
+                    if (minor && sev) {
+                        minor.visible = showCracks; minor.material.opacity = 0.95; minor.material.color.setHex(0x000000);
+                        sev.visible = showCracks;   sev.material.opacity = 0.95;   sev.material.color.setHex(0x000000);
+                    }
                 });
+            };
+            if (b3D.beamsX && b3D.beamsX[lvl]) {
+                b3D.beamsX[lvl].forEach(setBeamCollapsed);
             }
             if (b3D.beamsY && b3D.beamsY[lvl]) {
-                b3D.beamsY[lvl].forEach(beam => {
-                    if (beam.material) beam.material.color.setHex(0x111111);
-                });
+                b3D.beamsY[lvl].forEach(setBeamCollapsed);
             }
         }
         return;
@@ -6022,7 +6249,85 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
                 }
             }
 
-            // Mover y deformar las columnas según la opción de flexión avanzada
+            // Actualizar visualización de Grietas (Cracks) en Columnas
+            const showCracksCheck = document.getElementById("show-cracks");
+            const showCracks = showCracksCheck ? showCracksCheck.checked : true;
+            
+            col.meshes.forEach(segMesh => {
+                const minor = segMesh.getObjectByName("cracks_minor");
+                const mod = segMesh.getObjectByName("cracks_moderate");
+                const sev = segMesh.getObjectByName("cracks_severe");
+
+                if (minor && mod && sev) {
+                    if (showCracks) {
+                        if (colDriftRatio >= 0.018) {
+                            minor.visible = true; minor.material.opacity = 0.95;
+                            mod.visible = true;   mod.material.opacity = 0.95;
+                            sev.visible = true;   sev.material.opacity = 0.95;
+                        } else if (colDriftRatio >= 0.015) {
+                            minor.visible = true; minor.material.opacity = 0.90;
+                            mod.visible = true;   mod.material.opacity = 0.80;
+                            sev.visible = false;  sev.material.opacity = 0;
+                        } else if (colDriftRatio >= 0.012) {
+                            minor.visible = true; minor.material.opacity = 0.60;
+                            mod.visible = false;  mod.material.opacity = 0;
+                            sev.visible = false;  sev.material.opacity = 0;
+                        } else {
+                            minor.visible = false; minor.material.opacity = 0;
+                            mod.visible = false;   mod.material.opacity = 0;
+                            sev.visible = false;   sev.material.opacity = 0;
+                        }
+                    } else {
+                        minor.visible = false;
+                        mod.visible = false;
+                        sev.visible = false;
+                    }
+                }
+            });
+
+            // Determinar deriva máxima del entrepiso para activar daño en vigas
+            let maxStoryDrift = 0;
+            cols.forEach(c_col => {
+                if (c_col.currentDriftRatio > maxStoryDrift) {
+                    maxStoryDrift = c_col.currentDriftRatio;
+                }
+            });
+
+            const beamDriftTriggerMinor = colorTheme === '2019' ? 0.008 : 0.016; // Vigas 2019 (viga débil) agrietan antes
+            const beamDriftTriggerSevere = colorTheme === '2019' ? 0.015 : 0.022;
+
+            const updateBeamCracks = (beam) => {
+                beam.meshes.forEach(segMesh => {
+                    const minor = segMesh.getObjectByName("cracks_minor");
+                    const sev = segMesh.getObjectByName("cracks_severe");
+                    if (minor && sev) {
+                        if (showCracks) {
+                            if (maxStoryDrift >= beamDriftTriggerSevere) {
+                                minor.visible = true; minor.material.opacity = 0.90;
+                                sev.visible = true;   sev.material.opacity = 0.85;
+                            } else if (maxStoryDrift >= beamDriftTriggerMinor) {
+                                minor.visible = true; minor.material.opacity = 0.70;
+                                sev.visible = false;  sev.material.opacity = 0;
+                            } else {
+                                minor.visible = false; minor.material.opacity = 0;
+                                sev.visible = false;  sev.material.opacity = 0;
+                            }
+                        } else {
+                            minor.visible = false;
+                            sev.visible = false;
+                        }
+                    }
+                });
+            };
+
+            if (b3D.beamsX && b3D.beamsX[lvl]) {
+                b3D.beamsX[lvl].forEach(updateBeamCracks);
+            }
+            if (b3D.beamsY && b3D.beamsY[lvl]) {
+                b3D.beamsY[lvl].forEach(updateBeamCracks);
+            }
+
+                        // Mover y deformar las columnas según la opción de flexión avanzada
             const dx = x_top - x_bottom;
             const dz = z_top - z_bottom;
 
@@ -6066,7 +6371,6 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
         });
 
         // Configuración de vigas
-        const colorTheme = (bModel === eq2001) ? '2001' : '2019';
         const customSectionsCheck = document.getElementById("custom-sections-enable");
         const useCustom = customSectionsCheck ? customSectionsCheck.checked : false;
         let beamH;
