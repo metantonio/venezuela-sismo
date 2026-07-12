@@ -6772,9 +6772,14 @@ async function initDamageMap() {
 
     // 1. Fallas Geológicas (FUNVISIS)
     const sanSebastianCoords = [
-        [10.750, -67.200],
-        [10.730, -66.900],
-        [10.710, -66.600]
+        [10.760, -67.200],
+        [10.752, -67.100],
+        [10.743, -67.000],
+        [10.733, -66.900],
+        [10.722, -66.800],
+        [10.710, -66.700],
+        [10.698, -66.600],
+        [10.685, -66.500]
     ];
     const sanSebastianPoly = L.polyline(sanSebastianCoords, {
         color: '#f87171',
@@ -6793,10 +6798,13 @@ async function initDamageMap() {
     sanSebastianPoly.bindTooltip("Falla de San Sebastián", { sticky: true, className: "fault-tooltip" });
 
     const tacaguaAvilaCoords = [
-        [10.585, -67.150],
-        [10.592, -66.950],
-        [10.600, -66.750],
-        [10.608, -66.550]
+        [10.575, -67.150],
+        [10.582, -67.050],
+        [10.588, -66.950],
+        [10.593, -66.850],
+        [10.598, -66.750],
+        [10.602, -66.650],
+        [10.605, -66.550]
     ];
     const tacaguaAvilaPoly = L.polyline(tacaguaAvilaCoords, {
         color: '#fb923c',
@@ -6815,9 +6823,15 @@ async function initDamageMap() {
     tacaguaAvilaPoly.bindTooltip("Falla de Tacagua - El Ávila", { sticky: true, className: "fault-tooltip" });
 
     const macutoCoords = [
-        [10.612, -66.920],
-        [10.615, -66.830],
-        [10.620, -66.730]
+        [10.603, -67.050],
+        [10.605, -67.000],
+        [10.608, -66.950],
+        [10.611, -66.900],
+        [10.613, -66.850],
+        [10.615, -66.800],
+        [10.618, -66.750],
+        [10.620, -66.700],
+        [10.623, -66.650]
     ];
     const macutoPoly = L.polyline(macutoCoords, {
         color: '#facc15',
