@@ -486,6 +486,13 @@ function initUI() {
 
     // Sincronizar estado inicial de la carga de sismos personalizados
     toggleEarthquakeInputType();
+
+    // Inicializar sistema de evaluación de Boletín FUNVISIS
+    try {
+        initBoletin();
+    } catch (e) {
+        console.error("Error al inicializar sección Boletín:", e);
+    }
 }
 
 // --- FÓRMULAS SÍSMICAS COVENIN 1756 ---
@@ -7750,4 +7757,919 @@ if (document.readyState === 'loading') {
 } else {
     initFeedbackSystem();
 }
+
+
+// ==========================================================================
+// SECCIÓN DE EVALUACIÓN RÁPIDA DE DAÑOS (BOLETÍN FUNVISIS 2023)
+// ==========================================================================
+
+let activeGuideElement = 'column';
+let activeGuideDamage = 'moderado';
+
+// Inicializador principal
+function initBoletin() {
+    // 1. Escuchas de eventos para formulario principal
+    const formInputs = [
+        'bol-name', 'bol-address', 'bol-floors', 'bol-use', 'bol-material',
+        'bol-critical-floor', 'bol-access', 'bol-sev-cols', 'bol-sev-walls-c',
+        'bol-sev-walls-m', 'bol-sev-beams', 'bol-mod-total', 'bol-mod-count'
+    ];
+
+    formInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', calculateBoletinRisk);
+            el.addEventListener('change', calculateBoletinRisk);
+        }
+    });
+
+    // Escuchas para radio buttons (Inspección Externa y Componentes)
+    const radioNames = [
+        'bol-ext-collapse', 'bol-ext-neighbor', 'bol-ext-geol', 'bol-ext-settlement', 'bol-ext-tilt',
+        'bol-comp-slabs', 'bol-comp-walls', 'bol-comp-tanks', 'bol-comp-utilities', 'bol-comp-elevators'
+    ];
+
+    radioNames.forEach(name => {
+        const radios = document.getElementsByName(name);
+        radios.forEach(radio => {
+            radio.addEventListener('change', calculateBoletinRisk);
+        });
+    });
+
+    // Escuchas para checkboxes de acciones
+    const actionIds = [
+        'bol-act-det-struct', 'bol-act-det-geot', 'bol-act-det-inst',
+        'bol-act-prev-cordon', 'bol-act-prev-street', 'bol-act-prev-shore', 'bol-act-prev-gas', 'bol-act-prev-elec'
+    ];
+    actionIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', updateActionsFromUI);
+        }
+    });
+
+    // 2. Preset selector
+    const presetSelect = document.getElementById('boletin-preset-select');
+    if (presetSelect) {
+        presetSelect.addEventListener('change', (e) => {
+            loadBoletinPreset(e.target.value);
+        });
+    }
+
+    // 3. Botones del Manual de Entrenamiento (Guía Visual)
+    const elemBtns = document.querySelectorAll('.guide-elem-btn');
+    elemBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            elemBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeGuideElement = btn.getAttribute('data-element');
+            updateGuideVisual();
+        });
+    });
+
+    const dmgBtns = document.querySelectorAll('.guide-dmg-btn');
+    dmgBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            dmgBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeGuideDamage = btn.getAttribute('data-damage');
+            updateGuideVisual();
+        });
+    });
+
+    // Inicializar visualización de la guía y cálculo
+    updateGuideVisual();
+    calculateBoletinRisk();
+}
+
+// Algoritmo de decisión y actualización de etiqueta
+function calculateBoletinRisk() {
+    // 1. Obtener datos básicos
+    const name = document.getElementById('bol-name').value || 'Edificación';
+    const address = document.getElementById('bol-address').value || 'Sin dirección';
+    const floors = parseInt(document.getElementById('bol-floors').value) || 1;
+    const dateStr = new Date().toLocaleDateString('es-VE');
+
+    // Actualizar datos en la etiqueta visual
+    document.getElementById('tag-display-name').textContent = name;
+    document.getElementById('tag-display-address').textContent = address;
+    document.getElementById('tag-display-date').textContent = dateStr;
+
+    // Generar planilla aleatoria/consecutiva simulada
+    const floorsPad = String(floors).padStart(2, '0');
+    document.getElementById('tag-display-id').textContent = `BOL-2026-${floorsPad}45`;
+
+    // 2. Evaluar Sección 2: Riesgo Externo
+    let riskSec2 = 'bajo';
+    const extAspects = [
+        { val: getRadioVal('bol-ext-collapse'), name: 'Colapso de estructura' },
+        { val: getRadioVal('bol-ext-neighbor'), name: 'Edificios aledaños' },
+        { val: getRadioVal('bol-ext-geol'), name: 'Peligro geológico' },
+        { val: getRadioVal('bol-ext-settlement'), name: 'Asentamiento' },
+        { val: getRadioVal('bol-ext-tilt'), name: 'Inclinación de la estructura' }
+    ];
+
+    let extAltoAspects = [];
+    let extMedioAspects = [];
+    extAspects.forEach(asp => {
+        if (asp.val === 'alto') {
+            riskSec2 = 'alto';
+            extAltoAspects.push(asp.name);
+        } else if (asp.val === 'medio' && riskSec2 !== 'alto') {
+            riskSec2 = 'medio';
+            extMedioAspects.push(asp.name);
+        }
+    });
+
+    // 3. Evaluar Sección 3: Daño Severo/Completo (Piso Crítico)
+    const sevCols = parseInt(document.getElementById('bol-sev-cols').value) || 0;
+    const sevWallsC = parseInt(document.getElementById('bol-sev-walls-c').value) || 0;
+    const sevWallsM = parseInt(document.getElementById('bol-sev-walls-m').value) || 0;
+    const sevBeams = parseInt(document.getElementById('bol-sev-beams').value) || 0;
+    const totalSevereElements = sevCols + sevWallsC + sevWallsM + sevBeams;
+
+    let riskSec3 = 'bajo';
+    if (totalSevereElements >= 1) {
+        riskSec3 = 'alto';
+    }
+
+    // 4. Evaluar Sección 4: Daño Moderado
+    const modTotal = parseInt(document.getElementById('bol-mod-total').value) || 20;
+    const modCount = parseInt(document.getElementById('bol-mod-count').value) || 0;
+    const elementType = document.getElementById('bol-mod-element-type').value;
+
+    let pct = (modCount / Math.max(modTotal, 1)) * 100;
+    document.getElementById('bol-mod-pct-display').textContent = `${pct.toFixed(2)}%`;
+
+    let riskSec4 = 'bajo';
+    const riskDisplay = document.getElementById('bol-mod-risk-display');
+    
+    // Si la Sección 3 tiene daño severo, la planilla indica parar, pero calculamos igual
+    if (pct < 10) {
+        riskSec4 = 'bajo';
+        if (riskDisplay) {
+            riskDisplay.textContent = 'Bajo (<10%)';
+            riskDisplay.className = 'badge-status-green';
+        }
+    } else if (pct >= 10 && pct <= 30) {
+        riskSec4 = 'medio';
+        if (riskDisplay) {
+            riskDisplay.textContent = 'Medio (10-30%)';
+            riskDisplay.className = 'badge-status-yellow';
+        }
+    } else {
+        riskSec4 = 'alto';
+        if (riskDisplay) {
+            riskDisplay.textContent = 'Alto (>30%)';
+            riskDisplay.className = 'badge-status-red';
+        }
+    }
+
+    // Ocultar o atenuar Sección 4 si hay elementos con daño Severo
+    const cardDanoModerado = document.getElementById('card-dano-moderado');
+    if (cardDanoModerado) {
+        if (totalSevereElements >= 1) {
+            cardDanoModerado.style.opacity = '0.5';
+            cardDanoModerado.style.pointerEvents = 'none';
+        } else {
+            cardDanoModerado.style.opacity = '1';
+            cardDanoModerado.style.pointerEvents = 'auto';
+        }
+    }
+
+    // 5. Evaluar Sección 5: Componentes No Estructurales
+    let riskSec5 = 'bajo';
+    const compAspects = [
+        { val: getRadioVal('bol-comp-slabs'), name: 'Losas/Balcones' },
+        { val: getRadioVal('bol-comp-walls'), name: 'Paredes/Fachadas' },
+        { val: getRadioVal('bol-comp-tanks'), name: 'Tanques/Antenas' },
+        { val: getRadioVal('bol-comp-utilities'), name: 'Servicios de Gas/Luz' },
+        { val: getRadioVal('bol-comp-elevators'), name: 'Ascensores/Equipos' }
+    ];
+
+    let compAltoAspects = [];
+    let compMedioAspects = [];
+    compAspects.forEach(asp => {
+        if (asp.val === 'alto') {
+            riskSec5 = 'alto';
+            compAltoAspects.push(asp.name);
+        } else if (asp.val === 'medio' && riskSec5 !== 'alto') {
+            riskSec5 = 'medio';
+            compMedioAspects.push(asp.name);
+        }
+    });
+
+    // 6. Calificación Final (El máximo riesgo entre Secciones 2, 3, 4 y 5)
+    let finalRisk = 'bajo';
+    let triggers = [];
+
+    if (riskSec2 === 'alto') { finalRisk = 'alto'; triggers.push('Inspección Externa con Riesgo Alto'); }
+    if (riskSec3 === 'alto') { finalRisk = 'alto'; triggers.push('Daño Severo/Completo en Elementos Principales'); }
+    if (riskSec4 === 'alto') { finalRisk = 'alto'; triggers.push('Daño Moderado excesivo (>30% de elementos)'); }
+    if (riskSec5 === 'alto') { finalRisk = 'alto'; triggers.push('Componentes No Estructurales con Riesgo Alto'); }
+
+    if (finalRisk !== 'alto') {
+        if (riskSec2 === 'medio') { finalRisk = 'medio'; triggers.push('Inspección Externa con Riesgo Medio'); }
+        if (riskSec4 === 'medio') { finalRisk = 'medio'; triggers.push('Daño Moderado en rango 10-30%'); }
+        if (riskSec5 === 'medio') { finalRisk = 'medio'; triggers.push('Componentes No Estructurales con Riesgo Medio'); }
+    }
+
+    // 7. Actualizar la Etiqueta Visual de FUNVISIS
+    const tagBox = document.getElementById('boletin-tag-box');
+    const tagTitle = document.getElementById('boletin-tag-title');
+    const tagSubtitle = document.getElementById('boletin-tag-subtitle');
+    const explanationText = document.getElementById('dictamen-explanation-text');
+    const actionsList = document.getElementById('dictamen-actions-list');
+
+    // Desmarcar todo en checkboxes por defecto al recalcular para no pisar el UI
+    // a menos que sea gatillado por preset. Mantendremos sincronizado el dictamen con los checkboxes.
+    let suggestedActions = [];
+    let requiredDetInspections = [];
+
+    if (finalRisk === 'alto') {
+        // ETIQUETA ROJA: ACCESO NO PERMITIDO (PELIGRO)
+        tagBox.className = 'funvisis-tag-box tag-roja-style';
+        tagTitle.textContent = 'PELIGRO';
+        tagSubtitle.textContent = 'NO ENTRE NI OCUPE';
+        
+        explanationText.innerHTML = `<strong>Riesgo Alto Detectado.</strong> Se restringe totalmente el acceso debido a:<br>
+            <ul style="margin: 6px 0; padding-left: 18px; color: #ff6b6b;">
+                ${triggers.map(t => `<li>${t}</li>`).join('')}
+            </ul>
+            Detalles técnicos: ${extAltoAspects.length ? `Riesgo externo severo en: ${extAltoAspects.join(', ')}. ` : ''}
+            ${totalSevereElements ? `Se registraron ${totalSevereElements} elementos estructurales con daño Severo/Completo en el Piso Crítico (${document.getElementById('bol-critical-floor').value}).` : ''}
+            ${riskSec4 === 'alto' ? `Se superó el límite del 30% de daño moderado en ${elementType}s (${pct.toFixed(1)}%).` : ''}
+            ${compAltoAspects.length ? `Riesgo inminente de caída/colapso en: ${compAltoAspects.join(', ')}.` : ''}`;
+
+        suggestedActions = [
+            'Inspección Estructural Detallada por especialistas.',
+            'Acordonar la zona del edificio (riesgo de colapso o caída de escombros).',
+            'Cerrar calles aledañas al tránsito peatonal y vehicular.',
+            'Desconectar servicios principales de gas y electricidad para evitar incendios.',
+            'Apuntalar urgentemente elementos dañados que comprometan la gravedad.'
+        ];
+        
+        // Auto-check preventivos sugeridos
+        setCheckVal('bol-act-det-struct', true);
+        setCheckVal('bol-act-prev-cordon', true);
+    } else if (finalRisk === 'medio') {
+        // ETIQUETA AMARILLA: ACCESO RESTRINGIDO (ATENCIÓN)
+        tagBox.className = 'funvisis-tag-box tag-amarilla-style';
+        tagTitle.textContent = 'ATENCIÓN';
+        tagSubtitle.textContent = 'USO RESTRINGIDO';
+        
+        explanationText.innerHTML = `<strong>Riesgo Moderado Detectado.</strong> Acceso limitado temporalmente. Riesgos identificados:<br>
+            <ul style="margin: 6px 0; padding-left: 18px; color: #ffcc00;">
+                ${triggers.map(t => `<li>${t}</li>`).join('')}
+            </ul>
+            Detalles: ${extMedioAspects.length ? `Factores externos en nivel Medio: ${extMedioAspects.join(', ')}. ` : ''}
+            ${riskSec4 === 'medio' ? `Daño moderado de entrepiso en ${elementType}s del ${pct.toFixed(1)}% (Rango 10-30%).` : ''}
+            ${compMedioAspects.length ? `Daños moderados en componentes no estructurales: ${compMedioAspects.join(', ')}.` : ''}`;
+
+        suggestedActions = [
+            'Inspección Estructural Detallada para autorizar reparaciones.',
+            'Acordonar localmente las zonas inestables (ej. balcones o fachadas agrietadas).',
+            'Monitoreo visual continuo ante posibles réplicas.'
+        ];
+        
+        setCheckVal('bol-act-det-struct', true);
+        setCheckVal('bol-act-prev-cordon', true);
+    } else {
+        // ETIQUETA VERDE: ACCESO PERMITIDO (HABITABLE)
+        tagBox.className = 'funvisis-tag-box tag-verde-style';
+        tagTitle.textContent = 'HABITABLE';
+        tagSubtitle.textContent = 'ACCESO PERMITIDO';
+        
+        explanationText.innerHTML = `<strong>Estructura Segura / Daño Leve.</strong> La edificación no presenta riesgos estructurales ni externos significativos. Las condiciones son estables.`;
+        
+        suggestedActions = [
+            'Acceso libre permitido de forma inmediata.',
+            'Monitorear la aparición de microfisuras durante las réplicas.',
+            'No se requieren inspecciones detalladas obligatorias de emergencia.'
+        ];
+        
+        setCheckVal('bol-act-det-struct', false);
+        setCheckVal('bol-act-prev-cordon', false);
+    }
+
+    // Renderizar lista de acciones sugeridas en panel
+    actionsList.innerHTML = suggestedActions.map(act => `<li><i class="fa-solid fa-check" style="color: #2ec4b6; margin-right: 6px;"></i> ${act}</li>`).join('');
+}
+
+// Actualizar checkboxes del formulario basados en clics del usuario
+function updateActionsFromUI() {
+    // Esto se dispara cuando el usuario interactúa manualmente con los checkboxes
+    // No requiere lógica especial más allá de no interferir con calculateBoletinRisk.
+}
+
+// Carga de Presets de Casos Reales
+function loadBoletinPreset(presetName) {
+    const setRadio = (name, value) => {
+        const radios = document.getElementsByName(name);
+        radios.forEach(r => {
+            r.checked = (r.value === value);
+        });
+    };
+
+    const setInput = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.value = value;
+    };
+
+    const setCheck = (id, checked) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = checked;
+    };
+
+    if (presetName === 'sheraton') {
+        // Hotel Macuto Sheraton (Caracas 1967) - Colapso de Columnas en PB/Mezzanina
+        setInput('bol-name', 'Hotel Macuto Sheraton (Módulo Central)');
+        setInput('bol-address', 'Sector Caraballeda, Litoral Central');
+        setInput('bol-floors', 11);
+        setInput('bol-use', 'commercial');
+        setInput('bol-material', 'concrete');
+
+        // Inspección Externa: Peligro geológico medio (licuación de arena costera)
+        setRadio('bol-ext-collapse', 'bajo');
+        setRadio('bol-ext-neighbor', 'bajo');
+        setRadio('bol-ext-geol', 'medio');
+        setRadio('bol-ext-settlement', 'bajo');
+        setRadio('bol-ext-tilt', 'bajo');
+
+        // Daño Severo: 14 Columnas en Mezzanina colapsadas/aplastadas
+        setInput('bol-critical-floor', 'Mezzanina / Piso 3');
+        setInput('bol-access', 'todos');
+        setInput('bol-sev-cols', 14);
+        setInput('bol-sev-walls-c', 0);
+        setInput('bol-sev-walls-m', 0);
+        setInput('bol-sev-beams', 4); // Vigas agrietadas con pérdida de concreto
+
+        // Daño Moderado (Sección 4): Omitido por severidad alta
+        setInput('bol-mod-element-type', 'columna');
+        setInput('bol-mod-total', 24);
+        setInput('bol-mod-count', 0);
+
+        // Componentes No Estructurales: Colapso de cielo raso en lobby, vigas de mampostería agrietadas
+        setRadio('bol-comp-slabs', 'medio');
+        setRadio('bol-comp-walls', 'medio');
+        setRadio('bol-comp-tanks', 'bajo');
+        setRadio('bol-comp-utilities', 'medio');
+        setRadio('bol-comp-elevators', 'medio');
+
+        // Acciones recomendadas
+        setCheck('bol-act-det-struct', true);
+        setCheck('bol-act-det-geot', true);
+        setCheck('bol-act-det-inst', true);
+        setCheck('bol-act-prev-cordon', true);
+        setCheck('bol-act-prev-street', true);
+        setCheck('bol-act-prev-shore', true);
+        setCheck('bol-act-prev-gas', true);
+        setCheck('bol-act-prev-elec', true);
+
+    } else if (presetName === 'liceo') {
+        // Liceo Raimundo Martínez Centeno (Cariaco sismo 1997) - Vigas rotas, columnas dañadas
+        setInput('bol-name', 'Liceo Raimundo M. Centeno');
+        setInput('bol-address', 'Av. Principal de Cariaco, Edo. Sucre');
+        setInput('bol-floors', 3);
+        setInput('bol-use', 'public');
+        setInput('bol-material', 'concrete');
+
+        // Externa: Colapso parcial externo por falla de pórticos
+        setRadio('bol-ext-collapse', 'medio');
+        setRadio('bol-ext-neighbor', 'bajo');
+        setRadio('bol-ext-geol', 'bajo');
+        setRadio('bol-ext-settlement', 'bajo');
+        setRadio('bol-ext-tilt', 'bajo');
+
+        // Piso Crítico: 1er Piso
+        setInput('bol-critical-floor', 'Primer Piso');
+        setInput('bol-access', 'todos');
+        setInput('bol-sev-cols', 0); // No colapsaron del todo, pero hubo cortante severo
+        setInput('bol-sev-walls-c', 0);
+        setInput('bol-sev-walls-m', 0);
+        setInput('bol-sev-beams', 2); // 2 vigas con agrietamiento severo y flexión notable
+
+        // Daño Moderado: Columnas con daño moderado
+        setInput('bol-mod-element-type', 'columna');
+        setInput('bol-mod-total', 16);
+        setInput('bol-mod-count', 4); // 25% columns con daño moderado
+
+        // Componentes: Escaleras agrietadas, paredes tabiquería agrietadas
+        setRadio('bol-comp-slabs', 'bajo');
+        setRadio('bol-comp-walls', 'medio');
+        setRadio('bol-comp-tanks', 'bajo');
+        setRadio('bol-comp-utilities', 'bajo');
+        setRadio('bol-comp-elevators', 'bajo');
+
+        // Acciones
+        setCheck('bol-act-det-struct', true);
+        setCheck('bol-act-det-geot', false);
+        setCheck('bol-act-det-inst', false);
+        setCheck('bol-act-prev-cordon', true);
+        setCheck('bol-act-prev-street', false);
+        setCheck('bol-act-prev-shore', true);
+        setCheck('bol-act-prev-gas', false);
+        setCheck('bol-act-prev-elec', false);
+
+    } else if (presetName === 'tanaguarena') {
+        // Residencias Solymar (Vargas 2026) - Daño Moderado de Columnas (Etiqueta Amarilla)
+        setInput('bol-name', 'Residencias Solymar (Módulo B)');
+        setInput('bol-address', 'Av. La Playa, Tanaguarena, La Guaira');
+        setInput('bol-floors', 6);
+        setInput('bol-use', 'residential');
+        setInput('bol-material', 'concrete');
+
+        // Externa: Edificio aledaño inclinado (riesgo medio), asentamientos leves
+        setRadio('bol-ext-collapse', 'bajo');
+        setRadio('bol-ext-neighbor', 'medio');
+        setRadio('bol-ext-geol', 'bajo');
+        setRadio('bol-ext-settlement', 'bajo');
+        setRadio('bol-ext-tilt', 'bajo');
+
+        // Sin daño severo
+        setInput('bol-critical-floor', 'Planta Baja');
+        setInput('bol-access', 'casi');
+        setInput('bol-sev-cols', 0);
+        setInput('bol-sev-walls-c', 0);
+        setInput('bol-sev-walls-m', 0);
+        setInput('bol-sev-beams', 0);
+
+        // Daño Moderado: 4 columnas de 20 con fisuras de flexión de 1.5mm (15%)
+        setInput('bol-mod-element-type', 'columna');
+        setInput('bol-mod-total', 20);
+        setInput('bol-mod-count', 3); // 15% -> Riesgo Estructural Medio
+
+        // Componentes: Tabiquería exterior con fisuras cruzadas importantes
+        setRadio('bol-comp-slabs', 'bajo');
+        setRadio('bol-comp-walls', 'medio');
+        setRadio('bol-comp-tanks', 'bajo');
+        setRadio('bol-comp-utilities', 'bajo');
+        setRadio('bol-comp-elevators', 'bajo');
+
+        // Acciones
+        setCheck('bol-act-det-struct', true);
+        setCheck('bol-act-det-geot', false);
+        setCheck('bol-act-det-inst', false);
+        setCheck('bol-act-prev-cordon', true);
+        setCheck('bol-act-prev-street', false);
+        setCheck('bol-act-prev-shore', false);
+        setCheck('bol-act-prev-gas', false);
+        setCheck('bol-act-prev-elec', false);
+
+    } else if (presetName === 'vivienda') {
+        // Vivienda Unifamiliar Macuto (2026) - Daños Leves (Etiqueta Verde)
+        setInput('bol-name', 'Vivienda Unifamiliar Ing. Urich');
+        setInput('bol-address', 'Calle El Progreso, Macuto, La Guaira');
+        setInput('bol-floors', 2);
+        setInput('bol-use', 'residential');
+        setInput('bol-material', 'concrete');
+
+        // Externa: Todo bajo/seguro
+        setRadio('bol-ext-collapse', 'bajo');
+        setRadio('bol-ext-neighbor', 'bajo');
+        setRadio('bol-ext-geol', 'bajo');
+        setRadio('bol-ext-settlement', 'bajo');
+        setRadio('bol-ext-tilt', 'bajo');
+
+        // Sin daños severos ni moderados
+        setInput('bol-critical-floor', 'Planta Baja');
+        setInput('bol-access', 'todos');
+        setInput('bol-sev-cols', 0);
+        setInput('bol-sev-walls-c', 0);
+        setInput('bol-sev-walls-m', 0);
+        setInput('bol-sev-beams', 0);
+
+        // Daño Moderado: 0 de 8 columnas
+        setInput('bol-mod-element-type', 'columna');
+        setInput('bol-mod-total', 8);
+        setInput('bol-mod-count', 0);
+
+        // Componentes: Microfisuras en revoques (Bajo)
+        setRadio('bol-comp-slabs', 'bajo');
+        setRadio('bol-comp-walls', 'bajo');
+        setRadio('bol-comp-tanks', 'bajo');
+        setRadio('bol-comp-utilities', 'bajo');
+        setRadio('bol-comp-elevators', 'bajo');
+
+        // Acciones
+        setCheck('bol-act-det-struct', false);
+        setCheck('bol-act-det-geot', false);
+        setCheck('bol-act-det-inst', false);
+        setCheck('bol-act-prev-cordon', false);
+        setCheck('bol-act-prev-street', false);
+        setCheck('bol-act-prev-shore', false);
+        setCheck('bol-act-prev-gas', false);
+        setCheck('bol-act-prev-elec', false);
+    } else {
+        // Clear/Personalizado
+        setInput('bol-name', 'Edificación Personalizada');
+        setInput('bol-address', 'La Guaira, Venezuela');
+        setInput('bol-floors', 5);
+        setInput('bol-use', 'residential');
+        setInput('bol-material', 'concrete');
+
+        setRadio('bol-ext-collapse', 'bajo');
+        setRadio('bol-ext-neighbor', 'bajo');
+        setRadio('bol-ext-geol', 'bajo');
+        setRadio('bol-ext-settlement', 'bajo');
+        setRadio('bol-ext-tilt', 'bajo');
+
+        setInput('bol-critical-floor', 'Planta Baja');
+        setInput('bol-access', 'todos');
+        setInput('bol-sev-cols', 0);
+        setInput('bol-sev-walls-c', 0);
+        setInput('bol-sev-walls-m', 0);
+        setInput('bol-sev-beams', 0);
+
+        setInput('bol-mod-element-type', 'columna');
+        setInput('bol-mod-total', 20);
+        setInput('bol-mod-count', 0);
+
+        setRadio('bol-comp-slabs', 'bajo');
+        setRadio('bol-comp-walls', 'bajo');
+        setRadio('bol-comp-tanks', 'bajo');
+        setRadio('bol-comp-utilities', 'bajo');
+        setRadio('bol-comp-elevators', 'bajo');
+
+        setCheck('bol-act-det-struct', false);
+        setCheck('bol-act-det-geot', false);
+        setCheck('bol-act-det-inst', false);
+        setCheck('bol-act-prev-cordon', false);
+        setCheck('bol-act-prev-street', false);
+        setCheck('bol-act-prev-shore', false);
+        setCheck('bol-act-prev-gas', false);
+        setCheck('bol-act-prev-elec', false);
+    }
+
+    calculateBoletinRisk();
+}
+
+// Helpers para valores de inputs
+function getRadioVal(name) {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : 'bajo';
+}
+
+function setCheckVal(id, checked) {
+    const el = document.getElementById(id);
+    if (el) el.checked = checked;
+}
+
+// Actualizar la guía técnica del manual de entrenamiento
+function updateGuideVisual() {
+    const guideData = {
+        column: {
+            title: "Columnas de Concreto Armado",
+            impact: "Define el comportamiento de pórticos. Daño Severo/Completo restringe el acceso inmediato (Etiqueta Roja).",
+            reference: {
+                menor: "Fisuras finas (< 1 mm). Sismo de Yaguaraparo 2018.",
+                moderado: "Grietas entre 1 y 2 mm. Liceo Raimundo Martínez Centeno, Cariaco 1997.",
+                severo: "Grietas > 2 mm y desconchado del concreto. Edificio La Mar Suites, Tucacas 2009.",
+                completo: "Pandeo de barras de acero y aplastamiento del concreto. Edificio Petunia, Caracas 1967."
+            },
+            desc: {
+                menor: "Fisuras muy superficiales o capilares que no cruzan el núcleo del concreto. No comprometen la rigidez lateral de la columna.",
+                moderado: "Grietas diagonales de cortante o fisuración horizontal de flexión. Requiere inyección de resina epóxica en fases de reparación, pero no de emergencia.",
+                severo: "Amplias grietas, caída del recubrimiento exterior del concreto por fatiga y desprendimiento. El núcleo de concreto confinado comienza a dañarse.",
+                completo: "Aplastamiento destructivo de la sección de concreto, desbocamiento de estribos y pandeo hacia el exterior de las barras longitudinales de acero."
+            }
+        },
+        joint: {
+            title: "Uniones Viga-Columna (Nodos)",
+            impact: "Zona crítica de transferencia de momentos. Daños severos inducen fallas de piso blando muy frágiles.",
+            reference: {
+                menor: "Desconchado muy superficial. Liceo R. Martínez, Cariaco 1997.",
+                moderado: "Fisuras diagonales leves y exposición superficial de estribos. Pedernales 2016.",
+                severo: "Grietas en X en el núcleo del nodo y desprendimiento. Ensayos estructurales IMME-UCV.",
+                completo: "Pérdida total del núcleo del nodo, separación física de elementos. Pedernales 2016."
+            },
+            desc: {
+                menor: "Caída menor del revoque o acabado arquitectónico exterior en el encuentro de viga y columna. Sin fisuras de cortante.",
+                moderado: "Fisuras inclinadas en la zona del nodo. Estribos internos intactos pero sometidos a esfuerzos. Pérdida parcial del recubrimiento de concreto.",
+                severo: "Fisuración diagonal severa en cruz (forma de X) que atraviesa el núcleo. Concreto triturado en los laterales de la unión.",
+                completo: "Colapso completo de la unión del nodo, con pérdida de la capacidad de soporte vertical de la columna e imposibilidad de transmitir momentos."
+            }
+        },
+        beam: {
+            title: "Vigas de Concreto Armado",
+            impact: "Afecta la rigidez local y ductilidad. Daño severo local puede ser mitigado con apuntalamiento temporal.",
+            reference: {
+                menor: "Grietas de flexión capilares. Sismo de Yaguaraparo 2018.",
+                moderado: "Grietas de 1-2 mm con leve aplastamiento. Sismo de Caracas 1967.",
+                severo: "Caída de concreto en apoyos, fisuración ancha. Sismo de Tucacas 2012.",
+                completo: "Falla de cortante en apoyos, flecha vertical severa visible. Cariaco 1997."
+            },
+            desc: {
+                menor: "Fisuras verticales finas en la zona de máximo momento positivo (centro de la luz) o negativo (apoyos). Sin peligro.",
+                moderado: "Fisuras de flexión notables con leve desconchado en la cara inferior de la viga. Fisuras diagonales de cortante incipientes cerca del apoyo.",
+                severo: "Fisuración severa por cortante o flexión. Concreto desprendido, dejando al descubierto el acero de refuerzo longitudinal o transversal (estribos).",
+                completo: "Rotura de barras de acero a tracción, desprendimiento generalizado del concreto y deformación vertical (deflexión) permanente visible."
+            }
+        },
+        wall_c: {
+            title: "Muros de Concreto Armado (Pantallas)",
+            impact: "Muros de corte aportan gran rigidez. Las grietas diagonales indican sobreesfuerzo de cortante de la edificación.",
+            reference: {
+                menor: "Fisuras muy finas. Sismo de Hawai 2006.",
+                moderado: "Grietas diagonales entre 2 mm y 6 mm. Ensayos estructurales.",
+                severo: "Exposición de malla de refuerzo y desconchado. Laboratorios CENAPRED.",
+                completo: "Fractura de acero, pandeo de barras, deslizamiento en base. Chile 2010."
+            },
+            desc: {
+                menor: "Pocas fisuras superficiales finas (< 2 mm) distribuidas uniformemente. Típico comportamiento elástico inicial.",
+                moderado: "Agrietamiento diagonal notable cruzando el alma del muro (espesores 2-6 mm). Sin peligro inminente de aplastamiento.",
+                severo: "Grietas anchas (> 6 mm) con pérdida de recubrimiento y exposición de la armadura electrosoldada o cabillas de refuerzo en el muro.",
+                completo: "Aplastamiento severo de los bordes de confinamiento del muro, pandeo del acero, deslizamiento horizontal (falla por deslizamiento en junta) o colapso."
+            }
+        },
+        wall_m: {
+            title: "Muros Portantes de Mampostería Estructural",
+            impact: "Muros cargan el peso de losas. Daño severo en muros portantes equivale a colapso estructural inminente.",
+            reference: {
+                menor: "Microfisuras en mortero. Criterios del Boletín.",
+                moderado: "Fisuración diagonal de 1-3 mm. Sismo de México 2019.",
+                severo: "Dislocación de bloques o grietas diagonales > 3 mm. CENAPRED 2014.",
+                completo: "Desplome de muros, desprendimiento masivo de ladrillos. Bam, Irán 2004."
+            },
+            desc: {
+                menor: "Líneas de agrietamiento finas restringidas al mortero de pega entre bloques o ladrillos. Sin bloques rotos.",
+                moderado: "Fisuras diagonales escalonadas a lo largo de las juntas y afectando algunos bloques individuales (espesores 1-3 mm).",
+                severo: "Grietas diagonales severas de más de 3 mm de espesor que rompen los bloques en línea continua. Pérdida parcial del plano del muro.",
+                completo: "Aplastamiento local severo de esquinas de apoyo, dislocación y derrumbe parcial del muro, inclinación del muro fuera de la vertical o colapso total."
+            }
+        },
+        infill: {
+            title: "Tabiques y Paredes de Relleno (No Estructural)",
+            impact: "Son componentes secundarios. Aunque no comprometen la estructura, su caída causa la mayoría de muertes en sismos.",
+            reference: {
+                menor: "Microfisuras perimetrales. Cumaná 2008.",
+                moderado: "Fisuras diagonales y rotura en esquinas. Tecomán 2003.",
+                severo: "Separación física de pórticos y bloques sueltos. Tucacas 2009.",
+                completo: "Volcamiento de paredes fuera de su plano, derrumbe. La Guaira 2026."
+            },
+            desc: {
+                menor: "Fisuración muy fina en el contorno del pórtico (losa/columnas) debido a la diferencia de rigidez entre concreto y arcilla.",
+                moderado: "Fisuras en cruz en el centro de la pared o grietas diagonales cerca de marcos de puertas y ventanas. Algunos ladrillos con grietas leves.",
+                severo: "Pared separada de la estructura de concreto. Grietas anchas con peligro de caída del bloque hacia el exterior o interior del recinto.",
+                completo: "Pared totalmente destruida o desplomada fuera de su plano de confinamiento por fuerzas inerciales perpendiculares."
+            }
+        }
+    };
+
+    const element = activeGuideElement;
+    const damage = activeGuideDamage;
+    const data = guideData[element];
+
+    // Actualizar Textos
+    document.getElementById('guide-title').textContent = `${data.title} - Daño ${damage.charAt(0).toUpperCase() + damage.slice(1)}`;
+    document.getElementById('guide-criteria').textContent = data.desc[damage];
+    document.getElementById('guide-photo-ref').innerHTML = `<i class="fa-solid fa-camera" style="color: #ffb703;"></i> ${data.reference[damage]}`;
+    document.getElementById('guide-impact').querySelector('span').innerHTML = `<strong>Guía del Inspector:</strong> ${data.impact}`;
+
+    // Dibujar Gráfico SVG Dinámico
+    const svgCanvas = document.getElementById('guide-svg-canvas');
+    if (svgCanvas) {
+        svgCanvas.innerHTML = drawGuideSVG(element, damage);
+    }
+}
+
+// Dibujado de diagramas dinámicos SVG para ilustrar los daños
+function drawGuideSVG(element, damage) {
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">`;
+    
+    // Fondo de dibujo técnico oscuro
+    svg += `<rect width="200" height="200" fill="#0f131a" rx="4" />`;
+    // Rejilla de fondo
+    svg += `<g stroke="rgba(255, 255, 255, 0.03)" stroke-width="0.5">`;
+    for (let i = 20; i < 200; i += 20) {
+        svg += `<line x1="${i}" y1="0" x2="${i}" y2="200" />`;
+        svg += `<line x1="0" y1="${i}" x2="200" y2="${i}" />`;
+    }
+    svg += `</g>`;
+
+    if (element === 'column') {
+        // Dibujo de Columna
+        // Base y Tope (losas)
+        svg += `<rect x="30" y="20" width="140" height="15" fill="#2d3748" />`;
+        svg += `<rect x="30" y="165" width="140" height="15" fill="#2d3748" />`;
+        
+        // Cuerpo columna
+        svg += `<rect x="80" y="35" width="40" height="130" fill="#4a5568" stroke="#718096" stroke-width="2" id="col-body" />`;
+        
+        if (damage === 'menor') {
+            // Grietas muy finas
+            svg += `<path d="M 80,60 L 95,62 M 80,120 L 90,121 M 120,80 L 110,81" stroke="#facc15" stroke-width="1" />`;
+            // Texto indicativo
+            svg += `<text x="100" y="193" fill="#a0aec0" font-size="9" text-anchor="middle" font-family="monospace">Grietas capilares &lt; 1mm</text>`;
+        } else if (damage === 'moderado') {
+            // Grietas cruzadas inclinadas
+            svg += `<path d="M 80,60 L 105,75 M 120,65 L 95,80 M 80,120 L 100,130" stroke="#fb923c" stroke-width="1.5" stroke-linecap="round" />`;
+            svg += `<text x="100" y="193" fill="#a0aec0" font-size="9" text-anchor="middle" font-family="monospace">Grietas diagonal 1-2mm</text>`;
+        } else if (damage === 'severo') {
+            // Pérdida de recubrimiento (desconchado) y acero visible
+            // Recubrimiento faltante
+            svg += `<path d="M 80,70 Q 95,85 80,100 Z" fill="#2d3748" />`;
+            // Estribo visible
+            svg += `<line x1="84" y1="75" x2="84" y2="95" stroke="#a0aec0" stroke-width="1.5" />`;
+            svg += `<line x1="80" y1="85" x2="120" y2="85" stroke="#a0aec0" stroke-dasharray="2,2" stroke-width="1" />`;
+            // Grietas anchas rojas
+            svg += `<path d="M 80,85 L 115,105 M 120,80 L 85,110" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" />`;
+            svg += `<text x="100" y="193" fill="#f87171" font-size="9" text-anchor="middle" font-family="monospace">Desconchado y Grieta &gt; 2mm</text>`;
+        } else if (damage === 'completo') {
+            // Columnas deformadas, acero pandeado exterior
+            // Redibujar columna deformada/acortada
+            svg += `<path d="M 80,35 L 80,75 L 72,90 L 80,110 L 80,165 L 120,165 L 120,110 L 128,95 L 120,80 L 120,35 Z" fill="#742a2a" stroke="#f87171" stroke-width="2" />`;
+            // Acero pandeado saliente
+            svg += `<path d="M 78,75 Q 60,90 78,110" fill="none" stroke="#ef4444" stroke-width="2.5" />`;
+            svg += `<path d="M 122,80 Q 138,95 122,110" fill="none" stroke="#ef4444" stroke-width="2.5" />`;
+            // Grietas catastróficas y escombros
+            svg += `<path d="M 80,90 L 120,90 M 80,85 L 120,100" stroke="#ef4444" stroke-width="3" />`;
+            svg += `<circle cx="65" cy="140" r="4" fill="#a0aec0" />`;
+            svg += `<circle cx="135" cy="150" r="3" fill="#a0aec0" />`;
+            svg += `<rect x="70" y="155" width="8" height="6" fill="#a0aec0" />`;
+            svg += `<text x="100" y="193" fill="#ef4444" font-size="9" text-anchor="middle" font-family="monospace">Pandeo de acero y colapso</text>`;
+        }
+
+    } else if (element === 'joint') {
+        // Nodos Viga-Columna
+        // Cruz de columna y vigas
+        svg += `<path d="M 85,20 L 115,20 L 115,75 L 180,75 L 180,105 L 115,105 L 115,180 L 85,180 L 85,105 L 20,105 L 20,75 L 85,75 Z" fill="#4a5568" stroke="#718096" stroke-width="2" />`;
+        
+        if (damage === 'menor') {
+            // Fisuras en contorno del nodo
+            svg += `<path d="M 85,78 L 95,83 M 115,77 L 108,84 M 88,103 L 94,97" stroke="#facc15" stroke-width="1" />`;
+            svg += `<text x="100" y="193" fill="#a0aec0" font-size="9" text-anchor="middle" font-family="monospace">Microfisuras perimetrales</text>`;
+        } else if (damage === 'moderado') {
+            // Grietas diagonales cruzando el nodo
+            svg += `<path d="M 88,78 L 112,102 M 112,78 L 92,98" stroke="#fb923c" stroke-width="1.5" />`;
+            svg += `<text x="100" y="193" fill="#a0aec0" font-size="9" text-anchor="middle" font-family="monospace">Grietas en núcleo de nodo</text>`;
+        } else if (damage === 'severo') {
+            // Desconchado importante en núcleo
+            svg += `<circle cx="100" cy="90" r="15" fill="#2d3748" />`;
+            svg += `<line x1="90" y1="80" x2="90" y2="100" stroke="#a0aec0" stroke-width="1.5" />`;
+            // Grieta en X gruesa roja
+            svg += `<path d="M 85,75 L 115,105 M 115,75 L 85,105" stroke="#f87171" stroke-width="3" stroke-linecap="round" />`;
+            svg += `<text x="100" y="193" fill="#f87171" font-size="9" text-anchor="middle" font-family="monospace">X-Shear severo y desprendimiento</text>`;
+        } else if (damage === 'completo') {
+            // Nodo destruido
+            svg += `<circle cx="100" cy="90" r="22" fill="#742a2a" stroke="#ef4444" stroke-dasharray="3,3" />`;
+            // Rotura de elementos, cables de acero doblados
+            svg += `<path d="M 90,80 Q 100,75 110,83 M 92,102 Q 100,108 108,98" fill="none" stroke="#ef4444" stroke-width="2" />`;
+            svg += `<path d="M 85,75 L 115,105 M 115,75 L 85,105" stroke="#111" stroke-width="4" />`;
+            svg += `<text x="100" y="193" fill="#ef4444" font-size="9" text-anchor="middle" font-family="monospace">Falla de soporte y aplastamiento</text>`;
+        }
+
+    } else if (element === 'beam') {
+        // Viga Horizontal
+        // Columnas laterales
+        svg += `<rect x="20" y="30" width="25" height="140" fill="#2d3748" />`;
+        svg += `<rect x="155" y="30" width="25" height="140" fill="#2d3748" />`;
+        // Viga
+        svg += `<rect x="45" y="60" width="110" height="35" fill="#4a5568" stroke="#718096" stroke-width="2" id="beam-rect" />`;
+
+        if (damage === 'menor') {
+            // Pequeñas grietas verticales en zona inferior del centro
+            svg += `<line x1="90" y1="95" x2="90" y2="85" stroke="#facc15" stroke-width="1" />`;
+            svg += `<line x1="100" y1="95" x2="100" y2="83" stroke="#facc15" stroke-width="1" />`;
+            svg += `<line x1="110" y1="95" x2="110" y2="87" stroke="#facc15" stroke-width="1" />`;
+            svg += `<text x="100" y="193" fill="#a0aec0" font-size="9" text-anchor="middle" font-family="monospace">Fisuras verticales de flexión</text>`;
+        } else if (damage === 'moderado') {
+            // Grietas diagonales en extremos, flexión en centro
+            svg += `<path d="M 45,70 L 58,85 M 155,70 L 142,85" stroke="#fb923c" stroke-width="1.5" />`;
+            svg += `<line x1="100" y1="95" x2="100" y2="80" stroke="#fb923c" stroke-width="1.5" />`;
+            svg += `<text x="100" y="193" fill="#a0aec0" font-size="9" text-anchor="middle" font-family="monospace">Grietas en centro y extremos</text>`;
+        } else if (damage === 'severo') {
+            // Desconchado en apoyos
+            svg += `<rect x="45" y="60" width="15" height="15" fill="#2d3748" />`;
+            svg += `<rect x="140" y="60" width="15" height="15" fill="#2d3748" />`;
+            // Cabillas visibles
+            svg += `<line x1="45" y1="65" x2="60" y2="65" stroke="#a0aec0" stroke-width="1.5" />`;
+            // Deformación leve y grieta profunda
+            svg += `<path d="M 45,75 L 70,95 M 155,75 L 130,95" stroke="#f87171" stroke-width="2.5" />`;
+            svg += `<text x="100" y="193" fill="#f87171" font-size="9" text-anchor="middle" font-family="monospace">Falla de cortante severa en apoyos</text>`;
+        } else if (damage === 'completo') {
+            // Viga partida y flectada hacia abajo
+            // Ocultar viga recta
+            svg += `<rect x="44" y="59" width="112" height="37" fill="#0f131a" />`;
+            // Dibujar viga deformada
+            svg += `<path d="M 45,60 L 95,80 L 105,80 L 155,60 L 155,90 L 105,110 L 95,110 L 45,90 Z" fill="#742a2a" stroke="#ef4444" stroke-width="2" />`;
+            // Grieta central abierta
+            svg += `<path d="M 100,80 L 100,110" stroke="#ef4444" stroke-width="3.5" />`;
+            // Acero roto colgante
+            svg += `<path d="M 95,80 Q 100,90 98,95 M 105,80 Q 100,90 102,95" fill="none" stroke="#ef4444" stroke-width="2" />`;
+            svg += `<text x="100" y="193" fill="#ef4444" font-size="9" text-anchor="middle" font-family="monospace">Rotura de viga y flexión plástica</text>`;
+        }
+
+    } else if (element === 'wall_c') {
+        // Muros de Concreto
+        svg += `<rect x="40" y="30" width="120" height="140" fill="#4a5568" stroke="#718096" stroke-width="2" />`;
+        
+        if (damage === 'menor') {
+            svg += `<path d="M 50,45 L 80,75 M 120,110 L 140,130" stroke="#facc15" stroke-width="1" />`;
+            svg += `<text x="100" y="193" fill="#a0aec0" font-size="9" text-anchor="middle" font-family="monospace">Fisuras diagonales finas</text>`;
+        } else if (damage === 'moderado') {
+            // Grietas diagonales cruzadas (X)
+            svg += `<path d="M 50,50 L 150,150 M 150,50 L 50,150" stroke="#fb923c" stroke-width="1.5" />`;
+            svg += `<text x="100" y="193" fill="#a0aec0" font-size="9" text-anchor="middle" font-family="monospace">Grietas en X en el muro</text>`;
+        } else if (damage === 'severo') {
+            // Desconchado en base o esquinas
+            svg += `<path d="M 40,150 Q 60,140 70,170 Z" fill="#2d3748" />`;
+            // Malla expuesta
+            svg += `<line x1="45" y1="155" x2="65" y2="155" stroke="#a0aec0" stroke-width="1" />`;
+            svg += `<line x1="55" y1="145" x2="55" y2="165" stroke="#a0aec0" stroke-width="1" />`;
+            // Grietas en X gruesas
+            svg += `<path d="M 50,50 L 150,150 M 150,50 L 50,150" stroke="#f87171" stroke-width="2.5" />`;
+            svg += `<text x="100" y="193" fill="#f87171" font-size="9" text-anchor="middle" font-family="monospace">Desconchado basal y daño estructural</text>`;
+        } else if (damage === 'completo') {
+            // Deslizamiento en base, muro cortado en dos
+            svg += `<rect x="38" y="28" width="124" height="144" fill="#0f131a" />`;
+            // Dibujar muro desplazado horizontalmente en la base
+            svg += `<path d="M 50,30 L 160,30 L 160,130 L 150,130 M 150,130 L 40,130 L 40,30" fill="#742a2a" stroke="#ef4444" stroke-width="2" />`;
+            // Base del muro
+            svg += `<path d="M 40,133 L 160,133 L 160,170 L 40,170 Z" fill="#4a5568" stroke="#718096" stroke-width="2" />`;
+            // Flechas de desplazamiento
+            svg += `<path d="M 30,130 L 15,130 M 15,130 L 22,125 M 15,130 L 22,135" stroke="#ef4444" stroke-width="2" />`;
+            svg += `<path d="M 170,130 L 185,130 M 185,130 L 178,125 M 185,130 L 178,135" stroke="#ef4444" stroke-width="2" />`;
+            // Grietas masivas en alma
+            svg += `<path d="M 50,45 L 140,130" stroke="#ef4444" stroke-width="3" />`;
+            svg += `<text x="100" y="193" fill="#ef4444" font-size="9" text-anchor="middle" font-family="monospace">Falla por cortante y deslizamiento</text>`;
+        }
+
+    } else if (element === 'wall_m') {
+        // Muros de Mampostería (Ladrillos)
+        svg += `<rect x="40" y="30" width="120" height="140" fill="#a0522d" stroke="#cd853f" stroke-width="2" />`;
+        // Líneas de bloques horizontales
+        for (let y = 44; y < 170; y += 14) {
+            svg += `<line x1="40" y1="${y}" x2="160" y2="${y}" stroke="rgba(255,255,255,0.15)" stroke-width="1" />`;
+        }
+
+        if (damage === 'menor') {
+            // Grietas escalonadas en mortero
+            svg += `<path d="M 70,60 L 80,60 L 80,74 L 90,74 L 90,88" stroke="#facc15" stroke-width="1.5" fill="none" />`;
+            svg += `<text x="100" y="193" fill="#a0aec0" font-size="9" text-anchor="middle" font-family="monospace">Fisuras finas en juntas</text>`;
+        } else if (damage === 'moderado') {
+            // Diagonales más amplias
+            svg += `<path d="M 60,44 L 80,44 L 80,58 L 100,58 L 100,72 L 120,72 L 120,86 L 140,86" stroke="#fb923c" stroke-width="2.5" fill="none" />`;
+            svg += `<path d="M 140,44 L 120,44 L 120,58 L 100,58 L 100,72 L 80,72 L 80,86 L 60,86" stroke="#fb923c" stroke-width="2.5" fill="none" />`;
+            svg += `<text x="100" y="193" fill="#a0aec0" font-size="9" text-anchor="middle" font-family="monospace">Agrietamiento diagonal en juntas</text>`;
+        } else if (damage === 'severo') {
+            // Bloques salidos, grieta rompe ladrillos
+            svg += `<path d="M 40,40 L 160,160" stroke="#f87171" stroke-width="3.5" />`;
+            // Ladrillo caído
+            svg += `<rect x="120" y="150" width="15" height="10" fill="#a0522d" stroke="#ef4444" stroke-width="1" transform="rotate(15 120 150)" />`;
+            svg += `<text x="100" y="193" fill="#f87171" font-size="9" text-anchor="middle" font-family="monospace">Falla diagonal y desprendimiento</text>`;
+        } else if (damage === 'completo') {
+            // Muro derrumbado
+            svg += `<rect x="38" y="28" width="124" height="144" fill="#0f131a" />`;
+            // Pilas de bloques derrumbados en el suelo
+            for (let i = 0; i < 6; i++) {
+                svg += `<rect x="${50 + i*16}" y="155" width="14" height="8" fill="#5c2c16" stroke="#ef4444" transform="rotate(${i*12} ${50 + i*16} 155)" />`;
+                svg += `<rect x="${60 + i*14}" y="163" width="14" height="8" fill="#5c2c16" stroke="#ef4444" transform="rotate(${-i*8} ${60 + i*14} 163)" />`;
+            }
+            svg += `<text x="100" y="193" fill="#ef4444" font-size="9" text-anchor="middle" font-family="monospace">Derrumbe del muro portante</text>`;
+        }
+
+    } else if (element === 'infill') {
+        // Tabique de Relleno (Pórtico + Pared)
+        // Pórtico estructural
+        svg += `<rect x="30" y="20" width="140" height="150" fill="none" stroke="#4a5568" stroke-width="8" />`;
+        // Pared de relleno interior
+        svg += `<rect x="34" y="24" width="132" height="142" fill="#d2691e" opacity="0.8" />`;
+        // Líneas de bloques
+        for (let y = 35; y < 160; y += 15) {
+            svg += `<line x1="34" y1="${y}" x2="166" y2="${y}" stroke="rgba(0,0,0,0.15)" stroke-width="1" />`;
+        }
+
+        if (damage === 'menor') {
+            // Fisuras en contorno entre viga y columna
+            svg += `<path d="M 34,24 L 166,24 M 34,24 L 34,166 M 166,24 L 166,166" stroke="#facc15" stroke-width="2" fill="none" />`;
+            svg += `<text x="100" y="193" fill="#a0aec0" font-size="9" text-anchor="middle" font-family="monospace">Fisuras de interfaz perimetral</text>`;
+        } else if (damage === 'moderado') {
+            // X en el panel central
+            svg += `<path d="M 40,30 L 160,160 M 160,30 L 40,160" stroke="#fb923c" stroke-width="1.5" />`;
+            svg += `<text x="100" y="193" fill="#a0aec0" font-size="9" text-anchor="middle" font-family="monospace">Fisuras en X en tabiquería</text>`;
+        } else if (damage === 'severo') {
+            // Gaps anchos y bloques cayendo
+            svg += `<path d="M 34,24 L 166,24 M 34,24 L 34,166" stroke="#ef4444" stroke-width="3" fill="none" />`;
+            svg += `<path d="M 40,30 L 160,160" stroke="#f87171" stroke-width="2.5" />`;
+            // Bloque suelto
+            svg += `<rect x="50" y="130" width="16" height="8" fill="#d2691e" stroke="#ef4444" transform="rotate(25 50 130)" />`;
+            svg += `<text x="100" y="193" fill="#f87171" font-size="9" text-anchor="middle" font-family="monospace">Separación y peligro de caída</text>`;
+        } else if (damage === 'completo') {
+            // Panel caído del marco
+            // Ocultar panel
+            svg += `<rect x="34" y="24" width="132" height="142" fill="#0f131a" />`;
+            // Escombros en el suelo
+            for (let i = 0; i < 8; i++) {
+                svg += `<rect x="${40 + i*16}" y="158" width="15" height="8" fill="#b05010" stroke="#ef4444" transform="rotate(${i*23} ${40 + i*16} 158)" />`;
+                svg += `<rect x="${48 + i*14}" y="165" width="15" height="8" fill="#b05010" stroke="#ef4444" transform="rotate(${-i*15} ${48 + i*14} 165)" />`;
+            }
+            svg += `<text x="100" y="193" fill="#ef4444" font-size="9" text-anchor="middle" font-family="monospace">Colapso total fuera de plano</text>`;
+        }
+    }
+
+    svg += `</svg>`;
+    return svg;
+}
+
 
