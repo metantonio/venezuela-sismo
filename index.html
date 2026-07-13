@@ -2179,6 +2179,20 @@
                                                 </select>
                                             </div>
                                         </div>
+                                        <div class="boletin-form-row" style="margin-top: 10px;">
+                                            <div class="boletin-form-group-third">
+                                                <label for="bol-year">Año de Construcción</label>
+                                                <input type="number" id="bol-year" class="boletin-input" value="1980" min="1800" max="2100">
+                                            </div>
+                                            <div class="boletin-form-group-third">
+                                                <label for="bol-basements">Nº de Sótanos</label>
+                                                <input type="number" id="bol-basements" class="boletin-input" value="0" min="0">
+                                            </div>
+                                            <div class="boletin-form-group-third">
+                                                <label for="bol-semibasements">Nº de Semisótanos</label>
+                                                <input type="number" id="bol-semibasements" class="boletin-input" value="0" min="0">
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <!-- SECCION 2: INSPECCION EXTERNA -->
@@ -2270,29 +2284,46 @@
 
                                     <!-- SECCION 4: DAÑO MODERADO -->
                                     <div class="boletin-card" id="card-dano-moderado">
-                                        <div class="boletin-card-title"><i class="fa-solid fa-percent"></i> 4. Elementos Principales con Daño Moderado</div>
-                                        <p class="boletin-card-desc">Si no hay daño severo, evalúe el porcentaje de elementos examinados que presentan daño moderado en el piso crítico.</p>
-                                        <div class="boletin-form-row">
-                                            <div class="boletin-form-group-third">
-                                                <label for="bol-mod-element-type">Elemento más dañado</label>
-                                                <select id="bol-mod-element-type" class="boletin-select">
-                                                    <option value="columna" selected>Columna o Unión</option>
-                                                    <option value="muro-c">Muro de Concreto</option>
-                                                    <option value="muro-m">Muro de Mampostería</option>
-                                                    <option value="viga">Viga o Arriostramiento</option>
-                                                </select>
-                                            </div>
-                                            <div class="boletin-form-group-third">
-                                                <label for="bol-mod-total">Nº Elementos Examinados</label>
-                                                <input type="number" id="bol-mod-total" class="boletin-input" value="20" min="1">
-                                            </div>
-                                            <div class="boletin-form-group-third">
-                                                <label for="bol-mod-count">Nº Elementos Moderados</label>
-                                                <input type="number" id="bol-mod-count" class="boletin-input" value="0" min="0">
-                                            </div>
-                                        </div>
+                                        <div class="boletin-card-title"><i class="fa-solid fa-percent"></i> 4. Elementos Principales con Daño Moderado en Piso Crítico</div>
+                                        <p class="boletin-card-desc">Si no hay daño severo, evalúe la cantidad de elementos con daño Moderado para obtener el porcentaje de afectación. El riesgo está determinado por el mayor porcentaje de la tabla.</p>
+                                        <table class="boletin-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Tipo de Elemento</th>
+                                                    <th style="width: 25%; text-align: center;">Nº Examinados</th>
+                                                    <th style="width: 25%; text-align: center;">Nº Moderados</th>
+                                                    <th style="width: 25%; text-align: center;">% Moderado</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Columnas o uniones</td>
+                                                    <td><input type="number" id="bol-mod-cols-tot" class="boletin-input" value="20" min="1" style="text-align: center; padding: 4px;"></td>
+                                                    <td><input type="number" id="bol-mod-cols-cnt" class="boletin-input" value="0" min="0" style="text-align: center; padding: 4px;"></td>
+                                                    <td style="text-align: center; font-weight: bold; color: #fff;" id="bol-mod-cols-pct">0.00%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Muros de concreto</td>
+                                                    <td><input type="number" id="bol-mod-wallsc-tot" class="boletin-input" value="10" min="1" style="text-align: center; padding: 4px;"></td>
+                                                    <td><input type="number" id="bol-mod-wallsc-cnt" class="boletin-input" value="0" min="0" style="text-align: center; padding: 4px;"></td>
+                                                    <td style="text-align: center; font-weight: bold; color: #fff;" id="bol-mod-wallsc-pct">0.00%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Muros de mampostería</td>
+                                                    <td><input type="number" id="bol-mod-wallsm-tot" class="boletin-input" value="10" min="1" style="text-align: center; padding: 4px;"></td>
+                                                    <td><input type="number" id="bol-mod-wallsm-cnt" class="boletin-input" value="0" min="0" style="text-align: center; padding: 4px;"></td>
+                                                    <td style="text-align: center; font-weight: bold; color: #fff;" id="bol-mod-wallsm-pct">0.00%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Vigas o arriostramientos</td>
+                                                    <td><input type="number" id="bol-mod-beams-tot" class="boletin-input" value="15" min="1" style="text-align: center; padding: 4px;"></td>
+                                                    <td><input type="number" id="bol-mod-beams-cnt" class="boletin-input" value="0" min="0" style="text-align: center; padding: 4px;"></td>
+                                                    <td style="text-align: center; font-weight: bold; color: #fff;" id="bol-mod-beams-pct">0.00%</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                         <div class="boletin-calc-result-box" style="margin-top: 12px; background: rgba(0,0,0,0.25); padding: 10px 14px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid #2ec4b6;">
-                                            <span style="font-size: 12px; color: var(--text-muted);">Porcentaje calculado: <strong id="bol-mod-pct-display" style="color: #fff; font-size: 13px;">0.00%</strong></span>
+                                            <span style="font-size: 12px; color: var(--text-muted);">Mayor porcentaje: <strong id="bol-mod-pct-display" style="color: #fff; font-size: 13px;">0.00%</strong></span>
                                             <span style="font-size: 12.5px; color: var(--text-muted); font-weight: 500;">Riesgo Daño Moderado: <span id="bol-mod-risk-display" style="color: #2ec4b6; font-weight: bold;">Bajo (&lt;10%)</span></span>
                                         </div>
                                     </div>

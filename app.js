@@ -7772,7 +7772,12 @@ function initBoletin() {
     const formInputs = [
         'bol-name', 'bol-address', 'bol-floors', 'bol-use', 'bol-material',
         'bol-critical-floor', 'bol-access', 'bol-sev-cols', 'bol-sev-walls-c',
-        'bol-sev-walls-m', 'bol-sev-beams', 'bol-mod-total', 'bol-mod-count'
+        'bol-sev-walls-m', 'bol-sev-beams',
+        'bol-year', 'bol-basements', 'bol-semibasements',
+        'bol-mod-cols-tot', 'bol-mod-cols-cnt',
+        'bol-mod-wallsc-tot', 'bol-mod-wallsc-cnt',
+        'bol-mod-wallsm-tot', 'bol-mod-wallsm-cnt',
+        'bol-mod-beams-tot', 'bol-mod-beams-cnt'
     ];
 
     formInputs.forEach(id => {
@@ -7848,6 +7853,9 @@ function calculateBoletinRisk() {
     const name = document.getElementById('bol-name').value || 'Edificación';
     const address = document.getElementById('bol-address').value || 'Sin dirección';
     const floors = parseInt(document.getElementById('bol-floors').value) || 1;
+    const year = parseInt(document.getElementById('bol-year').value) || 1980;
+    const basements = parseInt(document.getElementById('bol-basements').value) || 0;
+    const semibasements = parseInt(document.getElementById('bol-semibasements').value) || 0;
     const dateStr = new Date().toLocaleDateString('es-VE');
 
     // Actualizar datos en la etiqueta visual
@@ -7893,25 +7901,47 @@ function calculateBoletinRisk() {
         riskSec3 = 'alto';
     }
 
-    // 4. Evaluar Sección 4: Daño Moderado
-    const modTotal = parseInt(document.getElementById('bol-mod-total').value) || 20;
-    const modCount = parseInt(document.getElementById('bol-mod-count').value) || 0;
-    const elementType = document.getElementById('bol-mod-element-type').value;
+    // 4. Evaluar Sección 4: Daño Moderado (Cálculo tabular e individual para cada uno de los 4 elementos principales)
+    const modColsTot = parseInt(document.getElementById('bol-mod-cols-tot').value) || 1;
+    const modColsCnt = parseInt(document.getElementById('bol-mod-cols-cnt').value) || 0;
+    const pctCols = (modColsCnt / Math.max(modColsTot, 1)) * 100;
+    document.getElementById('bol-mod-cols-pct').textContent = `${pctCols.toFixed(2)}%`;
 
-    let pct = (modCount / Math.max(modTotal, 1)) * 100;
-    document.getElementById('bol-mod-pct-display').textContent = `${pct.toFixed(2)}%`;
+    const modWallsCTot = parseInt(document.getElementById('bol-mod-wallsc-tot').value) || 1;
+    const modWallsCCnt = parseInt(document.getElementById('bol-mod-wallsc-cnt').value) || 0;
+    const pctWallsC = (modWallsCCnt / Math.max(modWallsCTot, 1)) * 100;
+    document.getElementById('bol-mod-wallsc-pct').textContent = `${pctWallsC.toFixed(2)}%`;
+
+    const modWallsMTot = parseInt(document.getElementById('bol-mod-wallsm-tot').value) || 1;
+    const modWallsMCnt = parseInt(document.getElementById('bol-mod-wallsm-cnt').value) || 0;
+    const pctWallsM = (modWallsMCnt / Math.max(modWallsMTot, 1)) * 100;
+    document.getElementById('bol-mod-wallsm-pct').textContent = `${pctWallsM.toFixed(2)}%`;
+
+    const modBeamsTot = parseInt(document.getElementById('bol-mod-beams-tot').value) || 1;
+    const modBeamsCnt = parseInt(document.getElementById('bol-mod-beams-cnt').value) || 0;
+    const pctBeams = (modBeamsCnt / Math.max(modBeamsTot, 1)) * 100;
+    document.getElementById('bol-mod-beams-pct').textContent = `${pctBeams.toFixed(2)}%`;
+
+    // El riesgo por daño moderado se determina a partir del mayor porcentaje obtenido entre los elementos
+    const maxPct = Math.max(pctCols, pctWallsC, pctWallsM, pctBeams);
+    document.getElementById('bol-mod-pct-display').textContent = `${maxPct.toFixed(2)}%`;
+
+    let maxElemName = 'elementos estructurales';
+    if (maxPct === pctCols) maxElemName = 'Columnas o uniones';
+    else if (maxPct === pctWallsC) maxElemName = 'Muros de concreto';
+    else if (maxPct === pctWallsM) maxElemName = 'Muros de mampostería';
+    else if (maxPct === pctBeams) maxElemName = 'Vigas o arriostramientos';
 
     let riskSec4 = 'bajo';
     const riskDisplay = document.getElementById('bol-mod-risk-display');
     
-    // Si la Sección 3 tiene daño severo, la planilla indica parar, pero calculamos igual
-    if (pct < 10) {
+    if (maxPct < 10) {
         riskSec4 = 'bajo';
         if (riskDisplay) {
             riskDisplay.textContent = 'Bajo (<10%)';
             riskDisplay.className = 'badge-status-green';
         }
-    } else if (pct >= 10 && pct <= 30) {
+    } else if (maxPct >= 10 && maxPct <= 30) {
         riskSec4 = 'medio';
         if (riskDisplay) {
             riskDisplay.textContent = 'Medio (10-30%)';
@@ -7984,7 +8014,6 @@ function calculateBoletinRisk() {
     // Desmarcar todo en checkboxes por defecto al recalcular para no pisar el UI
     // a menos que sea gatillado por preset. Mantendremos sincronizado el dictamen con los checkboxes.
     let suggestedActions = [];
-    let requiredDetInspections = [];
 
     if (finalRisk === 'alto') {
         // ETIQUETA ROJA: ACCESO NO PERMITIDO (PELIGRO)
@@ -7998,7 +8027,7 @@ function calculateBoletinRisk() {
             </ul>
             Detalles técnicos: ${extAltoAspects.length ? `Riesgo externo severo en: ${extAltoAspects.join(', ')}. ` : ''}
             ${totalSevereElements ? `Se registraron ${totalSevereElements} elementos estructurales con daño Severo/Completo en el Piso Crítico (${document.getElementById('bol-critical-floor').value}).` : ''}
-            ${riskSec4 === 'alto' ? `Se superó el límite del 30% de daño moderado en ${elementType}s (${pct.toFixed(1)}%).` : ''}
+            ${riskSec4 === 'alto' ? `Se superó el límite del 30% de daño moderado en ${maxElemName} (${maxPct.toFixed(1)}%).` : ''}
             ${compAltoAspects.length ? `Riesgo inminente de caída/colapso en: ${compAltoAspects.join(', ')}.` : ''}`;
 
         suggestedActions = [
@@ -8023,7 +8052,7 @@ function calculateBoletinRisk() {
                 ${triggers.map(t => `<li>${t}</li>`).join('')}
             </ul>
             Detalles: ${extMedioAspects.length ? `Factores externos en nivel Medio: ${extMedioAspects.join(', ')}. ` : ''}
-            ${riskSec4 === 'medio' ? `Daño moderado de entrepiso en ${elementType}s del ${pct.toFixed(1)}% (Rango 10-30%).` : ''}
+            ${riskSec4 === 'medio' ? `Daño moderado de entrepiso en ${maxElemName} del ${maxPct.toFixed(1)}% (Rango 10-30%).` : ''}
             ${compMedioAspects.length ? `Daños moderados en componentes no estructurales: ${compMedioAspects.join(', ')}.` : ''}`;
 
         suggestedActions = [
@@ -8059,7 +8088,6 @@ function calculateBoletinRisk() {
 // Actualizar checkboxes del formulario basados en clics del usuario
 function updateActionsFromUI() {
     // Esto se dispara cuando el usuario interactúa manualmente con los checkboxes
-    // No requiere lógica especial más allá de no interferir con calculateBoletinRisk.
 }
 
 // Carga de Presets de Casos Reales
@@ -8088,6 +8116,9 @@ function loadBoletinPreset(presetName) {
         setInput('bol-floors', 11);
         setInput('bol-use', 'commercial');
         setInput('bol-material', 'concrete');
+        setInput('bol-year', 1955);
+        setInput('bol-basements', 0);
+        setInput('bol-semibasements', 1);
 
         // Inspección Externa: Peligro geológico medio (licuación de arena costera)
         setRadio('bol-ext-collapse', 'bajo');
@@ -8102,12 +8133,17 @@ function loadBoletinPreset(presetName) {
         setInput('bol-sev-cols', 14);
         setInput('bol-sev-walls-c', 0);
         setInput('bol-sev-walls-m', 0);
-        setInput('bol-sev-beams', 4); // Vigas agrietadas con pérdida de concreto
+        setInput('bol-sev-beams', 4);
 
         // Daño Moderado (Sección 4): Omitido por severidad alta
-        setInput('bol-mod-element-type', 'columna');
-        setInput('bol-mod-total', 24);
-        setInput('bol-mod-count', 0);
+        setInput('bol-mod-cols-tot', 24);
+        setInput('bol-mod-cols-cnt', 0);
+        setInput('bol-mod-wallsc-tot', 10);
+        setInput('bol-mod-wallsc-cnt', 0);
+        setInput('bol-mod-wallsm-tot', 10);
+        setInput('bol-mod-wallsm-cnt', 0);
+        setInput('bol-mod-beams-tot', 20);
+        setInput('bol-mod-beams-cnt', 0);
 
         // Componentes No Estructurales: Colapso de cielo raso en lobby, vigas de mampostería agrietadas
         setRadio('bol-comp-slabs', 'medio');
@@ -8133,6 +8169,9 @@ function loadBoletinPreset(presetName) {
         setInput('bol-floors', 3);
         setInput('bol-use', 'public');
         setInput('bol-material', 'concrete');
+        setInput('bol-year', 1978);
+        setInput('bol-basements', 0);
+        setInput('bol-semibasements', 0);
 
         // Externa: Colapso parcial externo por falla de pórticos
         setRadio('bol-ext-collapse', 'medio');
@@ -8144,15 +8183,20 @@ function loadBoletinPreset(presetName) {
         // Piso Crítico: 1er Piso
         setInput('bol-critical-floor', 'Primer Piso');
         setInput('bol-access', 'todos');
-        setInput('bol-sev-cols', 0); // No colapsaron del todo, pero hubo cortante severo
+        setInput('bol-sev-cols', 0);
         setInput('bol-sev-walls-c', 0);
         setInput('bol-sev-walls-m', 0);
-        setInput('bol-sev-beams', 2); // 2 vigas con agrietamiento severo y flexión notable
+        setInput('bol-sev-beams', 2);
 
         // Daño Moderado: Columnas con daño moderado
-        setInput('bol-mod-element-type', 'columna');
-        setInput('bol-mod-total', 16);
-        setInput('bol-mod-count', 4); // 25% columns con daño moderado
+        setInput('bol-mod-cols-tot', 16);
+        setInput('bol-mod-cols-cnt', 4); // 25% columns con daño moderado
+        setInput('bol-mod-wallsc-tot', 10);
+        setInput('bol-mod-wallsc-cnt', 0);
+        setInput('bol-mod-wallsm-tot', 10);
+        setInput('bol-mod-wallsm-cnt', 0);
+        setInput('bol-mod-beams-tot', 12);
+        setInput('bol-mod-beams-cnt', 0);
 
         // Componentes: Escaleras agrietadas, paredes tabiquería agrietadas
         setRadio('bol-comp-slabs', 'bajo');
@@ -8178,6 +8222,9 @@ function loadBoletinPreset(presetName) {
         setInput('bol-floors', 6);
         setInput('bol-use', 'residential');
         setInput('bol-material', 'concrete');
+        setInput('bol-year', 2005);
+        setInput('bol-basements', 1);
+        setInput('bol-semibasements', 0);
 
         // Externa: Edificio aledaño inclinado (riesgo medio), asentamientos leves
         setRadio('bol-ext-collapse', 'bajo');
@@ -8194,12 +8241,17 @@ function loadBoletinPreset(presetName) {
         setInput('bol-sev-walls-m', 0);
         setInput('bol-sev-beams', 0);
 
-        // Daño Moderado: 4 columnas de 20 con fisuras de flexión de 1.5mm (15%)
-        setInput('bol-mod-element-type', 'columna');
-        setInput('bol-mod-total', 20);
-        setInput('bol-mod-count', 3); // 15% -> Riesgo Estructural Medio
+        // Daño Moderado: 3 columnas de 20 con fisuras de flexión de 1.5mm (15%)
+        setInput('bol-mod-cols-tot', 20);
+        setInput('bol-mod-cols-cnt', 3); // 15% -> Riesgo Estructural Medio
+        setInput('bol-mod-wallsc-tot', 6);
+        setInput('bol-mod-wallsc-cnt', 0);
+        setInput('bol-mod-wallsm-tot', 4);
+        setInput('bol-mod-wallsm-cnt', 0);
+        setInput('bol-mod-beams-tot', 16);
+        setInput('bol-mod-beams-cnt', 0);
 
-        // Componentes: Tabiquería exterior con fisuras cruzadas importantes
+        // Tabiquería exterior con fisuras cruzadas importantes
         setRadio('bol-comp-slabs', 'bajo');
         setRadio('bol-comp-walls', 'medio');
         setRadio('bol-comp-tanks', 'bajo');
@@ -8223,6 +8275,9 @@ function loadBoletinPreset(presetName) {
         setInput('bol-floors', 2);
         setInput('bol-use', 'residential');
         setInput('bol-material', 'concrete');
+        setInput('bol-year', 2012);
+        setInput('bol-basements', 0);
+        setInput('bol-semibasements', 0);
 
         // Externa: Todo bajo/seguro
         setRadio('bol-ext-collapse', 'bajo');
@@ -8239,10 +8294,15 @@ function loadBoletinPreset(presetName) {
         setInput('bol-sev-walls-m', 0);
         setInput('bol-sev-beams', 0);
 
-        // Daño Moderado: 0 de 8 columnas
-        setInput('bol-mod-element-type', 'columna');
-        setInput('bol-mod-total', 8);
-        setInput('bol-mod-count', 0);
+        // Daño Moderado: 0
+        setInput('bol-mod-cols-tot', 8);
+        setInput('bol-mod-cols-cnt', 0);
+        setInput('bol-mod-wallsc-tot', 6);
+        setInput('bol-mod-wallsc-cnt', 0);
+        setInput('bol-mod-wallsm-tot', 6);
+        setInput('bol-mod-wallsm-cnt', 0);
+        setInput('bol-mod-beams-tot', 10);
+        setInput('bol-mod-beams-cnt', 0);
 
         // Componentes: Microfisuras en revoques (Bajo)
         setRadio('bol-comp-slabs', 'bajo');
@@ -8267,6 +8327,9 @@ function loadBoletinPreset(presetName) {
         setInput('bol-floors', 5);
         setInput('bol-use', 'residential');
         setInput('bol-material', 'concrete');
+        setInput('bol-year', 1980);
+        setInput('bol-basements', 0);
+        setInput('bol-semibasements', 0);
 
         setRadio('bol-ext-collapse', 'bajo');
         setRadio('bol-ext-neighbor', 'bajo');
@@ -8281,9 +8344,14 @@ function loadBoletinPreset(presetName) {
         setInput('bol-sev-walls-m', 0);
         setInput('bol-sev-beams', 0);
 
-        setInput('bol-mod-element-type', 'columna');
-        setInput('bol-mod-total', 20);
-        setInput('bol-mod-count', 0);
+        setInput('bol-mod-cols-tot', 20);
+        setInput('bol-mod-cols-cnt', 0);
+        setInput('bol-mod-wallsc-tot', 10);
+        setInput('bol-mod-wallsc-cnt', 0);
+        setInput('bol-mod-wallsm-tot', 10);
+        setInput('bol-mod-wallsm-cnt', 0);
+        setInput('bol-mod-beams-tot', 15);
+        setInput('bol-mod-beams-cnt', 0);
 
         setRadio('bol-comp-slabs', 'bajo');
         setRadio('bol-comp-walls', 'bajo');
