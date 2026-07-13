@@ -857,7 +857,15 @@ function main() {
     report += "   demanda de diseño normativa reglamentaria; (b) El doblete sísmico (choques sucesivos a t=0s y t=40s)\n";
     report += "   no permite a la estructura disipar la energía acumulada ni recuperar su rango elástico,\n";
     report += "   induciendo una fatiga de bajo ciclo destructiva en los elementos de concreto armado.\n";
-    report += "5. Necesidad de Cambios Normativos y Revisión Estructural: Estos resultados justifican la\n";
+    report += "5. Brecha entre Simulación Teórica y Realidad Constructiva: Es crítico resaltar que los modelos de\n";
+    report += "   simulación asumen materiales homogéneos perfectos, colocación ideal de refuerzos y simetría. En la\n";
+    report += "   realidad, la mala praxis constructiva (ej. concreto contaminado con arena de playa, mal curado, dosificación\n";
+    report += "   empírica de agua, y espaciamiento incorrecto de estribos), junto con la falta de revisión e inspección\n";
+    report += "   por parte de organismos gubernamentales (tanto en licencias de construcción como en fiscalización de obra),\n";
+    report += "   la corrosión marina acelerada del litoral central y las modificaciones arquitectónicas informales\n";
+    report += "   posteriores que añaden peso o restan rigidez, reducen severamente el margen de seguridad real.\n";
+    report += "   El comportamiento real de la infraestructura puede ser sustancialmente peor que el teórico de la simulación.\n";
+    report += "6. Necesidad de Cambios Normativos y Revisión Estructural: Estos resultados justifican la\n";
     report += "   introducción de cambios sustanciales en la normativa sísmica y una revisión profunda a todas\n";
     report += "   las edificaciones existentes en las zonas de alta sismicidad, debido a que la aceleración máxima\n";
     report += "   histórica estimada ha aumentado. Para estas corridas se utilizó un valor extremo de 0.60g (que\n";
