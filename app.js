@@ -7342,7 +7342,6 @@ async function initDamageMap() {
 
     // Añadir al mapa por defecto
     faultsGroup.addTo(map);
-    impactZonesGroup.addTo(map);
 
     // Controles de capas
     const overlayLayers = {
