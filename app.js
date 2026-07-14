@@ -7077,6 +7077,40 @@ async function initDamageMap() {
         attribution: 'Map data &copy; Google Maps'
     }).addTo(map);
 
+    // --- Control de Coordenadas al pasar el Mouse ---
+    const MousePositionControl = L.Control.extend({
+        options: {
+            position: 'bottomleft'
+        },
+        onAdd: function (map) {
+            this._container = L.DomUtil.create('div', 'leaflet-control-mouseposition');
+            L.DomEvent.disableClickPropagation(this._container);
+            this._container.style.background = 'rgba(15, 23, 42, 0.85)';
+            this._container.style.border = '1px solid rgba(255, 255, 255, 0.15)';
+            this._container.style.padding = '6px 12px';
+            this._container.style.borderRadius = '8px';
+            this._container.style.color = '#00f2fe';
+            this._container.style.fontSize = '12px';
+            this._container.style.fontFamily = "'Courier New', Courier, monospace";
+            this._container.style.fontWeight = 'bold';
+            this._container.style.boxShadow = '0 4px 12px rgba(0,0,0,0.5)';
+            this._container.style.backdropFilter = 'blur(6px)';
+            this._container.style.minWidth = '210px';
+            this._container.innerHTML = '<i class="fa-solid fa-crosshairs" style="color: #ffb703; margin-right: 6px;"></i>Lat: 10.61400, Lng: -66.86500';
+            return this._container;
+        },
+        updateHTML: function (lat, lng) {
+            this._container.innerHTML = `<i class="fa-solid fa-crosshairs" style="color: #ffb703; margin-right: 6px; animation: fa-spin 4s linear infinite;"></i>Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`;
+        }
+    });
+
+    const positionControl = new MousePositionControl();
+    positionControl.addTo(map);
+
+    map.on('mousemove', function (e) {
+        positionControl.updateHTML(e.latlng.lat, e.latlng.lng);
+    });
+
     // --- Capas de Fallas Geológicas y Zonas de Intensidad (Doublete Sísmico 1967) ---
     const faultsGroup = L.layerGroup();
     const impactZonesGroup = L.layerGroup();
