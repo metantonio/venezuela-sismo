@@ -438,7 +438,7 @@ function initUI() {
             // Configurar Interacción Suelo-Estructura (ISE) por defecto para La Guaira
             setCheck("ise-enable", true);
             setSelect("ise-foundation-type", "mat");
-            
+
             const vsEl = document.getElementById("ise-vs");
             const dfEl = document.getElementById("ise-df");
             const poissonEl = document.getElementById("ise-poisson");
@@ -572,7 +572,7 @@ function getSpectrum2001(T, params) {
         // Tramo de transición para períodos cortos (T < T+)
         // El factor de reducción varía linealmente de 1 a R: Rp = 1 + (T / T_plus) * (R - 1)
         const Rp = 1 + (T / T_plus) * (R - 1);
-        
+
         // Espectro elástico elástico A(T) con meseta a partir de T_o
         let elasticA;
         if (T < T_o) {
@@ -1003,7 +1003,7 @@ class BuildingModel {
         // --- CÁLCULO DE INTERACCIÓN SUELO-ESTRUCTURA (ISE) ---
         const ssiX = calculateSSIReductionFactor(N, this.h, this.m, this.T1_x, numColsX, numColsY, sX_val, sY_val, 'X');
         const ssiY = calculateSSIReductionFactor(N, this.h, this.m, this.T1_y, numColsX, numColsY, sX_val, sY_val, 'Y');
-        
+
         this.ssiX = ssiX;
         this.ssiY = ssiY;
 
@@ -1085,7 +1085,7 @@ class BuildingModel {
         const w2_y = 2.0 * Math.sqrt(this.k_init_y / this.m) * Math.sin(3.0 * Math.PI / (4.0 * N + 2.0));
 
         const zeta = parseFloat(document.getElementById("damping-ratio").value);
-        
+
         let zeta_x = zeta;
         let zeta_y = zeta;
         if (this.ssiX && this.ssiX.lambda < 1.0) {
@@ -1247,7 +1247,7 @@ const CABILLAS_VE = [
     { name: '5/8"', desig: 5, diam_cm: 1.588, area_cm2: 1.98 },
     { name: '3/4"', desig: 6, diam_cm: 1.905, area_cm2: 2.85 },
     { name: '7/8"', desig: 7, diam_cm: 2.222, area_cm2: 3.88 },
-    { name: '1"',   desig: 8, diam_cm: 2.54,  area_cm2: 5.07 },
+    { name: '1"', desig: 8, diam_cm: 2.54, area_cm2: 5.07 },
     { name: '1 3/8"', desig: 11, diam_cm: 3.581, area_cm2: 10.07 }
 ];
 
@@ -1339,81 +1339,81 @@ function generateBeamSVG(bw, h, d, L_cm, cover, nBotBars, nTopBars, s_conf, s_ce
     </style>`;
 
     // Título dirección
-    svg += `<text x="${lx+lw/2}" y="16" class="tt">${dirLabel}</text>`;
+    svg += `<text x="${lx + lw / 2}" y="16" class="tt">${dirLabel}</text>`;
 
     // Vista longitudinal
-    svg += `<text x="${lx+lw/2}" y="${ly-6}" class="tt" font-size="9">VISTA LONGITUDINAL</text>`;
+    svg += `<text x="${lx + lw / 2}" y="${ly - 6}" class="tt" font-size="9">VISTA LONGITUDINAL</text>`;
     // Columnas
-    svg += `<rect x="${lx-colStub}" y="${ly-5}" width="${colStub}" height="${lh+10}" class="cf" rx="2"/>`;
-    svg += `<rect x="${lx+lw}" y="${ly-5}" width="${colStub}" height="${lh+10}" class="cf" rx="2"/>`;
+    svg += `<rect x="${lx - colStub}" y="${ly - 5}" width="${colStub}" height="${lh + 10}" class="cf" rx="2"/>`;
+    svg += `<rect x="${lx + lw}" y="${ly - 5}" width="${colStub}" height="${lh + 10}" class="cf" rx="2"/>`;
     // Viga
     svg += `<rect x="${lx}" y="${ly}" width="${lw}" height="${lh}" class="bf" rx="1"/>`;
     // Zonas confinadas
     svg += `<rect x="${lx}" y="${ly}" width="${confPx}" height="${lh}" class="cz"/>`;
-    svg += `<rect x="${lx+lw-confPx}" y="${ly}" width="${confPx}" height="${lh}" class="cz"/>`;
+    svg += `<rect x="${lx + lw - confPx}" y="${ly}" width="${confPx}" height="${lh}" class="cz"/>`;
     // Barras longitudinales
-    svg += `<line x1="${lx}" y1="${btY}" x2="${lx+lw}" y2="${btY}" class="bl"/>`;
-    svg += `<line x1="${lx}" y1="${bbY}" x2="${lx+lw}" y2="${bbY}" class="bl"/>`;
+    svg += `<line x1="${lx}" y1="${btY}" x2="${lx + lw}" y2="${btY}" class="bl"/>`;
+    svg += `<line x1="${lx}" y1="${bbY}" x2="${lx + lw}" y2="${bbY}" class="bl"/>`;
     // Etiquetas barras
-    svg += `<text x="${lx+lw/2}" y="${btY-4}" class="st" text-anchor="middle">As' (compresión)</text>`;
-    svg += `<text x="${lx+lw/2}" y="${bbY+11}" class="st" text-anchor="middle">As (tracción)</text>`;
+    svg += `<text x="${lx + lw / 2}" y="${btY - 4}" class="st" text-anchor="middle">As' (compresión)</text>`;
+    svg += `<text x="${lx + lw / 2}" y="${bbY + 11}" class="st" text-anchor="middle">As (tracción)</text>`;
 
     // Estribos
     let x = lx + Math.max(4, 5 * scaleL);
-    while (x < lx + confPx) { svg += `<line x1="${x}" y1="${ly+4}" x2="${x}" y2="${ly+lh-4}" class="sl"/>`; x += sConfPx; }
-    while (x < lx + lw - confPx) { svg += `<line x1="${x}" y1="${ly+4}" x2="${x}" y2="${ly+lh-4}" class="sl" opacity=".5"/>`; x += sCenterPx; }
-    while (x < lx + lw - 4) { svg += `<line x1="${x}" y1="${ly+4}" x2="${x}" y2="${ly+lh-4}" class="sl"/>`; x += sConfPx; }
+    while (x < lx + confPx) { svg += `<line x1="${x}" y1="${ly + 4}" x2="${x}" y2="${ly + lh - 4}" class="sl"/>`; x += sConfPx; }
+    while (x < lx + lw - confPx) { svg += `<line x1="${x}" y1="${ly + 4}" x2="${x}" y2="${ly + lh - 4}" class="sl" opacity=".5"/>`; x += sCenterPx; }
+    while (x < lx + lw - 4) { svg += `<line x1="${x}" y1="${ly + 4}" x2="${x}" y2="${ly + lh - 4}" class="sl"/>`; x += sConfPx; }
 
     // Corte A-A indicador
     const cutX = lx + lw * 0.28;
-    svg += `<line x1="${cutX}" y1="${ly-8}" x2="${cutX}" y2="${ly+lh+8}" stroke="#ffb703" stroke-width=".7" stroke-dasharray="6,3"/>`;
-    svg += `<text x="${cutX-7}" y="${ly-10}" fill="#ffb703" font-size="8" font-family="Inter" font-weight="bold">A</text>`;
-    svg += `<text x="${cutX+3}" y="${ly+lh+16}" fill="#ffb703" font-size="8" font-family="Inter" font-weight="bold">A</text>`;
+    svg += `<line x1="${cutX}" y1="${ly - 8}" x2="${cutX}" y2="${ly + lh + 8}" stroke="#ffb703" stroke-width=".7" stroke-dasharray="6,3"/>`;
+    svg += `<text x="${cutX - 7}" y="${ly - 10}" fill="#ffb703" font-size="8" font-family="Inter" font-weight="bold">A</text>`;
+    svg += `<text x="${cutX + 3}" y="${ly + lh + 16}" fill="#ffb703" font-size="8" font-family="Inter" font-weight="bold">A</text>`;
 
     // Cotas - zona confinada izquierda
     const dY = ly + lh + 22;
-    svg += `<line x1="${lx}" y1="${dY}" x2="${lx+confPx}" y2="${dY}" class="dl"/>`;
-    svg += `<line x1="${lx}" y1="${dY-4}" x2="${lx}" y2="${dY+4}" class="dl"/>`;
-    svg += `<line x1="${lx+confPx}" y1="${dY-4}" x2="${lx+confPx}" y2="${dY+4}" class="dl"/>`;
-    svg += `<text x="${lx+confPx/2}" y="${dY+12}" class="dt">2h=${(2*h/100).toFixed(2)}m</text>`;
-    svg += `<text x="${lx+confPx/2}" y="${dY+22}" class="st" text-anchor="middle">s=${s_conf.toFixed(0)}cm</text>`;
+    svg += `<line x1="${lx}" y1="${dY}" x2="${lx + confPx}" y2="${dY}" class="dl"/>`;
+    svg += `<line x1="${lx}" y1="${dY - 4}" x2="${lx}" y2="${dY + 4}" class="dl"/>`;
+    svg += `<line x1="${lx + confPx}" y1="${dY - 4}" x2="${lx + confPx}" y2="${dY + 4}" class="dl"/>`;
+    svg += `<text x="${lx + confPx / 2}" y="${dY + 12}" class="dt">2h=${(2 * h / 100).toFixed(2)}m</text>`;
+    svg += `<text x="${lx + confPx / 2}" y="${dY + 22}" class="st" text-anchor="middle">s=${s_conf.toFixed(0)}cm</text>`;
     // Zona central
     const cS = lx + confPx, cE = lx + lw - confPx;
     svg += `<line x1="${cS}" y1="${dY}" x2="${cE}" y2="${dY}" class="dl"/>`;
-    svg += `<text x="${(cS+cE)/2}" y="${dY+12}" class="dt">Zona central</text>`;
-    svg += `<text x="${(cS+cE)/2}" y="${dY+22}" class="st" text-anchor="middle">s=${s_center.toFixed(0)}cm</text>`;
+    svg += `<text x="${(cS + cE) / 2}" y="${dY + 12}" class="dt">Zona central</text>`;
+    svg += `<text x="${(cS + cE) / 2}" y="${dY + 22}" class="st" text-anchor="middle">s=${s_center.toFixed(0)}cm</text>`;
     // Zona confinada derecha
-    svg += `<line x1="${cE}" y1="${dY}" x2="${lx+lw}" y2="${dY}" class="dl"/>`;
-    svg += `<line x1="${cE}" y1="${dY-4}" x2="${cE}" y2="${dY+4}" class="dl"/>`;
-    svg += `<line x1="${lx+lw}" y1="${dY-4}" x2="${lx+lw}" y2="${dY+4}" class="dl"/>`;
-    svg += `<text x="${(cE+lx+lw)/2}" y="${dY+12}" class="dt">2h</text>`;
+    svg += `<line x1="${cE}" y1="${dY}" x2="${lx + lw}" y2="${dY}" class="dl"/>`;
+    svg += `<line x1="${cE}" y1="${dY - 4}" x2="${cE}" y2="${dY + 4}" class="dl"/>`;
+    svg += `<line x1="${lx + lw}" y1="${dY - 4}" x2="${lx + lw}" y2="${dY + 4}" class="dl"/>`;
+    svg += `<text x="${(cE + lx + lw) / 2}" y="${dY + 12}" class="dt">2h</text>`;
     // Cota total
     const tDY = dY + 33;
-    svg += `<line x1="${lx}" y1="${tDY}" x2="${lx+lw}" y2="${tDY}" class="dl"/>`;
-    svg += `<line x1="${lx}" y1="${tDY-4}" x2="${lx}" y2="${tDY+4}" class="dl"/>`;
-    svg += `<line x1="${lx+lw}" y1="${tDY-4}" x2="${lx+lw}" y2="${tDY+4}" class="dl"/>`;
-    svg += `<text x="${lx+lw/2}" y="${tDY+13}" class="dt">L = ${(L_cm/100).toFixed(2)} m</text>`;
+    svg += `<line x1="${lx}" y1="${tDY}" x2="${lx + lw}" y2="${tDY}" class="dl"/>`;
+    svg += `<line x1="${lx}" y1="${tDY - 4}" x2="${lx}" y2="${tDY + 4}" class="dl"/>`;
+    svg += `<line x1="${lx + lw}" y1="${tDY - 4}" x2="${lx + lw}" y2="${tDY + 4}" class="dl"/>`;
+    svg += `<text x="${lx + lw / 2}" y="${tDY + 13}" class="dt">L = ${(L_cm / 100).toFixed(2)} m</text>`;
 
     // -- Sección Transversal A-A --
     const secScale = Math.min(120 / bw, 170 / h) * 0.75;
     const sw = bw * secScale, sh = h * secScale;
     const sx = 540, sy = 30;
     const scx = sx + 70, scy = sy + 90;
-    const rx = scx - sw/2, ry = scy - sh/2;
+    const rx = scx - sw / 2, ry = scy - sh / 2;
     const covPx = cover * secScale, stPx = db_st * secScale;
 
-    svg += `<text x="${scx}" y="${sy+4}" class="tt" font-size="9">SECCIÓN A-A</text>`;
+    svg += `<text x="${scx}" y="${sy + 4}" class="tt" font-size="9">SECCIÓN A-A</text>`;
     svg += `<rect x="${rx}" y="${ry}" width="${sw}" height="${sh}" class="bf" rx="2"/>`;
     // Estribo
-    const esx = rx + covPx, esy = ry + covPx, esw = sw - 2*covPx, esh = sh - 2*covPx;
+    const esx = rx + covPx, esy = ry + covPx, esw = sw - 2 * covPx, esh = sh - 2 * covPx;
     svg += `<rect x="${esx}" y="${esy}" width="${esw}" height="${esh}" class="sr" rx="3"/>`;
     // Ganchos 135° (esquinas superiores)
     const hkL = 10;
-    svg += `<line x1="${esx}" y1="${esy+3}" x2="${esx+hkL*.71}" y2="${esy+3+hkL*.71}" class="hl"/>`;
-    svg += `<line x1="${esx+esw}" y1="${esy+3}" x2="${esx+esw-hkL*.71}" y2="${esy+3+hkL*.71}" class="hl"/>`;
+    svg += `<line x1="${esx}" y1="${esy + 3}" x2="${esx + hkL * .71}" y2="${esy + 3 + hkL * .71}" class="hl"/>`;
+    svg += `<line x1="${esx + esw}" y1="${esy + 3}" x2="${esx + esw - hkL * .71}" y2="${esy + 3 + hkL * .71}" class="hl"/>`;
     // Ganchos 135° (esquinas inferiores)
-    svg += `<line x1="${esx}" y1="${esy+esh-3}" x2="${esx+hkL*.71}" y2="${esy+esh-3-hkL*.71}" class="hl"/>`;
-    svg += `<line x1="${esx+esw}" y1="${esy+esh-3}" x2="${esx+esw-hkL*.71}" y2="${esy+esh-3-hkL*.71}" class="hl"/>`;
+    svg += `<line x1="${esx}" y1="${esy + esh - 3}" x2="${esx + hkL * .71}" y2="${esy + esh - 3 - hkL * .71}" class="hl"/>`;
+    svg += `<line x1="${esx + esw}" y1="${esy + esh - 3}" x2="${esx + esw - hkL * .71}" y2="${esy + esh - 3 - hkL * .71}" class="hl"/>`;
 
     // Barras inferiores (tracción)
     const r = Math.max(3.5, 5 * secScale / h);
@@ -1421,49 +1421,49 @@ function generateBeamSVG(bw, h, d, L_cm, cover, nBotBars, nTopBars, s_conf, s_ce
     const bStartX = esx + r + 3, bEndX = esx + esw - r - 3;
     const bSpacing = nBotBars > 1 ? (bEndX - bStartX) / (nBotBars - 1) : 0;
     for (let i = 0; i < nBotBars; i++) {
-        const cx = nBotBars === 1 ? (bStartX + bEndX)/2 : bStartX + i * bSpacing;
+        const cx = nBotBars === 1 ? (bStartX + bEndX) / 2 : bStartX + i * bSpacing;
         svg += `<circle cx="${cx}" cy="${botCy}" r="${r}" class="bc"/>`;
     }
     // Barras superiores (compresión)
     const topCy = ry + covPx + stPx + r + 1;
     const tSpacing = nTopBars > 1 ? (bEndX - bStartX) / (nTopBars - 1) : 0;
     for (let i = 0; i < nTopBars; i++) {
-        const cx = nTopBars === 1 ? (bStartX + bEndX)/2 : bStartX + i * tSpacing;
+        const cx = nTopBars === 1 ? (bStartX + bEndX) / 2 : bStartX + i * tSpacing;
         svg += `<circle cx="${cx}" cy="${topCy}" r="${r}" class="bct"/>`;
     }
 
     // Cotas de sección
-    svg += `<line x1="${rx}" y1="${ry+sh+12}" x2="${rx+sw}" y2="${ry+sh+12}" class="dl"/>`;
-    svg += `<text x="${scx}" y="${ry+sh+22}" class="dt">${bw} cm</text>`;
-    svg += `<text x="${rx+sw+14}" y="${scy+3}" class="dt" text-anchor="start" transform="rotate(-90,${rx+sw+14},${scy})">${h} cm</text>`;
+    svg += `<line x1="${rx}" y1="${ry + sh + 12}" x2="${rx + sw}" y2="${ry + sh + 12}" class="dl"/>`;
+    svg += `<text x="${scx}" y="${ry + sh + 22}" class="dt">${bw} cm</text>`;
+    svg += `<text x="${rx + sw + 14}" y="${scy + 3}" class="dt" text-anchor="start" transform="rotate(-90,${rx + sw + 14},${scy})">${h} cm</text>`;
     // Recubrimiento
-    svg += `<text x="${rx+covPx/2}" y="${scy}" class="st" text-anchor="middle" transform="rotate(-90,${rx+covPx/2},${scy})">${cover}cm</text>`;
+    svg += `<text x="${rx + covPx / 2}" y="${scy}" class="st" text-anchor="middle" transform="rotate(-90,${rx + covPx / 2},${scy})">${cover}cm</text>`;
 
     // -- Detalle de Estribo --
     const dx = sx + 10, dy = sy + sh * secScale + 130;
-    svg += `<text x="${dx+55}" y="${dy-5}" class="tt" font-size="9">DETALLE ESTRIBO</text>`;
-    svg += `<text x="${dx+55}" y="${dy+7}" class="st" text-anchor="middle">Gancho sísmico 135°</text>`;
+    svg += `<text x="${dx + 55}" y="${dy - 5}" class="tt" font-size="9">DETALLE ESTRIBO</text>`;
+    svg += `<text x="${dx + 55}" y="${dy + 7}" class="st" text-anchor="middle">Gancho sísmico 135°</text>`;
     const dex = dx + 5, dey = dy + 16, dew = 100, deh = 55;
     svg += `<rect x="${dex}" y="${dey}" width="${dew}" height="${deh}" class="sr" rx="5"/>`;
     const hk = 16;
     // 4 ganchos en cada esquina
-    svg += `<line x1="${dex}" y1="${dey+4}" x2="${dex+hk*.71}" y2="${dey+4+hk*.71}" class="hl"/>`;
-    svg += `<line x1="${dex+dew}" y1="${dey+4}" x2="${dex+dew-hk*.71}" y2="${dey+4+hk*.71}" class="hl"/>`;
-    svg += `<line x1="${dex}" y1="${dey+deh-4}" x2="${dex+hk*.71}" y2="${dey+deh-4-hk*.71}" class="hl"/>`;
-    svg += `<line x1="${dex+dew}" y1="${dey+deh-4}" x2="${dex+dew-hk*.71}" y2="${dey+deh-4-hk*.71}" class="hl"/>`;
-    svg += `<text x="${dex+dew+10}" y="${dey+18}" class="st" text-anchor="start">135°</text>`;
-    svg += `<text x="${dex+dew+10}" y="${dey+30}" class="st" text-anchor="start">Ext: 6d_b</text>`;
-    svg += `<text x="${dex+dew/2}" y="${dey+deh+14}" class="dt">Estribo #3 (3/8")</text>`;
+    svg += `<line x1="${dex}" y1="${dey + 4}" x2="${dex + hk * .71}" y2="${dey + 4 + hk * .71}" class="hl"/>`;
+    svg += `<line x1="${dex + dew}" y1="${dey + 4}" x2="${dex + dew - hk * .71}" y2="${dey + 4 + hk * .71}" class="hl"/>`;
+    svg += `<line x1="${dex}" y1="${dey + deh - 4}" x2="${dex + hk * .71}" y2="${dey + deh - 4 - hk * .71}" class="hl"/>`;
+    svg += `<line x1="${dex + dew}" y1="${dey + deh - 4}" x2="${dex + dew - hk * .71}" y2="${dey + deh - 4 - hk * .71}" class="hl"/>`;
+    svg += `<text x="${dex + dew + 10}" y="${dey + 18}" class="st" text-anchor="start">135°</text>`;
+    svg += `<text x="${dex + dew + 10}" y="${dey + 30}" class="st" text-anchor="start">Ext: 6d_b</text>`;
+    svg += `<text x="${dex + dew / 2}" y="${dey + deh + 14}" class="dt">Estribo #3 (3/8")</text>`;
 
     // Leyenda
-    svg += `<rect x="12" y="${H-28}" width="9" height="9" class="cz" stroke="#ff6b6b" stroke-width=".6"/>`;
-    svg += `<text x="24" y="${H-20}" class="st">Zona Confinada (2h)</text>`;
-    svg += `<line x1="120" y1="${H-24}" x2="135" y2="${H-24}" class="sl"/>`;
-    svg += `<text x="140" y="${H-20}" class="st" text-anchor="start">Estribos</text>`;
-    svg += `<line x1="186" y1="${H-24}" x2="201" y2="${H-24}" class="bl"/>`;
-    svg += `<text x="206" y="${H-20}" class="st" text-anchor="start">Acero Long.</text>`;
-    svg += `<circle cx="268" cy="${H-24}" r="3" class="bc"/><text x="276" y="${H-20}" class="st" text-anchor="start">Tracción</text>`;
-    svg += `<circle cx="324" cy="${H-24}" r="3" class="bct"/><text x="332" y="${H-20}" class="st" text-anchor="start">Compresión</text>`;
+    svg += `<rect x="12" y="${H - 28}" width="9" height="9" class="cz" stroke="#ff6b6b" stroke-width=".6"/>`;
+    svg += `<text x="24" y="${H - 20}" class="st">Zona Confinada (2h)</text>`;
+    svg += `<line x1="120" y1="${H - 24}" x2="135" y2="${H - 24}" class="sl"/>`;
+    svg += `<text x="140" y="${H - 20}" class="st" text-anchor="start">Estribos</text>`;
+    svg += `<line x1="186" y1="${H - 24}" x2="201" y2="${H - 24}" class="bl"/>`;
+    svg += `<text x="206" y="${H - 20}" class="st" text-anchor="start">Acero Long.</text>`;
+    svg += `<circle cx="268" cy="${H - 24}" r="3" class="bc"/><text x="276" y="${H - 20}" class="st" text-anchor="start">Tracción</text>`;
+    svg += `<circle cx="324" cy="${H - 24}" r="3" class="bct"/><text x="332" y="${H - 20}" class="st" text-anchor="start">Compresión</text>`;
 
     svg += `</svg>`;
     return svg;
@@ -2158,11 +2158,11 @@ function renderBeam3DCanvas(canvasId, beamData, model2001, model2019, structConf
             ctx.fillText(`Momento Sísmico: ${Math.round(localMu).toLocaleString()} kgf·m`, ttx + 8, tty + 28);
             ctx.fillText(`Capacidad φMn: ${Math.round(beamData.phiMn).toLocaleString()} kgf·m`, ttx + 8, tty + 40);
             ctx.fillText(`DCR Local: ${(localMu / Math.max(1, beamData.phiMn)).toFixed(2)}`, ttx + 8, tty + 52);
-            
+
             const stateText = localD >= 0.8 ? 'COLAPSO/FRACTURA' : localD >= 0.5 ? 'SEVERO' : localD >= 0.2 ? 'AGRIETADO' : 'ELÁSTICO';
             ctx.font = 'bold 8px "Inter", sans-serif';
             ctx.fillStyle = localD >= 0.5 ? '#ff3333' : localD >= 0.2 ? '#ffb703' : '#4cc9f0';
-            ctx.fillText(`Estado: ${stateText} (${(localD*100).toFixed(1)}%)`, ttx + 8, tty + 66);
+            ctx.fillText(`Estado: ${stateText} (${(localD * 100).toFixed(1)}%)`, ttx + 8, tty + 66);
         }
 
         // --- PANEL DE MÉTRICAS ---
@@ -3932,7 +3932,7 @@ function calculateSSIReductionFactor(N, h, m, T_rigid, numColsX, numColsY, sX, s
 
     const areaMultiplier = (foundType === 'isolated') ? 0.35 : 1.0;
     const areaFound = B * L * areaMultiplier;
-    
+
     const Rx = Math.sqrt(areaFound / Math.PI);
     const I_base = (Math.pow(B, 3) * L / 12) * areaMultiplier;
     const Rtheta = Math.pow((4.0 * I_base / Math.PI), 0.25);
@@ -3953,7 +3953,7 @@ function calculateSSIReductionFactor(N, h, m, T_rigid, numColsX, numColsY, sX, s
     const h_star = 0.7 * N * h;
 
     const lambda_ise = 1.0 / (1.0 + (K_struc / Kx) + (K_struc * h_star * h_star / Ktheta));
-    
+
     return {
         lambda: Math.min(1.0, Math.max(0.01, lambda_ise)),
         B, L, Rx, Rtheta, G, poisson, density, Kx, Ktheta, K_struc, h_star, eh, er, foundType, vs, df
@@ -3997,7 +3997,7 @@ function handleFileSelect(event) {
     document.getElementById("file-upload-status").style.color = "#ffb703";
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         const text = e.target.result;
         parseAccelerogramFile(text);
     };
@@ -4007,7 +4007,7 @@ function handleFileSelect(event) {
 function parseAccelerogramFile(text) {
     const lines = text.split(/\r?\n/);
     const parsedData = [];
-    
+
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line || line.startsWith('#') || line.startsWith('%') || line.startsWith('//')) {
@@ -4094,7 +4094,7 @@ function parseAccelerogramFile(text) {
         }
     }
 
-    const statusText = `OK: ${fileDuration.toFixed(1)}s | dt=${(fileDuration/rawAccels.length).toFixed(3)}s | PGA=${maxAbs.toFixed(2)}g (${unitInfo})`;
+    const statusText = `OK: ${fileDuration.toFixed(1)}s | dt=${(fileDuration / rawAccels.length).toFixed(3)}s | PGA=${maxAbs.toFixed(2)}g (${unitInfo})`;
     document.getElementById("file-upload-status").textContent = statusText;
     document.getElementById("file-upload-status").style.color = "#4cc9f0";
 
@@ -4818,11 +4818,11 @@ function updateSingleBaseShearArrow(arrow, labelSprite, canvas, ctx, texture, co
         ctx.fillStyle = colorString;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        
+
         // Conversión a kgf
         const force_kgf = Math.abs(forceVal) / G;
         let forceText = Math.round(force_kgf).toLocaleString() + " kgf";
-        
+
         ctx.fillText(forceText, canvas.width / 2, canvas.height / 2);
         texture.needsUpdate = true;
     }
@@ -5443,39 +5443,39 @@ function disposeGroup(group) {
 function createFlexuralColumnCracks(w, h, d, level) {
     const vertices = [];
     const offset = 0.002;
-    
+
     if (level === 'minor') {
-        const zf = d/2 + offset;
+        const zf = d / 2 + offset;
         vertices.push(
-            -w/2, -h/2 + 0.08, zf,  w/2, -h/2 + 0.10, zf,
-            -w/2, h/2 - 0.10, zf,   w/2, h/2 - 0.08, zf
+            -w / 2, -h / 2 + 0.08, zf, w / 2, -h / 2 + 0.10, zf,
+            -w / 2, h / 2 - 0.10, zf, w / 2, h / 2 - 0.08, zf
         );
-        const zb = -d/2 - offset;
+        const zb = -d / 2 - offset;
         vertices.push(
-            -w/2, -h/2 + 0.10, zb,  w/2, -h/2 + 0.08, zb,
-            -w/2, h/2 - 0.08, zb,   w/2, h/2 - 0.10, zb
+            -w / 2, -h / 2 + 0.10, zb, w / 2, -h / 2 + 0.08, zb,
+            -w / 2, h / 2 - 0.08, zb, w / 2, h / 2 - 0.10, zb
         );
     } else if (level === 'moderate') {
-        const zf = d/2 + offset;
+        const zf = d / 2 + offset;
         vertices.push(
-            -w/2, -h/2 + 0.18, zf,  w/3, -h/2 + 0.16, zf,
-            -w/3, h/2 - 0.16, zf,   w/2, h/2 - 0.18, zf
+            -w / 2, -h / 2 + 0.18, zf, w / 3, -h / 2 + 0.16, zf,
+            -w / 3, h / 2 - 0.16, zf, w / 2, h / 2 - 0.18, zf
         );
-        const xl = -w/2 - offset;
+        const xl = -w / 2 - offset;
         vertices.push(
-            xl, -h/2 + 0.10, -d/2,  xl, -h/2 + 0.10, d/2,
-            xl, h/2 - 0.10, -d/2,   xl, h/2 - 0.10, d/2
+            xl, -h / 2 + 0.10, -d / 2, xl, -h / 2 + 0.10, d / 2,
+            xl, h / 2 - 0.10, -d / 2, xl, h / 2 - 0.10, d / 2
         );
     } else if (level === 'severe') {
-        const zf = d/2 + offset;
+        const zf = d / 2 + offset;
         vertices.push(
-            -w/2, -h/2 + 0.25, zf,  w/2, -h/2 + 0.22, zf,
-            -w/2, h/2 - 0.22, zf,   w/2, h/2 - 0.25, zf
+            -w / 2, -h / 2 + 0.25, zf, w / 2, -h / 2 + 0.22, zf,
+            -w / 2, h / 2 - 0.22, zf, w / 2, h / 2 - 0.25, zf
         );
-        const xr = w/2 + offset;
+        const xr = w / 2 + offset;
         vertices.push(
-            xr, -h/2 + 0.10, -d/2,  xr, -h/2 + 0.10, d/2,
-            xr, h/2 - 0.10, -d/2,   xr, h/2 - 0.10, d/2
+            xr, -h / 2 + 0.10, -d / 2, xr, -h / 2 + 0.10, d / 2,
+            xr, h / 2 - 0.10, -d / 2, xr, h / 2 - 0.10, d / 2
         );
     }
 
@@ -5489,25 +5489,25 @@ function createShearColumnCracks(w, h, d, level) {
     const offset = 0.002;
 
     if (level === 'minor') {
-        const zf = d/2 + offset;
-        vertices.push(-w/2, -h/4, zf, w/2, h/4, zf);
-        const zb = -d/2 - offset;
-        vertices.push(-w/2, -h/4, zb, w/2, h/4, zb);
+        const zf = d / 2 + offset;
+        vertices.push(-w / 2, -h / 4, zf, w / 2, h / 4, zf);
+        const zb = -d / 2 - offset;
+        vertices.push(-w / 2, -h / 4, zb, w / 2, h / 4, zb);
     } else if (level === 'moderate') {
-        const zf = d/2 + offset;
-        vertices.push(-w/2, h/4, zf, w/2, -h/4, zf);
-        const zb = -d/2 - offset;
-        vertices.push(-w/2, h/4, zb, w/2, -h/4, zb);
+        const zf = d / 2 + offset;
+        vertices.push(-w / 2, h / 4, zf, w / 2, -h / 4, zf);
+        const zb = -d / 2 - offset;
+        vertices.push(-w / 2, h / 4, zb, w / 2, -h / 4, zb);
     } else if (level === 'severe') {
-        const xl = -w/2 - offset;
+        const xl = -w / 2 - offset;
         vertices.push(
-            xl, -h/3, -d/2, xl, h/3, d/2,
-            xl, h/3, -d/2, xl, -h/3, d/2
+            xl, -h / 3, -d / 2, xl, h / 3, d / 2,
+            xl, h / 3, -d / 2, xl, -h / 3, d / 2
         );
-        const xr = w/2 + offset;
+        const xr = w / 2 + offset;
         vertices.push(
-            xr, -h/3, -d/2, xr, h/3, d/2,
-            xr, h/3, -d/2, xr, -h/3, d/2
+            xr, -h / 3, -d / 2, xr, h / 3, d / 2,
+            xr, h / 3, -d / 2, xr, -h / 3, d / 2
         );
     }
 
@@ -5520,27 +5520,27 @@ function createShearColumnCracks(w, h, d, level) {
 function createBeamCracksGeometry(L, H, W, level) {
     const vertices = [];
     const offset = 0.002;
-    const yf = W/2 + offset;
-    
+    const yf = W / 2 + offset;
+
     if (level === 'minor') {
         vertices.push(
-            -L/2 + 0.15, -H/2, yf,   -L/2 + 0.15, H/3, yf,
-            L/2 - 0.15, -H/2, yf,    L/2 - 0.15, H/3, yf
+            -L / 2 + 0.15, -H / 2, yf, -L / 2 + 0.15, H / 3, yf,
+            L / 2 - 0.15, -H / 2, yf, L / 2 - 0.15, H / 3, yf
         );
-        const yb = -W/2 - offset;
+        const yb = -W / 2 - offset;
         vertices.push(
-            -L/2 + 0.15, -H/2, yb,   -L/2 + 0.15, H/3, yb,
-            L/2 - 0.15, -H/2, yb,    L/2 - 0.15, H/3, yb
+            -L / 2 + 0.15, -H / 2, yb, -L / 2 + 0.15, H / 3, yb,
+            L / 2 - 0.15, -H / 2, yb, L / 2 - 0.15, H / 3, yb
         );
     } else if (level === 'severe') {
         vertices.push(
-            -L/2 + 0.30, -H/2, yf,   -L/2 + 0.30, H/2, yf,
-            L/2 - 0.30, -H/2, yf,    L/2 - 0.30, H/2, yf
+            -L / 2 + 0.30, -H / 2, yf, -L / 2 + 0.30, H / 2, yf,
+            L / 2 - 0.30, -H / 2, yf, L / 2 - 0.30, H / 2, yf
         );
-        const yb = -W/2 - offset;
+        const yb = -W / 2 - offset;
         vertices.push(
-            -L/2 + 0.30, -H/2, yb,   -L/2 + 0.30, H/2, yb,
-            L/2 - 0.30, -H/2, yb,    L/2 - 0.30, H/2, yb
+            -L / 2 + 0.30, -H / 2, yb, -L / 2 + 0.30, H / 2, yb,
+            L / 2 - 0.30, -H / 2, yb, L / 2 - 0.30, H / 2, yb
         );
     }
 
@@ -6117,8 +6117,8 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
                     const sev = segMesh.getObjectByName("cracks_severe");
                     if (minor && mod && sev) {
                         minor.visible = showCracks; minor.material.opacity = 0.95; minor.material.color.setHex(0x000000);
-                        mod.visible = showCracks;   mod.material.opacity = 0.95;   mod.material.color.setHex(0x000000);
-                        sev.visible = showCracks;   sev.material.opacity = 0.95;   sev.material.color.setHex(0x000000);
+                        mod.visible = showCracks; mod.material.opacity = 0.95; mod.material.color.setHex(0x000000);
+                        sev.visible = showCracks; sev.material.opacity = 0.95; sev.material.color.setHex(0x000000);
                     }
                 });
                 col.material.color.setHex(0x111111); // Negro
@@ -6132,7 +6132,7 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
                     const sev = segMesh.getObjectByName("cracks_severe");
                     if (minor && sev) {
                         minor.visible = showCracks; minor.material.opacity = 0.95; minor.material.color.setHex(0x000000);
-                        sev.visible = showCracks;   sev.material.opacity = 0.95;   sev.material.color.setHex(0x000000);
+                        sev.visible = showCracks; sev.material.opacity = 0.95; sev.material.color.setHex(0x000000);
                     }
                 });
             };
@@ -6259,7 +6259,7 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
             // Actualizar visualización de Grietas (Cracks) en Columnas
             const showCracksCheck = document.getElementById("show-cracks");
             const showCracks = showCracksCheck ? showCracksCheck.checked : true;
-            
+
             col.meshes.forEach(segMesh => {
                 const minor = segMesh.getObjectByName("cracks_minor");
                 const mod = segMesh.getObjectByName("cracks_moderate");
@@ -6269,20 +6269,20 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
                     if (showCracks) {
                         if (colDriftRatio >= 0.018) {
                             minor.visible = true; minor.material.opacity = 0.95;
-                            mod.visible = true;   mod.material.opacity = 0.95;
-                            sev.visible = true;   sev.material.opacity = 0.95;
+                            mod.visible = true; mod.material.opacity = 0.95;
+                            sev.visible = true; sev.material.opacity = 0.95;
                         } else if (colDriftRatio >= 0.015) {
                             minor.visible = true; minor.material.opacity = 0.90;
-                            mod.visible = true;   mod.material.opacity = 0.80;
-                            sev.visible = false;  sev.material.opacity = 0;
+                            mod.visible = true; mod.material.opacity = 0.80;
+                            sev.visible = false; sev.material.opacity = 0;
                         } else if (colDriftRatio >= 0.012) {
                             minor.visible = true; minor.material.opacity = 0.60;
-                            mod.visible = false;  mod.material.opacity = 0;
-                            sev.visible = false;  sev.material.opacity = 0;
+                            mod.visible = false; mod.material.opacity = 0;
+                            sev.visible = false; sev.material.opacity = 0;
                         } else {
                             minor.visible = false; minor.material.opacity = 0;
-                            mod.visible = false;   mod.material.opacity = 0;
-                            sev.visible = false;   sev.material.opacity = 0;
+                            mod.visible = false; mod.material.opacity = 0;
+                            sev.visible = false; sev.material.opacity = 0;
                         }
                     } else {
                         minor.visible = false;
@@ -6311,13 +6311,13 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
                         if (showCracks) {
                             if (maxStoryDrift >= beamDriftTriggerSevere) {
                                 minor.visible = true; minor.material.opacity = 0.90;
-                                sev.visible = true;   sev.material.opacity = 0.85;
+                                sev.visible = true; sev.material.opacity = 0.85;
                             } else if (maxStoryDrift >= beamDriftTriggerMinor) {
                                 minor.visible = true; minor.material.opacity = 0.70;
-                                sev.visible = false;  sev.material.opacity = 0;
+                                sev.visible = false; sev.material.opacity = 0;
                             } else {
                                 minor.visible = false; minor.material.opacity = 0;
-                                sev.visible = false;  sev.material.opacity = 0;
+                                sev.visible = false; sev.material.opacity = 0;
                             }
                         } else {
                             minor.visible = false;
@@ -6334,7 +6334,7 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
                 b3D.beamsY[lvl].forEach(updateBeamCracks);
             }
 
-                        // Mover y deformar las columnas según la opción de flexión avanzada
+            // Mover y deformar las columnas según la opción de flexión avanzada
             const dx = x_top - x_bottom;
             const dz = z_top - z_bottom;
 
@@ -6940,7 +6940,7 @@ function initVargasChart() {
                 },
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
+                        label: function (context) {
                             return ` ${context.dataset.label}: ${context.raw}% de colapsos`;
                         }
                     }
@@ -6961,7 +6961,7 @@ function initVargasChart() {
                     ticks: {
                         color: '#94a3b8',
                         font: { family: 'Inter', size: 11 },
-                        callback: function(value) {
+                        callback: function (value) {
                             return value + '%';
                         }
                     },
@@ -7004,7 +7004,7 @@ window.changePopupPhoto = function (buildingId, direction) {
     if (imgEl) {
         imgEl.src = photos[building.currentPhotoIndex];
     }
-    
+
     const wrapper = document.getElementById(`popup-photo-wrapper-${buildingId}`);
     if (wrapper) {
         wrapper.setAttribute('onclick', `window.open('${photos[building.currentPhotoIndex]}', '_blank')`);
@@ -7026,13 +7026,13 @@ async function initDamageMap() {
     // --- Collapse probability data from Monte Carlo simulations (Vargas 2026) ---
     // Key: number of floors → { p2001: %, p2019: % }
     const collapseData = {
-        4:  { p2001: 100.0, p2019: 45.5 },
-        5:  { p2001: 100.0, p2019: 63.6 },
-        6:  { p2001: 100.0, p2019: 36.4 },
-        7:  { p2001: 100.0, p2019: 72.7 },
-        8:  { p2001:  90.9, p2019: 63.6 },
-        9:  { p2001:  81.8, p2019: 63.6 },
-        10: { p2001:  81.8, p2019: 54.5 }
+        4: { p2001: 100.0, p2019: 45.5 },
+        5: { p2001: 100.0, p2019: 63.6 },
+        6: { p2001: 100.0, p2019: 36.4 },
+        7: { p2001: 100.0, p2019: 72.7 },
+        8: { p2001: 90.9, p2019: 63.6 },
+        9: { p2001: 81.8, p2019: 63.6 },
+        10: { p2001: 81.8, p2019: 54.5 }
     };
 
     // --- 198 real buildings geolocated across La Guaira / Vargas dataset ---
@@ -7055,17 +7055,17 @@ async function initDamageMap() {
     // Enrich with collapse probabilities and floor validation
     // Known structural floor counts (measured from structural drawings or field surveys)
     const knownFloorBuildings = new Set([
-        'OPPPE 26', 'OPPPE 27', 'OPPE 30', 'Hotel Eduard\'s', 'Rita Sol', 'Ritamar', 'Bravamar', 
-        'Vallarta', 'Petunia', 'Coral Park', 'Coral Mar', 'Puerto Coral', 'Coral Beach', 
-        'Meliá Caribe', 'Punta Brisas', 'Punto Piedra', 'Aguamarina', 'Paseo del Mar', 
-        'Aduana de La Guaira', 'Torre Administrativa', 'Cumanaguto', 'Hugo Chávez', 'Oasis Beach', 
+        'OPPPE 26', 'OPPPE 27', 'OPPE 30', 'Hotel Eduard\'s', 'Rita Sol', 'Ritamar', 'Bravamar',
+        'Vallarta', 'Petunia', 'Coral Park', 'Coral Mar', 'Puerto Coral', 'Coral Beach',
+        'Meliá Caribe', 'Punta Brisas', 'Punto Piedra', 'Aguamarina', 'Paseo del Mar',
+        'Aduana de La Guaira', 'Torre Administrativa', 'Cumanaguto', 'Hugo Chávez', 'Oasis Beach',
         'Mar Azul', 'Cimaventura', 'Belo Horizonte', 'Catia Mar', 'Carmen de Uria', 'Uria Mar'
     ]);
 
     buildings.forEach(b => {
         // Check if building has an exact known floor count or if it was estimated
-        const hasKnownFloors = knownFloorBuildings.has(b.name) || 
-                              [...knownFloorBuildings].some(k => b.name.includes(k));
+        const hasKnownFloors = knownFloorBuildings.has(b.name) ||
+            [...knownFloorBuildings].some(k => b.name.includes(k));
         b.has_real_floors = hasKnownFloors;
 
         const data = collapseData[b.floors] || collapseData[5];
@@ -7237,18 +7237,18 @@ async function initDamageMap() {
         if (pgaResponse.ok) {
             const pgaContoursData = await pgaResponse.json();
             L.geoJSON(pgaContoursData, {
-                style: function(feature) {
+                style: function (feature) {
                     const val = feature.properties.value; // %g (50, 20, 10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05)
                     let color = '#60a5fa';
                     let weight = 2.0;
-                    
+
                     if (val >= 50) { color = '#ef4444'; weight = 4.0; } // 0.50g
                     else if (val >= 20) { color = '#fb923c'; weight = 3.5; } // 0.20g
                     else if (val >= 10) { color = '#facc15'; weight = 3.0; } // 0.10g
                     else if (val >= 5) { color = '#4ade80'; weight = 2.5; }  // 0.05g
                     else if (val >= 2) { color = '#2ec4b6'; weight = 2.0; }  // 0.02g
                     else if (val >= 1) { color = '#3b82f6'; weight = 1.5; }  // 0.01g
-                    
+
                     return {
                         color: color,
                         weight: weight,
@@ -7256,7 +7256,7 @@ async function initDamageMap() {
                         dashArray: '4, 4'
                     };
                 },
-                onEachFeature: function(feature, layer) {
+                onEachFeature: function (feature, layer) {
                     const val = feature.properties.value;
                     const pgaValG = (val / 100).toFixed(2);
                     layer.bindPopup(`
@@ -7391,22 +7391,22 @@ async function initDamageMap() {
         if (typeof input === 'number') {
             const prob = input;
             if (prob >= 100) return '#111111';
-            if (prob >= 80)  return '#e63946';
-            if (prob >= 60)  return '#fb8500';
-            if (prob >= 40)  return '#ffb703';
+            if (prob >= 80) return '#e63946';
+            if (prob >= 60) return '#fb8500';
+            if (prob >= 40) return '#ffb703';
             return '#2ec4b6';
         }
         if (typeof input === 'object') {
             if (input.status === 'collapsed') return '#111111';
-            if (input.status === 'damaged')   return '#fb8500'; // Naranja para estructuras en pie con daño
-            if (input.status === 'survived')  return '#2ec4b6';
+            if (input.status === 'damaged') return '#fb8500'; // Naranja para estructuras en pie con daño
+            if (input.status === 'survived') return '#2ec4b6';
 
             const prob = norm === '2001' ? input.p2001 : input.p2019;
             if (prob === null || prob === undefined) return '#fb8500';
             if (prob >= 100) return '#111111';
-            if (prob >= 80)  return '#e63946';
-            if (prob >= 60)  return '#fb8500';
-            if (prob >= 40)  return '#ffb703';
+            if (prob >= 80) return '#e63946';
+            if (prob >= 60) return '#fb8500';
+            if (prob >= 40) return '#ffb703';
             return '#2ec4b6';
         }
         return '#ffb703';
@@ -7415,14 +7415,14 @@ async function initDamageMap() {
     function getStatusLabel(b) {
         const buildingStatus = typeof b === 'object' ? b.status : arguments[1];
         if (buildingStatus === 'collapsed') return { text: 'COLAPSÓ', cls: 'popup-status-collapsed', icon: 'fa-house-chimney-crack' };
-        if (buildingStatus === 'damaged')   return { text: 'DAÑO SEVERO (EN PIE)', cls: 'popup-status-damaged', icon: 'fa-house-crack' };
-        if (buildingStatus === 'survived')  return { text: 'RESISTIÓ', cls: 'popup-status-survived', icon: 'fa-shield-halved' };
+        if (buildingStatus === 'damaged') return { text: 'DAÑO SEVERO (EN PIE)', cls: 'popup-status-damaged', icon: 'fa-house-crack' };
+        if (buildingStatus === 'survived') return { text: 'RESISTIÓ', cls: 'popup-status-survived', icon: 'fa-shield-halved' };
 
         const prob = typeof b === 'object' ? (currentNorm === '2001' ? b.p2001 : b.p2019) : b;
         if (prob === null || prob === undefined) return { text: 'DAÑO SEVERO (EN PIE)', cls: 'popup-status-damaged', icon: 'fa-house-crack' };
         if (prob >= 100) return { text: 'COLAPSÓ', cls: 'popup-status-collapsed', icon: 'fa-house-chimney-crack' };
-        if (prob >= 70)  return { text: 'DAÑO SEVERO', cls: 'popup-status-damaged', icon: 'fa-house-crack' };
-        if (prob >= 40)  return { text: 'DAÑO MODERADO', cls: 'popup-status-damaged', icon: 'fa-exclamation-triangle' };
+        if (prob >= 70) return { text: 'DAÑO SEVERO', cls: 'popup-status-damaged', icon: 'fa-house-crack' };
+        if (prob >= 40) return { text: 'DAÑO MODERADO', cls: 'popup-status-damaged', icon: 'fa-exclamation-triangle' };
         return { text: 'RESISTIÓ', cls: 'popup-status-survived', icon: 'fa-shield-halved' };
     }
 
@@ -7457,14 +7457,14 @@ async function initDamageMap() {
                 b.currentPhotoIndex = 0;
             }
             const activePhoto = photos[b.currentPhotoIndex];
-            
+
             photoHtml = `
                 <div style="margin-top: 10px; position: relative;">
                     <div id="popup-photo-wrapper-${b.id}" style="text-align: center; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); cursor: pointer;" onclick="window.open('${activePhoto}', '_blank')" title="Haga clic para ampliar la imagen">
                         <img id="popup-photo-img-${b.id}" src="${activePhoto}" style="width: 100%; height: 130px; object-fit: cover; display: block; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1.0'" alt="Evidencia de daño" />
                     </div>
             `;
-            
+
             if (photos.length > 1) {
                 photoHtml += `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);">
@@ -7480,7 +7480,7 @@ async function initDamageMap() {
                     </div>
                 `;
             }
-            
+
             photoHtml += `</div>`;
         }
 
@@ -7525,7 +7525,7 @@ async function initDamageMap() {
             </div>
             <div class="popup-row">
                 <span class="popup-row-label">${normLabel}</span>
-                <span class="popup-row-value" style="color: ${color};">${probStr}</span>
+                <span class="popup-row-value" style="color: #77777;">${probStr}</span>
             </div>
             <div class="popup-row">
                 <span class="popup-row-label">${otherNormLabel}</span>
@@ -7627,8 +7627,8 @@ async function initDamageMap() {
 
         const filtered = buildings.filter(b => {
             // Text search match (name, zone, address)
-            const matchText = !query || 
-                b.name.toLowerCase().includes(query) || 
+            const matchText = !query ||
+                b.name.toLowerCase().includes(query) ||
                 (b.zone && b.zone.toLowerCase().includes(query)) ||
                 (b.address && b.address.toLowerCase().includes(query));
 
@@ -7774,7 +7774,7 @@ async function initDamageMap() {
 
                 navigator.clipboard.writeText(textToCopy).then(() => {
                     showCorrectionNotification(`¡Datos de "${b.name}" copiados al portapapeles! Redirigiendo a GitHub...`);
-                    
+
                     setTimeout(() => {
                         window.open('https://github.com/metantonio/venezuela-sismo/issues?q=state%3Aopen%20label%3A%22Correcci%C3%B3n%20Edificaci%C3%B3n%20Mapa%22', '_blank');
                     }, 1000);
@@ -7813,7 +7813,7 @@ async function initDamageMap() {
         toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
 
         toast.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #ffb703; font-size: 16px;"></i> <span>${message}</span>`;
-        
+
         document.body.appendChild(toast);
 
         toast.offsetHeight; // force reflow
@@ -8151,7 +8151,7 @@ function calculateBoletinRisk() {
 
     let riskSec4 = 'bajo';
     const riskDisplay = document.getElementById('bol-mod-risk-display');
-    
+
     if (maxPct < 10) {
         riskSec4 = 'bajo';
         if (riskDisplay) {
@@ -8237,7 +8237,7 @@ function calculateBoletinRisk() {
         tagBox.className = 'funvisis-tag-box tag-roja-style';
         tagTitle.textContent = 'PELIGRO';
         tagSubtitle.textContent = 'NO ENTRE NI OCUPE';
-        
+
         explanationText.innerHTML = `<strong>Riesgo Alto Detectado.</strong> Se restringe totalmente el acceso debido a:<br>
             <ul style="margin: 6px 0; padding-left: 18px; color: #ff6b6b;">
                 ${triggers.map(t => `<li>${t}</li>`).join('')}
@@ -8254,7 +8254,7 @@ function calculateBoletinRisk() {
             'Desconectar servicios principales de gas y electricidad para evitar incendios.',
             'Apuntalar urgentemente elementos dañados que comprometan la gravedad.'
         ];
-        
+
         // Auto-check preventivos sugeridos
         setCheckVal('bol-act-det-struct', true);
         setCheckVal('bol-act-prev-cordon', true);
@@ -8263,7 +8263,7 @@ function calculateBoletinRisk() {
         tagBox.className = 'funvisis-tag-box tag-amarilla-style';
         tagTitle.textContent = 'ATENCIÓN';
         tagSubtitle.textContent = 'USO RESTRINGIDO';
-        
+
         explanationText.innerHTML = `<strong>Riesgo Moderado Detectado.</strong> Acceso limitado temporalmente. Riesgos identificados:<br>
             <ul style="margin: 6px 0; padding-left: 18px; color: #ffcc00;">
                 ${triggers.map(t => `<li>${t}</li>`).join('')}
@@ -8277,7 +8277,7 @@ function calculateBoletinRisk() {
             'Acordonar localmente las zonas inestables (ej. balcones o fachadas agrietadas).',
             'Monitoreo visual continuo ante posibles réplicas.'
         ];
-        
+
         setCheckVal('bol-act-det-struct', true);
         setCheckVal('bol-act-prev-cordon', true);
     } else {
@@ -8285,15 +8285,15 @@ function calculateBoletinRisk() {
         tagBox.className = 'funvisis-tag-box tag-verde-style';
         tagTitle.textContent = 'HABITABLE';
         tagSubtitle.textContent = 'ACCESO PERMITIDO';
-        
+
         explanationText.innerHTML = `<strong>Estructura Segura / Daño Leve.</strong> La edificación no presenta riesgos estructurales ni externos significativos. Las condiciones son estables.`;
-        
+
         suggestedActions = [
             'Acceso libre permitido de forma inmediata.',
             'Monitorear la aparición de microfisuras durante las réplicas.',
             'No se requieren inspecciones detalladas obligatorias de emergencia.'
         ];
-        
+
         setCheckVal('bol-act-det-struct', false);
         setCheckVal('bol-act-prev-cordon', false);
     }
@@ -8721,7 +8721,7 @@ function updateGuideVisual() {
 // Dibujado de diagramas dinámicos SVG para ilustrar los daños
 function drawGuideSVG(element, damage) {
     let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">`;
-    
+
     // Fondo de dibujo técnico oscuro
     svg += `<rect width="200" height="200" fill="#0f131a" rx="4" />`;
     // Rejilla de fondo
@@ -8737,10 +8737,10 @@ function drawGuideSVG(element, damage) {
         // Base y Tope (losas)
         svg += `<rect x="30" y="20" width="140" height="15" fill="#2d3748" />`;
         svg += `<rect x="30" y="165" width="140" height="15" fill="#2d3748" />`;
-        
+
         // Cuerpo columna
         svg += `<rect x="80" y="35" width="40" height="130" fill="#4a5568" stroke="#718096" stroke-width="2" id="col-body" />`;
-        
+
         if (damage === 'menor') {
             // Grietas muy finas
             svg += `<path d="M 80,60 L 95,62 M 80,120 L 90,121 M 120,80 L 110,81" stroke="#facc15" stroke-width="1" />`;
@@ -8779,7 +8779,7 @@ function drawGuideSVG(element, damage) {
         // Nodos Viga-Columna
         // Cruz de columna y vigas
         svg += `<path d="M 85,20 L 115,20 L 115,75 L 180,75 L 180,105 L 115,105 L 115,180 L 85,180 L 85,105 L 20,105 L 20,75 L 85,75 Z" fill="#4a5568" stroke="#718096" stroke-width="2" />`;
-        
+
         if (damage === 'menor') {
             // Fisuras en contorno del nodo
             svg += `<path d="M 85,78 L 95,83 M 115,77 L 108,84 M 88,103 L 94,97" stroke="#facc15" stroke-width="1" />`;
@@ -8848,7 +8848,7 @@ function drawGuideSVG(element, damage) {
     } else if (element === 'wall_c') {
         // Muros de Concreto
         svg += `<rect x="40" y="30" width="120" height="140" fill="#4a5568" stroke="#718096" stroke-width="2" />`;
-        
+
         if (damage === 'menor') {
             svg += `<path d="M 50,45 L 80,75 M 120,110 L 140,130" stroke="#facc15" stroke-width="1" />`;
             svg += `<text x="100" y="193" fill="#a0aec0" font-size="9" text-anchor="middle" font-family="monospace">Fisuras diagonales finas</text>`;
@@ -8908,8 +8908,8 @@ function drawGuideSVG(element, damage) {
             svg += `<rect x="38" y="28" width="124" height="144" fill="#0f131a" />`;
             // Pilas de bloques derrumbados en el suelo
             for (let i = 0; i < 6; i++) {
-                svg += `<rect x="${50 + i*16}" y="155" width="14" height="8" fill="#5c2c16" stroke="#ef4444" transform="rotate(${i*12} ${50 + i*16} 155)" />`;
-                svg += `<rect x="${60 + i*14}" y="163" width="14" height="8" fill="#5c2c16" stroke="#ef4444" transform="rotate(${-i*8} ${60 + i*14} 163)" />`;
+                svg += `<rect x="${50 + i * 16}" y="155" width="14" height="8" fill="#5c2c16" stroke="#ef4444" transform="rotate(${i * 12} ${50 + i * 16} 155)" />`;
+                svg += `<rect x="${60 + i * 14}" y="163" width="14" height="8" fill="#5c2c16" stroke="#ef4444" transform="rotate(${-i * 8} ${60 + i * 14} 163)" />`;
             }
             svg += `<text x="100" y="193" fill="#ef4444" font-size="9" text-anchor="middle" font-family="monospace">Derrumbe del muro portante</text>`;
         }
@@ -8946,8 +8946,8 @@ function drawGuideSVG(element, damage) {
             svg += `<rect x="34" y="24" width="132" height="142" fill="#0f131a" />`;
             // Escombros en el suelo
             for (let i = 0; i < 8; i++) {
-                svg += `<rect x="${40 + i*16}" y="158" width="15" height="8" fill="#b05010" stroke="#ef4444" transform="rotate(${i*23} ${40 + i*16} 158)" />`;
-                svg += `<rect x="${48 + i*14}" y="165" width="15" height="8" fill="#b05010" stroke="#ef4444" transform="rotate(${-i*15} ${48 + i*14} 165)" />`;
+                svg += `<rect x="${40 + i * 16}" y="158" width="15" height="8" fill="#b05010" stroke="#ef4444" transform="rotate(${i * 23} ${40 + i * 16} 158)" />`;
+                svg += `<rect x="${48 + i * 14}" y="165" width="15" height="8" fill="#b05010" stroke="#ef4444" transform="rotate(${-i * 15} ${48 + i * 14} 165)" />`;
             }
             svg += `<text x="100" y="193" fill="#ef4444" font-size="9" text-anchor="middle" font-family="monospace">Colapso total fuera de plano</text>`;
         }
