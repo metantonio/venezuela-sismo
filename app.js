@@ -6981,6 +6981,41 @@ function initVargasChart() {
 //  MAPA SATELITAL DE DAÑO SÍSMICO — LA GUAIRA / CARABALLEDA
 // ============================================================
 
+window.changePopupPhoto = function (buildingId, direction) {
+    if (!window.mapBuildings) return;
+    const building = window.mapBuildings.find(b => b.id === buildingId);
+    if (!building) return;
+
+    const photos = Array.isArray(building.photo) ? building.photo : (building.photo ? [building.photo] : []);
+    if (photos.length <= 1) return;
+
+    if (building.currentPhotoIndex === undefined) {
+        building.currentPhotoIndex = 0;
+    }
+
+    building.currentPhotoIndex += direction;
+    if (building.currentPhotoIndex < 0) {
+        building.currentPhotoIndex = photos.length - 1;
+    } else if (building.currentPhotoIndex >= photos.length) {
+        building.currentPhotoIndex = 0;
+    }
+
+    const imgEl = document.getElementById(`popup-photo-img-${buildingId}`);
+    if (imgEl) {
+        imgEl.src = photos[building.currentPhotoIndex];
+    }
+    
+    const wrapper = document.getElementById(`popup-photo-wrapper-${buildingId}`);
+    if (wrapper) {
+        wrapper.setAttribute('onclick', `window.open('${photos[building.currentPhotoIndex]}', '_blank')`);
+    }
+
+    const counterEl = document.getElementById(`popup-photo-counter-${buildingId}`);
+    if (counterEl) {
+        counterEl.textContent = `${building.currentPhotoIndex + 1} / ${photos.length}`;
+    }
+};
+
 async function initDamageMap() {
     const container = document.getElementById('damage-map-container');
     if (!container || typeof L === 'undefined') {
@@ -7002,11 +7037,12 @@ async function initDamageMap() {
 
     // --- 198 real buildings geolocated across La Guaira / Vargas dataset ---
     // Extracted directly from terremotovenezuela.com database & post-seismic citizen reports
-        let buildings;
+    let buildings;
     try {
         const response = await fetch('buildings.json');
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         buildings = await response.json();
+        window.mapBuildings = buildings;
     } catch (err) {
         console.error('[initDamageMap] Error al cargar buildings.json:', err);
         const tbody = document.getElementById('damage-map-table-body');
@@ -7412,11 +7448,42 @@ async function initDamageMap() {
                </div>`
             : '';
 
-        const photoHtml = b.photo
-            ? `<div style="margin-top: 10px; text-align: center; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); cursor: pointer;" onclick="window.open('${b.photo}', '_blank')" title="Haga clic para ampliar la imagen">
-                 <img src="${b.photo}" style="width: 100%; max-height: 140px; object-fit: cover; display: block; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1.0'" alt="Evidencia de daño" />
-               </div>`
-            : '';
+        const photos = Array.isArray(b.photo) ? b.photo : (b.photo ? [b.photo] : []);
+        let photoHtml = '';
+        if (photos.length > 0) {
+            if (b.currentPhotoIndex === undefined) {
+                b.currentPhotoIndex = 0;
+            }
+            if (b.currentPhotoIndex >= photos.length) {
+                b.currentPhotoIndex = 0;
+            }
+            const activePhoto = photos[b.currentPhotoIndex];
+            
+            photoHtml = `
+                <div style="margin-top: 10px; position: relative;">
+                    <div id="popup-photo-wrapper-${b.id}" style="text-align: center; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); cursor: pointer;" onclick="window.open('${activePhoto}', '_blank')" title="Haga clic para ampliar la imagen">
+                        <img id="popup-photo-img-${b.id}" src="${activePhoto}" style="width: 100%; max-height: 140px; object-fit: cover; display: block; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1.0'" alt="Evidencia de daño" />
+                    </div>
+            `;
+            
+            if (photos.length > 1) {
+                photoHtml += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);">
+                        <button class="popup-photo-btn" onclick="window.changePopupPhoto('${b.id}', -1); event.stopPropagation();" style="background: rgba(255,255,255,0.1); border: none; color: #fff; cursor: pointer; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                            <i class="fa-solid fa-chevron-left"></i> Ant.
+                        </button>
+                        <span id="popup-photo-counter-${b.id}" style="font-size: 11px; color: var(--text-muted); font-family: monospace; font-weight: bold;">
+                            ${b.currentPhotoIndex + 1} / ${photos.length}
+                        </span>
+                        <button class="popup-photo-btn" onclick="window.changePopupPhoto('${b.id}', 1); event.stopPropagation();" style="background: rgba(255,255,255,0.1); border: none; color: #fff; cursor: pointer; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                            Sig. <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                `;
+            }
+            
+            photoHtml += `</div>`;
+        }
 
         return `
             <div class="popup-building-name">

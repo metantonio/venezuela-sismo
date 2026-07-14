@@ -9,7 +9,10 @@
         "floors": 8,
         "status": "collapsed",
         "damage_level": "total",
-        "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/0afc4e1f-763e-4335-a86b-eab4940d7488.png",
+        "photo": [
+            "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/0afc4e1f-763e-4335-a86b-eab4940d7488.png",
+            "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/ee141332-9c40-40a1-bdbf-493005388747.jpg"
+        ],
         "real": true
     },
     {
