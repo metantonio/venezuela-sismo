@@ -2041,6 +2041,10 @@ select:focus {
 }
 
 /* Leaflet popup overrides for dark theme */
+.damage-popup {
+    width: 260px !important;
+}
+
 .damage-popup .leaflet-popup-content-wrapper {
     background: rgba(15, 23, 42, 0.92);
     backdrop-filter: blur(12px);
@@ -2056,7 +2060,7 @@ select:focus {
     margin: 12px 14px;
     font-size: 12px;
     line-height: 1.5;
-    min-width: 200px;
+    width: auto !important;
 }
 
 .damage-popup .leaflet-popup-tip {

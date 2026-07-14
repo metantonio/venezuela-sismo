@@ -7462,7 +7462,7 @@ async function initDamageMap() {
             photoHtml = `
                 <div style="margin-top: 10px; position: relative;">
                     <div id="popup-photo-wrapper-${b.id}" style="text-align: center; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); cursor: pointer;" onclick="window.open('${activePhoto}', '_blank')" title="Haga clic para ampliar la imagen">
-                        <img id="popup-photo-img-${b.id}" src="${activePhoto}" style="width: 100%; max-height: 140px; object-fit: cover; display: block; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1.0'" alt="Evidencia de daño" />
+                        <img id="popup-photo-img-${b.id}" src="${activePhoto}" style="width: 100%; height: 130px; object-fit: cover; display: block; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1.0'" alt="Evidencia de daño" />
                     </div>
             `;
             
