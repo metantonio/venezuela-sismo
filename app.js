@@ -7717,6 +7717,11 @@ async function initDamageMap() {
                             <i class="fa-solid ${status.icon}"></i> ${status.text}
                         </span>
                     </td>
+                    <td class="calc-value" style="padding: 4px;">
+                        <button class="btn-correction" data-index="${i}" title="Copiar datos y reportar corrección en GitHub" style="background: rgba(255, 183, 3, 0.1); border: 1px solid rgba(255, 183, 3, 0.3); color: #ffb703; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; outline: none;">
+                            <i class="fa-solid fa-pen-to-square"></i> Corregir
+                        </button>
+                    </td>
                 </tr>
             `;
         }).join('');
@@ -7742,6 +7747,87 @@ async function initDamageMap() {
                 }
             });
         });
+
+        // Correction button listener
+        tbody.querySelectorAll('.btn-correction').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Avoid triggering row centering
+                const idx = parseInt(btn.getAttribute('data-index'), 10);
+                const b = list[idx];
+                if (!b) return;
+
+                const cleanData = {
+                    id: b.id,
+                    name: b.name,
+                    zone: b.zone || '',
+                    address: b.address || '',
+                    lat: b.lat,
+                    lng: b.lng,
+                    floors: b.floors,
+                    status: b.status,
+                    damage_level: b.damage_level,
+                    photo: b.photo,
+                    real: b.real,
+                    boletin: b.boletin || ''
+                };
+
+                const textToCopy = JSON.stringify(cleanData, null, 2);
+
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showCorrectionNotification(`¡Datos de "${b.name}" copiados al portapapeles! Redirigiendo a GitHub...`);
+                    
+                    setTimeout(() => {
+                        window.open('https://github.com/metantonio/venezuela-sismo/issues?q=state%3Aopen%20label%3A%22Correcci%C3%B3n%20Edificaci%C3%B3n%20Mapa%22', '_blank');
+                    }, 1000);
+                }).catch(err => {
+                    console.error('Error al copiar al portapapeles:', err);
+                    window.open('https://github.com/metantonio/venezuela-sismo/issues?q=state%3Aopen%20label%3A%22Correcci%C3%B3n%20Edificaci%C3%B3n%20Mapa%22', '_blank');
+                });
+            });
+        });
+    }
+
+    function showCorrectionNotification(message) {
+        const existing = document.getElementById('correction-toast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.id = 'correction-toast';
+        toast.style.position = 'fixed';
+        toast.style.bottom = '24px';
+        toast.style.right = '24px';
+        toast.style.background = 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)';
+        toast.style.border = '1px solid #ffb703';
+        toast.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 183, 3, 0.2)';
+        toast.style.color = '#fff';
+        toast.style.padding = '12px 20px';
+        toast.style.borderRadius = '8px';
+        toast.style.fontSize = '13px';
+        toast.style.zIndex = '9999';
+        toast.style.fontFamily = "'Inter', sans-serif";
+        toast.style.fontWeight = '500';
+        toast.style.display = 'flex';
+        toast.style.alignItems = 'center';
+        toast.style.gap = '8px';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+
+        toast.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #ffb703; font-size: 16px;"></i> <span>${message}</span>`;
+        
+        document.body.appendChild(toast);
+
+        toast.offsetHeight; // force reflow
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(10px)';
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
     }
 
     // Initial load
