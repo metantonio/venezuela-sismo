@@ -7485,6 +7485,36 @@ async function initDamageMap() {
             photoHtml += `</div>`;
         }
 
+        let boletinHtml = '';
+        if (b.boletin) {
+            const bul = b.boletin.toLowerCase().trim();
+            if (bul.includes('verde')) {
+                boletinHtml = `
+                    <div style="text-align: center; margin-top: 4px;">
+                        <span class="popup-status-badge popup-status-survived" style="text-transform: none; letter-spacing: normal;">
+                            <i class="fa-solid fa-circle-check"></i> Boletín: Verde (Habitable)
+                        </span>
+                    </div>
+                `;
+            } else if (bul.includes('amarillo') || bul.includes('amarilla')) {
+                boletinHtml = `
+                    <div style="text-align: center; margin-top: 4px;">
+                        <span class="popup-status-badge popup-status-damaged" style="text-transform: none; letter-spacing: normal;">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Boletín: Amarillo (Restringido)
+                        </span>
+                    </div>
+                `;
+            } else if (bul.includes('rojo') || bul.includes('roja')) {
+                boletinHtml = `
+                    <div style="text-align: center; margin-top: 4px;">
+                        <span class="popup-status-badge popup-status-collapsed" style="text-transform: none; letter-spacing: normal;">
+                            <i class="fa-solid fa-ban"></i> Boletín: Rojo (Inhabitable)
+                        </span>
+                    </div>
+                `;
+            }
+        }
+
         return `
             <div class="popup-building-name">
                 <i class="fa-solid fa-building" style="color: ${color};"></i>
@@ -7507,6 +7537,7 @@ async function initDamageMap() {
                     <i class="fa-solid ${status.icon}"></i> ${status.text}
                 </span>
             </div>
+            ${boletinHtml}
             ${confirmedBadge}
             ${photoHtml}
         `;

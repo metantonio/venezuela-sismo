@@ -13,7 +13,8 @@
             "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/0afc4e1f-763e-4335-a86b-eab4940d7488.png",
             "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/ee141332-9c40-40a1-bdbf-493005388747.jpg"
         ],
-        "real": true
+        "real": true,
+        "boletin": "rojo"
     },
     {
         "id": "fd9ad90f-5ad6-492b-9e4a-c086ba6885e2",
@@ -26,7 +27,8 @@
         "status": "collapsed",
         "damage_level": "total",
         "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/ee141332-9c40-40a1-bdbf-493005388747.jpg",
-        "real": true
+        "real": true,
+        "boletin": "rojo"
     },
     {
         "id": "fc3b56e5-0425-42b4-8499-74f42b6fcf51",
@@ -39,7 +41,8 @@
         "status": "collapsed",
         "damage_level": "total",
         "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/7d591f0d-1a7f-4d3d-a369-d8d01eea7b69.jpeg",
-        "real": true
+        "real": true,
+        "boletin": "rojo"
     },
     {
         "id": "fa85134a-59a7-45e7-b355-fbf578141268",
