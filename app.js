@@ -42,6 +42,17 @@ let particleSystem = null;
 let particlesCount = 200;
 let particlesData = [];
 
+// FX cinematográficos del viewport 3D
+let cameraShake = 0;
+let shockwaveRings = [];
+let shockwaveCooldown = 0;
+let collapseFxFired = { b2001: false, b2019: false };
+let ambientMotes = null;
+let ambientMotesData = [];
+let backdropPlane = null;
+let accentLight2001 = null;
+let accentLight2019 = null;
+
 // Estados de Evacuación
 let evacuation2001 = { meshes: [], currentFloor: 0, startTime: null, escaped: false, trapped: false };
 let evacuation2019 = { meshes: [], currentFloor: 0, startTime: null, escaped: false, trapped: false };
@@ -62,13 +73,13 @@ let texture2019 = null;
 const hingeYellowMat = new THREE.MeshStandardMaterial({
     color: 0xffca28,
     emissive: 0xffca28,
-    emissiveIntensity: 0.6,
+    emissiveIntensity: 1.1,
     roughness: 0.2
 });
 const hingeRedMat = new THREE.MeshStandardMaterial({
     color: 0xff1744,
     emissive: 0xff1744,
-    emissiveIntensity: 0.7,
+    emissiveIntensity: 1.3,
     roughness: 0.2
 });
 
@@ -132,6 +143,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // --- INTERFAZ DE USUARIO (EVENTOS Y TABS) ---
+// Pinta el relleno degradado de un slider según su valor (variable CSS --fill)
+function paintRangeFill(el) {
+    if (!el) return;
+    const min = parseFloat(el.min) || 0;
+    const max = parseFloat(el.max) || 100;
+    const pct = ((parseFloat(el.value) - min) / (max - min)) * 100;
+    el.style.setProperty('--fill', pct + '%');
+}
+
+function refreshRangeFills() {
+    document.querySelectorAll('input[type="range"]').forEach(paintRangeFill);
+}
+
 function initUI() {
     // Tab switching
     const tabBtns = document.querySelectorAll(".tab-btn");
@@ -178,6 +202,13 @@ function initUI() {
             fetchRecentEarthquakes();
         });
     }
+
+    // Pintar relleno degradado en todos los sliders y mantenerlo actualizado
+    document.querySelectorAll('input[type="range"]').forEach(el => {
+        el.addEventListener('input', () => paintRangeFill(el));
+        el.addEventListener('change', () => paintRangeFill(el));
+        paintRangeFill(el);
+    });
 
     // Inputs dinámicos (actualizar etiquetas de valores)
     const setupSlider = (id, suffix = "") => {
@@ -2494,6 +2525,9 @@ function computeBeamDesign(bw, h, fc, fy, As_placed, AsPrime_placed, L_cm, V_sto
 
 // --- GENERACIÓN DE ESPECTROS Y ARCHIVO DE SISMO (MAIN ENGINE) ---
 function generateSpectraAndEarthquake() {
+    // Sincronizar relleno visual de sliders (cubre cambios programáticos como el preset Vargas)
+    refreshRangeFills();
+
     const N = parseInt(document.getElementById("num-stories").value);
     const storyHeight = parseFloat(document.getElementById("story-height").value);
 
@@ -4451,11 +4485,11 @@ function initThreeJS() {
 
     // Crear Escena
     scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x090a0f, 0.015);
+    scene.fog = new THREE.FogExp2(0x05070d, 0.014);
 
-    // Cámara
-    camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-    camera.position.set(0, 8, 25);
+    // Cámara (encuadre cinematográfico)
+    camera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.set(0, 9, 26);
 
     // Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -4472,31 +4506,48 @@ function initThreeJS() {
     controls.maxPolarAngle = Math.PI / 2 - 0.02; // no pasar por debajo del suelo
     controls.minDistance = 5;
     controls.maxDistance = 60;
+    controls.target.set(0, 4, 0);
 
-    // Luces
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    // --- RIG DE ILUMINACIÓN CINEMATOGRÁFICA ---
+    // Luz ambiental de cielo/suelo para relleno suave
+    const hemiLight = new THREE.HemisphereLight(0x8fb8ff, 0x0b0f18, 0.5);
+    scene.add(hemiLight);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.18);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    // Luz principal (key light) con sombras de alta resolución
+    const isMobileViewport = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.95);
     dirLight.position.set(10, 20, 15);
     dirLight.castShadow = true;
-    dirLight.shadow.mapSize.width = 1024;
-    dirLight.shadow.mapSize.height = 1024;
+    dirLight.shadow.mapSize.width = isMobileViewport ? 1024 : 2048;
+    dirLight.shadow.mapSize.height = isMobileViewport ? 1024 : 2048;
     dirLight.shadow.camera.near = 0.5;
-    dirLight.shadow.camera.far = 50;
-    const d = 15;
+    dirLight.shadow.camera.far = 60;
+    dirLight.shadow.bias = -0.0004;
+    const d = 18;
     dirLight.shadow.camera.left = -d;
     dirLight.shadow.camera.right = d;
     dirLight.shadow.camera.top = d;
     dirLight.shadow.camera.bottom = -d;
     scene.add(dirLight);
 
-    // Suelo base vibrante
+    // Luces de acento por norma (cyan = 2001, magenta = 2019). Se reposicionan en rebuild3DStructures()
+    accentLight2001 = new THREE.PointLight(0x22d3ee, 0.55, 34, 1.6);
+    accentLight2001.position.set(-8, 4, 5);
+    scene.add(accentLight2001);
+
+    accentLight2019 = new THREE.PointLight(0xff3d8a, 0.55, 34, 1.6);
+    accentLight2019.position.set(8, 4, 5);
+    scene.add(accentLight2019);
+
+    // Suelo base vibrante (acabado pulido oscuro)
     const groundGeometry = new THREE.BoxGeometry(30, 0.5, 12);
     const groundMaterial = new THREE.MeshStandardMaterial({
-        color: 0x1a2130,
-        roughness: 0.8,
-        metalness: 0.1
+        color: 0x141a29,
+        roughness: 0.55,
+        metalness: 0.35
     });
     groundPlane = new THREE.Mesh(groundGeometry, groundMaterial);
     groundPlane.position.y = -0.25;
@@ -4504,15 +4555,24 @@ function initThreeJS() {
     scene.add(groundPlane);
 
     // Rejilla de fondo decorativa
-    gridHelper = new THREE.GridHelper(40, 20, 0x475569, 0x1e293b);
+    gridHelper = new THREE.GridHelper(40, 20, 0x33507a, 0x141d31);
     gridHelper.position.y = 0.01;
     scene.add(gridHelper);
+
+    // Telón de fondo: silueta nocturna de El Ávila y la ciudad
+    createBackdrop();
 
     // --- EJES IDENTIFICADOS X / Y ---
     createAxisIndicators();
 
     // Partículas de polvo/humo
     initParticles();
+
+    // Motas de polvo ambientales en suspensión (atmósfera nocturna)
+    initAmbientMotes();
+
+    // Anillos de onda expansiva (shockwaves) para el sismo
+    initShockwaves();
 
     // Flechas indicadoras de fuerza cortante base
     createBaseShearArrows();
@@ -4589,6 +4649,177 @@ function initThreeJS() {
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
     });
+}
+
+// --- TELÓN DE FONDO: SILUETA NOCTURNA (EL ÁVILA + CIUDAD) ---
+function createBackdrop() {
+    const c = document.createElement('canvas');
+    c.width = 2048;
+    c.height = 512;
+    const g = c.getContext('2d');
+    g.clearRect(0, 0, c.width, c.height);
+
+    // Cordillera lejana (tono más claro por atmósfera)
+    drawRidge(g, c.width, c.height, 200, 95, 2.3, 'rgba(17, 26, 46, 0.85)');
+    // Cordillera cercana (El Ávila, más oscura)
+    drawRidge(g, c.width, c.height, 265, 70, 5.1, 'rgba(9, 14, 27, 0.95)');
+
+    // Ciudad nocturna al pie
+    drawCitySilhouette(g, c.width, c.height);
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.minFilter = THREE.LinearFilter;
+    const mat = new THREE.MeshBasicMaterial({
+        map: tex,
+        transparent: true,
+        depthWrite: false,
+        fog: false
+    });
+    backdropPlane = new THREE.Mesh(new THREE.PlaneGeometry(190, 48), mat);
+    backdropPlane.position.set(0, 16, -46);
+    backdropPlane.renderOrder = -1;
+    scene.add(backdropPlane);
+}
+
+function drawRidge(g, w, h, baseY, amp, seed, fillStyle) {
+    g.fillStyle = fillStyle;
+    g.beginPath();
+    g.moveTo(0, h);
+    for (let x = 0; x <= w; x += 6) {
+        const t = (x / w) * Math.PI * 2;
+        const y = baseY
+            + Math.sin(t * 2.1 + seed) * amp * 0.55
+            + Math.sin(t * 4.7 + seed * 2.7) * amp * 0.3
+            + Math.sin(t * 9.3 + seed * 5.3) * amp * 0.15;
+        g.lineTo(x, y);
+    }
+    g.lineTo(w, h);
+    g.closePath();
+    g.fill();
+}
+
+function drawCitySilhouette(g, w, h) {
+    // RNG determinista simple para un skyline consistente
+    let s = 42;
+    const rnd = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+
+    let x = -10;
+    while (x < w + 10) {
+        const bw = 24 + rnd() * 55;
+        const bh = 14 + rnd() * 62;
+        g.fillStyle = 'rgba(6, 10, 20, 0.95)';
+        g.fillRect(x, h - bh, bw, bh);
+
+        // Ventanas encendidas dispersas
+        const rows = Math.floor(bh / 12);
+        const cols = Math.floor(bw / 11);
+        for (let r = 0; r < rows; r++) {
+            for (let col = 0; col < cols; col++) {
+                if (rnd() < 0.16) {
+                    const warm = rnd() < 0.75;
+                    g.fillStyle = warm ? 'rgba(255, 209, 130, 0.55)' : 'rgba(140, 210, 255, 0.5)';
+                    g.fillRect(x + 4 + col * 11, h - bh + 5 + r * 12, 3, 4);
+                }
+            }
+        }
+        x += bw + 6 + rnd() * 16;
+    }
+}
+
+// --- MOTAS DE POLVO AMBIENTALES (DERIVA LENTA) ---
+function initAmbientMotes() {
+    const count = 90;
+    const positions = new Float32Array(count * 3);
+    ambientMotesData = [];
+
+    for (let i = 0; i < count; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 80;
+        positions[i * 3 + 1] = Math.random() * 26 + 0.4;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 45;
+        ambientMotesData.push({
+            speed: 0.4 + Math.random() * 0.8,
+            phase: Math.random() * Math.PI * 2
+        });
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    const material = new THREE.PointsMaterial({
+        size: 0.15,
+        color: 0x9fd8ff,
+        transparent: true,
+        opacity: 0.32,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+    });
+
+    ambientMotes = new THREE.Points(geometry, material);
+    scene.add(ambientMotes);
+}
+
+function updateAmbientMotes(timeMs) {
+    if (!ambientMotes) return;
+    const pos = ambientMotes.geometry.attributes.position.array;
+    const t = timeMs * 0.001;
+    for (let i = 0; i < ambientMotesData.length; i++) {
+        const d = ambientMotesData[i];
+        pos[i * 3] += Math.cos(t * d.speed * 0.35 + d.phase) * 0.0035;
+        pos[i * 3 + 1] += Math.sin(t * d.speed * 0.5 + d.phase) * 0.0035;
+    }
+    ambientMotes.geometry.attributes.position.needsUpdate = true;
+}
+
+// --- ANILLOS DE ONDA EXPANSIVA (SHOCKWAVES) ---
+function initShockwaves() {
+    shockwaveRings = [];
+    for (let i = 0; i < 5; i++) {
+        const geo = new THREE.RingGeometry(0.95, 1.0, 72);
+        const mat = new THREE.MeshBasicMaterial({
+            color: 0x9fdcff,
+            transparent: true,
+            opacity: 0,
+            side: THREE.DoubleSide,
+            depthWrite: false
+        });
+        const ring = new THREE.Mesh(geo, mat);
+        ring.rotation.x = -Math.PI / 2;
+        ring.position.y = 0.04;
+        ring.visible = false;
+        ring.userData = { life: 0, maxLife: 55, maxRadius: 24 };
+        scene.add(ring);
+        shockwaveRings.push(ring);
+    }
+}
+
+function spawnShockwave(x, z, colorHex, maxRadius) {
+    const ring = shockwaveRings.find(r => !r.visible);
+    if (!ring) return;
+    ring.visible = true;
+    ring.position.set(x, 0.04, z);
+    ring.scale.set(0.5, 0.5, 1);
+    ring.material.color.setHex(colorHex);
+    ring.userData.life = ring.userData.maxLife;
+    ring.userData.maxRadius = maxRadius || 24;
+}
+
+function updateShockwaves() {
+    for (let i = 0; i < shockwaveRings.length; i++) {
+        const ring = shockwaveRings[i];
+        if (!ring.visible) continue;
+        ring.userData.life -= 1;
+        if (ring.userData.life <= 0) {
+            ring.visible = false;
+            ring.material.opacity = 0;
+            continue;
+        }
+        const progress = 1 - ring.userData.life / ring.userData.maxLife;
+        const eased = 1 - Math.pow(1 - progress, 2);
+        const radius = 0.5 + eased * ring.userData.maxRadius;
+        ring.scale.set(radius, radius, 1);
+        ring.material.opacity = (1 - progress) * 0.38;
+    }
 }
 
 // --- SELECCIÓN Y DETALLES DE COLUMNAS EN 3D ---
@@ -5549,6 +5780,41 @@ function createBeamCracksGeometry(L, H, W, level) {
     return geom;
 }
 
+// ENCUADRE AUTOMÁTICO DE CÁMARA SEGÚN LA ESCALA REAL DE LOS EDIFICIOS
+// Conserva el ángulo de órbita del usuario: solo ajusta la distancia cuando
+// la estructura no cabe en el encuadre actual (o quedó demasiado lejos).
+function autoFrameCamera() {
+    if (typeof camera === 'undefined' || !camera || !controls || isPlaying) return;
+    if (!buildings3D.b2001.group || !buildings3D.b2019.group) return;
+
+    const box = new THREE.Box3().setFromObject(buildings3D.b2001.group);
+    box.union(new THREE.Box3().setFromObject(buildings3D.b2019.group));
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    if (!isFinite(size.y) || size.y <= 0) return;
+
+    const halfFov = THREE.MathUtils.degToRad(camera.fov / 2);
+    const fitH = (size.y / 2) / Math.tan(halfFov);
+    const fitW = (size.x / 2) / (Math.tan(halfFov) * Math.max(0.4, camera.aspect));
+    const needed = Math.min(58, Math.max(18, Math.max(fitH, fitW) * 1.18));
+
+    const target = new THREE.Vector3(0, Math.max(2.5, center.y * 0.85), 0);
+    const dir = camera.position.clone().sub(controls.target);
+    const currentDist = dir.length();
+    dir.normalize();
+    if (dir.lengthSq() < 0.5 || !isFinite(dir.x)) dir.set(0, 0.33, 1).normalize();
+
+    controls.target.copy(target);
+    // Alejar si no cabe; acercar si quedó excesivamente lejos tras reducir la estructura
+    if (needed > currentDist * 1.03 || currentDist > needed * 1.8) {
+        camera.position.copy(target).addScaledVector(dir, needed);
+    } else {
+        // Mantener la distancia del usuario pero con el nuevo objetivo
+        camera.position.copy(target).addScaledVector(dir, currentDist);
+    }
+    controls.update();
+}
+
 // RECONSTRUCCIÓN DE LOS MODELOS 3D DE CADA EDIFICIO
 function rebuild3DStructures() {
     if (typeof scene === 'undefined' || !scene) {
@@ -5596,9 +5862,9 @@ function rebuild3DStructures() {
         const groundD = Math.max(12, bD + 6);
         const groundGeometry = new THREE.BoxGeometry(groundW, 0.5, groundD);
         const groundMaterial = new THREE.MeshStandardMaterial({
-            color: 0x1a2130,
-            roughness: 0.8,
-            metalness: 0.1
+            color: 0x141a29,
+            roughness: 0.55,
+            metalness: 0.35
         });
         groundPlane = new THREE.Mesh(groundGeometry, groundMaterial);
         groundPlane.position.y = -0.25;
@@ -5609,10 +5875,18 @@ function rebuild3DStructures() {
     if (gridHelper) {
         scene.remove(gridHelper);
         const gridGridSize = Math.max(40, xOffset * 2 + bW + 20);
-        gridHelper = new THREE.GridHelper(gridGridSize, 20, 0x475569, 0x1e293b);
+        gridHelper = new THREE.GridHelper(gridGridSize, 20, 0x33507a, 0x141d31);
         gridHelper.position.y = 0.01;
         scene.add(gridHelper);
     }
+
+    // Reposicionar luces de acento junto a cada edificio
+    if (accentLight2001) accentLight2001.position.set(-xOffset, Math.max(3, N * h * 0.45), bD / 2 + 5);
+    if (accentLight2019) accentLight2019.position.set(xOffset, Math.max(3, N * h * 0.45), bD / 2 + 5);
+
+    // Reiniciar banderas de FX de colapso
+    collapseFxFired.b2001 = false;
+    collapseFxFired.b2019 = false;
 
     // Reconstruir indicadores de ejes con posición adaptada
     createAxisIndicators();
@@ -5622,28 +5896,46 @@ function rebuild3DStructures() {
         bData.floors = [];
         bData.columns = [];
 
+        // Color de borde luminoso según la norma (identidad visual)
+        const edgeColor = colorTheme === '2001' ? 0x22d3ee : 0xff3d8a;
+
         // Losa base (cimentación)
         const baseGeom = new THREE.BoxGeometry(bW + 0.6, 0.25, bD + 0.6);
-        const baseMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.7 });
+        const baseMat = new THREE.MeshStandardMaterial({ color: 0x2a3548, roughness: 0.6, metalness: 0.25 });
         const baseMesh = new THREE.Mesh(baseGeom, baseMat);
         baseMesh.position.y = 0.125;
         baseMesh.castShadow = true;
         baseMesh.receiveShadow = true;
         bData.group.add(baseMesh);
 
+        // Borde tenue en la cimentación
+        const baseEdges = new THREE.LineSegments(
+            new THREE.EdgesGeometry(baseGeom),
+            new THREE.LineBasicMaterial({ color: edgeColor, transparent: true, opacity: 0.22 })
+        );
+        baseMesh.add(baseEdges);
+
         // Crear losas para cada piso
         for (let i = 0; i < N; i++) {
             const floorGeom = new THREE.BoxGeometry(bW + 0.4, 0.2, bD + 0.4);
             const floorMat = new THREE.MeshStandardMaterial({
-                color: colorTheme === '2001' ? 0x1e293b : 0x0f172a,
-                roughness: 0.5,
-                metalness: 0.2
+                color: colorTheme === '2001' ? 0x1c2740 : 0x131a2e,
+                roughness: 0.42,
+                metalness: 0.35
             });
             const floorMesh = new THREE.Mesh(floorGeom, floorMat);
             floorMesh.position.set(0, (i + 1) * h, 0);
             floorMesh.castShadow = true;
             floorMesh.receiveShadow = true;
             bData.group.add(floorMesh);
+
+            // Filo luminoso de la losa (cyan = 2001, magenta = 2019)
+            const edgeLines = new THREE.LineSegments(
+                new THREE.EdgesGeometry(floorGeom),
+                new THREE.LineBasicMaterial({ color: edgeColor, transparent: true, opacity: 0.5 })
+            );
+            floorMesh.add(edgeLines);
+
             bData.floors.push(floorMesh);
         }
 
@@ -5989,6 +6281,9 @@ function rebuild3DStructures() {
         escaped: false,
         trapped: false
     };
+
+    // Encuadre cinematográfico según la nueva escala de la escena
+    autoFrameCamera();
 }
 
 // Convertir colores CSS a Hex para ThreeJS
@@ -6018,6 +6313,21 @@ function update3DPhysics() {
         groundPlane.position.z = groundDisp;
     }
 
+    // --- FX: sacudida de cámara y ondas expansivas según intensidad ---
+    const absAccel = Math.abs(groundAccel[simStepIndex] || 0);
+    cameraShake = Math.min(0.5, absAccel * 0.55);
+
+    if (absAccel > 0.20) {
+        shockwaveCooldown -= 1;
+        if (shockwaveCooldown <= 0) {
+            const ringColor = absAccel > 0.45 ? 0xff7aa8 : 0x9fdcff;
+            spawnShockwave(0, 0, ringColor, 18 + absAccel * 18);
+            shockwaveCooldown = 24; // pasos físicos mínimos entre anillos
+        }
+    } else if (shockwaveCooldown > 0) {
+        shockwaveCooldown -= 1;
+    }
+
     const numColsX = parseInt(document.getElementById("num-cols-x").value) || 2;
     const sX = parseFloat(document.getElementById("col-dist-x").value) || 5.0;
     const bW = sX * (numColsX - 1);
@@ -6040,6 +6350,18 @@ function update3DPhysics() {
     const sY = parseFloat(document.getElementById("col-dist-y").value) || 5.0;
     const bD = sY * (numColsY - 1);
     updateBaseShearArrows(isX, xOffset, bD, groundDisp);
+
+    // --- FX: onda expansiva y sacudida extra al ocurrir un colapso ---
+    if (eq2001.isCollapsed && !collapseFxFired.b2001) {
+        collapseFxFired.b2001 = true;
+        spawnShockwave(-xOffset, 0, 0xff3d5a, 30);
+        cameraShake = Math.max(cameraShake, 0.65);
+    }
+    if (eq2019.isCollapsed && !collapseFxFired.b2019) {
+        collapseFxFired.b2019 = true;
+        spawnShockwave(xOffset, 0, 0xff3d5a, 30);
+        cameraShake = Math.max(cameraShake, 0.65);
+    }
 }
 
 function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
@@ -6504,11 +6826,30 @@ function animate3D() {
     // Controles orbitales
     controls.update();
 
-    // Actualizar partículas
+    // Actualizar partículas y FX ambientales
     updateParticles();
+    updateAmbientMotes(performance.now());
+    updateShockwaves();
 
-    // Renderizado
-    renderer.render(scene, camera);
+    // Sacudida de cámara proporcional a la aceleración del terreno.
+    // Se aplica un offset temporal solo durante el render para no perturbar OrbitControls.
+    if (cameraShake > 0.004) {
+        const ox = (Math.random() - 0.5) * cameraShake;
+        const oy = (Math.random() - 0.5) * cameraShake * 0.6;
+        const oz = (Math.random() - 0.5) * cameraShake;
+
+        camera.position.x += ox;
+        camera.position.y += oy;
+        camera.position.z += oz;
+        renderer.render(scene, camera);
+        camera.position.x -= ox;
+        camera.position.y -= oy;
+        camera.position.z -= oz;
+
+        cameraShake *= 0.90; // decaimiento suave
+    } else {
+        renderer.render(scene, camera);
+    }
 }
 
 // --- BUCLE DE SIMULACIÓN Y CONTROL DEL TIEMPO ---
@@ -6607,6 +6948,7 @@ function resetSimulation() {
     document.getElementById("metric-time").innerHTML = `0.00 <span class="unit">s</span>`;
     document.getElementById("metric-phase").textContent = "En reposo";
     document.getElementById("metric-phase").className = "text-green";
+    updateViewportPhasePill("En reposo", "text-green");
 
     // Resetear textos de métricas
     document.getElementById("drift-2001").textContent = "0.00%";
@@ -6696,6 +7038,24 @@ function getEvacStatusText(evacState) {
     return `<span style="color: #ffb703; font-weight: bold;" class="animate-pulse"><i class="fa-solid fa-person-running"></i> Piso ${evacState.currentFloor}</span>`;
 }
 
+// Actualiza la píldora HUD de fase sísmica sobre el viewport 3D
+function updateViewportPhasePill(text, phaseClass) {
+    const pill = document.getElementById("viewport-phase-pill");
+    const pillText = document.getElementById("viewport-phase-text");
+    if (!pill || !pillText) return;
+
+    pillText.textContent = text;
+    pill.classList.remove("is-safe", "is-warning", "is-danger");
+
+    if (phaseClass.includes("text-red")) {
+        pill.classList.add("is-danger");
+    } else if (phaseClass.includes("text-yellow")) {
+        pill.classList.add("is-warning");
+    } else if (phaseClass.includes("text-green")) {
+        pill.classList.add("is-safe");
+    }
+}
+
 function updateMetricsUI() {
     document.getElementById("metric-time").innerHTML = `${currentTime.toFixed(2)} <span class="unit">s</span>`;
 
@@ -6728,6 +7088,9 @@ function updateMetricsUI() {
         phaseSpan.textContent = "Tranquilidad / Sismo Finalizado";
         phaseSpan.className = "text-green";
     }
+
+    // Espejo en la píldora HUD sobre el viewport 3D
+    updateViewportPhasePill(phaseSpan.textContent, phaseSpan.className);
 
     // Métricas del Edificio 2001
     const drift1 = (eq2001.maxDriftRatio * 100).toFixed(2) + "%";

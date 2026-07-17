@@ -18,7 +18,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="index.css?v=905">
+    <link rel="stylesheet" href="index.css?v=1000">
     <!-- Leaflet.js Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -691,6 +691,12 @@
                 <div class="tab-content-container">
                     <!-- 3D VIEW TAB -->
                     <div id="tab-3d" class="tab-content active">
+                        <!-- HUD: Píldora de fase sísmica -->
+                        <div class="viewport-phase-pill" id="viewport-phase-pill">
+                            <span class="vp-dot"></span>
+                            <span id="viewport-phase-text">En reposo</span>
+                        </div>
+
                         <div class="threejs-legend">
                             <div class="legend-title">Estado de Columnas:</div>
                             <div class="legend-items">
@@ -2837,7 +2843,7 @@
             </div>
 
             <!-- Custom JavaScript -->
-            <script src="app.js?v=930"></script>
+            <script src="app.js?v=1000"></script>
 </body>
 
 </html>
