@@ -8113,8 +8113,13 @@ const CITY_CFG = {
     htScale: 5.0,          // exageración de altura
     dispExag: 60.0,        // exageración de desplazamientos (cinemática visible)
     collapseDur: 2.4,      // duración de la animación de colapso (s)
+    waveSpeed: 2800,       // velocidad aparente de la onda sísmica oeste→este (m/s)
+    vertExag: 1.15,        // exageración vertical del relieve
     seed: 20260624
 };
+
+// Matriz temporal reutilizable (actualización de instancias del tejido urbano)
+const _cityTmpMat = typeof THREE !== 'undefined' ? new THREE.Matrix4() : null;
 
 // Probabilidad de colapso Monte Carlo (misma tabla del mapa de daño) para la ficha
 const CITY_COLLAPSE_MC = { 4: 45.5, 5: 63.6, 6: 36.4, 7: 72.7, 8: 63.6, 9: 63.6, 10: 54.5 };
@@ -8214,6 +8219,17 @@ function cityTileY2Lat(y, z) {
     return 180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
 }
 
+// Muestreo bilineal de la malla de elevaciones (fila 0 = norte)
+function citySampleHeight(hg, cols, rows, u, vN) {
+    const gx = Math.max(0, Math.min(cols - 1.001, u * (cols - 1)));
+    const gy = Math.max(0, Math.min(rows - 1.001, vN * (rows - 1)));
+    const x0 = Math.floor(gx), y0 = Math.floor(gy);
+    const fx = gx - x0, fy = gy - y0;
+    const h00 = hg[y0 * cols + x0], h10 = hg[y0 * cols + x0 + 1];
+    const h01 = hg[(y0 + 1) * cols + x0], h11 = hg[(y0 + 1) * cols + x0 + 1];
+    return (h00 * (1 - fx) + h10 * fx) * (1 - fy) + (h01 * (1 - fx) + h11 * fx) * fy;
+}
+
 async function buildCitySatelliteGround(scene, toScene, extent) {
     const margin = 0.12;
     const latSpan = extent.latMax - extent.latMin, lngSpan = extent.lngMax - extent.lngMin;
@@ -8267,20 +8283,122 @@ async function buildCitySatelliteGround(scene, toScene, extent) {
     const latMid = (cityTileY2Lat(y0, z) + cityTileY2Lat(y1 + 1, z)) / 2;
     const center = toScene(latMid, lngMid);
 
+    // --- Elevaciones: teselas Terrarium (AWS, CORS habilitado, sin API key) ---
+    // Decodificación Terrarium: elevación(m) = R·256 + G + B/256 − 32768
+    const TS = 64; // submuestreo 4× por tesela (256 → 64 muestras)
+    const cols = tilesX * TS, rows = tilesY * TS;
+    const hgrid = new Float32Array(cols * rows);
+    let demType = 'terrarium';
+    try {
+        const loadDem = (tx, ty) => new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            const done = (ok) => {
+                clearTimeout(timer);
+                if (ok) {
+                    const c = document.createElement('canvas');
+                    c.width = TS; c.height = TS;
+                    const cctx = c.getContext('2d');
+                    cctx.drawImage(img, 0, 0, TS, TS);
+                    const d = cctx.getImageData(0, 0, TS, TS).data;
+                    const r0 = (ty - y0) * TS, c0 = (tx - x0) * TS;
+                    for (let py = 0; py < TS; py++) for (let px = 0; px < TS; px++) {
+                        const k = (py * TS + px) * 4;
+                        const elev = d[k] * 256 + d[k + 1] + d[k + 2] / 256 - 32768;
+                        hgrid[(r0 + py) * cols + c0 + px] = elev > -5 ? elev : -5;
+                    }
+                }
+                resolve(ok);
+            };
+            const timer = setTimeout(() => { img.src = ''; done(false); }, 9000);
+            img.onload = () => done(true);
+            img.onerror = () => done(false);
+            // Nota: Terrarium usa orden z/x/y (a diferencia de ESRI, que es z/y/x)
+            img.src = `https://s3.amazonaws.com/elevation-tiles-prod/terrarium/${z}/${tx}/${ty}.png`;
+        });
+        const demJobs = [];
+        for (let tx = x0; tx <= x1; tx++) for (let ty = y0; ty <= y1; ty++) demJobs.push(loadDem(tx, ty));
+        const demRes = await Promise.all(demJobs);
+        const demOk = demRes.filter(Boolean).length;
+        if (demOk < demJobs.length * 0.75) throw new Error(`DEM incompleto (${demOk}/${demJobs.length})`);
+    } catch (e) {
+        // Respaldo: cresta procedural del cordón montañoso al sur de la franja urbana
+        console.warn('[city-sim] DEM Terrarium no disponible, usando cresta procedural:', e.message);
+        demType = 'procedural';
+        for (let r = 0; r < rows; r++) for (let cI = 0; cI < cols; cI++) {
+            const vN = r / (rows - 1); // 0 norte (mar) → 1 sur (montaña)
+            const s = Math.max(0, Math.min(1, (vN - 0.45) / 0.5));
+            const mod = 0.82 + 0.18 * Math.sin(cI * 0.11 + r * 0.07) * Math.sin(cI * 0.031 + 1.3);
+            hgrid[r * cols + cI] = Math.pow(s, 1.25) * 2350 * mod;
+        }
+    }
+
+    // --- Plano segmentado desplazado por las elevaciones ---
+    const segX = Math.min(240, Math.max(120, tilesX * 26));
+    const segY = Math.min(120, Math.max(48, tilesY * 26));
+    const geo = new THREE.PlaneGeometry(planeW, planeH, segX, segY);
+    const posAttr = geo.getAttribute('position');
+    const nv = posAttr.count;
+    const baseX = new Float32Array(nv);   // x local (oeste→este, = x mundo − centro)
+    const baseH = new Float32Array(nv);   // altura del relieve (eje z local → y mundo)
+    const delays = new Float32Array(nv);  // retardo de la onda viajera por vértice
+    let maxH = 0;
+    for (let i = 0; i < nv; i++) {
+        const lx = posAttr.getX(i), ly = posAttr.getY(i);
+        const u = (lx + planeW / 2) / planeW;
+        const vN = 1 - (ly + planeH / 2) / planeH; // ly=+H/2 es el borde norte
+        const hgt = citySampleHeight(hgrid, cols, rows, u, vN) * CITY_CFG.vertExag;
+        posAttr.setZ(i, hgt);
+        if (hgt > maxH) maxH = hgt;
+        baseX[i] = lx;
+        baseH[i] = hgt;
+        delays[i] = (lx + planeW / 2) / CITY_CFG.waveSpeed;
+    }
+    posAttr.needsUpdate = true;
+
     const mat = new THREE.MeshBasicMaterial({ map: texture, color: 0xa3adbb });
-    const plane = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), mat);
+    const plane = new THREE.Mesh(geo, mat);
     plane.rotation.x = -Math.PI / 2;
     plane.position.set(center.x, 0, center.z);
     scene.add(plane);
-    return plane;
+
+    return {
+        mesh: plane, posAttr, baseX, baseH, delays, maxH, demType,
+        xWest: center.x - planeW / 2, xEast: center.x + planeW / 2,
+        zMin: center.z - planeH / 2, zMax: center.z + planeH / 2,
+        heightAt: (wx, wz) => {
+            const u = (wx - center.x + planeW / 2) / planeW;
+            const vN = 1 - ((center.z - wz) + planeH / 2) / planeH;
+            return citySampleHeight(hgrid, cols, rows, u, vN) * CITY_CFG.vertExag;
+        }
+    };
 }
 
 // Terreno estilizado de respaldo si el mosaico satelital no está disponible
+// (incluye cresta procedural del cordón montañoso para conservar la lectura del paisaje)
 function buildCityFallbackGround(scene) {
-    const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(60000, 30000),
-        new THREE.MeshStandardMaterial({ color: 0x141c26, roughness: 1.0 })
-    );
+    const W = 60000, H = 30000;
+    const ridgeAt = (lx, ly) => {
+        const vN = 1 - (ly + H / 2) / H; // 0 norte → 1 sur
+        const s = Math.max(0, Math.min(1, (vN - 0.45) / 0.45));
+        const mod = 0.82 + 0.18 * Math.sin(lx * 0.0008) * Math.sin(ly * 0.0013 + 1.7);
+        return Math.pow(s, 1.25) * 2350 * CITY_CFG.vertExag * mod;
+    };
+    const geo = new THREE.PlaneGeometry(W, H, 180, 90);
+    const posAttr = geo.getAttribute('position');
+    const nv = posAttr.count;
+    const baseX = new Float32Array(nv), baseH = new Float32Array(nv), delays = new Float32Array(nv);
+    for (let i = 0; i < nv; i++) {
+        const lx = posAttr.getX(i), ly = posAttr.getY(i);
+        const hgt = ridgeAt(lx, ly);
+        posAttr.setZ(i, hgt);
+        baseX[i] = lx;
+        baseH[i] = hgt;
+        delays[i] = (lx + W / 2) / CITY_CFG.waveSpeed;
+    }
+    posAttr.needsUpdate = true;
+    const ground = new THREE.Mesh(geo,
+        new THREE.MeshStandardMaterial({ color: 0x141c26, roughness: 1.0 }));
     ground.rotation.x = -Math.PI / 2;
     scene.add(ground);
     const grid = new THREE.GridHelper(60000, 150, 0x1d2a3a, 0x16202e);
@@ -8293,6 +8411,11 @@ function buildCityFallbackGround(scene) {
     sea.rotation.x = -Math.PI / 2;
     sea.position.set(0, 0.5, -11500);
     scene.add(sea);
+    return {
+        mesh: ground, posAttr, baseX, baseH, delays, maxH: 2350 * CITY_CFG.vertExag, demType: 'procedural',
+        xWest: -W / 2, xEast: W / 2, zMin: -H / 2, zMax: H / 2,
+        heightAt: (wx, wz) => ridgeAt(wx, -wz)
+    };
 }
 
 async function initCitySim() {
@@ -8395,15 +8518,57 @@ async function initCitySim() {
     scene.add(group);
     citySim.group = group;
 
-    // --- Terreno (satélite real con respaldo estilizado) ---
+    // --- Terreno (satélite real + elevaciones DEM, con respaldo estilizado) ---
     try {
-        await buildCitySatelliteGround(group, toScene, ext);
+        citySim.terrain = await buildCitySatelliteGround(group, toScene, ext);
         citySim.groundType = 'satellite';
     } catch (e) {
         console.warn('[city-sim] Mosaico satelital no disponible, usando terreno estilizado:', e.message);
-        buildCityFallbackGround(group);
+        citySim.terrain = buildCityFallbackGround(group);
         citySim.groundType = 'fallback';
     }
+    const terr = citySim.terrain;
+    const xWest = terr.xWest;
+    console.info(`[city-sim] Terreno: ${citySim.groundType}, DEM: ${terr.demType}, altura máx ≈ ${Math.round(terr.maxH)} m, onda oeste→este a ${CITY_CFG.waveSpeed} m/s`);
+
+    // --- Frentes de onda sísmica (uno por evento del doblete) ---
+    // Envolvente Jennings de cada evento (misma parametrización del registro)
+    const shockEnvelope = (start) => {
+        const is2 = start > 0;
+        const pga = is2 ? CITY_CFG.pga2 : CITY_CFG.pga1;
+        const ramp = is2 ? 2.5 : 2.0, hold = is2 ? 12.0 : 10.0;
+        const decay = is2 ? 0.12 : 0.15, end = is2 ? 35 : 30;
+        return (age) => {
+            if (age < 0 || age >= end) return 0;
+            if (age < ramp) return Math.pow(age / ramp, 2) * pga;
+            if (age <= hold) return pga;
+            return Math.exp(-decay * (age - hold)) * pga;
+        };
+    };
+    citySim.waveFronts = [0, CITY_CFG.shock2Start].map(start => {
+        const c = document.createElement('canvas');
+        c.width = 4; c.height = 128;
+        const cctx = c.getContext('2d');
+        const grad = cctx.createLinearGradient(0, 128, 0, 0);
+        grad.addColorStop(0, 'rgba(96,224,255,0.9)');
+        grad.addColorStop(0.35, 'rgba(56,189,248,0.38)');
+        grad.addColorStop(1, 'rgba(56,189,248,0)');
+        cctx.fillStyle = grad;
+        cctx.fillRect(0, 0, 4, 128);
+        const tex = new THREE.CanvasTexture(c);
+        const matF = new THREE.MeshBasicMaterial({
+            map: tex, transparent: true, opacity: 0, side: THREE.DoubleSide,
+            blending: THREE.AdditiveBlending, depthWrite: false, fog: false
+        });
+        const zSpan = (terr.zMax - terr.zMin) * 1.04;
+        const front = new THREE.Mesh(new THREE.PlaneGeometry(zSpan, 1500), matF);
+        front.rotation.y = Math.PI / 2; // panel vertical perpendicular al eje x
+        front.position.set(xWest, 750, (terr.zMin + terr.zMax) / 2);
+        front.visible = false;
+        front.renderOrder = 5;
+        scene.add(front);
+        return { mesh: front, start, env: shockEnvelope(start) };
+    });
 
     // --- Edificios del catálogo (extrusión de rectángulos reales) ---
     const baseColor = new THREE.Color(0x9fb4c8);
@@ -8420,7 +8585,8 @@ async function initCitySim() {
         const col = baseColor.clone().multiplyScalar(tint);
         const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.85, metalness: 0.08 });
         const mesh = new THREE.Mesh(geo, mat);
-        mesh.position.set(pos.x, 0, pos.z);
+        const gy = terr.heightAt ? Math.max(0, terr.heightAt(pos.x, pos.z)) : 0;
+        mesh.position.set(pos.x, gy, pos.z);
         mesh.rotation.y = (rngB() - 0.5) * 0.5;
         mesh.userData.x0 = pos.x;
         mesh.userData.z0 = pos.z;
@@ -8432,6 +8598,7 @@ async function initCitySim() {
             status: b.status, damageLevel: b.damage_level,
             collapseT: null, toppleZ: 0, toppleX: 0, shiftX: 0, shiftZ: 0,
             damageT: null, tiltZ: 0, tiltX: 0,
+            delay: (pos.x - xWest) / CITY_CFG.waveSpeed, y0: gy,
             dustSpawned: false, rubble: null, event: null
         };
 
@@ -8450,7 +8617,9 @@ async function initCitySim() {
             rGeo.translate(0, hr / 2, 0);
             const rubble = new THREE.Mesh(rGeo,
                 new THREE.MeshStandardMaterial({ color: 0x5a5044, roughness: 1.0 }));
-            rubble.position.set(pos.x + st.shiftX * 0.6, 0, pos.z + st.shiftZ * 0.6);
+            rubble.position.set(pos.x + st.shiftX * 0.6, gy, pos.z + st.shiftZ * 0.6);
+            rubble.userData.x0 = rubble.position.x;
+            rubble.userData.z0 = rubble.position.z;
             rubble.rotation.y = rngB() * Math.PI;
             rubble.scale.y = 0.001;
             rubble.visible = false;
@@ -8477,13 +8646,19 @@ async function initCitySim() {
     const fillers = new THREE.InstancedMesh(fGeo, fMat, fillerCount);
     const dummy = new THREE.Object3D();
     const fColor = new THREE.Color();
+    const fBase = new Float32Array(fillerCount * 3);   // x, y, z base por instancia
+    const fDelay = new Float32Array(fillerCount);      // retardo de la onda por instancia
     for (let i = 0; i < fillerCount; i++) {
         const anchor = vargas[Math.floor(rngF() * vargas.length)];
         const aPos = toScene(anchor.lat, anchor.lng);
         const ang = rngF() * Math.PI * 2;
         const rad = 60 + rngF() * 420;
-        dummy.position.set(aPos.x + Math.cos(ang) * rad, 0, aPos.z + Math.sin(ang) * rad);
+        const fx0 = aPos.x + Math.cos(ang) * rad, fz0 = aPos.z + Math.sin(ang) * rad;
+        const fy0 = terr.heightAt ? Math.max(0, terr.heightAt(fx0, fz0)) : 0;
+        dummy.position.set(fx0, fy0, fz0);
         dummy.rotation.y = rngF() * Math.PI;
+        fBase[i * 3] = fx0; fBase[i * 3 + 1] = fy0; fBase[i * 3 + 2] = fz0;
+        fDelay[i] = (fx0 - xWest) / CITY_CFG.waveSpeed;
         const fw = (10 + rngF() * 14) * CITY_CFG.fpScale;
         const fh = (1.5 + rngF() * rngF() * 5.5) * 3.0 * CITY_CFG.htScale * 0.8;
         dummy.scale.set(fw, fh, fw * (0.7 + rngF() * 0.6));
@@ -8493,6 +8668,8 @@ async function initCitySim() {
     }
     fillers.instanceMatrix.needsUpdate = true;
     if (fillers.instanceColor) fillers.instanceColor.needsUpdate = true;
+    fillers.userData.base = fBase;
+    fillers.userData.delay = fDelay;
     group.add(fillers);
     citySim.fillers = fillers;
 
@@ -8578,22 +8755,88 @@ function updateCityPlayButton() {
     }
 }
 
-// Aplica el estado completo de la ciudad en el instante t (determinístico)
+// Aplica el estado completo de la ciudad en el instante t (determinístico).
+// La perturbación viaja de oeste a este a CITY_CFG.waveSpeed: cada elemento
+// (vértice del terreno, edificio, relleno) responde al registro con el retardo
+// que tarda el frente de onda en llegar a su longitud.
 function applyCityState(t, dtFrame, live) {
     if (!citySim) return;
+    // En pausa y con el mismo instante no hay nada que recomputar
+    if (!live && citySim.lastAppliedT === t) { citySim.t = t; return; }
+    citySim.lastAppliedT = t;
     citySim.t = t;
-    const a_g = sampleCityAccel(t);
 
-    // Movimiento del terreno (amplificado a escala de ciudad)
-    const gx = a_g * CITY_CFG.dispExag * 0.6;
-    citySim.group.position.x = gx;
-    citySim.group.position.z = a_g * CITY_CFG.dispExag * 0.15;
+    const terr = citySim.terrain;
+    const xWest = terr ? terr.xWest : 0;
+    const KX = CITY_CFG.dispExag * 0.5;   // desplazamiento horizontal del suelo
+    const KY = CITY_CFG.dispExag * 0.22;  // rizado vertical del suelo
+    const waveSpan = terr ? (terr.xEast - terr.xWest) / CITY_CFG.waveSpeed : 0;
+
+    // --- Terreno: ondula al paso del frente de onda ---
+    if (terr && terr.posAttr) {
+        if (t - waveSpan > CITY_CFG.duration + 1) {
+            // El registro terminó en todo el corredor: dejar el relieve en reposo
+            if (!terr.settled) {
+                const arr0 = terr.posAttr.array;
+                for (let i = 0; i < terr.baseX.length; i++) {
+                    arr0[i * 3] = terr.baseX[i];
+                    arr0[i * 3 + 2] = terr.baseH[i];
+                }
+                terr.posAttr.needsUpdate = true;
+                terr.settled = true;
+            }
+        } else {
+            const arr = terr.posAttr.array;
+            for (let i = 0; i < terr.baseX.length; i++) {
+                const a = sampleCityAccel(t - terr.delays[i]);
+                arr[i * 3] = terr.baseX[i] + a * KX;
+                arr[i * 3 + 2] = terr.baseH[i] + a * KY;
+            }
+            terr.posAttr.needsUpdate = true;
+            terr.settled = false;
+        }
+    }
+
+    // --- Tejido urbano genérico (instancias) ---
+    if (citySim.fillers && _cityTmpMat) {
+        const fb = citySim.fillers.userData.base;
+        const fd = citySim.fillers.userData.delay;
+        const nF = fd.length;
+        for (let i = 0; i < nF; i++) {
+            const a = sampleCityAccel(t - fd[i]);
+            citySim.fillers.getMatrixAt(i, _cityTmpMat);
+            _cityTmpMat.elements[12] = fb[i * 3] + a * KX;
+            _cityTmpMat.elements[13] = fb[i * 3 + 1] + a * KY;
+            citySim.fillers.setMatrixAt(i, _cityTmpMat);
+        }
+        citySim.fillers.instanceMatrix.needsUpdate = true;
+    }
+
+    // --- Frentes de onda luminosos (barren de oeste a este) ---
+    if (citySim.waveFronts && terr) {
+        // Brillo según la envolvente del evento + pulso sutil con el registro instantáneo
+        const pulse = 0.78 + 0.22 * Math.min(1, Math.abs(sampleCityAccel(t)) / 0.4);
+        citySim.waveFronts.forEach(f => {
+            const age = t - f.start;
+            const xF = xWest + CITY_CFG.waveSpeed * age;
+            if (age >= 0 && xF <= terr.xEast + 500) {
+                f.mesh.visible = true;
+                f.mesh.position.x = xF;
+                f.mesh.material.opacity = (0.08 + 0.55 * Math.min(1, f.env(age) / 0.45)) * pulse;
+            } else {
+                f.mesh.visible = false;
+            }
+        });
+    }
 
     let nCollapsed = 0, nDamaged = 0;
     const amber = new THREE.Color(0xf59e0b);
 
     citySim.buildings.forEach(st => {
         const mesh = st.mesh;
+        const aLoc = sampleCityAccel(t - st.delay); // aceleración en su longitud
+        const gX = aLoc * KX;                        // el suelo se desplaza bajo el edificio
+        const gY = aLoc * KY;
         const isCollapsedNow = (st.collapseT !== null && t >= st.collapseT);
 
         if (isCollapsedNow) {
@@ -8604,25 +8847,27 @@ function applyCityState(t, dtFrame, live) {
             mesh.scale.y = Math.max(0.12, 1 - 0.88 * eIn);
             mesh.rotation.z = st.toppleZ * eOut;
             mesh.rotation.x = st.toppleX * eOut;
-            mesh.position.x = mesh.userData.x0 + st.shiftX * eIn;
+            mesh.position.x = mesh.userData.x0 + st.shiftX * eIn + gX;
+            mesh.position.y = st.y0 + gY;
             mesh.position.z = mesh.userData.z0 + st.shiftZ * eIn;
             mesh.material.emissive.setRGB(0.30 * (1 - p) * p * 4, 0.04, 0.03);
             if (st.rubble) {
                 st.rubble.visible = p > 0.45;
                 st.rubble.scale.y = Math.max(0.001, Math.min(1, (p - 0.45) / 0.55));
+                st.rubble.position.x = st.rubble.userData.x0 + gX;
+                st.rubble.position.y = st.y0 + gY;
             }
             if (live && !st.dustSpawned && p > 0.08) {
-                spawnCityDust(mesh.userData.x0, st.h * 0.55, mesh.userData.z0, st.N >= 7);
+                spawnCityDust(mesh.userData.x0 + gX, st.y0 + st.h * 0.55, mesh.userData.z0, st.N >= 7);
                 st.dustSpawned = true;
             }
             if (p >= 0.5) nCollapsed++;
         } else {
             // Restaurar estado intacto (necesario al rebobinar antes del colapso)
             if (mesh.scale.y !== 1) mesh.scale.y = 1;
-            if (mesh.position.x !== mesh.userData.x0) {
-                mesh.position.x = mesh.userData.x0;
-                mesh.position.z = mesh.userData.z0;
-            }
+            mesh.position.x = mesh.userData.x0 + gX;
+            mesh.position.y = st.y0 + gY;
+            mesh.position.z = mesh.userData.z0;
             mesh.material.emissive.setRGB(0, 0, 0);
             if (st.rubble && st.rubble.visible) { st.rubble.visible = false; st.rubble.scale.y = 0.001; }
 
@@ -8630,7 +8875,7 @@ function applyCityState(t, dtFrame, live) {
             if (live && dtFrame > 0) {
                 const w = 2.0 * Math.PI / st.T;
                 const zeta = 0.05;
-                const acc = -a_g * 9.81 - 2.0 * zeta * w * st.v - w * w * st.u;
+                const acc = -aLoc * 9.81 - 2.0 * zeta * w * st.v - w * w * st.u;
                 st.v += acc * dtFrame;
                 st.u += st.v * dtFrame;
             } else if (!live) {

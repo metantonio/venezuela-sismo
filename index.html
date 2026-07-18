@@ -18,7 +18,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="index.css?v=1122">
+    <link rel="stylesheet" href="index.css?v=1123">
     <!-- Leaflet.js Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -2219,7 +2219,11 @@
                                     <em>extrusiones genéricas</em> de contexto. Cada edificio oscila como un
                                     oscilador independiente sintonizado a su altura (T &asymp; 0.06&middot;N + 0.15 s),
                                     amplificando la respuesta de los edificios de 5&ndash;8 pisos en resonancia con el
-                                    suelo aluvial.
+                                    suelo aluvial. La perturbación <strong>viaja de oeste a este</strong> a
+                                    &asymp;2.8&nbsp;km/s: cada edificio empieza a oscilar cuando el frente de onda
+                                    (franja luminosa cian) alcanza su longitud, y el terreno ondula a su paso.
+                                    El relieve reproduce la <strong>topografía real</strong> del cordón montañoso
+                                    (DEM Terrarium/AWS) drapeado con la imagen satelital.
                                 </p>
 
                                 <!-- DISCLAIMER -->
@@ -2290,13 +2294,14 @@
                                 <div id="city-canvas-container" class="city-canvas-container">
                                     <div id="city-loading" class="city-loading">
                                         <i class="fa-solid fa-circle-notch fa-spin"></i>
-                                        <span>Cargando ciudad de La Guaira…</span>
+                                        <span>Cargando relieve, imagen satelital y ciudad de La Guaira…</span>
                                     </div>
                                     <div class="city-legend">
                                         <span><i style="background:#9fb4c8;"></i> Catálogo real</span>
                                         <span><i style="background:#f59e0b;"></i> Dañado</span>
                                         <span><i style="background:#ef4444;"></i> Colapsado</span>
                                         <span><i style="background:#3a4757;"></i> Tejido urbano (genérico)</span>
+                                        <span><i style="background:#38bdf8;"></i> Frente de onda (oeste → este)</span>
                                     </div>
                                     <div id="city-info-card" class="city-info-card" style="display: none;"></div>
                                 </div>
@@ -2991,7 +2996,7 @@
             </div>
 
             <!-- Custom JavaScript -->
-            <script src="app.js?v=1122"></script>
+            <script src="app.js?v=1123"></script>
 </body>
 
 </html>
