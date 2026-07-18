@@ -18,7 +18,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="index.css?v=1121">
+    <link rel="stylesheet" href="index.css?v=1122">
     <!-- Leaflet.js Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -697,6 +697,8 @@
                         Simulaciones Conclusiones</button>
                     <button class="tab-btn" data-tab="tab-damage-map"><i class="fa-solid fa-map-location-dot"></i>
                         Mapa de Daño</button>
+                    <button class="tab-btn" data-tab="tab-city"><i class="fa-solid fa-city"></i> Simulación
+                        Urbana</button>
                     <button class="tab-btn" data-tab="tab-boletin"><i class="fa-solid fa-clipboard-check"></i>
                         Evaluación Boletín</button>
                 </nav>
@@ -2197,6 +2199,111 @@
                         </div>
                     </div>
 
+                    <!-- TAB SIMULACIÓN URBANA LA GUAIRA -->
+                    <div id="tab-city" class="tab-content">
+                        <div class="tab-info-container">
+                            <div class="info-section">
+                                <h3
+                                    style="color: var(--color-2001); display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                    <i class="fa-solid fa-city"></i> Simulación Urbana 3D — Doblete Sísmico de La
+                                    Guaira (24/Jun/2026)
+                                </h3>
+                                <p
+                                    style="line-height: 1.6; color: var(--text-muted); font-size: 13px; margin-bottom: 14px;">
+                                    Reconstrucción cinematográfica del corredor costero de La Guaira durante el
+                                    <strong>doblete sísmico</strong> (0.40g seguido de 0.60g a los 40 s).
+                                    Las <strong>184 edificaciones del catálogo real</strong> (buildings.json) se
+                                    extruyen sobre la imagen satelital según sus coordenadas y número de pisos, y su
+                                    destino durante la simulación reproduce <strong>el desenlace real reportado</strong>:
+                                    118 colapsos y 66 con daño severo/parcial. El resto del tejido urbano son
+                                    <em>extrusiones genéricas</em> de contexto. Cada edificio oscila como un
+                                    oscilador independiente sintonizado a su altura (T &asymp; 0.06&middot;N + 0.15 s),
+                                    amplificando la respuesta de los edificios de 5&ndash;8 pisos en resonancia con el
+                                    suelo aluvial.
+                                </p>
+
+                                <!-- DISCLAIMER -->
+                                <div
+                                    style="background: rgba(255, 183, 3, 0.05); border: 1px solid rgba(255, 183, 3, 0.15); border-left: 4px solid #ffb703; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 12px; line-height: 1.5;">
+                                    <span
+                                        style="color: #ffb703; font-weight: 600; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                        <i class="fa-solid fa-triangle-exclamation"></i> Nota Importante
+                                    </span>
+                                    <p style="margin: 0; color: var(--text-muted);">
+                                        Esta visualización es <strong>cinematográfica y no sigue las normas
+                                            COVENIN 1756</strong>: no calcula demandas ni capacidades. Los instantes y
+                                        mecanismos de colapso son una representación artística asignada de forma
+                                        determinística; lo que <strong>sí es real</strong> es el inventario final de
+                                        daños (qué edificio colapsó y cuál quedó en pie). Haga clic en cualquier
+                                        edificio del catálogo para ver su ficha.
+                                    </p>
+                                </div>
+
+                                <!-- CONTROLES DE LA SIMULACIÓN -->
+                                <div class="city-controls">
+                                    <button id="city-btn-play" class="btn btn-primary" style="padding: 8px 18px;">
+                                        <i class="fa-solid fa-play"></i> <span>Reproducir</span>
+                                    </button>
+                                    <button id="city-btn-restart" class="btn btn-secondary" style="padding: 8px 14px;">
+                                        <i class="fa-solid fa-rotate-left"></i> Reiniciar
+                                    </button>
+                                    <div class="city-speed-group" role="group" aria-label="Velocidad">
+                                        <button class="city-speed-btn" data-speed="0.5">0.5×</button>
+                                        <button class="city-speed-btn active" data-speed="1">1×</button>
+                                        <button class="city-speed-btn" data-speed="2">2×</button>
+                                        <button class="city-speed-btn" data-speed="4">4×</button>
+                                    </div>
+                                    <div class="city-timeline">
+                                        <input type="range" id="city-scrubber" min="0" max="75" step="0.1" value="0">
+                                        <div class="city-timeline-marks">
+                                            <span style="left: 0%;">0 s</span>
+                                            <span class="city-mark-eq1" style="left: 2%;" title="Evento 1 — 0.40g">●</span>
+                                            <span style="left: 53.3%;">40 s</span>
+                                            <span class="city-mark-eq2" style="left: 55.3%;" title="Evento 2 — 0.60g">●</span>
+                                            <span style="left: 97%;">75 s</span>
+                                        </div>
+                                    </div>
+                                    <div id="city-phase-pill" class="city-phase-pill">En calma</div>
+                                </div>
+
+                                <!-- CONTADORES EN VIVO -->
+                                <div class="city-stats">
+                                    <div class="city-stat">
+                                        <span class="city-stat-value" id="city-clock">0.0 s</span>
+                                        <span class="city-stat-label">Tiempo</span>
+                                    </div>
+                                    <div class="city-stat city-stat-ok">
+                                        <span class="city-stat-value" id="city-count-standing">184</span>
+                                        <span class="city-stat-label">En pie (catálogo)</span>
+                                    </div>
+                                    <div class="city-stat city-stat-warn">
+                                        <span class="city-stat-value" id="city-count-damaged">0</span>
+                                        <span class="city-stat-label">Dañados</span>
+                                    </div>
+                                    <div class="city-stat city-stat-danger">
+                                        <span class="city-stat-value" id="city-count-collapsed">0</span>
+                                        <span class="city-stat-label">Colapsados</span>
+                                    </div>
+                                </div>
+
+                                <!-- VIEWPORT 3D -->
+                                <div id="city-canvas-container" class="city-canvas-container">
+                                    <div id="city-loading" class="city-loading">
+                                        <i class="fa-solid fa-circle-notch fa-spin"></i>
+                                        <span>Cargando ciudad de La Guaira…</span>
+                                    </div>
+                                    <div class="city-legend">
+                                        <span><i style="background:#9fb4c8;"></i> Catálogo real</span>
+                                        <span><i style="background:#f59e0b;"></i> Dañado</span>
+                                        <span><i style="background:#ef4444;"></i> Colapsado</span>
+                                        <span><i style="background:#3a4757;"></i> Tejido urbano (genérico)</span>
+                                    </div>
+                                    <div id="city-info-card" class="city-info-card" style="display: none;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- TAB EVALUACIÓN BOLETÍN -->
                     <div id="tab-boletin" class="tab-content">
                         <div class="tab-info-container">
@@ -2884,7 +2991,7 @@
             </div>
 
             <!-- Custom JavaScript -->
-            <script src="app.js?v=1121"></script>
+            <script src="app.js?v=1122"></script>
 </body>
 
 </html>

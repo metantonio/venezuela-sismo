@@ -194,9 +194,12 @@ function initUI() {
             // La franja de métricas sísmicas solo aplica a pestañas de simulación
             const metricsBoard = document.querySelector(".metrics-board");
             if (metricsBoard) {
-                const hideMetrics = (tabId === "tab-damage-map" || tabId === "tab-boletin");
+                const hideMetrics = (tabId === "tab-damage-map" || tabId === "tab-boletin" || tabId === "tab-city");
                 metricsBoard.classList.toggle("metrics-hidden", hideMetrics);
             }
+
+            // El render 3D de la ciudad solo corre mientras su pestaña está activa
+            if (citySim) citySim.active = (tabId === "tab-city");
 
             // Forzar redibujado de charts en tabs ocultos
             if (tabId === "tab-spectra" && spectraChartInstance) {
@@ -218,6 +221,17 @@ function initUI() {
                     setTimeout(() => { initDamageMap(); }, 100);
                 } else {
                     damageMapInstance.invalidateSize();
+                }
+            } else if (tabId === "tab-city") {
+                if (!citySim) {
+                    setTimeout(() => { initCitySim(); }, 120);
+                } else {
+                    citySim.active = true;
+                    resizeCityRenderer();
+                    if (!citySim.loopRunning) {
+                        citySim.lastFrame = performance.now();
+                        requestAnimationFrame(cityFrameLoop);
+                    }
                 }
             }
         });
@@ -8080,6 +8094,736 @@ window.changePopupPhoto = function (buildingId, direction) {
         counterEl.textContent = `${building.currentPhotoIndex + 1} / ${photos.length}`;
     }
 };
+
+// ============================================================================
+// --- SIMULACIÓN URBANA 3D: DOBLETE SÍSMICO DE LA GUAIRA (24/Jun/2026) ---
+// Visualización cinematográfica (NO normativa): los edificios del catálogo real
+// de Vargas se extruyen sobre la imagen satelital y reproducen su desenlace
+// reportado durante el doblete 0.40g (t=0) / 0.60g (t=40s).
+// ============================================================================
+let citySim = null;
+
+const CITY_CFG = {
+    duration: 75.0,
+    pga1: 0.40,
+    pga2: 0.60,
+    shock2Start: 40.0,
+    bbox: { latMin: 10.55, latMax: 10.65, lngMin: -67.10, lngMax: -66.75 },
+    fpScale: 3.5,          // exageración de huella (visibilidad a escala de ciudad)
+    htScale: 5.0,          // exageración de altura
+    dispExag: 60.0,        // exageración de desplazamientos (cinemática visible)
+    collapseDur: 2.4,      // duración de la animación de colapso (s)
+    seed: 20260624
+};
+
+// Probabilidad de colapso Monte Carlo (misma tabla del mapa de daño) para la ficha
+const CITY_COLLAPSE_MC = { 4: 45.5, 5: 63.6, 6: 36.4, 7: 72.7, 8: 63.6, 9: 63.6, 10: 54.5 };
+
+// RNG determinístico (mulberry32) para que la simulación sea reproducible
+function cityMulberry32(seed) {
+    let a = seed >>> 0;
+    return function () {
+        a |= 0; a = (a + 0x6D2B79F5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+}
+
+function cityHashStr(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return h >>> 0;
+}
+
+// Acelerograma sintético del doblete (Kanai-Tajimi + Jennings), versión con semilla
+function buildCityGroundMotion() {
+    const dtC = 0.02;
+    const n = Math.ceil(CITY_CFG.duration / dtC);
+    const acc = new Float32Array(n);
+    const rng = cityMulberry32(CITY_CFG.seed);
+    const omega_g = (2.0 * Math.PI) / 0.60; // suelo aluvial S3, T_g ≈ 0.6 s
+    const zeta_g = 0.6;
+
+    const whiteNoise = () => {
+        const w = new Float32Array(n);
+        for (let i = 0; i < n; i++) {
+            const u1 = Math.max(rng(), 1e-12), u2 = rng();
+            w[i] = Math.sqrt(-2.0 * Math.log(u1)) * Math.sin(2.0 * Math.PI * u2);
+        }
+        return w;
+    };
+    const ktFilter = (noise) => {
+        const out = new Float32Array(n);
+        let x_f = 0, v_f = 0, a_f = 0;
+        for (let i = 0; i < n; i++) {
+            const x_p = x_f + dtC * v_f + dtC * dtC * 0.25 * a_f;
+            const v_p = v_f + 0.5 * dtC * a_f;
+            const a_n = noise[i] - 2.0 * zeta_g * omega_g * v_p - omega_g * omega_g * x_p;
+            x_f = x_p + 0.25 * dtC * dtC * a_n;
+            v_f = v_p + 0.5 * dtC * a_n;
+            a_f = a_n;
+            out[i] = 2.0 * zeta_g * omega_g * v_f + omega_g * omega_g * x_f;
+        }
+        let mx = 0;
+        for (let i = 0; i < n; i++) mx = Math.max(mx, Math.abs(out[i]));
+        if (mx > 0) for (let i = 0; i < n; i++) out[i] /= mx;
+        return out;
+    };
+
+    const f1 = ktFilter(whiteNoise());
+    const f2 = ktFilter(whiteNoise());
+    for (let i = 0; i < n; i++) {
+        const t = i * dtC;
+        let env1 = 0, env2 = 0;
+        if (t >= 0 && t < 30) {
+            if (t < 2.0) env1 = Math.pow(t / 2.0, 2);
+            else if (t <= 10.0) env1 = 1.0;
+            else env1 = Math.exp(-0.15 * (t - 10.0));
+        }
+        if (t >= CITY_CFG.shock2Start && t < 75) {
+            const tl = t - CITY_CFG.shock2Start;
+            if (tl < 2.5) env2 = Math.pow(tl / 2.5, 2);
+            else if (tl <= 12.0) env2 = 1.0;
+            else env2 = Math.exp(-0.12 * (tl - 12.0));
+        }
+        acc[i] = f1[i] * env1 * CITY_CFG.pga1 + f2[i] * env2 * CITY_CFG.pga2;
+    }
+    return { acc, dt: dtC };
+}
+
+function sampleCityAccel(t) {
+    if (!citySim || !citySim.motion) return 0;
+    const { acc, dt } = citySim.motion;
+    const pos = t / dt;
+    const i = Math.floor(pos);
+    if (i < 0 || i >= acc.length - 1) return 0;
+    const frac = pos - i;
+    return acc[i] * (1 - frac) + acc[i + 1] * frac;
+}
+
+// Mosaico satelital ESRI (World Imagery soporta CORS) → textura del terreno
+function cityLng2TileX(lng, z) { return Math.floor((lng + 180) / 360 * Math.pow(2, z)); }
+function cityLat2TileY(lat, z) {
+    const r = lat * Math.PI / 180;
+    return Math.floor((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * Math.pow(2, z));
+}
+function cityTileX2Lng(x, z) { return x / Math.pow(2, z) * 360 - 180; }
+function cityTileY2Lat(y, z) {
+    const n = Math.PI - 2 * Math.PI * y / Math.pow(2, z);
+    return 180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
+}
+
+async function buildCitySatelliteGround(scene, toScene, extent) {
+    const margin = 0.12;
+    const latSpan = extent.latMax - extent.latMin, lngSpan = extent.lngMax - extent.lngMin;
+    const latMin = extent.latMin - latSpan * margin, latMax = extent.latMax + latSpan * margin;
+    const lngMin = extent.lngMin - lngSpan * margin, lngMax = extent.lngMax + lngSpan * margin;
+
+    let z = 15, x0, x1, y0, y1, tilesX, tilesY;
+    while (z > 12) {
+        x0 = cityLng2TileX(lngMin, z); x1 = cityLng2TileX(lngMax, z);
+        y0 = cityLat2TileY(latMax, z); y1 = cityLat2TileY(latMin, z);
+        tilesX = x1 - x0 + 1; tilesY = y1 - y0 + 1;
+        if (tilesX * tilesY <= 44) break;
+        z--;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = tilesX * 256;
+    canvas.height = tilesY * 256;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#0d1420';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const loadTile = (tx, ty) => new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        const done = (ok) => {
+            clearTimeout(timer);
+            if (ok) ctx.drawImage(img, (tx - x0) * 256, (ty - y0) * 256);
+            resolve(ok);
+        };
+        const timer = setTimeout(() => { img.src = ''; done(false); }, 9000);
+        img.onload = () => done(true);
+        img.onerror = () => done(false);
+        img.src = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${ty}/${tx}`;
+    });
+
+    const jobs = [];
+    for (let tx = x0; tx <= x1; tx++) for (let ty = y0; ty <= y1; ty++) jobs.push(loadTile(tx, ty));
+    const results = await Promise.all(jobs);
+    const okCount = results.filter(Boolean).length;
+    if (okCount < jobs.length * 0.75) throw new Error(`Mosaico satelital incompleto (${okCount}/${jobs.length})`);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.encoding = THREE.sRGBEncoding;
+    texture.anisotropy = 4;
+
+    const latC = (cityTileY2Lat(y0, z) + cityTileY2Lat(y1 + 1, z)) / 2;
+    const mpp = 156543.03392 * Math.cos(latC * Math.PI / 180) / Math.pow(2, z);
+    const planeW = canvas.width * mpp, planeH = canvas.height * mpp;
+    const lngMid = (cityTileX2Lng(x0, z) + cityTileX2Lng(x1 + 1, z)) / 2;
+    const latMid = (cityTileY2Lat(y0, z) + cityTileY2Lat(y1 + 1, z)) / 2;
+    const center = toScene(latMid, lngMid);
+
+    const mat = new THREE.MeshBasicMaterial({ map: texture, color: 0xa3adbb });
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), mat);
+    plane.rotation.x = -Math.PI / 2;
+    plane.position.set(center.x, 0, center.z);
+    scene.add(plane);
+    return plane;
+}
+
+// Terreno estilizado de respaldo si el mosaico satelital no está disponible
+function buildCityFallbackGround(scene) {
+    const ground = new THREE.Mesh(
+        new THREE.PlaneGeometry(60000, 30000),
+        new THREE.MeshStandardMaterial({ color: 0x141c26, roughness: 1.0 })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    scene.add(ground);
+    const grid = new THREE.GridHelper(60000, 150, 0x1d2a3a, 0x16202e);
+    grid.position.y = 1;
+    scene.add(grid);
+    const sea = new THREE.Mesh(
+        new THREE.PlaneGeometry(60000, 14000),
+        new THREE.MeshStandardMaterial({ color: 0x0a2436, roughness: 0.35, metalness: 0.4 })
+    );
+    sea.rotation.x = -Math.PI / 2;
+    sea.position.set(0, 0.5, -11500);
+    scene.add(sea);
+}
+
+async function initCitySim() {
+    const container = document.getElementById('city-canvas-container');
+    const loadingEl = document.getElementById('city-loading');
+    if (!container || typeof THREE === 'undefined') {
+        if (loadingEl) loadingEl.innerHTML = '<span>Three.js no está disponible.</span>';
+        return;
+    }
+
+    citySim = {
+        active: true, playing: false, speed: 1, t: 0,
+        scene: null, camera: null, renderer: null, controls: null,
+        group: null, motion: null, buildings: [], fillers: null,
+        dust: [], raycaster: new THREE.Raycaster(), pointer: new THREE.Vector2(),
+        lastFrame: 0, extent: null
+    };
+
+    // --- Cargar catálogo y filtrar el corredor de Vargas ---
+    let catalog = window.mapBuildings;
+    if (!catalog) {
+        try {
+            const res = await fetch('buildings.json');
+            catalog = await res.json();
+            window.mapBuildings = catalog;
+        } catch (e) {
+            if (loadingEl) loadingEl.innerHTML = '<span>Error al cargar buildings.json</span>';
+            return;
+        }
+    }
+    const bb = CITY_CFG.bbox;
+    const vargas = catalog.filter(b =>
+        b.lat >= bb.latMin && b.lat <= bb.latMax && b.lng >= bb.lngMin && b.lng <= bb.lngMax);
+    if (vargas.length === 0) {
+        if (loadingEl) loadingEl.innerHTML = '<span>Sin edificios del catálogo en el área.</span>';
+        return;
+    }
+
+    // --- Transformación geográfica → metros de escena ---
+    const lat0 = vargas.reduce((a, b) => a + b.lat, 0) / vargas.length;
+    const lng0 = vargas.reduce((a, b) => a + b.lng, 0) / vargas.length;
+    const mPerDegLat = 110540.0;
+    const mPerDegLng = 111320.0 * Math.cos(lat0 * Math.PI / 180);
+    const toScene = (lat, lng) => ({ x: (lng - lng0) * mPerDegLng, z: -(lat - lat0) * mPerDegLat });
+    const ext = {
+        latMin: Math.min(...vargas.map(b => b.lat)), latMax: Math.max(...vargas.map(b => b.lat)),
+        lngMin: Math.min(...vargas.map(b => b.lng)), lngMax: Math.max(...vargas.map(b => b.lng))
+    };
+    citySim.extent = ext;
+
+    // --- Escena ---
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0d1420);
+    scene.fog = new THREE.FogExp2(0x0d1420, 0.000055);
+    citySim.scene = scene;
+
+    const camera = new THREE.PerspectiveCamera(46, container.clientWidth / container.clientHeight, 5, 120000);
+    citySim.camera = camera;
+
+    // Anclar el encuadre inicial al clúster más denso del catálogo (vista de barrio;
+    // el usuario puede alejarse con la órbita para ver todo el corredor costero)
+    let anchorB = vargas[0], anchorCount = -1;
+    vargas.forEach(b => {
+        let c = 0;
+        vargas.forEach(o => {
+            const dx = (o.lng - b.lng) * mPerDegLng, dz = (o.lat - b.lat) * mPerDegLat;
+            if (dx * dx + dz * dz < 500 * 500) c++;
+        });
+        if (c > anchorCount) { anchorCount = c; anchorB = b; }
+    });
+    const anchorPos = toScene(anchorB.lat, anchorB.lng);
+    camera.position.set(anchorPos.x + 1150, 720, anchorPos.z + 1550);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    container.appendChild(renderer.domElement);
+    citySim.renderer = renderer;
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.maxPolarAngle = Math.PI * 0.49;
+    controls.minDistance = 200;
+    controls.maxDistance = 45000;
+    controls.target.set(anchorPos.x, 50, anchorPos.z);
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.35;
+    controls.addEventListener('start', () => { controls.autoRotate = false; });
+    citySim.controls = controls;
+
+    scene.add(new THREE.HemisphereLight(0x8fb4d8, 0x1a1410, 0.85));
+    const sun = new THREE.DirectionalLight(0xffd9a0, 0.9);
+    sun.position.set(-9000, 6500, -4000);
+    scene.add(sun);
+
+    // Grupo de la ciudad (se desplaza con el movimiento del terreno)
+    const group = new THREE.Group();
+    scene.add(group);
+    citySim.group = group;
+
+    // --- Terreno (satélite real con respaldo estilizado) ---
+    try {
+        await buildCitySatelliteGround(group, toScene, ext);
+        citySim.groundType = 'satellite';
+    } catch (e) {
+        console.warn('[city-sim] Mosaico satelital no disponible, usando terreno estilizado:', e.message);
+        buildCityFallbackGround(group);
+        citySim.groundType = 'fallback';
+    }
+
+    // --- Edificios del catálogo (extrusión de rectángulos reales) ---
+    const baseColor = new THREE.Color(0x9fb4c8);
+    vargas.forEach((b) => {
+        const rngB = cityMulberry32(cityHashStr(b.id || b.name));
+        const N = Math.max(2, b.floors || 5);
+        const h = N * 3.0 * CITY_CFG.htScale;
+        const fp = (12.0 + rngB() * 6.0) * CITY_CFG.fpScale;
+        const pos = toScene(b.lat, b.lng);
+
+        const geo = new THREE.BoxGeometry(fp, h, fp * (0.75 + rngB() * 0.5));
+        geo.translate(0, h / 2, 0);
+        const tint = 0.9 + rngB() * 0.2;
+        const col = baseColor.clone().multiplyScalar(tint);
+        const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.85, metalness: 0.08 });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(pos.x, 0, pos.z);
+        mesh.rotation.y = (rngB() - 0.5) * 0.5;
+        mesh.userData.x0 = pos.x;
+        mesh.userData.z0 = pos.z;
+        group.add(mesh);
+
+        const st = {
+            b, mesh, N, h, baseColor: col.clone(),
+            T: 0.06 * N + 0.15, u: 0, v: 0,
+            status: b.status, damageLevel: b.damage_level,
+            collapseT: null, toppleZ: 0, toppleX: 0, shiftX: 0, shiftZ: 0,
+            damageT: null, tiltZ: 0, tiltX: 0,
+            dustSpawned: false, rubble: null, event: null
+        };
+
+        if (b.status === 'collapsed') {
+            const shock = rngB() < 0.35 ? 1 : 2;
+            st.event = shock;
+            st.collapseT = shock === 1 ? 3.0 + rngB() * 21.0 : CITY_CFG.shock2Start + 2.5 + rngB() * 24.0;
+            const dir = rngB() < 0.5 ? -1 : 1;
+            st.toppleZ = dir * (0.05 + rngB() * 0.11);
+            st.toppleX = (rngB() - 0.5) * 0.10;
+            st.shiftX = (rngB() - 0.5) * fp * 0.35;
+            st.shiftZ = (rngB() - 0.5) * fp * 0.35;
+            // Montículo de escombros (aparece al final del colapso)
+            const hr = 2.2 * CITY_CFG.htScale + rngB() * 1.5 * CITY_CFG.htScale;
+            const rGeo = new THREE.BoxGeometry(fp * 1.35, hr, fp * 1.35);
+            rGeo.translate(0, hr / 2, 0);
+            const rubble = new THREE.Mesh(rGeo,
+                new THREE.MeshStandardMaterial({ color: 0x5a5044, roughness: 1.0 }));
+            rubble.position.set(pos.x + st.shiftX * 0.6, 0, pos.z + st.shiftZ * 0.6);
+            rubble.rotation.y = rngB() * Math.PI;
+            rubble.scale.y = 0.001;
+            rubble.visible = false;
+            group.add(rubble);
+            st.rubble = rubble;
+        } else {
+            st.event = rngB() < 0.3 ? 1 : 2;
+            st.damageT = st.event === 1 ? 3.0 + rngB() * 20.0 : CITY_CFG.shock2Start + 1.5 + rngB() * 22.0;
+            const mag = (b.damage_level === 'severo') ? 0.026 + rngB() * 0.020 : 0.007 + rngB() * 0.009;
+            const dir = rngB() < 0.5 ? -1 : 1;
+            st.tiltZ = dir * mag;
+            st.tiltX = (rngB() - 0.5) * mag * 0.8;
+        }
+        mesh.userData.cityState = st;
+        citySim.buildings.push(st);
+    });
+
+    // --- Tejido urbano genérico (extrusiones de contexto, InstancedMesh) ---
+    const rngF = cityMulberry32(CITY_CFG.seed ^ 0x5F3759DF);
+    const fillerCount = 520;
+    const fGeo = new THREE.BoxGeometry(1, 1, 1);
+    fGeo.translate(0, 0.5, 0);
+    const fMat = new THREE.MeshStandardMaterial({ color: 0x3a4757, roughness: 0.95 });
+    const fillers = new THREE.InstancedMesh(fGeo, fMat, fillerCount);
+    const dummy = new THREE.Object3D();
+    const fColor = new THREE.Color();
+    for (let i = 0; i < fillerCount; i++) {
+        const anchor = vargas[Math.floor(rngF() * vargas.length)];
+        const aPos = toScene(anchor.lat, anchor.lng);
+        const ang = rngF() * Math.PI * 2;
+        const rad = 60 + rngF() * 420;
+        dummy.position.set(aPos.x + Math.cos(ang) * rad, 0, aPos.z + Math.sin(ang) * rad);
+        dummy.rotation.y = rngF() * Math.PI;
+        const fw = (10 + rngF() * 14) * CITY_CFG.fpScale;
+        const fh = (1.5 + rngF() * rngF() * 5.5) * 3.0 * CITY_CFG.htScale * 0.8;
+        dummy.scale.set(fw, fh, fw * (0.7 + rngF() * 0.6));
+        dummy.updateMatrix();
+        fillers.setMatrixAt(i, dummy.matrix);
+        fillers.setColorAt(i, fColor.setScalar(0.8 + rngF() * 0.45));
+    }
+    fillers.instanceMatrix.needsUpdate = true;
+    if (fillers.instanceColor) fillers.instanceColor.needsUpdate = true;
+    group.add(fillers);
+    citySim.fillers = fillers;
+
+    // --- Movimiento del terreno (doblete con semilla fija) ---
+    citySim.motion = buildCityGroundMotion();
+
+    // --- UI ---
+    wireCityControls();
+    applyCityState(0, 0, false);
+    updateCityUI();
+
+    if (loadingEl) loadingEl.classList.add('hidden');
+    window.addEventListener('resize', resizeCityRenderer);
+
+    // Picking de edificios del catálogo
+    renderer.domElement.addEventListener('pointerdown', (ev) => {
+        citySim.pointer.x = (ev.offsetX / renderer.domElement.clientWidth) * 2 - 1;
+        citySim.pointer.y = -(ev.offsetY / renderer.domElement.clientHeight) * 2 + 1;
+        citySim.raycaster.setFromCamera(citySim.pointer, citySim.camera);
+        const meshes = citySim.buildings.map(s => s.mesh);
+        const hits = citySim.raycaster.intersectObjects(meshes, false);
+        if (hits.length > 0) showCityBuildingCard(hits[0].object.userData.cityState);
+        else hideCityBuildingCard();
+    });
+
+    citySim.lastFrame = performance.now();
+    requestAnimationFrame(cityFrameLoop);
+}
+
+function wireCityControls() {
+    const btnPlay = document.getElementById('city-btn-play');
+    const btnRestart = document.getElementById('city-btn-restart');
+    const scrubber = document.getElementById('city-scrubber');
+
+    if (btnPlay) {
+        btnPlay.addEventListener('click', () => {
+            if (!citySim) return;
+            if (citySim.t >= CITY_CFG.duration) applyCityState(0, 0, false);
+            citySim.playing = !citySim.playing;
+            updateCityPlayButton();
+        });
+    }
+    if (btnRestart) {
+        btnRestart.addEventListener('click', () => {
+            if (!citySim) return;
+            citySim.playing = false;
+            clearCityDust();
+            applyCityState(0, 0, false);
+            updateCityPlayButton();
+            updateCityUI();
+        });
+    }
+    document.querySelectorAll('.city-speed-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.city-speed-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (citySim) citySim.speed = parseFloat(btn.dataset.speed) || 1;
+        });
+    });
+    if (scrubber) {
+        scrubber.addEventListener('input', () => {
+            if (!citySim) return;
+            citySim.playing = false;
+            clearCityDust();
+            applyCityState(parseFloat(scrubber.value) || 0, 0, false);
+            updateCityPlayButton();
+            updateCityUI();
+        });
+    }
+}
+
+function updateCityPlayButton() {
+    const btn = document.getElementById('city-btn-play');
+    if (!btn || !citySim) return;
+    const icon = btn.querySelector('i');
+    const label = btn.querySelector('span');
+    if (citySim.playing) {
+        if (icon) icon.className = 'fa-solid fa-pause';
+        if (label) label.textContent = 'Pausar';
+    } else {
+        if (icon) icon.className = 'fa-solid fa-play';
+        if (label) label.textContent = (citySim.t >= CITY_CFG.duration) ? 'Repetir' : 'Reproducir';
+    }
+}
+
+// Aplica el estado completo de la ciudad en el instante t (determinístico)
+function applyCityState(t, dtFrame, live) {
+    if (!citySim) return;
+    citySim.t = t;
+    const a_g = sampleCityAccel(t);
+
+    // Movimiento del terreno (amplificado a escala de ciudad)
+    const gx = a_g * CITY_CFG.dispExag * 0.6;
+    citySim.group.position.x = gx;
+    citySim.group.position.z = a_g * CITY_CFG.dispExag * 0.15;
+
+    let nCollapsed = 0, nDamaged = 0;
+    const amber = new THREE.Color(0xf59e0b);
+
+    citySim.buildings.forEach(st => {
+        const mesh = st.mesh;
+        const isCollapsedNow = (st.collapseT !== null && t >= st.collapseT);
+
+        if (isCollapsedNow) {
+            // --- Colapso por pancaking + vuelco ---
+            const p = Math.min(1, (t - st.collapseT) / CITY_CFG.collapseDur);
+            const eIn = p * p * p;
+            const eOut = 1 - Math.pow(1 - p, 3);
+            mesh.scale.y = Math.max(0.12, 1 - 0.88 * eIn);
+            mesh.rotation.z = st.toppleZ * eOut;
+            mesh.rotation.x = st.toppleX * eOut;
+            mesh.position.x = mesh.userData.x0 + st.shiftX * eIn;
+            mesh.position.z = mesh.userData.z0 + st.shiftZ * eIn;
+            mesh.material.emissive.setRGB(0.30 * (1 - p) * p * 4, 0.04, 0.03);
+            if (st.rubble) {
+                st.rubble.visible = p > 0.45;
+                st.rubble.scale.y = Math.max(0.001, Math.min(1, (p - 0.45) / 0.55));
+            }
+            if (live && !st.dustSpawned && p > 0.08) {
+                spawnCityDust(mesh.userData.x0, st.h * 0.55, mesh.userData.z0, st.N >= 7);
+                st.dustSpawned = true;
+            }
+            if (p >= 0.5) nCollapsed++;
+        } else {
+            // Restaurar estado intacto (necesario al rebobinar antes del colapso)
+            if (mesh.scale.y !== 1) mesh.scale.y = 1;
+            if (mesh.position.x !== mesh.userData.x0) {
+                mesh.position.x = mesh.userData.x0;
+                mesh.position.z = mesh.userData.z0;
+            }
+            mesh.material.emissive.setRGB(0, 0, 0);
+            if (st.rubble && st.rubble.visible) { st.rubble.visible = false; st.rubble.scale.y = 0.001; }
+
+            // --- Oscilación elástica (SDOF por edificio) + deriva permanente ---
+            if (live && dtFrame > 0) {
+                const w = 2.0 * Math.PI / st.T;
+                const zeta = 0.05;
+                const acc = -a_g * 9.81 - 2.0 * zeta * w * st.v - w * w * st.u;
+                st.v += acc * dtFrame;
+                st.u += st.v * dtFrame;
+            } else if (!live) {
+                st.u = 0; st.v = 0;
+            }
+            let tiltZ = 0, tiltX = 0, dmg = 0;
+            if (st.damageT !== null && t >= st.damageT) {
+                dmg = Math.min(1, (t - st.damageT) / 1.2);
+                const e = 1 - Math.pow(1 - dmg, 2);
+                tiltZ = st.tiltZ * e;
+                tiltX = st.tiltX * e;
+                mesh.material.color.copy(st.baseColor).lerp(amber, dmg * 0.55);
+                if (dmg >= 1) nDamaged++;
+            } else if (mesh.material.color !== st.baseColor) {
+                mesh.material.color.copy(st.baseColor);
+            }
+            const sway = Math.max(-0.16, Math.min(0.16, st.u * CITY_CFG.dispExag / st.h));
+            mesh.rotation.z = tiltZ + sway;
+            mesh.rotation.x = tiltX + sway * 0.35;
+        }
+    });
+
+    citySim.counts = {
+        collapsed: nCollapsed,
+        damaged: nDamaged,
+        standing: citySim.buildings.length - nCollapsed - nDamaged
+    };
+}
+
+function spawnCityDust(x, y, z, big) {
+    const rng = cityMulberry32((x * 131 + z * 71) | 0);
+    const n = big ? 80 : 50;
+    const positions = new Float32Array(n * 3);
+    const vels = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+        positions[i * 3] = x + (rng() - 0.5) * 40;
+        positions[i * 3 + 1] = y * (0.4 + rng() * 0.6);
+        positions[i * 3 + 2] = z + (rng() - 0.5) * 40;
+        const ang = rng() * Math.PI * 2;
+        const spd = 25 + rng() * 60;
+        vels[i * 3] = Math.cos(ang) * spd;
+        vels[i * 3 + 1] = 20 + rng() * 45;
+        vels[i * 3 + 2] = Math.sin(ang) * spd;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const mat = new THREE.PointsMaterial({
+        color: 0xb8a88e, size: big ? 60 : 42, sizeAttenuation: true,
+        transparent: true, opacity: 0.85, depthWrite: false
+    });
+    const points = new THREE.Points(geo, mat);
+    citySim.scene.add(points);
+    citySim.dust.push({ points, vels, life: 0, maxLife: 3.4 });
+}
+
+function updateCityDust(dtFrame) {
+    const dustArr = citySim.dust;
+    for (let d = dustArr.length - 1; d >= 0; d--) {
+        const p = dustArr[d];
+        p.life += dtFrame;
+        const posAttr = p.points.geometry.getAttribute('position');
+        for (let i = 0; i < posAttr.count; i++) {
+            posAttr.array[i * 3] += p.vels[i * 3] * dtFrame;
+            posAttr.array[i * 3 + 1] = Math.max(1, posAttr.array[i * 3 + 1] + p.vels[i * 3 + 1] * dtFrame);
+            posAttr.array[i * 3 + 2] += p.vels[i * 3 + 2] * dtFrame;
+            p.vels[i * 3 + 1] -= 9.8 * dtFrame * 12;
+            const drag = 1 - 0.9 * dtFrame;
+            p.vels[i * 3] *= drag; p.vels[i * 3 + 2] *= drag;
+        }
+        posAttr.needsUpdate = true;
+        p.points.material.opacity = Math.max(0, 0.85 * (1 - p.life / p.maxLife));
+        if (p.life >= p.maxLife) {
+            citySim.scene.remove(p.points);
+            p.points.geometry.dispose();
+            p.points.material.dispose();
+            dustArr.splice(d, 1);
+        }
+    }
+}
+
+function clearCityDust() {
+    if (!citySim) return;
+    citySim.dust.forEach(p => {
+        citySim.scene.remove(p.points);
+        p.points.geometry.dispose();
+        p.points.material.dispose();
+    });
+    citySim.dust = [];
+    citySim.buildings.forEach(st => { st.dustSpawned = false; });
+}
+
+function updateCityUI() {
+    if (!citySim) return;
+    const t = citySim.t;
+    const clock = document.getElementById('city-clock');
+    const cStand = document.getElementById('city-count-standing');
+    const cDmg = document.getElementById('city-count-damaged');
+    const cCol = document.getElementById('city-count-collapsed');
+    const pill = document.getElementById('city-phase-pill');
+    const scrubber = document.getElementById('city-scrubber');
+
+    if (clock) clock.textContent = t.toFixed(1) + ' s';
+    if (citySim.counts) {
+        if (cStand) cStand.textContent = citySim.counts.standing;
+        if (cDmg) cDmg.textContent = citySim.counts.damaged;
+        if (cCol) cCol.textContent = citySim.counts.collapsed;
+    }
+    if (scrubber && document.activeElement !== scrubber) scrubber.value = t;
+    if (pill) {
+        let txt = 'En calma', cls = 'city-phase-pill';
+        if (t >= CITY_CFG.duration) { txt = 'Final del registro'; cls += ' phase-end'; }
+        else if (t >= CITY_CFG.shock2Start) { txt = 'Evento 2 — 0.60g'; cls += ' phase-eq2'; }
+        else if (t >= 30) { txt = 'Interludio'; cls += ' phase-end'; }
+        else if (t > 0.5) { txt = 'Evento 1 — 0.40g'; cls += ' phase-eq1'; }
+        pill.textContent = txt;
+        pill.className = cls;
+    }
+}
+
+function cityFrameLoop(now) {
+    if (!citySim || !citySim.active) { if (citySim) citySim.loopRunning = false; return; }
+    citySim.loopRunning = true;
+    const dtFrame = Math.min(0.05, Math.max(0.001, (now - citySim.lastFrame) / 1000));
+    citySim.lastFrame = now;
+
+    if (citySim.playing) {
+        const t = citySim.t + dtFrame * citySim.speed;
+        if (t >= CITY_CFG.duration) {
+            applyCityState(CITY_CFG.duration, dtFrame, true);
+            citySim.playing = false;
+            updateCityPlayButton();
+        } else {
+            applyCityState(t, dtFrame, true);
+        }
+        updateCityUI();
+    } else {
+        // En pausa la ciudad sigue renderizándose (órbita), sin avanzar el reloj
+        applyCityState(citySim.t, 0, false);
+    }
+
+    updateCityDust(dtFrame);
+    citySim.controls.update();
+    citySim.renderer.render(citySim.scene, citySim.camera);
+    requestAnimationFrame(cityFrameLoop);
+}
+
+function resizeCityRenderer() {
+    if (!citySim || !citySim.renderer) return;
+    const container = document.getElementById('city-canvas-container');
+    if (!container) return;
+    const w = container.clientWidth, h = container.clientHeight;
+    if (w < 10 || h < 10) return;
+    citySim.camera.aspect = w / h;
+    citySim.camera.updateProjectionMatrix();
+    citySim.renderer.setSize(w, h);
+}
+
+function showCityBuildingCard(st) {
+    const card = document.getElementById('city-info-card');
+    if (!card || !st) return;
+    const b = st.b;
+    const isCol = st.status === 'collapsed';
+    const statusTxt = isCol ? 'Colapsado' : 'Dañado (en pie)';
+    const dmgTxt = { total: 'Total', severo: 'Severo', parcial: 'Parcial' }[b.damage_level] || b.damage_level || '—';
+    const pMC = CITY_COLLAPSE_MC[b.floors] !== undefined ? CITY_COLLAPSE_MC[b.floors].toFixed(1) + '%' : 'N/D';
+    const eventTxt = isCol
+        ? `Evento ${st.event} (t &asymp; ${st.collapseT.toFixed(0)} s)`
+        : `Evento ${st.event} (t &asymp; ${st.damageT.toFixed(0)} s)`;
+    let photo = null;
+    if (Array.isArray(b.photo) && b.photo.length) photo = b.photo[0];
+    else if (typeof b.photo === 'string' && b.photo.startsWith('http')) photo = b.photo;
+
+    card.innerHTML = `
+        <button class="city-card-close" title="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <h4><i class="fa-solid fa-building"></i> ${b.name || 'Sin nombre'}</h4>
+        <div class="city-card-zone">${b.zone || ''}</div>
+        <div class="city-card-row"><span>Pisos</span><b>${b.floors || 'N/D'}</b></div>
+        <div class="city-card-row"><span>Estado real</span><b class="city-card-status ${isCol ? 'collapsed' : 'damaged'}">${statusTxt}</b></div>
+        <div class="city-card-row"><span>Nivel de daño</span><b>${dmgTxt}</b></div>
+        <div class="city-card-row"><span>${isCol ? 'Colapsa en' : 'Se daña en'}</span><b>${eventTxt}</b></div>
+        <div class="city-card-row"><span>P(colapso) MC 2019</span><b>${pMC}</b></div>
+        <div style="margin-top: 6px; font-size: 10.5px; opacity: 0.75;">${b.address || ''}</div>
+        ${photo ? `<img src="${photo}" alt="Foto de ${b.name}" loading="lazy" onerror="this.style.display='none'">` : ''}
+    `;
+    card.style.display = 'block';
+    const closeBtn = card.querySelector('.city-card-close');
+    if (closeBtn) closeBtn.addEventListener('click', hideCityBuildingCard);
+}
+
+function hideCityBuildingCard() {
+    const card = document.getElementById('city-info-card');
+    if (card) card.style.display = 'none';
+}
 
 async function initDamageMap() {
     const container = document.getElementById('damage-map-container');
