@@ -33,8 +33,8 @@ let damageMapInstance = null; // Leaflet map for damage visualization
 // Escena de Three.js
 let scene, camera, renderer, controls;
 let buildings3D = {
-    b2001: { group: null, floors: [], columns: [] },
-    b2019: { group: null, floors: [], columns: [] }
+    b2001: { group: null, floors: [], columns: [], springs: [], springsGroup: null },
+    b2019: { group: null, floors: [], columns: [], springs: [], springsGroup: null }
 };
 let groundPlane;
 let gridHelper;
@@ -52,6 +52,24 @@ let ambientMotesData = [];
 let backdropPlane = null;
 let accentLight2001 = null;
 let accentLight2019 = null;
+
+// Terreno deformable con propagación dinámica de ondas sísmicas
+let terrainGroup = null;
+let terrainSolid = null;
+let terrainWire = null;
+let terrainBaseXZ = null; // posiciones (x,z) de reposo de cada vértice
+let terrainAmp = 0;
+let terrainWaveTime = 0;
+let lastGroundAccel = 0;
+let lastFrameTs = 0;
+const TERRAIN_EPICENTER = { x: -34, z: -30 };
+
+// Visualizador interactivo de modos de vibración (modo en calma)
+let modeViewer = { active: false, kind: 'X', mode: 1 };
+let modeViewerClock = 0;
+
+// Resortes helicoidales de fundación (representación SSI)
+const SSI_SPRING_HEIGHT = 1.1;
 
 // Estados de Evacuación
 let evacuation2001 = { meshes: [], currentFloor: 0, startTime: null, escaped: false, trapped: false };
@@ -169,6 +187,16 @@ function initUI() {
             btn.classList.add("active");
             const tabId = btn.getAttribute("data-tab");
             document.getElementById(tabId).classList.add("active");
+
+            // Asegurar que la pestaña activa sea visible en la barra (scroll horizontal)
+            btn.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+
+            // La franja de métricas sísmicas solo aplica a pestañas de simulación
+            const metricsBoard = document.querySelector(".metrics-board");
+            if (metricsBoard) {
+                const hideMetrics = (tabId === "tab-damage-map" || tabId === "tab-boletin");
+                metricsBoard.classList.toggle("metrics-hidden", hideMetrics);
+            }
 
             // Forzar redibujado de charts en tabs ocultos
             if (tabId === "tab-spectra" && spectraChartInstance) {
@@ -378,6 +406,50 @@ function initUI() {
     document.getElementById("btn-run").addEventListener("click", toggleSimulation);
     document.getElementById("btn-pause").addEventListener("click", pauseSimulation);
     document.getElementById("btn-reset").addEventListener("click", resetSimulation);
+
+    // --- Visualizador de modos de vibración ---
+    const btnModeViewer = document.getElementById("btn-mode-viewer");
+    if (btnModeViewer) {
+        btnModeViewer.addEventListener("click", () => setModeViewerActive(!modeViewer.active));
+    }
+    const closeModeViewer = document.getElementById("close-mode-viewer");
+    if (closeModeViewer) {
+        closeModeViewer.addEventListener("click", () => setModeViewerActive(false));
+    }
+    const mobModes = document.getElementById("mobile-btn-modes");
+    if (mobModes) {
+        mobModes.addEventListener("click", () => setModeViewerActive(!modeViewer.active));
+    }
+    ["x", "y", "t"].forEach(k => {
+        const b = document.getElementById(`mv-kind-${k}`);
+        if (b) b.addEventListener("click", () => {
+            modeViewer.kind = k.toUpperCase();
+            ["x", "y", "t"].forEach(kk => {
+                const bb = document.getElementById(`mv-kind-${kk}`);
+                if (bb) bb.classList.toggle("active", kk === k);
+            });
+            updateModeViewerInfo();
+        });
+    });
+    [1, 2, 3].forEach(n => {
+        const b = document.getElementById(`mv-mode-${n}`);
+        if (b) b.addEventListener("click", () => {
+            modeViewer.mode = n;
+            [1, 2, 3].forEach(nn => {
+                const bb = document.getElementById(`mv-mode-${nn}`);
+                if (bb) bb.classList.toggle("active", nn === n);
+            });
+            updateModeViewerInfo();
+        });
+    });
+
+    // Resortes SSI: reconstruir la escena al alternar (solo en calma)
+    const ssiToggle = document.getElementById("show-ssi-springs");
+    if (ssiToggle) {
+        ssiToggle.addEventListener("change", () => {
+            if (!isPlaying) rebuild3DStructures();
+        });
+    }
 
     // Preset Vargas
     const btnPresetVargas = document.getElementById("btn-preset-vargas");
@@ -1010,6 +1082,15 @@ class BuildingModel {
             this.scwbRatio = (sumMnViga > 0) ? (sumMnCol / sumMnViga) : Infinity;
             this.strongColumnWeakBeam = (this.scwbRatio >= 1.2);
 
+            // Datos para la deducción paso a paso de k en la memoria de cálculo
+            this.stiffnessDerivation = {
+                mode: 'sections',
+                Ec_col, n_col,
+                Ic_x, Ic_gross_x, Ic_y, Ic_gross_y,
+                k_col_fixed_x, k_col_fixed_y,
+                Icr, kappa_x, kappa_y, eta_x, eta_y
+            };
+
         } else {
             const phi_Sx = (60.0 + sX_val) / (60.0 + 4.0 * sX_val);
             const phi_Sy = (60.0 + sY_val) / (60.0 + 4.0 * sY_val);
@@ -1029,6 +1110,13 @@ class BuildingModel {
 
             this.T1_x = targetT1 * Math.sqrt(massRatio / stiffnessRatio_x);
             this.T1_y = targetT1 * Math.sqrt(massRatio / stiffnessRatio_y);
+
+            // Datos para la deducción paso a paso de k en la memoria de cálculo
+            this.stiffnessDerivation = {
+                mode: 'period',
+                targetT1, k_ref, phi_Sx, phi_Sy, phi_ref,
+                stiffnessScale_x, stiffnessScale_y, colFactor: this.numCols / 4.0
+            };
         }
 
         // --- CÁLCULO DE INTERACCIÓN SUELO-ESTRUCTURA (ISE) ---
@@ -3276,62 +3364,8 @@ function generateSpectraAndEarthquake() {
             </div>
         `;
 
-        // --- REPORTE DE INTERACCIÓN SUELO-ESTRUCTURA (ISE) ---
-        let iseReportHTML = "";
-        const iseEnable = document.getElementById("ise-enable")?.checked;
-        if (iseEnable && eq2001 && eq2001.ssiX && eq2019 && eq2019.ssiX) {
-            const sX_ssi = eq2001.ssiX;
-            const sY_ssi = eq2001.ssiY;
-
-            iseReportHTML = `
-                <div style="margin-top: 24px; margin-bottom: 24px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
-                    <h4 style="color: #4cc9f0; margin-bottom: 10px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
-                        <i class="fa-solid fa-mountain"></i> Interacción Suelo-Estructura (ISE) — Elasticidad Dinámica (Gazetas)
-                    </h4>
-                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
-                        Cálculo de rigideces dinámicas equivalentes de la fundación y amortiguamiento por radiación del suelo. 
-                        Cimentación: <strong>${sX_ssi.foundType === 'mat' ? 'Losa Continua' : 'Zapatas Aisladas'}</strong> |
-                        Vel. Onda Corte: <strong>${sX_ssi.vs} m/s</strong> |
-                        Desplante Df: <strong>${sX_ssi.df.toFixed(2)} m</strong> |
-                        G Suelo: <strong>${Math.round(sX_ssi.G).toLocaleString()} kgf/m²</strong>
-                    </p>
-                    <table class="calc-table">
-                        <thead>
-                            <tr>
-                                <th>Eje Analizado</th>
-                                <th>Dimensiones Base (B × L)</th>
-                                <th>Rigidez Horizontal (Kx)</th>
-                                <th>Rigidez Cabeceo (Kθ)</th>
-                                <th>Rigidez Estructura (K_struc)</th>
-                                <th>Coeficiente λ_ISE</th>
-                                <th>Elongación T_flex / T_rigid</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="calc-param-name"><strong>Eje X (Longitudinal)</strong></td>
-                                <td class="calc-value">${sX_ssi.B.toFixed(1)}m × ${sX_ssi.L.toFixed(1)}m</td>
-                                <td class="calc-value">${Math.round(sX_ssi.Kx).toLocaleString()} kgf/m</td>
-                                <td class="calc-value">${Math.round(sX_ssi.Ktheta).toLocaleString()} kgf·m/rad</td>
-                                <td class="calc-value">${Math.round(sX_ssi.K_struc).toLocaleString()} kgf/m</td>
-                                <td class="calc-value" style="font-weight: bold; color: #4cc9f0;">${sX_ssi.lambda.toFixed(3)}</td>
-                                <td class="calc-value" style="color: #ffb703;">${(1.0 / Math.sqrt(sX_ssi.lambda)).toFixed(2)}x</td>
-                            </tr>
-                            <tr>
-                                <td class="calc-param-name"><strong>Eje Y (Transversal)</strong></td>
-                                <td class="calc-value">${sY_ssi.B.toFixed(1)}m × ${sY_ssi.L.toFixed(1)}m</td>
-                                <td class="calc-value">${Math.round(sY_ssi.Kx).toLocaleString()} kgf/m</td>
-                                <td class="calc-value">${Math.round(sY_ssi.Ktheta).toLocaleString()} kgf·m/rad</td>
-                                <td class="calc-value">${Math.round(sY_ssi.K_struc).toLocaleString()} kgf/m</td>
-                                <td class="calc-value" style="font-weight: bold; color: #4cc9f0;">${sY_ssi.lambda.toFixed(3)}</td>
-                                <td class="calc-value" style="color: #ffb703;">${(1.0 / Math.sqrt(sY_ssi.lambda)).toFixed(2)}x</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
-        reportHTML += iseReportHTML;
+        // (La sección de Interacción Suelo-Estructura y resortes SSI se genera
+        //  más abajo, de forma independiente al modo de secciones)
 
         // --- VERIFICACIÓN Y DISEÑO DE VIGAS POR TEORÍA DE ROTURA ---
         const nBaysX = numColsX - 1;
@@ -3594,6 +3628,311 @@ function generateSpectraAndEarthquake() {
         `;
     }
 
+
+    // --- ENSAMBLAJE MATRICIAL DE RIGIDEZ LATERAL (MDOF EDIFICIO DE CORTE) ---
+    // Matriz tridiagonal K: K[i][i] = k_i + k_{i+1}, K[i][i+1] = K[i+1][i] = -k_{i+1}, K[N][N] = k_N
+    {
+        const KGF = 9.80665; // conversión N → kgf (consistente con el resto de la memoria)
+        const kx01 = new Array(N).fill(eq2001.k_init_x / KGF);
+        const ky01 = new Array(N).fill(eq2001.k_init_y / KGF);
+        const kx19 = new Array(N).fill(eq2019.k_init_x / KGF);
+        const ky19 = new Array(N).fill(eq2019.k_init_y / KGF);
+
+        // Tabla de rigideces de entrepiso (vector k)
+        let kVecRows = '';
+        for (let i = 0; i < N; i++) {
+            kVecRows += `
+                <tr>
+                    <td class="calc-param-name">Piso ${i + 1}${i === 0 ? ' (entrepiso basal)' : ''}</td>
+                    <td class="calc-symbol">k<sub>${i + 1}</sub></td>
+                    <td class="calc-value">${Math.round(kx01[i]).toLocaleString()}</td>
+                    <td class="calc-value">${Math.round(ky01[i]).toLocaleString()}</td>
+                    <td class="calc-value">${Math.round(kx19[i]).toLocaleString()}</td>
+                    <td class="calc-value">${Math.round(ky19[i]).toLocaleString()}</td>
+                    <td class="calc-unit">kgf/m</td>
+                </tr>`;
+        }
+
+        // Render compacto de la matriz ensamblada con factor de escala
+        const matrixHTML = (kArr, label, accent) => {
+            const n = kArr.length;
+            let maxV = 0;
+            for (let i = 0; i < n; i++) maxV = Math.max(maxV, kArr[i] + (i < n - 1 ? kArr[i + 1] : 0));
+            const expo = Math.floor(Math.log10(maxV));
+            const scale = Math.pow(10, expo);
+            let rows = '';
+            for (let i = 0; i < n; i++) {
+                let cells = '';
+                for (let j = 0; j < n; j++) {
+                    let v = 0;
+                    if (i === j) v = kArr[i] + (i < n - 1 ? kArr[i + 1] : 0);
+                    else if (j === i + 1 || j === i - 1) v = -kArr[Math.max(i, j)];
+                    const st = (v === 0)
+                        ? 'color: rgba(255,255,255,0.16);'
+                        : (i === j ? 'color: #fff; font-weight: 700;' : `color: ${accent};`);
+                    cells += `<td style="padding: 2px 6px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; border: 1px solid rgba(255,255,255,0.06); ${st}">${(v / scale).toFixed(2)}</td>`;
+                }
+                rows += `<tr>${cells}</tr>`;
+            }
+            return `
+                <div style="flex: 1; min-width: 240px;">
+                    <p style="font-size: 11px; font-weight: 700; color: ${accent}; margin-bottom: 6px;">${label}</p>
+                    <table style="border-collapse: collapse; margin: 0 auto;">${rows}</table>
+                    <p style="font-size: 10px; color: var(--text-muted); margin-top: 6px; text-align: center;">[K] en &times;10<sup>${expo}</sup> kgf/m</p>
+                </div>`;
+        };
+
+        // Períodos modales exactos del edificio de corte uniforme (misma fórmula del modelo)
+        const modeT = (k, m, n) => {
+            const w = 2.0 * Math.sqrt(k / m) * Math.sin((2 * n - 1) * Math.PI / (4 * N + 2));
+            return (2 * Math.PI) / w;
+        };
+        let modalRows = '';
+        for (let n = 1; n <= 3; n++) {
+            modalRows += `
+                <tr>
+                    <td class="calc-param-name">Modo ${n}${n === 1 ? ' (fundamental)' : ''}</td>
+                    <td class="calc-value">${modeT(eq2001.k_init_x, eq2001.m, n).toFixed(3)} / ${(1 / modeT(eq2001.k_init_x, eq2001.m, n)).toFixed(2)}</td>
+                    <td class="calc-value">${modeT(eq2001.k_init_y, eq2001.m, n).toFixed(3)} / ${(1 / modeT(eq2001.k_init_y, eq2001.m, n)).toFixed(2)}</td>
+                    <td class="calc-value">${modeT(eq2019.k_init_x, eq2019.m, n).toFixed(3)} / ${(1 / modeT(eq2019.k_init_x, eq2019.m, n)).toFixed(2)}</td>
+                    <td class="calc-value">${modeT(eq2019.k_init_y, eq2019.m, n).toFixed(3)} / ${(1 / modeT(eq2019.k_init_y, eq2019.m, n)).toFixed(2)}</td>
+                    <td class="calc-unit">s / Hz</td>
+                </tr>`;
+        }
+
+        // --- Deducción paso a paso de la rigidez de entrepiso k (valores exactos del modelo) ---
+        const stepRow = (label, expr, vx, vy, unit, highlight) => `
+            <tr${highlight ? ' style="background: rgba(76, 201, 240, 0.06);"' : ''}>
+                <td class="calc-param-name">${label}</td>
+                <td class="calc-symbol">${expr}</td>
+                <td class="calc-value">${vx}</td>
+                <td class="calc-value">${vy}</td>
+                <td class="calc-unit">${unit}</td>
+            </tr>`;
+        const sd = eq2001.stiffnessDerivation;
+        const lamX = (eq2001.ssiX && typeof eq2001.ssiX.lambda === 'number') ? eq2001.ssiX.lambda : 1.0;
+        const lamY = (eq2001.ssiY && typeof eq2001.ssiY.lambda === 'number') ? eq2001.ssiY.lambda : 1.0;
+        const kRigX = eq2001.k_init_x / lamX, kRigY = eq2001.k_init_y / lamY; // rigidez base empotrada (pre-ISE)
+        const fK = v => Math.round(v / KGF).toLocaleString();   // N/m → kgf/m
+        const fI = v => Math.round(v * 1e8).toLocaleString();   // m⁴ → cm⁴
+        let kStepsRows = '';
+        let kStepsIntro = '';
+        let kInertiaNote = '';
+        if (sd && sd.mode === 'sections') {
+            kStepsIntro = `La rigidez de entrepiso se deduce <strong>desde las secciones físicas configuradas</strong> (valores idénticos para ambas normas, que comparten geometría):`;
+            kStepsRows =
+                stepRow('1. Módulo de elasticidad del concreto', 'E<sub>c</sub> = 15100&radic;f\'c',
+                    Math.round(sd.Ec_col / 98066.5).toLocaleString(), Math.round(sd.Ec_col / 98066.5).toLocaleString(), 'kgf/cm²') +
+                stepRow('2. Relación modular acero/concreto', 'n = E<sub>s</sub> / E<sub>c</sub>',
+                    sd.n_col.toFixed(2), sd.n_col.toFixed(2), '—') +
+                stepRow('3. Inercia transformada de la columna', 'I<sub>c</sub> = b·h&sup3;/12 + (n&minus;1)·A<sub>s</sub>·(h/2&minus;d\')&sup2;',
+                    fI(sd.Ic_x), fI(sd.Ic_y), 'cm⁴') +
+                stepRow('4. Rigidez de una columna biempotrada', 'k<sub>col</sub> = 12·E<sub>c</sub>·I<sub>c</sub> / h&sup3;',
+                    fK(sd.k_col_fixed_x), fK(sd.k_col_fixed_y), 'kgf/m') +
+                stepRow('5. Inercia fisurada de la viga', 'I<sub>cr</sub> (eje neutro elástico, doble armadura)',
+                    fI(sd.Icr), fI(sd.Icr), 'cm⁴') +
+                stepRow('6. Relación de rigideces viga&ndash;columna', '&kappa; = (E·I<sub>cr</sub>·h) / (2·E·I<sub>c</sub>·L)',
+                    sd.kappa_x.toFixed(4), sd.kappa_y.toFixed(4), '—') +
+                stepRow('7. Corrección por vigas flexibles (tipo Muto)', '&eta; = (12&kappa; + 1) / (12&kappa; + 4)',
+                    sd.eta_x.toFixed(4), sd.eta_y.toFixed(4), '—') +
+                stepRow('8. Entrepiso con base empotrada', 'k<sub>ríg</sub> = N<sub>col</sub> &times; k<sub>col</sub> &times; &eta;',
+                    fK(kRigX), fK(kRigY), 'kgf/m') +
+                stepRow('9. Coeficiente de reducción ISE', '&lambda; = [1 + K<sub>str</sub>/K<sub>x</sub> + K<sub>str</sub>·h*&sup2;/K<sub>&theta;</sub>]<sup>&minus;1</sup>',
+                    lamX.toFixed(3), lamY.toFixed(3), '—') +
+                stepRow('10. Rigidez de entrepiso del modelo', 'k = &lambda;<sub>ISE</sub> &times; k<sub>ríg</sub>',
+                    fK(eq2001.k_init_x), fK(eq2001.k_init_y), 'kgf/m', true);
+            kInertiaNote = `
+                <p style="font-size: 11px; color: var(--text-muted); margin: 0 0 18px; line-height: 1.6; border-left: 3px solid var(--color-2019); padding-left: 10px;">
+                    <strong style="color: var(--color-2019);">Nota sobre la inercia de columnas:</strong>
+                    se emplea la <strong>inercia transformada sin fisurar</strong> (I<sub>g</sub> + aporte del acero longitudinal).
+                    COVENIN 1756 admite usar <strong>inercia efectiva fisurada</strong> para el análisis (&asymp;0.5&middot;I<sub>g</sub> en columnas;
+                    las vigas aquí ya usan I<sub>cr</sub> fisurada en el paso 5). Con inercia fisurada la rigidez sería &asymp;50&nbsp;% menor
+                    y T<sub>1</sub> &asymp;40&nbsp;% mayor; los valores tabulados representan el <strong>límite elástico superior de rigidez</strong>
+                    (período mínimo), criterio conservador para fuerzas pero no necesariamente para derivas.
+                </p>`;
+        } else if (sd && sd.mode === 'period') {
+            kStepsIntro = `La rigidez de entrepiso se <strong>calibra desde el período fundamental objetivo</strong> del edificio de corte uniforme (valores idénticos para ambas normas):`;
+            kStepsRows =
+                stepRow('1. Período fundamental objetivo', 'T<sub>1,obj</sub>',
+                    sd.targetT1.toFixed(2), sd.targetT1.toFixed(2), 's') +
+                stepRow('2. Rigidez de referencia (edificio base)', 'k<sub>ref</sub> = m·(&pi; / (T<sub>1</sub>·sen(&pi;/(4N+2))))&sup2;',
+                    fK(sd.k_ref), fK(sd.k_ref), 'kgf/m') +
+                stepRow('3. Factor por número de columnas', 'N<sub>col</sub> / 4',
+                    sd.colFactor.toFixed(2), sd.colFactor.toFixed(2), '—') +
+                stepRow('4. Factor por luz de pórtico', '&phi;(s)/&phi;<sub>ref</sub>, &phi;(s) = (60+s)/(60+4s)',
+                    sd.stiffnessScale_x.toFixed(3), sd.stiffnessScale_y.toFixed(3), '—') +
+                stepRow('5. Entrepiso con base empotrada', 'k<sub>ríg</sub> = k<sub>ref</sub> &times; (N<sub>col</sub>/4) &times; &phi;/&phi;<sub>ref</sub>',
+                    fK(kRigX), fK(kRigY), 'kgf/m') +
+                stepRow('6. Coeficiente de reducción ISE', '&lambda; = [1 + K<sub>str</sub>/K<sub>x</sub> + K<sub>str</sub>·h*&sup2;/K<sub>&theta;</sub>]<sup>&minus;1</sup>',
+                    lamX.toFixed(3), lamY.toFixed(3), '—') +
+                stepRow('7. Rigidez de entrepiso del modelo', 'k = &lambda;<sub>ISE</sub> &times; k<sub>ríg</sub>',
+                    fK(eq2001.k_init_x), fK(eq2001.k_init_y), 'kgf/m', true);
+        }
+        const kStepsHTML = kStepsRows ? `
+                <p style="font-size: 12px; color: var(--text-muted); margin: 16px 0 8px; line-height: 1.5;">
+                    <strong>Deducción del valor exacto de k:</strong> ${kStepsIntro}
+                </p>
+                <table class="calc-table" style="margin-bottom: 14px;">
+                    <thead>
+                        <tr>
+                            <th>Paso de la Deducción</th>
+                            <th>Expresión</th>
+                            <th>Eje X</th>
+                            <th>Eje Y</th>
+                            <th>Unidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>${kStepsRows}</tbody>
+                </table>
+                ${kInertiaNote}` : '';
+
+        reportHTML += `
+            <div style="margin-top: 24px; margin-bottom: 24px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
+                <h4 style="color: var(--color-2001); margin-bottom: 10px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <i class="fa-solid fa-table-cells"></i> Ensamblaje Matricial de Rigidez Lateral (Modelo MDOF)
+                </h4>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.6;">
+                    El edificio se condensa como un <strong>modelo de corte de ${N} GDL</strong> (un desplazamiento lateral por piso).
+                    Con el vector de rigideces de entrepiso <strong>{k}</strong>, la matriz de rigidez global se ensambla por contribución de resortes en serie:
+                    <strong>K<sub>i,i</sub> = k<sub>i</sub> + k<sub>i+1</sub></strong>, <strong>K<sub>i,i+1</sub> = K<sub>i+1,i</sub> = &minus;k<sub>i+1</sub></strong> y <strong>K<sub>N,N</sub> = k<sub>N</sub></strong> (empotramiento en la base).
+                    La matriz de masas es diagonal: <strong>M<sub>i,i</sub> = m</strong> (${(eq2001.m / 1000).toFixed(1)} ton por piso).
+                    El resolvedor integra <strong>M&uuml; + C&uacute; + f<sub>s</sub>(u) = &minus;M&middot;1&middot;a<sub>g</sub>(t)</strong> con Newmark-&beta; y amortiguamiento de Rayleigh C = a<sub>M</sub>M + a<sub>K</sub>K por dirección.
+                </p>
+                ${kStepsHTML}
+                <table class="calc-table" style="margin-bottom: 20px;">
+                    <thead>
+                        <tr>
+                            <th>Entrepiso</th>
+                            <th>Símbolo</th>
+                            <th>2001 &mdash; Eje X</th>
+                            <th>2001 &mdash; Eje Y</th>
+                            <th>2019 &mdash; Eje X</th>
+                            <th>2019 &mdash; Eje Y</th>
+                            <th>Unidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>${kVecRows}</tbody>
+                </table>
+                <div style="display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-around; background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 16px;">
+                    ${matrixHTML(kx01, '[K] COVENIN 2001 — Eje X', 'var(--color-2001)')}
+                    ${matrixHTML(kx19, '[K] COVENIN 2019 — Eje X', 'var(--color-2019)')}
+                </div>
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 10px; line-height: 1.5;">
+                    <strong>Nota:</strong> el ensamblaje mostrado corresponde a la dirección X (la que integra el resolvedor paso a paso);
+                    para la dirección Y el modelo distingue la respuesta mediante los coeficientes de amortiguamiento de Rayleigh (a<sub>M,y</sub>, a<sub>K,y</sub>)
+                    y las rigideces k<sub>i,y</sub> tabuladas arriba. Valores elásticos iniciales (antes de la degradación histerética no-lineal).
+                </p>
+                <p style="font-size: 12px; color: var(--text-muted); margin: 14px 0 8px; line-height: 1.5;">
+                    <strong>Verificación modal (autovalores de K&phi; = &omega;&sup2;M&phi;):</strong> para rigidez uniforme la solución cerrada es
+                    &omega;<sub>n</sub> = 2&radic;(k/m)&middot;sen((2n&minus;1)&pi;/(4N+2)). Son las mismas frecuencias que oscila el
+                    <strong>visualizador de modos de vibración</strong> de la Vista 3D.
+                </p>
+                <table class="calc-table">
+                    <thead>
+                        <tr>
+                            <th>Modo</th>
+                            <th>2001 X &nbsp;T / f</th>
+                            <th>2001 Y &nbsp;T / f</th>
+                            <th>2019 X &nbsp;T / f</th>
+                            <th>2019 Y &nbsp;T / f</th>
+                            <th>Unidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>${modalRows}</tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // --- RESORTES DE FUNDACIÓN / INTERACCIÓN SUELO-ESTRUCTURA (ISE) ---
+    {
+        const iseOn = document.getElementById("ise-enable")?.checked;
+        if (iseOn && eq2001.ssiX && eq2019.ssiX && typeof eq2001.ssiX.lambda === 'number') {
+            const nCols = numColsX * numColsY;
+            const rowSSI = (label, symbol, v01x, v01y, v19x, v19y, unit, highlight) => `
+                <tr${highlight ? ' style="background: rgba(76, 201, 240, 0.06);"' : ''}>
+                    <td class="calc-param-name">${label}</td>
+                    <td class="calc-symbol">${symbol}</td>
+                    <td class="calc-value">${v01x}</td>
+                    <td class="calc-value">${v01y}</td>
+                    <td class="calc-value">${v19x}</td>
+                    <td class="calc-value">${v19y}</td>
+                    <td class="calc-unit">${unit}</td>
+                </tr>`;
+            const fmtK = v => Math.round(v).toLocaleString();
+            const zetaEff = (eq, dir) => {
+                // Recuperar ζ efectivo desde aM de Rayleigh: aM = ζ·(2·w1·w2)/(w1+w2)
+                const k = (dir === 'Y') ? eq.k_init_y : eq.k_init_x;
+                const aM = (dir === 'Y') ? eq.aM_y : eq.aM_x;
+                const w1 = 2.0 * Math.sqrt(k / eq.m) * Math.sin(Math.PI / (4 * N + 2));
+                const w2 = 2.0 * Math.sqrt(k / eq.m) * Math.sin(3.0 * Math.PI / (4 * N + 2));
+                return aM * (w1 + w2) / (2.0 * w1 * w2) * 100;
+            };
+            const s01x = eq2001.ssiX, s01y = eq2001.ssiY, s19x = eq2019.ssiX, s19y = eq2019.ssiY;
+
+            reportHTML += `
+                <div style="margin-top: 24px; margin-bottom: 24px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
+                    <h4 style="color: #4cc9f0; margin-bottom: 10px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fa-solid fa-mountain"></i> Resortes de Fundación (ISE) — Elasticidad Dinámica del Suelo (Gazetas)
+                    </h4>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.6;">
+                        El suelo bajo la cimentación se modela como <strong>resortes dinámicos equivalentes</strong>: rigidez horizontal K<sub>x</sub> y de cabeceo K<sub>&theta;</sub>
+                        según las fórmulas de Gazetas para cimentaciones superficiales/emportadas. El factor <strong>&lambda;<sub>ISE</sub></strong> reduce la rigidez lateral del modelo
+                        (alargando el período) y el suelo aporta <strong>amortiguamiento por radiación</strong>.
+                        Cimentación: <strong>${s01x.foundType === 'mat' ? 'Losa Continua' : 'Zapatas Aisladas'}</strong> |
+                        v<sub>s</sub>: <strong>${s01x.vs} m/s</strong> |
+                        D<sub>f</sub>: <strong>${s01x.df.toFixed(2)} m</strong> |
+                        G<sub>suelo</sub>: <strong>${fmtK(s01x.G)} kgf/m²</strong> |
+                        &nu;: <strong>${s01x.poisson.toFixed(2)}</strong>
+                    </p>
+                    <table class="calc-table">
+                        <thead>
+                            <tr>
+                                <th>Parámetro del Resorte de Suelo</th>
+                                <th>Símbolo</th>
+                                <th>2001 X</th>
+                                <th>2001 Y</th>
+                                <th>2019 X</th>
+                                <th>2019 Y</th>
+                                <th>Unidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowSSI('Rigidez Horizontal del Suelo', 'K<sub>x</sub>', fmtK(s01x.Kx), fmtK(s01y.Kx), fmtK(s19x.Kx), fmtK(s19y.Kx), 'kgf/m')}
+                            ${rowSSI('Rigidez de Cabeceo (Rocking)', 'K<sub>&theta;</sub>', fmtK(s01x.Ktheta), fmtK(s01y.Ktheta), fmtK(s19x.Ktheta), fmtK(s19y.Ktheta), 'kgf·m/rad')}
+                            ${rowSSI('Rigidez Estructura Equivalente', 'K<sub>struc</sub>', fmtK(s01x.K_struc), fmtK(s01y.K_struc), fmtK(s19x.K_struc), fmtK(s19y.K_struc), 'kgf/m')}
+                            ${rowSSI('Rigidez por Resorte de Columna (K<sub>x</sub>/N<sub>col</sub>)', 'k<sub>res</sub>', fmtK(s01x.Kx / nCols), fmtK(s01y.Kx / nCols), fmtK(s19x.Kx / nCols), fmtK(s19y.Kx / nCols), 'kgf/m')}
+                            ${rowSSI('Coeficiente de Reducción ISE', '&lambda;<sub>ISE</sub>', s01x.lambda.toFixed(3), s01y.lambda.toFixed(3), s19x.lambda.toFixed(3), s19y.lambda.toFixed(3), '-', true)}
+                            ${rowSSI('Período Base Empotrada', 'T<sub>rígido</sub>', (eq2001.T1_x * Math.sqrt(s01x.lambda)).toFixed(3), (eq2001.T1_y * Math.sqrt(s01y.lambda)).toFixed(3), (eq2019.T1_x * Math.sqrt(s19x.lambda)).toFixed(3), (eq2019.T1_y * Math.sqrt(s19y.lambda)).toFixed(3), 's')}
+                            ${rowSSI('Período Flexible (con ISE)', 'T<sub>flex</sub>', eq2001.T1_x.toFixed(3), eq2001.T1_y.toFixed(3), eq2019.T1_x.toFixed(3), eq2019.T1_y.toFixed(3), 's')}
+                            ${rowSSI('Amortiguamiento Efectivo (rad. + histerético)', '&zeta;<sub>eff</sub>', zetaEff(eq2001, 'X').toFixed(1) + '%', zetaEff(eq2001, 'Y').toFixed(1) + '%', zetaEff(eq2019, 'X').toFixed(1) + '%', zetaEff(eq2019, 'Y').toFixed(1) + '%', '-')}
+                        </tbody>
+                    </table>
+                    <p style="font-size: 11.5px; color: var(--text-muted); margin-top: 12px; line-height: 1.6;">
+                        <strong style="color: #4cc9f0;">Representación 3D:</strong> cada columna descansa sobre un resorte helicoidal cuya deformación visible escala con
+                        <strong>1.15&middot;(2 &minus; &lambda;<sub>ISE</sub>)</strong> (suelos más flexibles se deforman más). Código de colores bajo balanceo:
+                        <span style="color: #34d399; font-weight: bold;">&#9679;</span> reposo &nbsp;
+                        <span style="color: #ef4444; font-weight: bold;">&#9679;</span> compresión &nbsp;
+                        <span style="color: #22d3ee; font-weight: bold;">&#9679;</span> tensión.
+                    </p>
+                </div>
+            `;
+        } else {
+            reportHTML += `
+                <div style="margin-top: 24px; margin-bottom: 24px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
+                    <h4 style="color: #4cc9f0; margin-bottom: 10px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fa-solid fa-mountain"></i> Resortes de Fundación (ISE)
+                    </h4>
+                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+                        <strong>Interacción Suelo-Estructura deshabilitada (&lambda;<sub>ISE</sub> = 1.0).</strong>
+                        La base se considera perfectamente empotrada; los resortes helicoidales de la Vista 3D representan una cimentación rígida nominal
+                        (sin deformación apreciable por balanceo). Habilite <strong>"Interacción Suelo-Estructura (ISE)"</strong> en el panel lateral
+                        para modelar la flexibilidad del suelo con rigideces de Gazetas y amortiguamiento por radiación.
+                    </p>
+                </div>
+            `;
+        }
+    }
 
     // Inyectar el reporte de cálculos dinámicamente en el DOM
     initialReportHTML = reportHTML;
@@ -4559,6 +4898,9 @@ function initThreeJS() {
     gridHelper.position.y = 0.01;
     scene.add(gridHelper);
 
+    // Malla de terreno deformable (ondas sísmicas superficiales)
+    createTerrainMesh(30, 12);
+
     // Telón de fondo: silueta nocturna de El Ávila y la ciudad
     createBackdrop();
 
@@ -4649,6 +4991,97 @@ function initThreeJS() {
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
     });
+}
+
+// --- TERRENO DEFORMABLE: MALLA CON PROPAGACIÓN DE ONDAS SÍSMICAS ---
+// La superficie del suelo es una malla cuyos vértices oscilan verticalmente
+// con ondas superficiales (tipo Rayleigh) que emanan de un epicentro. La
+// amplitud es proporcional a la aceleración instantánea del sismo.
+function createTerrainMesh(groundW, groundD) {
+    if (terrainGroup) {
+        scene.remove(terrainGroup);
+        terrainGroup.traverse(o => {
+            if (o.geometry) o.geometry.dispose();
+            if (o.material) o.material.dispose();
+        });
+        terrainGroup = null;
+    }
+
+    const w = Math.max(groundW * 1.7, 64);
+    const d = Math.max(groundD * 2.6, 52);
+    const geom = new THREE.PlaneGeometry(w, d, 84, 56);
+    geom.rotateX(-Math.PI / 2);
+
+    const count = geom.attributes.position.count;
+    terrainBaseXZ = new Float32Array(count * 2);
+    for (let i = 0; i < count; i++) {
+        terrainBaseXZ[i * 2] = geom.attributes.position.getX(i);
+        terrainBaseXZ[i * 2 + 1] = geom.attributes.position.getZ(i);
+    }
+
+    const solidMat = new THREE.MeshStandardMaterial({
+        color: 0x0c1424, roughness: 0.85, metalness: 0.25,
+        transparent: true, opacity: 0.78, depthWrite: false
+    });
+    terrainSolid = new THREE.Mesh(geom, solidMat);
+    terrainSolid.position.y = 0.03;
+    terrainSolid.renderOrder = 1;
+
+    // Mismo geometry compartido: el alambre se deforma solidariamente
+    const wireMat = new THREE.MeshBasicMaterial({
+        color: 0x2b7fff, wireframe: true, transparent: true, opacity: 0.16,
+        blending: THREE.AdditiveBlending, depthWrite: false
+    });
+    terrainWire = new THREE.Mesh(geom, wireMat);
+    terrainWire.position.y = 0.045;
+    terrainWire.renderOrder = 2;
+
+    terrainGroup = new THREE.Group();
+    terrainGroup.add(terrainSolid);
+    terrainGroup.add(terrainWire);
+    scene.add(terrainGroup);
+}
+
+function updateTerrainWaves(frameDt) {
+    if (!terrainGroup || !terrainSolid) return;
+
+    const toggle = document.getElementById('show-terrain-waves');
+    const visible = toggle ? toggle.checked : true;
+    terrainGroup.visible = visible;
+    if (!visible) return;
+
+    // En calma (sin simulación activa) la energía residual del terreno decae
+    if (!isPlaying) lastGroundAccel *= 0.94;
+
+    // Amplitud objetivo según la aceleración instantánea (suavizada)
+    const target = Math.min(0.85, Math.abs(lastGroundAccel) * 1.7);
+    terrainAmp += (target - terrainAmp) * 0.08;
+    terrainWaveTime += frameDt * (1.1 + terrainAmp * 2.2);
+
+    const pos = terrainSolid.geometry.attributes.position;
+    const A = terrainAmp + 0.012; // respiración ambiental mínima en calma
+    const epiX = TERRAIN_EPICENTER.x;
+    const epiZ = TERRAIN_EPICENTER.z;
+    const t = terrainWaveTime;
+
+    for (let i = 0; i < pos.count; i++) {
+        const x = terrainBaseXZ[i * 2];
+        const z = terrainBaseXZ[i * 2 + 1];
+        const dx = x - epiX;
+        const dz = z - epiZ;
+        const r = Math.sqrt(dx * dx + dz * dz);
+        const att = Math.exp(-r * 0.016);
+        // Onda superficial principal + secundaria de mayor longitud de onda
+        const y = A * att * (Math.sin(0.52 * r - 6.0 * t) + 0.45 * Math.sin(0.21 * r - 2.8 * t + 1.7));
+        pos.setY(i, y);
+    }
+    pos.needsUpdate = true;
+    terrainSolid.geometry.computeVertexNormals();
+
+    // El alambrado pulsa con la energía sísmica (azul en calma → magenta en sismo fuerte)
+    const energy = Math.min(1, terrainAmp / 0.6);
+    terrainWire.material.opacity = 0.14 + energy * 0.45;
+    terrainWire.material.color.setHex(0x2b7fff).lerp(new THREE.Color(0xff5e9c), energy);
 }
 
 // --- TELÓN DE FONDO: SILUETA NOCTURNA (EL ÁVILA + CIUDAD) ---
@@ -5872,6 +6305,9 @@ function rebuild3DStructures() {
         scene.add(groundPlane);
     }
 
+    // Recrear la malla de ondas con las nuevas dimensiones del terreno
+    createTerrainMesh(Math.max(30, xOffset * 2 + bW + 8), Math.max(12, bD + 6));
+
     if (gridHelper) {
         scene.remove(gridHelper);
         const gridGridSize = Math.max(40, xOffset * 2 + bW + 20);
@@ -6282,6 +6718,10 @@ function rebuild3DStructures() {
         trapped: false
     };
 
+    // Resortes helicoidales de fundación (representación visual de la rigidez del suelo)
+    buildSSISprings(buildings3D.b2001, -xOffset);
+    buildSSISprings(buildings3D.b2019, xOffset);
+
     // Encuadre cinematográfico según la nueva escala de la escena
     autoFrameCamera();
 }
@@ -6296,6 +6736,235 @@ function varToHexColor(varName) {
     return 0xffffff;
 }
 
+// --- RESORTES HELICOIDALES DE FUNDACIÓN (REPRESENTACIÓN SSI) ---
+// Cada columna descansa sobre un resorte que representa la rigidez del suelo.
+// Se comprimen (ámbar→rojo) y se estiran (cyan) con el balanceo del edificio,
+// con una ganancia que crece en suelos más flexibles (λ ISE menor).
+function createHelixSpring(radius, height, turns, colorHex) {
+    const pts = [];
+    const segPerTurn = 12;
+    const total = turns * segPerTurn;
+    for (let i = 0; i <= total; i++) {
+        const a = (i / segPerTurn) * Math.PI * 2;
+        pts.push(new THREE.Vector3(
+            Math.cos(a) * radius,
+            (i / total) * height,
+            Math.sin(a) * radius
+        ));
+    }
+    const curve = new THREE.CatmullRomCurve3(pts);
+    const geom = new THREE.TubeGeometry(curve, total * 2, radius * 0.2, 6, false);
+    const mat = new THREE.MeshStandardMaterial({
+        color: colorHex, roughness: 0.35, metalness: 0.65,
+        emissive: colorHex, emissiveIntensity: 0.25
+    });
+    const mesh = new THREE.Mesh(geom, mat);
+    mesh.castShadow = true;
+    return mesh;
+}
+
+function buildSSISprings(bData, initialX) {
+    // Limpiar resortes anteriores
+    if (bData.springsGroup) {
+        scene.remove(bData.springsGroup);
+        disposeGroup(bData.springsGroup);
+        bData.springsGroup = null;
+    }
+    bData.springs = [];
+
+    const toggle = document.getElementById('show-ssi-springs');
+    const enabled = toggle ? toggle.checked : true;
+
+    // Con resortes activos, el edificio se eleva sobre la cama de resortes
+    bData.group.position.y = enabled ? SSI_SPRING_HEIGHT : 0;
+    if (!enabled) return;
+
+    const g = new THREE.Group();
+    g.position.set(initialX, 0, 0);
+
+    const baseCols = bData.columns[0] || [];
+    baseCols.forEach(col => {
+        const spring = createHelixSpring(0.30, SSI_SPRING_HEIGHT, 6, 0x34d399);
+        spring.position.set(col.offsetX, 0, col.offsetZ);
+        g.add(spring);
+        bData.springs.push({ mesh: spring, ox: col.offsetX, oz: col.offsetZ });
+    });
+
+    scene.add(g);
+    bData.springsGroup = g;
+}
+
+function updateSSISprings(bModel, bData, roofDispVisual, activeDir, baseDX, baseDZ, initialX) {
+    if (!bData.springsGroup || !bData.springs.length) return;
+
+    // Los resortes se trasladan solidarios a la base del edificio (suelo + sway basal)
+    bData.springsGroup.position.x = initialX + baseDX;
+    bData.springsGroup.position.z = baseDZ;
+
+    const H = Math.max(1, bModel.N * bModel.h);
+    const lean = roofDispVisual / H; // inclinación por balanceo
+    const ssi = (activeDir === 'Y') ? bModel.ssiY : bModel.ssiX;
+    const lambda = (ssi && typeof ssi.lambda === 'number') ? Math.min(1, Math.max(0.05, ssi.lambda)) : 1.0;
+    const gain = 1.15 * (2.0 - lambda); // suelos más flexibles → mayor deformación visible
+    const maxD = SSI_SPRING_HEIGHT * 0.42;
+
+    const cCompression = new THREE.Color(0xef4444);
+    const cTension = new THREE.Color(0x22d3ee);
+    const cRest = new THREE.Color(0x34d399);
+
+    bData.springs.forEach(s => {
+        const off = (activeDir === 'Y') ? s.oz : s.ox;
+        let delta = -lean * off * gain;
+        delta = Math.max(-maxD, Math.min(maxD, delta));
+        const ratio = delta / maxD; // negativo = compresión, positivo = tensión
+
+        s.mesh.scale.y = (SSI_SPRING_HEIGHT + delta) / SSI_SPRING_HEIGHT;
+
+        const c = s.mesh.material.color;
+        if (ratio < 0) c.copy(cRest).lerp(cCompression, Math.min(1, -ratio * 1.15));
+        else c.copy(cRest).lerp(cTension, Math.min(1, ratio));
+        s.mesh.material.emissive.copy(c).multiplyScalar(0.35);
+    });
+}
+
+// --- VISUALIZADOR INTERACTIVO DE MODOS DE VIBRACIÓN (MODO EN CALMA) ---
+// Dimensiones en planta leídas de la configuración actual (misma fórmula que rebuild3DStructures)
+function getPlanDims() {
+    const numColsX = parseInt(document.getElementById("num-cols-x").value) || 2;
+    const numColsY = parseInt(document.getElementById("num-cols-y").value) || 2;
+    const sX = parseFloat(document.getElementById("col-dist-x").value) || 5.0;
+    const sY = parseFloat(document.getElementById("col-dist-y").value) || 5.0;
+    const bW = sX * (numColsX - 1);
+    const bD = sY * (numColsY - 1);
+    return { numColsX, numColsY, sX, sY, bW, bD, xOffset: Math.max(6, bW / 2 + 3.5) };
+}
+
+// Frecuencias y formas modales exactas del edificio de corte uniforme (base empotrada):
+// w_n = 2·sqrt(k/m)·sin((2n-1)π/(4N+2)),  phi_j^(n) = sin((2n-1)π·j/(2N+1))
+// Es la misma expresión con la que el modelo calcula T1, por lo que es consistente.
+function computeModeData(bModel, n, dir) {
+    const N = bModel.N;
+    const k = (dir === 'Y') ? bModel.k_init_y : bModel.k_init_x;
+    const m = bModel.m;
+    const w = 2.0 * Math.sqrt(k / m) * Math.sin((2 * n - 1) * Math.PI / (4 * N + 2));
+
+    const phi = new Array(N);
+    for (let j = 0; j < N; j++) {
+        phi[j] = Math.sin((2 * n - 1) * Math.PI * (j + 1) / (2 * N + 1));
+    }
+    // Normalizar a desplazamiento de techo unitario
+    const roof = Math.abs(phi[N - 1]) || 1;
+    let dPhiMax = 0;
+    for (let j = 0; j < N; j++) {
+        phi[j] /= roof;
+        const prev = (j === 0) ? 0 : phi[j - 1];
+        dPhiMax = Math.max(dPhiMax, Math.abs(phi[j] - prev));
+    }
+    return { w, T: (2 * Math.PI) / w, f: w / (2 * Math.PI), phi, dPhiMax: dPhiMax || 1 };
+}
+
+// Aplica la forma modal oscilante a un edificio en un instante t
+function applyModeToBuilding(bModel, b3D, initialX, dims, t) {
+    const dir = (modeViewer.kind === 'Y') ? 'Y' : 'X';
+    const md = computeModeData(bModel, modeViewer.mode, dir);
+    // Amplitud calibrada para que la deriva máxima de entrepiso roce el límite elástico (~1.7%)
+    const A = Math.min(0.30, Math.max(0.02, (0.017 * bModel.h) / md.dPhiMax));
+    const s = Math.sin(md.w * t);
+
+    let override;
+    let roofDispVisual;
+    if (modeViewer.kind === 'T') {
+        // Modo torsional: rotación pura de planta (perfil vertical del modo n).
+        // Amplitud calibrada para que la deriva de borde roce ~1.2% (visible sin
+        // que la losa amplificada ×6 parezca desconectada del pórtico).
+        const halfW = Math.max(1.5, dims.bW / 2);
+        const thetaAmp = (0.012 * bModel.h) / (md.dPhiMax * halfW);
+        override = {
+            disp: md.phi.map(p => p * A * 0.18 * s),
+            theta: md.phi.map(p => p * thetaAmp * s)
+        };
+        roofDispVisual = A * 0.18 * s * 6.0;
+    } else {
+        override = { disp: md.phi.map(p => p * A * s) };
+        roofDispVisual = A * s * 6.0;
+    }
+
+    updateBuilding3DPhysics(bModel, b3D, initialX, 0, dir, override);
+    updateSSISprings(bModel, b3D, roofDispVisual, dir, 0, 0, initialX);
+}
+
+let modeInfoFrameCounter = 0;
+function runModeViewerFrame() {
+    const dims = getPlanDims();
+    applyModeToBuilding(eq2001, buildings3D.b2001, -dims.xOffset, dims, modeViewerClock);
+    applyModeToBuilding(eq2019, buildings3D.b2019, dims.xOffset, dims, modeViewerClock);
+
+    // Refrescar la ficha de frecuencias a baja frecuencia (no en cada frame)
+    if ((++modeInfoFrameCounter % 15) === 0) updateModeViewerInfo();
+}
+
+function updateModeViewerInfo() {
+    if (!eq2001 || !eq2019) return;
+    const dir = (modeViewer.kind === 'Y') ? 'Y' : 'X';
+    const md1 = computeModeData(eq2001, modeViewer.mode, dir);
+    const md2 = computeModeData(eq2019, modeViewer.mode, dir);
+    // Frecuencia torsional estimada (acople torsional típico ~15% sobre la traslacional)
+    const factorT = (modeViewer.kind === 'T') ? 1.15 : 1.0;
+    const kindLabel = (modeViewer.kind === 'T') ? 'Torsión' : `Traslacional ${modeViewer.kind}`;
+    const n = modeViewer.mode;
+
+    const info = document.getElementById('mv-freq-info');
+    if (info) {
+        info.innerHTML =
+            `<strong>Modo ${n} · ${kindLabel}</strong><br>` +
+            `2001: T = ${(md1.T * factorT).toFixed(2)} s · f = ${(md1.f / factorT).toFixed(2)} Hz<br>` +
+            `2019: T = ${(md2.T * factorT).toFixed(2)} s · f = ${(md2.f / factorT).toFixed(2)} Hz`;
+    }
+    updateViewportPhasePill(
+        `Modo ${n} ${kindLabel} — T ≈ ${(md1.T * factorT).toFixed(2)} s`,
+        'text-green'
+    );
+}
+
+function setModeViewerActive(on) {
+    if (on && isPlaying) stopSimulation(); // modo en calma: detiene cualquier sismo activo
+    modeViewer.active = on;
+    modeViewerClock = 0;
+
+    const panel = document.getElementById('mode-viewer-panel');
+    if (panel) panel.style.display = on ? 'block' : 'none';
+
+    const btn = document.getElementById('btn-mode-viewer');
+    if (btn) {
+        btn.innerHTML = on
+            ? '<i class="fa-solid fa-circle-stop"></i> Salir de Modos'
+            : '<i class="fa-solid fa-water"></i> Modos de Vibración';
+        btn.classList.toggle('btn-danger', on);
+        btn.classList.toggle('btn-secondary', !on);
+    }
+    const mobBtn = document.getElementById('mobile-btn-modes');
+    if (mobBtn) mobBtn.classList.toggle('btn-danger', on);
+
+    if (on) {
+        updateModeViewerInfo();
+    } else {
+        restoreRestFrame();
+        updateViewportPhasePill('En reposo', 'text-green');
+    }
+}
+
+// Devuelve ambos edificios al reposo (formas modales a cero)
+function restoreRestFrame() {
+    if (!eq2001 || !eq2019 || !buildings3D.b2001.group) return;
+    const dims = getPlanDims();
+    const zero2001 = { disp: new Array(eq2001.N).fill(0), theta: new Array(eq2001.N).fill(0) };
+    const zero2019 = { disp: new Array(eq2019.N).fill(0), theta: new Array(eq2019.N).fill(0) };
+    updateBuilding3DPhysics(eq2001, buildings3D.b2001, -dims.xOffset, 0, 'X', zero2001);
+    updateBuilding3DPhysics(eq2019, buildings3D.b2019, dims.xOffset, 0, 'X', zero2019);
+    updateSSISprings(eq2001, buildings3D.b2001, 0, 'X', 0, 0, -dims.xOffset);
+    updateSSISprings(eq2019, buildings3D.b2019, 0, 'X', 0, 0, dims.xOffset);
+}
+
 // ACTUALIZACIÓN DE LA GEOMETRÍA 3D POR SWAY SÍSMICO Y DAÑO
 function update3DPhysics() {
     const activeTime = simStepIndex * dt;
@@ -6304,6 +6973,7 @@ function update3DPhysics() {
 
     // Desplazamiento actual del terreno (vibración visual del suelo)
     const groundDisp = groundAccel[simStepIndex] * 0.8; // amplificar visualmente el sismo
+    lastGroundAccel = groundAccel[simStepIndex] || 0;
 
     if (isX) {
         groundPlane.position.x = groundDisp;
@@ -6311,6 +6981,12 @@ function update3DPhysics() {
     } else {
         groundPlane.position.x = 0;
         groundPlane.position.z = groundDisp;
+    }
+
+    // La malla de ondas se traslada solidaria al suelo
+    if (terrainGroup) {
+        terrainGroup.position.x = isX ? groundDisp : 0;
+        terrainGroup.position.z = isX ? 0 : groundDisp;
     }
 
     // --- FX: sacudida de cámara y ondas expansivas según intensidad ---
@@ -6339,6 +7015,12 @@ function update3DPhysics() {
     // Actualizar Edificio 2019
     updateBuilding3DPhysics(eq2019, buildings3D.b2019, xOffset, groundDisp, activeDir);
 
+    // Actualizar resortes SSI (balanceo + traslación del suelo)
+    const baseDX = isX ? groundDisp : 0;
+    const baseDZ = isX ? 0 : groundDisp;
+    updateSSISprings(eq2001, buildings3D.b2001, eq2001.x[eq2001.N - 1] * 6.0, activeDir, baseDX, baseDZ, -xOffset);
+    updateSSISprings(eq2019, buildings3D.b2019, eq2019.x[eq2019.N - 1] * 6.0, activeDir, baseDX, baseDZ, xOffset);
+
     // Actualizar Evacuación
     const evacN = eq2001.N;
     const evacH = eq2001.h;
@@ -6364,7 +7046,7 @@ function update3DPhysics() {
     }
 }
 
-function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
+function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir, modeOverride) {
     const N = bModel.N;
     const h = bModel.h;
     const isX = (activeDir === 'X');
@@ -6472,15 +7154,21 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
     const ecc = parseFloat(document.getElementById("torsional-eccentricity").value) || 0.0;
     const rp = Math.sqrt((bW * bW + bD * bD) / 12) || 2.0;
 
+    // Fuente de desplazamientos: estado físico del modelo o forma modal sintética
+    // (visualizador de modos de vibración). thetaSrc permite imponer rotaciones
+    // puras por nivel (modo torsional) sin excentricidad configurada.
+    const dispSrc = (modeOverride && modeOverride.disp) ? modeOverride.disp : bModel.x;
+    const thetaSrc = (modeOverride && modeOverride.theta) ? modeOverride.theta : null;
+
     // Comportamiento normal (oscilación lateral + torsión)
     for (let lvl = 0; lvl < N; lvl++) {
         // Desplazamiento del nivel actual
-        const d_curr = bModel.x[lvl] * 6.0; // amplificado para visibilidad en 3D
-        const d_prev = (lvl === 0) ? 0 : bModel.x[lvl - 1] * 6.0;
+        const d_curr = dispSrc[lvl] * 6.0; // amplificado para visibilidad en 3D
+        const d_prev = (lvl === 0) ? 0 : dispSrc[lvl - 1] * 6.0;
 
         // Ángulo de rotación del nivel actual (amplificado para visibilidad)
-        const theta_curr = (d_curr * ecc) / rp;
-        const theta_prev = (lvl === 0) ? 0 : (d_prev * ecc) / rp;
+        const theta_curr = thetaSrc ? thetaSrc[lvl] * 6.0 : (d_curr * ecc) / rp;
+        const theta_prev = thetaSrc ? ((lvl === 0) ? 0 : thetaSrc[lvl - 1] * 6.0) : ((lvl === 0) ? 0 : (d_prev * ecc) / rp);
 
         // Desplazar y rotar losa
         const floorMesh = b3D.floors[lvl];
@@ -6520,13 +7208,13 @@ function updateBuilding3DPhysics(bModel, b3D, initialX, groundDisp, activeDir) {
             col.z_top_curr = z_top;
 
             // Calcular derivas reales (físicas, no amplificadas) de esta columna particular
-            const theta_curr_phys = (bModel.x[lvl] * ecc) / rp;
-            const theta_prev_phys = (lvl === 0) ? 0 : (bModel.x[lvl - 1] * ecc) / rp;
+            const theta_curr_phys = thetaSrc ? thetaSrc[lvl] : (dispSrc[lvl] * ecc) / rp;
+            const theta_prev_phys = thetaSrc ? ((lvl === 0) ? 0 : thetaSrc[lvl - 1]) : ((lvl === 0) ? 0 : (dispSrc[lvl - 1] * ecc) / rp);
 
-            const x_trans_p_phys = isX ? (lvl === 0 ? 0 : bModel.x[lvl - 1]) : 0;
-            const z_trans_p_phys = isX ? 0 : (lvl === 0 ? 0 : bModel.x[lvl - 1]);
-            const x_trans_c_phys = isX ? bModel.x[lvl] : 0;
-            const z_trans_c_phys = isX ? 0 : bModel.x[lvl];
+            const x_trans_p_phys = isX ? (lvl === 0 ? 0 : dispSrc[lvl - 1]) : 0;
+            const z_trans_p_phys = isX ? 0 : (lvl === 0 ? 0 : dispSrc[lvl - 1]);
+            const x_trans_c_phys = isX ? dispSrc[lvl] : 0;
+            const z_trans_c_phys = isX ? 0 : dispSrc[lvl];
 
             const x_b_phys = x_trans_p_phys + ox * Math.cos(theta_prev_phys) - oz * Math.sin(theta_prev_phys);
             const z_b_phys = z_trans_p_phys + ox * Math.sin(theta_prev_phys) + oz * Math.cos(theta_prev_phys);
@@ -6831,6 +7519,20 @@ function animate3D() {
     updateAmbientMotes(performance.now());
     updateShockwaves();
 
+    // Delta de tiempo entre frames (para FX continuos)
+    const nowTs = performance.now();
+    const frameDt = Math.min(0.05, lastFrameTs ? (nowTs - lastFrameTs) / 1000 : 0.016);
+    lastFrameTs = nowTs;
+
+    // Ondas sísmicas en la malla del terreno
+    updateTerrainWaves(frameDt);
+
+    // Visualizador de modos de vibración (solo en calma, sin simulación activa)
+    if (modeViewer.active && !isPlaying && eq2001 && eq2019) {
+        modeViewerClock += frameDt;
+        runModeViewerFrame();
+    }
+
     // Sacudida de cámara proporcional a la aceleración del terreno.
     // Se aplica un offset temporal solo durante el render para no perturbar OrbitControls.
     if (cameraShake > 0.004) {
@@ -6985,7 +7687,7 @@ function toggleInputControls(disable) {
         "earthquake-input-type", "file-accelerogram", "custom-file-dt", "custom-direction",
         "ise-enable", "ise-foundation-type", "ise-vs", "ise-df", "ise-poisson", "ise-density",
         "auto-mass", "building-use", "slab-thickness", "extra-dead-load",
-        "evacuation-mode"
+        "evacuation-mode", "show-terrain-waves", "show-ssi-springs"
     ];
     inputs.forEach(id => {
         const el = document.getElementById(id);

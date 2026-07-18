@@ -18,7 +18,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="index.css?v=1000">
+    <link rel="stylesheet" href="index.css?v=1121">
     <!-- Leaflet.js Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -203,6 +203,18 @@
                 <div class="checkbox-group" style="margin-top: -8px; margin-bottom: 16px;">
                     <input type="checkbox" id="show-cracks" checked>
                     <label for="show-cracks">Simular formación de grietas en columnas (Flexión vs Cortante)</label>
+                </div>
+
+                <div class="checkbox-group" style="margin-top: -8px; margin-bottom: 16px;">
+                    <input type="checkbox" id="show-terrain-waves" checked>
+                    <label for="show-terrain-waves">Propagación de ondas sísmicas en el terreno (malla
+                        deformable)</label>
+                </div>
+
+                <div class="checkbox-group" style="margin-top: -8px; margin-bottom: 16px;">
+                    <input type="checkbox" id="show-ssi-springs" checked>
+                    <label for="show-ssi-springs">Resortes de fundación SSI (tensión/compresión del suelo bajo
+                        columnas)</label>
                 </div>
 
                 <!-- COVENIN 1756:2001 -->
@@ -646,6 +658,8 @@
                         <button id="btn-reset" class="btn btn-danger"><i class="fa-solid fa-rotate-left"></i>
                             Reiniciar</button>
                     </div>
+                    <button id="btn-mode-viewer" class="btn btn-secondary btn-mode-viewer">
+                        <i class="fa-solid fa-water"></i> Modos de Vibración</button>
                 </div>
 
                 <!-- AUTOR -->
@@ -745,6 +759,30 @@
                             <div class="label-box label-2001">Edificio COVENIN 1756:2001</div>
                             <div class="label-box label-2019">Edificio COVENIN 1756:2019</div>
                         </div>
+
+                        <!-- PANEL: VISUALIZADOR DE MODOS DE VIBRACIÓN -->
+                        <div id="mode-viewer-panel" class="mode-viewer-card" style="display: none;">
+                            <div class="card-header">
+                                <span><i class="fa-solid fa-water"></i> Modos de Vibración</span>
+                                <button id="close-mode-viewer" class="close-btn">&times;</button>
+                            </div>
+                            <div class="mv-row">
+                                <span class="mv-label">Tipo:</span>
+                                <button class="mv-btn active" id="mv-kind-x">X</button>
+                                <button class="mv-btn" id="mv-kind-y">Y</button>
+                                <button class="mv-btn" id="mv-kind-t">Torsión</button>
+                            </div>
+                            <div class="mv-row">
+                                <span class="mv-label">Modo:</span>
+                                <button class="mv-btn active" id="mv-mode-1">1</button>
+                                <button class="mv-btn" id="mv-mode-2">2</button>
+                                <button class="mv-btn" id="mv-mode-3">3</button>
+                            </div>
+                            <div class="mv-info" id="mv-freq-info">T = -- s · f = -- Hz</div>
+                            <div class="mv-hint">Oscilación armónica según las frecuencias calculadas del modelo
+                                (edificio de corte uniforme). La amplitud roza el límite elástico.</div>
+                        </div>
+
                         <div id="canvas-3d-container">
                             <!-- Three.js Canvas will be appended here -->
                         </div>
@@ -2785,6 +2823,9 @@
                     <button id="mobile-btn-reset" class="btn btn-danger btn-round" title="Reiniciar">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
+                    <button id="mobile-btn-modes" class="btn btn-secondary btn-round" title="Modos de Vibración">
+                        <i class="fa-solid fa-water"></i>
+                    </button>
                 </div>
             </main>
 
@@ -2843,7 +2884,7 @@
             </div>
 
             <!-- Custom JavaScript -->
-            <script src="app.js?v=1000"></script>
+            <script src="app.js?v=1121"></script>
 </body>
 
 </html>
