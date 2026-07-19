@@ -8743,29 +8743,97 @@ async function initCitySim() {
     const fillerCount = 520;
     const fGeo = new THREE.BoxGeometry(1, 1, 1);
     fGeo.translate(0, 0.5, 0);
-    const fMat = new THREE.MeshStandardMaterial({ color: 0x3a4757, roughness: 0.95 });
+    const fMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85, metalness: 0.1 });
     const fillers = new THREE.InstancedMesh(fGeo, fMat, fillerCount);
     const dummy = new THREE.Object3D();
-    const fColor = new THREE.Color();
+    
+    // Paleta de colores urbanos realistas y variados (pasteles desaturados)
+    const fPalette = [
+        new THREE.Color(0x6b7c85), // Gris azulado frío
+        new THREE.Color(0x8f9a9c), // Cemento claro
+        new THREE.Color(0xa39b8f), // Arena / Adobe cálido
+        new THREE.Color(0x9e8677), // Terracota claro / Ladrillo
+        new THREE.Color(0x828c82)  // Gris verdoso suave
+    ];
+    
     const fBase = new Float32Array(fillerCount * 3);   // x, y, z base por instancia
     const fDelay = new Float32Array(fillerCount);      // retardo de la onda por instancia
     for (let i = 0; i < fillerCount; i++) {
-        const anchor = vargas[Math.floor(rngF() * vargas.length)];
-        const aPos = toScene(anchor.lat, anchor.lng);
-        const ang = rngF() * Math.PI * 2;
-        const rad = 60 + rngF() * 420;
-        const fx0 = aPos.x + Math.cos(ang) * rad, fz0 = aPos.z + Math.sin(ang) * rad;
-        const fy0 = terr.heightAt ? Math.max(0, terr.heightAt(fx0, fz0)) : 0;
+        let fx0 = 0, fz0 = 0, fy0 = 0;
+        let attempts = 0;
+        
+        while (attempts < 20) {
+            const anchor = vargas[Math.floor(rngF() * vargas.length)];
+            const aPos = toScene(anchor.lat, anchor.lng);
+            const ang = rngF() * Math.PI * 2;
+            const rad = 50 + rngF() * 380;
+            fx0 = aPos.x + Math.cos(ang) * rad;
+            fz0 = aPos.z + Math.sin(ang) * rad;
+            fy0 = terr.heightAt ? terr.heightAt(fx0, fz0) : 0;
+            
+            // 1. Evitar el mar (altura <= 3.0m)
+            if (fy0 <= 3.0) {
+                attempts++;
+                continue;
+            }
+            
+            // 2. Evitar solapamiento con los edificios reales del catálogo
+            let overlaps = false;
+            for (let j = 0; j < vargas.length; j++) {
+                const b = vargas[j];
+                const bPos = toScene(b.lat, b.lng);
+                const dx = fx0 - bPos.x;
+                const dz = fz0 - bPos.z;
+                if (dx*dx + dz*dz < 28*28) {
+                    overlaps = true;
+                    break;
+                }
+            }
+            if (overlaps) {
+                attempts++;
+                continue;
+            }
+            
+            // 3. Evitar solapamiento cercano con otros edificios genéricos anteriores
+            for (let k = 0; k < i; k++) {
+                const px = fBase[k * 3];
+                const pz = fBase[k * 3 + 2];
+                const dx = fx0 - px;
+                const dz = fz0 - pz;
+                if (dx*dx + dz*dz < 22*22) {
+                    overlaps = true;
+                    break;
+                }
+            }
+            if (!overlaps) {
+                break;
+            }
+            attempts++;
+        }
+        
         dummy.position.set(fx0, fy0, fz0);
         dummy.rotation.y = rngF() * Math.PI;
+        
         fBase[i * 3] = fx0; fBase[i * 3 + 1] = fy0; fBase[i * 3 + 2] = fz0;
         fDelay[i] = (fx0 - xWest) / CITY_CFG.waveSpeed;
-        const fw = (10 + rngF() * 14) * CITY_CFG.fpScale;
-        const fh = (1.5 + rngF() * rngF() * 5.5) * 3.0 * CITY_CFG.htScale * 0.8;
-        dummy.scale.set(fw, fh, fw * (0.7 + rngF() * 0.6));
+        
+        // Dimensiones más realistas
+        const isMidRise = rngF() < 0.15; // 15% medianos, 85% casas bajas
+        const floors = isMidRise ? (3 + Math.floor(rngF() * 4)) : (1 + Math.floor(rngF() * 2));
+        const baseFp = isMidRise ? (7 + rngF() * 4) : (4 + rngF() * 4);
+        
+        const fw = baseFp * CITY_CFG.fpScale;
+        const fd = baseFp * (0.85 + rngF() * 0.3) * CITY_CFG.fpScale;
+        const fh = floors * 3.0 * CITY_CFG.htScale;
+        
+        dummy.scale.set(fw, fh, fd);
         dummy.updateMatrix();
         fillers.setMatrixAt(i, dummy.matrix);
-        fillers.setColorAt(i, fColor.setScalar(0.8 + rngF() * 0.45));
+        
+        // Asignar color de la paleta
+        const col = fPalette[Math.floor(rngF() * fPalette.length)].clone();
+        col.multiplyScalar(0.85 + rngF() * 0.3);
+        fillers.setColorAt(i, col);
     }
     fillers.instanceMatrix.needsUpdate = true;
     if (fillers.instanceColor) fillers.instanceColor.needsUpdate = true;
