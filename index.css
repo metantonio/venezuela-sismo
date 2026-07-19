@@ -3687,3 +3687,261 @@ select option { background-color: #11151f; color: #f1f5f9; }
     .city-stat { min-width: 100px; padding: 8px 10px; }
     .city-stat-value { font-size: 16px; }
 }
+
+/* --- OVERRIDES PARA LAS PESTAÑAS (SCROLL Y BOTONES DE FLECHA) --- */
+.tabs-nav-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(9, 12, 20, 0.9);
+    border-bottom: 1px solid var(--border-color);
+    width: 100%;
+}
+
+.tabs-nav-wrapper .tabs-header {
+    flex-grow: 1;
+    border-bottom: none !important;
+    background: transparent !important;
+}
+
+/* Fading edges to indicate scroll capability */
+.tabs-nav-wrapper::before,
+.tabs-nav-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 45px;
+    pointer-events: none;
+    z-index: 2;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+.tabs-nav-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(9, 12, 20, 0.95), rgba(9, 12, 20, 0));
+}
+
+.tabs-nav-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(9, 12, 20, 0.95), rgba(9, 12, 20, 0));
+}
+
+.tabs-nav-wrapper.can-scroll-left::before {
+    opacity: 1;
+}
+.tabs-nav-wrapper.can-scroll-right::after {
+    opacity: 1;
+}
+
+/* Scroll buttons styling */
+.tabs-scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(8, 25, 40, 0.92);
+    border: 1px solid rgba(0, 242, 254, 0.45);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 3;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.tabs-scroll-btn:hover {
+    background: #00f2fe;
+    border-color: #fff;
+    color: #000;
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.6);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.tabs-scroll-btn.tabs-scroll-left {
+    left: 8px;
+}
+
+.tabs-scroll-btn.tabs-scroll-right {
+    right: 8px;
+}
+
+.tabs-scroll-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* --- MENU HAMBURGUESA Y NAVEGACIÓN VERTICAL PREMIUM --- */
+.top-bar {
+    height: 52px;
+    background: rgba(9, 12, 20, 0.95);
+    border-bottom: 1px solid var(--border-color);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 16px;
+    z-index: 100;
+    position: relative;
+    user-select: none;
+}
+
+.active-tab-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    background: linear-gradient(90deg, #00f2fe, #4facfe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
+}
+
+/* Botón Hamburguesa */
+.menu-toggle-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 101;
+}
+
+.menu-toggle-btn:hover {
+    background: rgba(0, 242, 254, 0.1);
+    border-color: rgba(0, 242, 254, 0.4);
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+}
+
+.menu-toggle-btn .bar {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background-color: #e2e8f0;
+    border-radius: 2px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animación Hamburguesa a X */
+.menu-toggle-btn.active .bar:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+    background-color: #00f2fe;
+}
+.menu-toggle-btn.active .bar:nth-child(2) {
+    opacity: 0;
+    transform: scale(0);
+}
+.menu-toggle-btn.active .bar:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+    background-color: #00f2fe;
+}
+
+/* Menú Desplegable (Drawer) */
+.nav-drawer {
+    position: absolute;
+    top: 52px;
+    left: 0;
+    right: 0;
+    background: rgba(8, 11, 18, 0.98);
+    border-bottom: 2px solid #00f2fe;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 99;
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 0.3s ease, 
+                visibility 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+
+.nav-drawer.active {
+    max-height: 480px;
+    opacity: 1;
+    visibility: visible;
+    overflow-y: auto;
+}
+
+.nav-drawer-content {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0;
+}
+
+/* Estilo de botones en el menú vertical */
+.nav-drawer .tab-btn {
+    width: 100%;
+    text-align: left;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02) !important;
+    color: var(--text-muted) !important;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 12px 24px !important;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    height: auto !important;
+    border-left: 3px solid transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.nav-drawer .tab-btn i {
+    width: 16px;
+    text-align: center;
+    color: var(--text-muted);
+    transition: color 0.25s ease;
+}
+
+.nav-drawer .tab-btn:hover {
+    background: rgba(0, 242, 254, 0.05) !important;
+    color: #00f2fe !important;
+    padding-left: 30px !important;
+}
+
+.nav-drawer .tab-btn:hover i {
+    color: #00f2fe;
+}
+
+.nav-drawer .tab-btn.active {
+    background: rgba(0, 242, 254, 0.1) !important;
+    color: #00f2fe !important;
+    font-weight: 700;
+    border-left: 4px solid #00f2fe !important;
+}
+
+.nav-drawer .tab-btn.active i {
+    color: #00f2fe;
+}
+
+/* Scrollbar fino para pantallas pequeñas */
+.nav-drawer::-webkit-scrollbar {
+    width: 4px;
+}
+.nav-drawer::-webkit-scrollbar-thumb {
+    background: rgba(34, 211, 238, 0.2);
+    border-radius: 2px;
+}

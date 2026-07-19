@@ -176,6 +176,27 @@ function refreshRangeFills() {
 }
 
 function initUI() {
+    // --- Lógica del Menú Hamburguesa ---
+    const menuToggle = document.getElementById("menu-toggle-btn");
+    const navDrawer = document.getElementById("nav-drawer");
+    const activeTabTitle = document.getElementById("active-tab-title");
+
+    if (menuToggle && navDrawer) {
+        menuToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const isOpen = navDrawer.classList.toggle("active");
+            menuToggle.classList.toggle("active", isOpen);
+        });
+
+        // Cerrar al hacer clic fuera del menú
+        document.addEventListener("click", (e) => {
+            if (!menuToggle.contains(e.target) && !navDrawer.contains(e.target)) {
+                navDrawer.classList.remove("active");
+                menuToggle.classList.remove("active");
+            }
+        });
+    }
+
     // Tab switching
     const tabBtns = document.querySelectorAll(".tab-btn");
     const tabContents = document.querySelectorAll(".tab-content, .control-panel");
@@ -189,8 +210,20 @@ function initUI() {
             const tabId = btn.getAttribute("data-tab");
             document.getElementById(tabId).classList.add("active");
 
-            // Asegurar que la pestaña activa sea visible en la barra (scroll horizontal)
-            btn.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+            // Actualizar título de la barra superior (removiendo el icono)
+            if (activeTabTitle) {
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = btn.innerHTML;
+                const icon = tempDiv.querySelector("i");
+                if (icon) icon.remove();
+                activeTabTitle.textContent = tempDiv.textContent.trim();
+            }
+
+            // Cerrar menú vertical al seleccionar una pestaña
+            if (navDrawer && menuToggle) {
+                navDrawer.classList.remove("active");
+                menuToggle.classList.remove("active");
+            }
 
             // La franja de métricas sísmicas solo aplica a pestañas de simulación
             const metricsBoard = document.querySelector(".metrics-board");
