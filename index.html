@@ -2783,6 +2783,13 @@
                                                 <li>No se requieren acciones de emergencia.</li>
                                             </ul>
                                         </div>
+
+                                        <!-- BOTÓN PARA ENVIAR REPORTE A GOOGLE FORMS -->
+                                        <div style="margin-top: 18px; text-align: center;">
+                                            <button id="btn-open-boletin-report" class="btn btn-primary" style="width: 100%; padding: 10px; font-weight: bold; background: linear-gradient(135deg, #ffb703 0%, #fb8500 100%); border: none; color: #000; box-shadow: 0 4px 14px rgba(251, 133, 0, 0.4); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                                <i class="fa-solid fa-cloud-arrow-up"></i> Enviar Reporte Oficial
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <!-- GUIA DE ENTRENAMIENTO INTERACTIVA -->
@@ -2940,6 +2947,82 @@
                     </button>
                 </div>
             </main>
+
+            <!-- BOLETÍN REPORT MODAL DIALOG -->
+            <div id="boletin-report-modal-overlay" class="feedback-modal-overlay">
+                <div class="feedback-modal-card" style="max-width: 520px;">
+                    <div class="feedback-modal-header">
+                        <h3><i class="fa-solid fa-file-shield" style="color: #ffb703;"></i> Reporte de Evaluación</h3>
+                        <button id="boletin-report-modal-close" class="feedback-close-btn">&times;</button>
+                    </div>
+                    <p class="feedback-modal-sub" style="margin-bottom: 15px;">
+                        Complete los datos del reporte. El sistema ha prellenado automáticamente la información técnica a partir de su evaluación en el Boletín.
+                    </p>
+                    <form id="boletin-report-form" autocomplete="off">
+                        <div class="feedback-form-group" style="margin-bottom: 12px;">
+                            <label for="rep-email">Correo Electrónico de Contacto <span style="color: #e63946;">*</span></label>
+                            <input type="email" id="rep-email" placeholder="ejemplo@correo.com" required style="width: 100%; padding: 8px 12px; background: rgba(15, 23, 42, 0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; font-size: 13px;">
+                        </div>
+
+                        <div class="feedback-form-group" style="margin-bottom: 12px;">
+                            <label for="rep-name">Nombre del Inmueble / Edificación <span style="color: #e63946;">*</span></label>
+                            <input type="text" id="rep-name" required style="width: 100%; padding: 8px 12px; background: rgba(15, 23, 42, 0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; font-size: 13px;">
+                        </div>
+
+                        <div class="feedback-form-group" style="margin-bottom: 12px;">
+                            <label for="rep-address">Dirección / Ubicación del Inmueble <span style="color: #e63946;">*</span></label>
+                            <input type="text" id="rep-address" required style="width: 100%; padding: 8px 12px; background: rgba(15, 23, 42, 0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; font-size: 13px;">
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                            <div class="feedback-form-group">
+                                <label for="rep-coords">Coordenadas del Mapa</label>
+                                <input type="text" id="rep-coords" placeholder="Lat, Lng (Opcional)" style="width: 100%; padding: 8px 12px; background: rgba(15, 23, 42, 0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; font-size: 13px;">
+                            </div>
+                            <div class="feedback-form-group">
+                                <label for="rep-color">Color de la Ficha <span style="color: #e63946;">*</span></label>
+                                <select id="rep-color" required style="width: 100%; padding: 8px 12px; background: rgba(15, 23, 42, 0.85); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; font-size: 13px; cursor: pointer; outline: none;">
+                                    <option value="Verde 🟢">Verde 🟢 (Habitable)</option>
+                                    <option value="Amarillo 🟡">Amarillo 🟡 (Restringido)</option>
+                                    <option value="Rojo 🔴">Rojo 🔴 (Inhabitable)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="feedback-form-group" style="margin-bottom: 12px;">
+                            <label style="display: block; margin-bottom: 6px;">Evaluación hecha por <span style="color: #e63946;">*</span></label>
+                            <div style="display: flex; gap: 18px; font-size: 13px;">
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #fff;">
+                                    <input type="radio" name="rep-evaluator" value="Ingeniero" checked style="accent-color: #ffb703;"> Ingeniero
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #fff;">
+                                    <input type="radio" name="rep-evaluator" value="Arquitecto" style="accent-color: #ffb703;"> Arquitecto
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #fff;">
+                                    <input type="radio" name="rep-evaluator" value="Otro:" style="accent-color: #ffb703;"> Otro
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="feedback-form-group" style="margin-bottom: 16px;">
+                            <label for="rep-desc">Descripción de los Daños</label>
+                            <textarea id="rep-desc" rows="4" placeholder="Detalle técnico de los daños..." style="width: 100%; padding: 8px 12px; background: rgba(15, 23, 42, 0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; font-size: 12.5px; resize: vertical; font-family: inherit;"></textarea>
+                        </div>
+
+                        <!-- AVISO DE SUBIDA DE FOTOS -->
+                        <div style="background: rgba(255, 183, 3, 0.08); border: 1px solid rgba(255, 183, 3, 0.25); border-radius: 6px; padding: 10px; font-size: 11px; color: #facc15; margin-bottom: 16px; line-height: 1.45;">
+                            <i class="fa-solid fa-circle-info"></i> <strong>Nota:</strong> Los campos de texto se completarán automáticamente en Google Forms. Para adjuntar las fotos requeridas, deberá subirlas en el formulario oficial que se abrirá en la siguiente pestaña.
+                        </div>
+
+                        <div class="feedback-modal-footer">
+                            <button type="button" id="boletin-report-cancel-btn" class="btn btn-secondary">Cancelar</button>
+                            <button type="submit" id="boletin-report-submit-btn" class="btn btn-primary" style="background: linear-gradient(135deg, #ffb703 0%, #fb8500 100%); border: none; color: #000; font-weight: bold; box-shadow: 0 4px 12px rgba(251, 133, 0, 0.3);">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Cargar y Continuar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
             <!-- FLOATING FEEDBACK BUTTON -->
             <button id="floating-feedback-btn" class="floating-feedback-btn" title="Enviar Feedback / Sugerencias">

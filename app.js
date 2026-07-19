@@ -20,6 +20,7 @@ let customAccelFileName = "";  // nombre del archivo cargado
 // Estructuras de los edificios
 let eq2001 = null;
 let eq2019 = null;
+let currentBoletinCoords = "";
 
 // Instancias de Gráficos (Chart.js)
 let spectraChartInstance = null;
@@ -10113,6 +10114,116 @@ function initBoletin() {
         });
     });
 
+    // --- Lógica del Modal del Reporte Oficial (Google Forms) ---
+    const openReportBtn = document.getElementById('btn-open-boletin-report');
+    if (openReportBtn) {
+        openReportBtn.addEventListener('click', () => {
+            // Prellenar campos en el modal
+            const nameVal = document.getElementById('bol-name').value || 'Edificación';
+            const addressVal = document.getElementById('bol-address').value || 'Sin dirección';
+            document.getElementById('rep-name').value = nameVal;
+            document.getElementById('rep-address').value = addressVal;
+            
+            // Determinar color de ficha
+            const tagTitle = document.getElementById('boletin-tag-title').textContent.trim();
+            let formColor = 'Verde 🟢';
+            if (tagTitle === 'PELIGRO') formColor = 'Rojo 🔴';
+            else if (tagTitle === 'ATENCIÓN') formColor = 'Amarillo 🟡';
+            document.getElementById('rep-color').value = formColor;
+
+            // Coordenadas
+            document.getElementById('rep-coords').value = currentBoletinCoords || '';
+
+            // Generar descripción técnica automática de los daños
+            const sevCols = parseInt(document.getElementById('bol-sev-cols').value) || 0;
+            const sevWallsC = parseInt(document.getElementById('bol-sev-walls-c').value) || 0;
+            const sevWallsM = parseInt(document.getElementById('bol-sev-walls-m').value) || 0;
+            const sevBeams = parseInt(document.getElementById('bol-sev-beams').value) || 0;
+            const totalSevere = sevCols + sevWallsC + sevWallsM + sevBeams;
+            
+            const maxPctText = document.getElementById('bol-mod-pct-display').textContent;
+            const extCollapse = getRadioVal('bol-ext-collapse');
+            const extGeol = getRadioVal('bol-ext-geol');
+            const extSettlement = getRadioVal('bol-ext-settlement');
+            const extTilt = getRadioVal('bol-ext-tilt');
+
+            let desc = `Inspección rápida realizada.\n`;
+            desc += `- Dictamen: ${tagTitle}\n`;
+            if (totalSevere > 0) {
+                desc += `- Daños Severos: ${totalSevere} elementos (Cols: ${sevCols}, Muros C: ${sevWallsC}, Muros M: ${sevWallsM}, Vigas: ${sevBeams}).\n`;
+            } else {
+                desc += `- Sin daños severos registrados.\n`;
+            }
+            desc += `- Daño moderado máximo: ${maxPctText}.\n`;
+            
+            let extRisks = [];
+            if (extCollapse !== 'bajo') extRisks.push(`Peligro colapso (${extCollapse})`);
+            if (extGeol !== 'bajo') extRisks.push(`Peligro geológico (${extGeol})`);
+            if (extSettlement !== 'bajo') extRisks.push(`Asentamiento (${extSettlement})`);
+            if (extTilt !== 'bajo') extRisks.push(`Inclinación (${extTilt})`);
+            
+            if (extRisks.length > 0) {
+                desc += `- Factores externos: ${extRisks.join(', ')}.\n`;
+            } else {
+                desc += `- Sin factores externos de riesgo.\n`;
+            }
+
+            document.getElementById('rep-desc').value = desc;
+
+            // Mostrar modal
+            document.getElementById('boletin-report-modal-overlay').classList.add('active');
+        });
+    }
+
+    const closeReportBtn = document.getElementById('boletin-report-modal-close');
+    if (closeReportBtn) {
+        closeReportBtn.addEventListener('click', () => {
+            document.getElementById('boletin-report-modal-overlay').classList.remove('active');
+        });
+    }
+
+    const cancelReportBtn = document.getElementById('boletin-report-cancel-btn');
+    if (cancelReportBtn) {
+        cancelReportBtn.addEventListener('click', () => {
+            document.getElementById('boletin-report-modal-overlay').classList.remove('active');
+        });
+    }
+
+    const reportForm = document.getElementById('boletin-report-form');
+    if (reportForm) {
+        reportForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('rep-email').value;
+            const name = document.getElementById('rep-name').value;
+            const address = document.getElementById('rep-address').value;
+            const coords = document.getElementById('rep-coords').value;
+            const color = document.getElementById('rep-color').value;
+            const evaluator = document.querySelector('input[name="rep-evaluator"]:checked').value;
+            const desc = document.getElementById('rep-desc').value;
+
+            // Construir URL precargada para Google Forms
+            const baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeLCR4CnpKBhJQy5EW6XFaJ-kZfnBgE6M0IoioaTrbWHloW6Q/viewform";
+            const queryParams = new URLSearchParams();
+            queryParams.append('usp', 'pp_url');
+            queryParams.append('entry.1389691904', email);     // Correo de contacto
+            queryParams.append('entry.344980478', name);       // Nombre del inmueble
+            queryParams.append('entry.162650589', address);    // Ubicación del inmueble
+            queryParams.append('entry.377810399', coords);     // Coordenadas mapa
+            queryParams.append('entry.592454983', color);      // Color del Boletin
+            queryParams.append('entry.1580584858', evaluator); // Evaluación hecha por
+            queryParams.append('entry.588769988', desc);       // Descripcion de los daños
+
+            const fullUrl = `${baseUrl}?${queryParams.toString()}`;
+            
+            // Abrir Google Form en nueva pestaña
+            window.open(fullUrl, '_blank');
+
+            // Cerrar el modal
+            document.getElementById('boletin-report-modal-overlay').classList.remove('active');
+        });
+    }
+
     // Inicializar visualización de la guía y cálculo
     updateGuideVisual();
     calculateBoletinRisk();
@@ -10381,6 +10492,7 @@ function loadBoletinPreset(presetName) {
     };
 
     if (presetName === 'sheraton') {
+        currentBoletinCoords = "10.6139, -66.8837";
         // Hotel Macuto Sheraton (Caracas 1967) - Colapso de Columnas en PB/Mezzanina
         setInput('bol-name', 'Hotel Macuto Sheraton (Módulo Central)');
         setInput('bol-address', 'Sector Caraballeda, Litoral Central');
@@ -10434,6 +10546,7 @@ function loadBoletinPreset(presetName) {
         setCheck('bol-act-prev-elec', true);
 
     } else if (presetName === 'liceo') {
+        currentBoletinCoords = "10.4988, -63.7494";
         // Liceo Raimundo Martínez Centeno (Cariaco sismo 1997) - Vigas rotas, columnas dañadas
         setInput('bol-name', 'Liceo Raimundo M. Centeno');
         setInput('bol-address', 'Av. Principal de Cariaco, Edo. Sucre');
@@ -10487,6 +10600,7 @@ function loadBoletinPreset(presetName) {
         setCheck('bol-act-prev-elec', false);
 
     } else if (presetName === 'tanaguarena') {
+        currentBoletinCoords = "10.6148, -66.8647";
         // Residencias Solymar (Vargas 2026) - Daño Moderado de Columnas (Etiqueta Amarilla)
         setInput('bol-name', 'Residencias Solymar (Módulo B)');
         setInput('bol-address', 'Av. La Playa, Tanaguarena, La Guaira');
@@ -10540,6 +10654,7 @@ function loadBoletinPreset(presetName) {
         setCheck('bol-act-prev-elec', false);
 
     } else if (presetName === 'vivienda') {
+        currentBoletinCoords = "10.6111, -66.8920";
         // Vivienda Unifamiliar Macuto (2026) - Daños Leves (Etiqueta Verde)
         setInput('bol-name', 'Vivienda Unifamiliar Ing. Urich');
         setInput('bol-address', 'Calle El Progreso, Macuto, La Guaira');
@@ -10592,6 +10707,7 @@ function loadBoletinPreset(presetName) {
         setCheck('bol-act-prev-gas', false);
         setCheck('bol-act-prev-elec', false);
     } else {
+        currentBoletinCoords = "";
         // Clear/Personalizado
         setInput('bol-name', 'Edificación Personalizada');
         setInput('bol-address', 'La Guaira, Venezuela');
