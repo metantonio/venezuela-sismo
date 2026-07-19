@@ -8419,6 +8419,94 @@ function buildCityFallbackGround(scene) {
     };
 }
 
+// --- Datos y Funciones para Visualización de Abanicos Fluviales (Vulnerabilidad y Licuación) ---
+const alluvialFansData = [
+    {
+        name: "Abanico de Caraballeda (Río San Julián)",
+        apex: { lat: 10.6045, lng: -66.8520 },
+        radius: 1700,
+        startAngle: 55 * Math.PI / 180,
+        endAngle: 125 * Math.PI / 180,
+        color: 0xef4444, // Rojo (Riesgo Alto de Licuación)
+        label: "Riesgo Alto (Aluvión y Licuación)"
+    },
+    {
+        name: "Abanico de Tanaguarena (Río Cerro Grande)",
+        apex: { lat: 10.6075, lng: -66.8675 },
+        radius: 1300,
+        startAngle: 60 * Math.PI / 180,
+        endAngle: 120 * Math.PI / 180,
+        color: 0xf59e0b, // Naranja (Riesgo Moderado-Alto)
+        label: "Riesgo Moderado-Alto"
+    },
+    {
+        name: "Abanico de Macuto (Río Macuto)",
+        apex: { lat: 10.6030, lng: -66.8950 },
+        radius: 1200,
+        startAngle: 65 * Math.PI / 180,
+        endAngle: 115 * Math.PI / 180,
+        color: 0xef4444,
+        label: "Riesgo Alto"
+    },
+    {
+        name: "Abanico de Carmen de Uria",
+        apex: { lat: 10.6080, lng: -66.8285 },
+        radius: 1100,
+        startAngle: 60 * Math.PI / 180,
+        endAngle: 120 * Math.PI / 180,
+        color: 0xef4444,
+        label: "Riesgo Alto (Fuerte Susceptibilidad)"
+    },
+    {
+        name: "Abanico de La Guaira (Quebrada Osorio)",
+        apex: { lat: 10.5980, lng: -66.9320 },
+        radius: 1000,
+        startAngle: 70 * Math.PI / 180,
+        endAngle: 110 * Math.PI / 180,
+        color: 0xf59e0b,
+        label: "Riesgo Moderado"
+    }
+];
+
+function createAlluvialFanMesh(centerX, centerZ, radius, startAngle, endAngle, colorHex) {
+    const geom = new THREE.RingGeometry(0, radius, 32, 8, startAngle, endAngle - startAngle);
+    geom.rotateX(-Math.PI / 2);
+    
+    const posAttr = geom.getAttribute('position');
+    const terr = citySim.terrain;
+    
+    for (let i = 0; i < posAttr.count; i++) {
+        const rx = posAttr.getX(i);
+        const rz = posAttr.getZ(i);
+        
+        const wx = rx + centerX;
+        const wz = rz + centerZ;
+        
+        let vy = 2;
+        if (terr && typeof terr.heightAt === 'function') {
+            vy = terr.heightAt(wx, wz);
+        }
+        
+        posAttr.setX(i, wx);
+        posAttr.setY(i, vy + 4.5); // 4.5m offset to fly clean over satellite tiles
+        posAttr.setZ(i, wz);
+    }
+    
+    geom.computeVertexNormals();
+    
+    const mat = new THREE.MeshBasicMaterial({
+        color: colorHex,
+        transparent: true,
+        opacity: 0.35,
+        side: THREE.DoubleSide,
+        depthWrite: false
+    });
+    
+    const mesh = new THREE.Mesh(geom, mat);
+    mesh.position.set(0, 0, 0);
+    return mesh;
+}
+
 async function initCitySim() {
     const container = document.getElementById('city-canvas-container');
     const loadingEl = document.getElementById('city-loading');
@@ -8530,6 +8618,18 @@ async function initCitySim() {
     }
     const terr = citySim.terrain;
     const xWest = terr.xWest;
+
+    // --- Capa de Abanicos Fluviales (Vulnerabilidad y Licuación) ---
+    const fansGroup = new THREE.Group();
+    fansGroup.visible = false; // oculto por defecto
+    group.add(fansGroup);
+    citySim.fansGroup = fansGroup;
+
+    alluvialFansData.forEach(fan => {
+        const centerPos = toScene(fan.apex.lat, fan.apex.lng);
+        const mesh = createAlluvialFanMesh(centerPos.x, centerPos.z, fan.radius, fan.startAngle, fan.endAngle, fan.color);
+        fansGroup.add(mesh);
+    });
     console.info(`[city-sim] Terreno: ${citySim.groundType}, DEM: ${terr.demType}, altura máx ≈ ${Math.round(terr.maxH)} m, onda oeste→este a ${CITY_CFG.waveSpeed} m/s`);
 
     // --- Frentes de onda sísmica (uno por evento del doblete) ---
@@ -8738,6 +8838,20 @@ function wireCityControls() {
             applyCityState(parseFloat(scrubber.value) || 0, 0, false);
             updateCityPlayButton();
             updateCityUI();
+        });
+    }
+
+    const toggleFans = document.getElementById('city-toggle-fans');
+    if (toggleFans) {
+        toggleFans.addEventListener('change', (e) => {
+            if (!citySim || !citySim.fansGroup) return;
+            citySim.fansGroup.visible = e.target.checked;
+            
+            // Toggle legend
+            const legendFans = document.getElementById('city-legend-fans');
+            if (legendFans) {
+                legendFans.style.display = e.target.checked ? 'flex' : 'none';
+            }
         });
     }
 }
@@ -9018,6 +9132,15 @@ function cityFrameLoop(now) {
     }
 
     updateCityDust(dtFrame);
+
+    // Animar pulsación de abanicos fluviales si están visibles
+    if (citySim.fansGroup && citySim.fansGroup.visible) {
+        const pulse = 0.30 + Math.sin(now * 0.002) * 0.08;
+        citySim.fansGroup.children.forEach(mesh => {
+            if (mesh.material) mesh.material.opacity = pulse;
+        });
+    }
+
     citySim.controls.update();
     citySim.renderer.render(citySim.scene, citySim.camera);
     requestAnimationFrame(cityFrameLoop);

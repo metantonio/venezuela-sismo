@@ -2243,6 +2243,15 @@
                                     </p>
                                 </div>
 
+                                <!-- CAPAS GEOESPACIALES -->
+                                <div class="city-layers-control" style="display: flex; gap: 12px; margin-bottom: 14px; align-items: center; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 8px; flex-wrap: wrap;">
+                                    <span style="font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.5px;">Capas de Riesgo:</span>
+                                    <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none;">
+                                        <input type="checkbox" id="city-toggle-fans" style="accent-color: #ffb703; cursor: pointer;">
+                                        <span>Abanicos Fluviales (Vulnerabilidad y Licuación)</span>
+                                    </label>
+                                </div>
+
                                 <!-- CONTROLES DE LA SIMULACIÓN -->
                                 <div class="city-controls">
                                     <button id="city-btn-play" class="btn btn-primary" style="padding: 8px 18px;">
@@ -2297,6 +2306,11 @@
                                         <span>Cargando relieve, imagen satelital y ciudad de La Guaira…</span>
                                     </div>
                                     <div class="city-legend">
+                                        <!-- Referencias para Capa de Abanicos Fluviales -->
+                                        <div id="city-legend-fans" style="display: none; border-bottom: 1px solid rgba(255,255,255,0.12); margin-bottom: 6px; padding-bottom: 6px; flex-direction: column; gap: 4px;">
+                                            <span><i style="background:rgba(239, 68, 68, 0.45); border: 1px solid #ef4444;"></i> Riesgo Alto (Licuación)</span>
+                                            <span><i style="background:rgba(245, 158, 11, 0.45); border: 1px solid #f59e0b;"></i> Riesgo Moderado-Alto</span>
+                                        </div>
                                         <span><i style="background:#9fb4c8;"></i> Catálogo real</span>
                                         <span><i style="background:#f59e0b;"></i> Dañado</span>
                                         <span><i style="background:#ef4444;"></i> Colapsado</span>
