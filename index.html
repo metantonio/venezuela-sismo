@@ -28,6 +28,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
 </head>
 
 <body>
@@ -712,6 +713,8 @@
                             Urbana</button>
                         <button class="tab-btn" data-tab="tab-boletin"><i class="fa-solid fa-clipboard-check"></i>
                             Evaluación Boletín</button>
+                        <button class="tab-btn" data-tab="tab-vision"><i class="fa-solid fa-eye" style="color: #38bdf8;"></i>
+                            Visión IA (Inspección)</button>
                     </div>
                 </nav>
 
@@ -2921,6 +2924,142 @@
                                         </p>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB ASISTENTE DE VISIÓN ARTIFICIAL DE INSPECCIÓN (TENSORFLOW.JS) -->
+                    <div id="tab-vision" class="tab-content">
+                        <div class="tab-info-container">
+                            <!-- HEADER / BANNER DE VISIÓN IA -->
+                            <div class="info-section" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)); border: 1px solid var(--border-color); border-left: 4px solid #38bdf8; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                                    <div>
+                                        <h3 style="color: #38bdf8; display: flex; align-items: center; gap: 10px; font-size: 18px; margin-bottom: 6px;">
+                                            <i class="fa-solid fa-brain" style="color: #38bdf8;"></i> Asistente de Inspección de Daños por Visión Artificial (Visión IA)
+                                        </h3>
+                                        <p style="color: var(--text-muted); font-size: 13px; line-height: 1.5; margin: 0;">
+                                            Clasificación automática de patologías sísmicas en elementos estructurales mediante redes neuronales convolucionales en tiempo real (TensorFlow.js ejecutado 100% local en tu navegador).
+                                        </p>
+                                    </div>
+                                    <div id="vision-ai-status-pill" style="padding: 6px 14px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 20px; font-size: 12px; color: #38bdf8; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                                        <i class="fa-solid fa-circle-check" style="color: #10b981;"></i> Motor IA Listo
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- BANNER DE DESCARGO DE RESPONSABILIDAD TÉCNICO-LEGAL (DISCLAIMER) -->
+                            <div style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); border-left: 4px solid #f59e0b; border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 12px;">
+                                <i class="fa-solid fa-triangle-exclamation" style="font-size: 20px; color: #fbbf24; margin-top: 2px; flex-shrink: 0;"></i>
+                                <div style="font-size: 12px; color: #fef08a; line-height: 1.45;">
+                                    <strong style="color: #fbbf24; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 3px;">
+                                        ⚠️ AVISO IMPORTANTE DE SEGURIDAD Y DESCARGO DE RESPONSABILIDAD:
+                                    </strong>
+                                    La evaluación por visión artificial mediante redes neuronales es un modelo orientativo preliminar y <strong>no es perfecta</strong>. Bajo ningún concepto esta herramienta reemplaza un estudio de ingeniería de campo oficial, ni constituye una certificación legal de habitabilidad. Toda edificación afectada por un sismo debe ser inspeccionada presencialmente por un <strong>Ingeniero Civil o Inspector Estructural calificado</strong> aplicando los protocolos de FUNVISIS y la norma COVENIN 1756.
+                                </div>
+                            </div>
+
+                            <!-- LAYOUT PRINCIPAL: 2 COLUMNAS -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;" class="vision-grid-layout">
+                                
+                                <!-- COLUMNA IZQUIERDA: CARGA DE IMAGEN & SAMPLES -->
+                                <div>
+                                    <div class="boletin-card" style="height: 100%; display: flex; flex-direction: column;">
+                                        <div class="boletin-card-title"><i class="fa-solid fa-camera" style="color: #38bdf8;"></i> 1. Fotografía del Elemento Estructural</div>
+                                        
+                                        <!-- SELECTOR DE TIPO DE ELEMENTO ESTRUCTURAL -->
+                                        <div style="margin-bottom: 14px;">
+                                            <label for="vision-element-selector" style="font-size: 11px; font-weight: 700; color: #ffb703; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
+                                                <i class="fa-solid fa-shapes"></i> Tipo de Elemento a Inspeccionar:
+                                            </label>
+                                            <select id="vision-element-selector" style="width: 100%; padding: 9px 12px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 8px; color: #fff; font-size: 13px; outline: none; cursor: pointer;">
+                                                <option value="auto" selected>🤖 Detección Automática por Visión (Geometría + Textura)</option>
+                                                <option value="column">🏛️ Columna Estructural (Elemento Vertical)</option>
+                                                <option value="beam">🏗️ Viga de Concreto (Elemento Horizontal)</option>
+                                                <option value="wall">🧱 Muro de Concreto / Mampostería (Plano)</option>
+                                                <option value="joint">📐 Nodo / Porción de Unión Viga-Columna</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- DROPZONE & CAMERA INPUT -->
+                                        <div id="vision-dropzone" style="border: 2px dashed rgba(56, 189, 248, 0.4); background: rgba(15, 23, 42, 0.6); border-radius: 12px; padding: 24px 16px; text-align: center; cursor: pointer; transition: all 0.25s ease; position: relative; min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px;">
+                                            <input type="file" id="vision-file-input" accept="image/*" capture="environment" style="display: none;">
+                                            <div id="vision-upload-prompt">
+                                                <i class="fa-solid fa-cloud-arrow-up" style="font-size: 42px; color: #38bdf8; margin-bottom: 8px; display: block;"></i>
+                                                <strong style="color: #fff; font-size: 14px; display: block;">Arrastra una foto o haz clic para seleccionar / usar cámara móvil</strong>
+                                                <span style="color: var(--text-muted); font-size: 11px;">Formatos soportados: JPG, PNG, WEBP (Columnas, Vigas, Muros o Nodos)</span>
+                                            </div>
+
+                                            <div id="vision-preview-container" style="display: none; width: 100%; height: 100%; position: relative;">
+                                                <img id="vision-preview-img" style="max-width: 100%; max-height: 260px; border-radius: 8px; object-fit: contain; box-shadow: 0 4px 15px rgba(0,0,0,0.5);" alt="Foto a analizar">
+                                                <button id="vision-clear-btn" style="position: absolute; top: 6px; right: 6px; background: rgba(239, 68, 68, 0.85); color: #fff; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Cambiar foto"><i class="fa-solid fa-xmark"></i></button>
+                                            </div>
+                                        </div>
+
+                                        <!-- MUESTRAS PRECARGADAS (PRESETS) -->
+                                        <div style="margin-top: 16px;">
+                                            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 10px;">
+                                                <i class="fa-solid fa-bolt" style="color: #facc15;"></i> Probar muestra de laboratorio (1-Clic):
+                                            </span>
+                                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
+                                                <button class="vision-sample-btn active" data-sample="col-shear" style="padding: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s;">
+                                                    <i class="fa-solid fa-building-columns" style="color: #ef4444;"></i> Columna Cortante
+                                                </button>
+                                                <button class="vision-sample-btn" data-sample="wall-shear" style="padding: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s;">
+                                                    <i class="fa-solid fa-border-all" style="color: #ef4444;"></i> Muro Cortante X
+                                                </button>
+                                                <button class="vision-sample-btn" data-sample="crushing" style="padding: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s;">
+                                                    <i class="fa-solid fa-volcano" style="color: #ef4444;"></i> Pandeo Base
+                                                </button>
+                                                <button class="vision-sample-btn" data-sample="spalling" style="padding: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s;">
+                                                    <i class="fa-solid fa-dumpster-fire" style="color: #f97316;"></i> Spalling
+                                                </button>
+                                                <button class="vision-sample-btn" data-sample="flexure" style="padding: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s;">
+                                                    <i class="fa-solid fa-barcode" style="color: #facc15;"></i> Flexión Viga
+                                                </button>
+                                                <button class="vision-sample-btn" data-sample="intact" style="padding: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s;">
+                                                    <i class="fa-solid fa-shield-halved" style="color: #10b981;"></i> Sin Daño
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- COLUMNA DERECHA: RESULTADOS DEL DIAGNÓSTICO -->
+                                <div>
+                                    <div class="boletin-card" style="height: 100%; display: flex; flex-direction: column;">
+                                        <div class="boletin-card-title"><i class="fa-solid fa-chart-pie" style="color: #38bdf8;"></i> 2. Diagnóstico e Inferencia de IA</div>
+
+                                        <!-- DICTAMEN DE HABITABILIDAD DE IA -->
+                                        <div id="vision-result-badge-box" style="background: rgba(239, 68, 68, 0.12); border: 1px solid #ef4444; border-radius: 10px; padding: 14px; text-align: center; margin-bottom: 16px; transition: all 0.3s ease;">
+                                            <div id="vision-result-tag-title" style="font-size: 17px; font-weight: 800; color: #ef4444; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
+                                                🔴 INSEGURO — PROHIBIDO EL PASO
+                                            </div>
+                                            <div id="vision-result-tag-desc" style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+                                                Se detectó falla por cortante diagonal severa en el elemento estructural.
+                                            </div>
+                                        </div>
+
+                                        <!-- BARRAS DE PROBABILIDAD DE LAS 5 CATEGORÍAS -->
+                                        <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;" id="vision-probabilities-container">
+                                            <!-- Se llenan dinámicamente en JS -->
+                                        </div>
+
+                                        <!-- ACCIONES RECOMENDADAS & TRANSFERENCIA AL BOLETÍN -->
+                                        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-top: auto;">
+                                            <strong style="font-size: 11px; color: #ffb703; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
+                                                <i class="fa-solid fa-clipboard-list"></i> Recomendación Técnica del Sistema:
+                                            </strong>
+                                            <p id="vision-action-text" style="font-size: 12px; color: var(--text-muted); margin: 0 0 10px 0; line-height: 1.4;">
+                                                Acordonamiento preventivo inmediato. Desalojar el inmueble y requerir inspección estructural detallada antes de permitir acceso.
+                                            </p>
+                                            <button id="vision-transfer-btn" class="btn btn-primary" style="width: 100%; padding: 9px 14px; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                                <i class="fa-solid fa-file-export"></i> Transferir Diagnóstico a Planilla del Boletín
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>

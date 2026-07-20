@@ -3945,3 +3945,8 @@ select option { background-color: #11151f; color: #f1f5f9; }
     background: rgba(34, 211, 238, 0.2);
     border-radius: 2px;
 }
+
+/* Visión IA Styles */
+.vision-sample-btn:hover { background: rgba(56, 189, 248, 0.15) !important; border-color: #38bdf8 !important; transform: translateY(-1px); }
+.vision-sample-btn.active { background: rgba(56, 189, 248, 0.25) !important; border-color: #38bdf8 !important; box-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
+@media (max-width: 900px) { .vision-grid-layout { grid-template-columns: 1fr !important; } }

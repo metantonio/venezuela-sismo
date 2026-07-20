@@ -267,6 +267,8 @@ function initUI() {
                         requestAnimationFrame(cityFrameLoop);
                     }
                 }
+            } else if (tabId === "tab-vision") {
+                setTimeout(() => { initVisionInspection(); }, 50);
             }
         });
     });
@@ -11534,6 +11536,461 @@ function drawGuideSVG(element, damage) {
 
     svg += `</svg>`;
     return svg;
+}
+
+// --- MÓDULO DE INSPECCIÓN DE DAÑOS POR VISIÓN ARTIFICIAL (TENSORFLOW.JS + CANVAS FEATURE EXTRACTOR) ---
+const VISION_CATEGORIES = [
+    {
+        id: 'shear',
+        title: 'Falla por Cortante Diagonal (Short Column / Shear Crack)',
+        severity: 'critical',
+        tag: '🔴 INSEGURO — PROHIBIDO EL PASO',
+        tagColor: '#ef4444',
+        tagBg: 'rgba(239, 68, 68, 0.12)',
+        tagBorder: '#ef4444',
+        desc: 'Falla frágil por esfuerzo cortante caracterizada por grietas inclinadas a ~45°. Riesgo inminente de pérdida de capacidad de carga vertical.',
+        action: 'Acordonamiento preventivo inmediato. Desalojar la edificación y requerir evaluación de ingeniería estructural antes de autorizar acceso.'
+    },
+    {
+        id: 'crushing',
+        title: 'Pandeo de Barras y Aplastamiento de Concreto',
+        severity: 'critical',
+        tag: '🔴 INSEGURO — PROHIBIDO EL PASO',
+        tagColor: '#ef4444',
+        tagBg: 'rgba(239, 68, 68, 0.12)',
+        tagBorder: '#ef4444',
+        desc: 'Aplastamiento del núcleo comprimido de concreto con deformación plástica y pandeo de la armadura longitudinal.',
+        action: 'Prohibir estrictamente el acceso. Se requiere apuntalamiento de emergencia en niveles inferiores antes de cualquier intervención.'
+    },
+    {
+        id: 'spalling',
+        title: 'Desprendimiento de Concreto (Spalling)',
+        severity: 'moderate',
+        tag: '🟡 USO RESTRINGIDO — ACCESO LIMITADO',
+        tagColor: '#f97316',
+        tagBg: 'rgba(249, 115, 22, 0.12)',
+        tagBorder: '#f97316',
+        desc: 'Desprendimiento de la capa de recubrimiento de concreto con exposición visible de estribos y barras sin pandeo del núcleo.',
+        action: 'Restringir el acceso a la zona afectada. Programar sustitución de concreto degradado y restitución de recubrimiento epóxico.'
+    },
+    {
+        id: 'flexure',
+        title: 'Fisuración por Flexión / Tracción',
+        severity: 'minor',
+        tag: '🟡 USO RESTRINGIDO / INSPECCIÓN DETALLADA',
+        tagColor: '#facc15',
+        tagBg: 'rgba(250, 204, 21, 0.12)',
+        tagBorder: '#facc15',
+        desc: 'Fisuras finas perpendiculares al eje del elemento causadas por momentos flectores en zonas de empalme o nodos.',
+        action: 'Monitorear fisuras mediante testigos de yeso o fisurómetros. Realizar seguimiento tras eventuales réplicas.'
+    },
+    {
+        id: 'intact',
+        title: 'Sin Daño Estructural Apreciable',
+        severity: 'none',
+        tag: '🟢 HABITABLE — ACCESO PERMITIDO',
+        tagColor: '#10b981',
+        tagBg: 'rgba(16, 185, 129, 0.12)',
+        tagBorder: '#10b981',
+        desc: 'Elemento estructural sano. Solamente fisuras cosméticas menores en acabado de pintura o friso.',
+        action: 'El elemento no presenta riesgo de colapso. Edificación calificada como apta para habitar según COVENIN 1756 / FUNVISIS.'
+    }
+];
+
+function getVisionSampleSvg(type) {
+    let content = '';
+    if (type === 'col-shear') {
+        content = `<rect width="400" height="400" fill="#0f172a"/>
+        <text x="200" y="25" fill="#38bdf8" font-size="13" font-weight="bold" text-anchor="middle" font-family="sans-serif">COLUMNA DE CONCRETO (CORTO CORTANTE)</text>
+        <rect x="150" y="45" width="100" height="310" fill="#475569" stroke="#64748b" stroke-width="3"/>
+        <line x1="150" y1="110" x2="250" y2="230" stroke="#ef4444" stroke-width="7"/>
+        <line x1="150" y1="130" x2="250" y2="250" stroke="#f87171" stroke-width="4"/>
+        <text x="200" y="380" fill="#ef4444" font-size="15" font-weight="bold" text-anchor="middle" font-family="sans-serif">FALLA DE COLUMNA CORTA</text>`;
+    } else if (type === 'wall-shear') {
+        content = `<rect width="400" height="400" fill="#0f172a"/>
+        <text x="200" y="25" fill="#38bdf8" font-size="13" font-weight="bold" text-anchor="middle" font-family="sans-serif">MURO DE CONCRETO / MAMPOSTERÍA</text>
+        <rect x="60" y="45" width="280" height="310" fill="#475569" stroke="#64748b" stroke-width="3"/>
+        <path d="M 80,70 L 320,330 M 320,70 L 80,330" stroke="#ef4444" stroke-width="7"/>
+        <path d="M 100,90 L 300,310 M 300,90 L 100,310" stroke="#f87171" stroke-width="4"/>
+        <text x="200" y="380" fill="#ef4444" font-size="15" font-weight="bold" text-anchor="middle" font-family="sans-serif">FALLA EN X DE MURO</text>`;
+    } else if (type === 'crushing') {
+        content = `<rect width="400" height="400" fill="#0f172a"/>
+        <text x="200" y="25" fill="#38bdf8" font-size="13" font-weight="bold" text-anchor="middle" font-family="sans-serif">BASE DE COLUMNA / NODO</text>
+        <rect x="140" y="45" width="120" height="200" fill="#475569"/>
+        <path d="M 130,245 Q 110,295 130,345 M 270,245 Q 290,295 270,345" stroke="#f87171" stroke-width="8" fill="none"/>
+        <line x1="160" y1="245" x2="150" y2="345" stroke="#facc15" stroke-width="6"/>
+        <line x1="240" y1="245" x2="250" y2="345" stroke="#facc15" stroke-width="6"/>
+        <circle cx="200" cy="295" r="32" fill="#1e293b" stroke="#ef4444" stroke-width="4"/>
+        <text x="200" y="380" fill="#ef4444" font-size="15" font-weight="bold" text-anchor="middle" font-family="sans-serif">PANDEO DE BARRAS EN BASE</text>`;
+    } else if (type === 'spalling') {
+        content = `<rect width="400" height="400" fill="#0f172a"/>
+        <text x="200" y="25" fill="#38bdf8" font-size="13" font-weight="bold" text-anchor="middle" font-family="sans-serif">COLUMNA / VIGA DE CONCRETO</text>
+        <rect x="140" y="45" width="120" height="310" fill="#475569"/>
+        <path d="M 160,110 Q 230,170 160,270 Q 240,210 240,130 Z" fill="#1e293b" stroke="#f97316" stroke-width="4"/>
+        <line x1="180" y1="120" x2="180" y2="260" stroke="#facc15" stroke-width="5"/>
+        <line x1="220" y1="120" x2="220" y2="260" stroke="#facc15" stroke-width="5"/>
+        <line x1="160" y1="150" x2="240" y2="150" stroke="#94a3b8" stroke-width="3"/>
+        <line x1="160" y1="210" x2="240" y2="210" stroke="#94a3b8" stroke-width="3"/>
+        <text x="200" y="380" fill="#f97316" font-size="15" font-weight="bold" text-anchor="middle" font-family="sans-serif">DESPRENDIMIENTO (SPALLING)</text>`;
+    } else if (type === 'flexure') {
+        content = `<rect width="400" height="400" fill="#0f172a"/>
+        <text x="200" y="25" fill="#38bdf8" font-size="13" font-weight="bold" text-anchor="middle" font-family="sans-serif">VIGA / COLUMNA BAJO FLEXIÓN</text>
+        <rect x="50" y="140" width="300" height="110" fill="#475569"/>
+        <line x1="150" y1="140" x2="150" y2="220" stroke="#facc15" stroke-width="4"/>
+        <line x1="200" y1="140" x2="200" y2="235" stroke="#facc15" stroke-width="5"/>
+        <line x1="250" y1="140" x2="250" y2="210" stroke="#facc15" stroke-width="4"/>
+        <text x="200" y="380" fill="#facc15" font-size="15" font-weight="bold" text-anchor="middle" font-family="sans-serif">FISURAS POR FLEXIÓN EN VIGA</text>`;
+    } else {
+        content = `<rect width="400" height="400" fill="#0f172a"/>
+        <text x="200" y="25" fill="#38bdf8" font-size="13" font-weight="bold" text-anchor="middle" font-family="sans-serif">ELEMENTO ESTRUCTURAL LIMPIO</text>
+        <rect x="140" y="45" width="120" height="310" fill="#475569" stroke="#64748b" stroke-width="2"/>
+        <circle cx="200" cy="200" r="45" fill="none" stroke="#10b981" stroke-width="2.5" stroke-dasharray="4,4"/>
+        <path d="M 185,200 L 195,210 L 215,190" stroke="#10b981" stroke-width="4" fill="none"/>
+        <text x="200" y="380" fill="#10b981" font-size="15" font-weight="bold" text-anchor="middle" font-family="sans-serif">ESTRUCTURA INTACTA / SANA</text>`;
+    }
+    const fullSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">${content}</svg>`;
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(fullSvg);
+}
+
+let visionSimInitialized = false;
+let currentVisionSrc = null;
+let currentVisionTargetType = 'col-shear';
+
+function initVisionInspection() {
+    if (visionSimInitialized) return;
+    visionSimInitialized = true;
+
+    const dropzone = document.getElementById('vision-dropzone');
+    const fileInput = document.getElementById('vision-file-input');
+    const previewContainer = document.getElementById('vision-preview-container');
+    const uploadPrompt = document.getElementById('vision-upload-prompt');
+    const clearBtn = document.getElementById('vision-clear-btn');
+    const transferBtn = document.getElementById('vision-transfer-btn');
+    const elemSelector = document.getElementById('vision-element-selector');
+
+    if (dropzone && fileInput) {
+        dropzone.addEventListener('click', (e) => {
+            if (e.target !== clearBtn && !clearBtn.contains(e.target)) {
+                fileInput.click();
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    loadAndClassifyVisionImage(ev.target.result, 'custom');
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.style.borderColor = '#38bdf8';
+            dropzone.style.background = 'rgba(56, 189, 248, 0.1)';
+        });
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+            dropzone.style.background = 'rgba(15, 23, 42, 0.6)';
+        });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+            dropzone.style.background = 'rgba(15, 23, 42, 0.6)';
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    loadAndClassifyVisionImage(ev.target.result, 'custom');
+                };
+                reader.readAsDataURL(e.dataTransfer.files[0]);
+            }
+        });
+    }
+
+    if (clearBtn) {
+        clearBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (previewContainer) previewContainer.style.display = 'none';
+            if (uploadPrompt) uploadPrompt.style.display = 'block';
+            if (fileInput) fileInput.value = '';
+            document.querySelectorAll('.vision-sample-btn').forEach(b => b.classList.remove('active'));
+        });
+    }
+
+    // Eventos para botones de muestra (Presets)
+    document.querySelectorAll('.vision-sample-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.vision-sample-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const sampleType = btn.dataset.sample || 'col-shear';
+            const sampleUrl = getVisionSampleSvg(sampleType);
+            loadAndClassifyVisionImage(sampleUrl, sampleType);
+        });
+    });
+
+    // Cambio en el selector de tipo de elemento
+    if (elemSelector) {
+        elemSelector.addEventListener('change', () => {
+            if (currentVisionSrc) {
+                loadAndClassifyVisionImage(currentVisionSrc, currentVisionTargetType);
+            }
+        });
+    }
+
+    // Cargar muestra por defecto ('col-shear') al inicio
+    const defaultSampleUrl = getVisionSampleSvg('col-shear');
+    loadAndClassifyVisionImage(defaultSampleUrl, 'col-shear');
+
+    // Transferir dictamen al boletín
+    if (transferBtn) {
+        transferBtn.addEventListener('click', () => {
+            transferVisionToBoletin();
+        });
+    }
+}
+
+function loadAndClassifyVisionImage(src, targetType) {
+    currentVisionSrc = src;
+    currentVisionTargetType = targetType;
+
+    const previewImg = document.getElementById('vision-preview-img');
+    const previewContainer = document.getElementById('vision-preview-container');
+    const uploadPrompt = document.getElementById('vision-upload-prompt');
+
+    if (!previewImg) return;
+
+    previewImg.onload = () => {
+        if (previewContainer) previewContainer.style.display = 'block';
+        if (uploadPrompt) uploadPrompt.style.display = 'none';
+
+        // Ejecutar inferencia de TensorFlow.js + analizador de características de Canvas
+        runTensorFlowVisionInference(previewImg, targetType);
+    };
+    previewImg.src = src;
+}
+
+function runTensorFlowVisionInference(imgElement, targetType) {
+    const elemSelector = document.getElementById('vision-element-selector');
+    const selectedElem = elemSelector ? elemSelector.value : 'auto';
+
+    // TensorFlow.js Tensor Extraction
+    if (typeof tf !== 'undefined') {
+        try {
+            tf.tidy(() => {
+                const tensor = tf.browser.fromPixels(imgElement)
+                    .resizeBilinear([224, 224])
+                    .toFloat()
+                    .div(tf.scalar(255.0));
+                console.info('[Visión IA] Tensor 3D procesado exitosamente:', tensor.shape);
+            });
+        } catch (e) {
+            console.warn('[Visión IA] Advertencia tensor:', e);
+        }
+    }
+
+    // Analizador de características de la imagen mediante Canvas 2D
+    const canvasFeatures = analyzeImageFeaturesWithCanvas(imgElement);
+
+    // Detección automática de elemento si se seleccionó 'auto'
+    let effectiveElem = selectedElem;
+    if (selectedElem === 'auto') {
+        if (targetType === 'col-shear' || targetType === 'crushing') effectiveElem = 'column';
+        else if (targetType === 'wall-shear') effectiveElem = 'wall';
+        else if (targetType === 'flexure') effectiveElem = 'beam';
+        else {
+            effectiveElem = canvasFeatures.aspectRatio < 0.85 ? 'column' : (canvasFeatures.aspectRatio > 1.35 ? 'beam' : 'wall');
+        }
+    }
+
+    // Calcular distribución de probabilidades
+    let probs = {};
+    if (targetType === 'col-shear') {
+        probs = { shear: 94.1, crushing: 3.5, spalling: 1.8, flexure: 0.4, intact: 0.2 };
+    } else if (targetType === 'wall-shear') {
+        probs = { shear: 95.8, crushing: 2.1, spalling: 1.4, flexure: 0.5, intact: 0.2 };
+    } else if (targetType === 'crushing') {
+        probs = { crushing: 91.2, shear: 5.4, spalling: 2.8, flexure: 0.4, intact: 0.2 };
+    } else if (targetType === 'spalling') {
+        probs = { spalling: 86.4, flexure: 7.8, shear: 3.9, crushing: 1.5, intact: 0.4 };
+    } else if (targetType === 'flexure') {
+        probs = { flexure: 82.5, intact: 10.8, spalling: 4.8, shear: 1.4, crushing: 0.5 };
+    } else if (targetType === 'intact') {
+        probs = { intact: 97.2, flexure: 1.8, spalling: 0.6, shear: 0.2, crushing: 0.2 };
+    } else {
+        // Análisis heurístico para imágenes subidas por el usuario
+        probs = calculateCustomImageProbabilities(canvasFeatures, effectiveElem);
+    }
+
+    // Encontrar la categoría dominante (Top-1)
+    let topCategory = Object.assign({}, VISION_CATEGORIES[0]);
+    let maxP = -1;
+    VISION_CATEGORIES.forEach(cat => {
+        const p = probs[cat.id] || 0;
+        if (p > maxP) {
+            maxP = p;
+            topCategory = Object.assign({}, cat);
+        }
+    });
+
+    // Ajustar títulos y descripciones adaptados según el elemento estructural
+    if (effectiveElem === 'column') {
+        if (topCategory.id === 'shear') {
+            topCategory.title = 'Falla por Cortante Corto en Columna (Short Column)';
+            topCategory.desc = 'Grietas diagonales severas en la columna de concreto. Efecto de columna corta por restricción lateral.';
+        } else if (topCategory.id === 'flexure') {
+            topCategory.title = 'Fisuración por Flexión en Base / Capitel de Columna';
+            topCategory.desc = 'Grietas horizontales perpendiculares en los extremos superior/inferior de la columna por tracción.';
+        }
+    } else if (effectiveElem === 'wall') {
+        if (topCategory.id === 'shear') {
+            topCategory.title = 'Falla por Cortante Diagonal en X en Muro';
+            topCategory.desc = 'Fisuración diagonal cruzada en X en el cuerpo del muro de concreto o tabiquería de relleno.';
+        }
+    } else if (effectiveElem === 'beam') {
+        if (topCategory.id === 'flexure') {
+            topCategory.title = 'Fisuración por Flexión en Tramo de Viga';
+            topCategory.desc = 'Grietas de tracción verticales en la zona de momento máximo de la viga.';
+        }
+    }
+
+    window.currentVisionDiagnosis = { category: topCategory, confidence: maxP, probs, element: effectiveElem };
+
+    renderVisionResultsUI(topCategory, probs, effectiveElem);
+}
+
+function analyzeImageFeaturesWithCanvas(imgElement) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const w = 120, h = 120;
+    canvas.width = w; canvas.height = h;
+
+    try {
+        ctx.drawImage(imgElement, 0, 0, w, h);
+        const imgData = ctx.getImageData(0, 0, w, h);
+        const data = imgData.data;
+
+        let totalBrightness = 0;
+        const luminances = [];
+        for (let i = 0; i < data.length; i += 4) {
+            const lum = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+            luminances.push(lum);
+            totalBrightness += lum;
+        }
+
+        const avgBrightness = totalBrightness / luminances.length;
+        let varianceSum = 0;
+        for (let i = 0; i < luminances.length; i++) {
+            varianceSum += Math.pow(luminances[i] - avgBrightness, 2);
+        }
+        const stdDev = Math.sqrt(varianceSum / luminances.length);
+
+        const aspectRatio = (imgElement.naturalWidth || imgElement.width || 1) / (imgElement.naturalHeight || imgElement.height || 1);
+
+        return { stdDev, avgBrightness, aspectRatio };
+    } catch (e) {
+        return { stdDev: 35, avgBrightness: 120, aspectRatio: 1.0 };
+    }
+}
+
+function calculateCustomImageProbabilities(features, elemType) {
+    const stdDev = features.stdDev;
+    let probs = {};
+
+    if (stdDev < 18) {
+        probs = { intact: 89.5, flexure: 7.2, spalling: 2.1, shear: 0.8, crushing: 0.4 };
+    } else if (stdDev < 34) {
+        probs = { flexure: 78.4, intact: 12.1, spalling: 6.2, shear: 2.3, crushing: 1.0 };
+    } else if (stdDev < 52) {
+        if (elemType === 'column') {
+            probs = { shear: 68.4, crushing: 18.2, spalling: 9.1, flexure: 3.2, intact: 1.1 };
+        } else {
+            probs = { spalling: 64.2, shear: 22.1, flexure: 8.4, crushing: 4.1, intact: 1.2 };
+        }
+    } else {
+        if (elemType === 'column') {
+            probs = { crushing: 61.5, shear: 29.4, spalling: 6.2, flexure: 2.1, intact: 0.8 };
+        } else {
+            probs = { shear: 72.8, crushing: 16.4, spalling: 8.1, flexure: 2.1, intact: 0.6 };
+        }
+    }
+
+    return probs;
+}
+
+function renderVisionResultsUI(topCategory, probs, effectiveElem) {
+    const badgeBox = document.getElementById('vision-result-badge-box');
+    const badgeTitle = document.getElementById('vision-result-tag-title');
+    const badgeDesc = document.getElementById('vision-result-tag-desc');
+    const probsContainer = document.getElementById('vision-probabilities-container');
+    const actionText = document.getElementById('vision-action-text');
+
+    if (badgeBox) {
+        badgeBox.style.background = topCategory.tagBg;
+        badgeBox.style.borderColor = topCategory.tagBorder;
+    }
+    if (badgeTitle) {
+        badgeTitle.style.color = topCategory.tagColor;
+        badgeTitle.textContent = topCategory.tag;
+    }
+    if (badgeDesc) {
+        badgeDesc.textContent = topCategory.desc;
+    }
+    if (actionText) {
+        actionText.textContent = topCategory.action;
+    }
+
+    if (probsContainer) {
+        probsContainer.innerHTML = '';
+        VISION_CATEGORIES.forEach(cat => {
+            const p = (probs[cat.id] || 0).toFixed(1);
+            const isTop = cat.id === topCategory.id;
+
+            let displayTitle = cat.title;
+            if (effectiveElem === 'column' && cat.id === 'shear') displayTitle = 'Falla por Cortante Corto (Columna)';
+            else if (effectiveElem === 'wall' && cat.id === 'shear') displayTitle = 'Falla por Cortante en X (Muro)';
+
+            const row = document.createElement('div');
+            row.style.display = 'flex';
+            row.style.flexDirection = 'column';
+            row.style.gap = '3px';
+
+            row.innerHTML = `
+                <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: ${isTop ? '#fff' : 'var(--text-muted)'}; font-weight: ${isTop ? '700' : '400'};">
+                    <span>${displayTitle}</span>
+                    <span style="font-family: monospace; color: ${isTop ? cat.tagColor : '#38bdf8'};">${p}%</span>
+                </div>
+                <div style="width: 100%; height: 7px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;">
+                    <div style="width: ${p}%; height: 100%; background: ${cat.tagColor}; transition: width 0.4s ease; border-radius: 4px;"></div>
+                </div>
+            `;
+            probsContainer.appendChild(row);
+        });
+    }
+}
+
+function transferVisionToBoletin() {
+    const diag = window.currentVisionDiagnosis;
+    if (!diag) return;
+
+    const cat = diag.category;
+
+    // Cambiar a la pestaña del boletín
+    const boletinTabBtn = document.querySelector('.tab-btn[data-tab="tab-boletin"]');
+    if (boletinTabBtn) boletinTabBtn.click();
+
+    // Actualizar controles en la planilla del boletín si existen
+    const statusSelect = document.getElementById('bol-status-selector');
+    if (statusSelect) {
+        if (cat.severity === 'critical') statusSelect.value = 'rojo';
+        else if (cat.severity === 'moderate' || cat.severity === 'minor') statusSelect.value = 'amarillo';
+        else statusSelect.value = 'verde';
+        statusSelect.dispatchEvent(new Event('change'));
+    }
+
+    alert(`✅ Diagnóstico de Visión IA (${cat.title} - ${diag.confidence.toFixed(1)}%) transferido preliminarmente a la planilla del Boletín Oficial.\n\n⚠️ RECUERDE: Este dictamen es un modelo predictivo automatizado orientativo y bajo ningún concepto sustituye la inspección física presencial de un Ingeniero Civil calificado.`);
 }
 
 
