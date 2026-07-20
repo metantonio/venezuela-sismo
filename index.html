@@ -32,6 +32,118 @@
 </head>
 
 <body>
+    <!-- PORTAL DE ENTRADA Y SELECCIÓN DE PERFIL -->
+    <div id="portal-overlay" class="portal-overlay active">
+        <div class="portal-card">
+            <div class="portal-header">
+                <div class="portal-logo-badge">
+                    <i class="fa-solid fa-building-shield"></i>
+                </div>
+                <h2>Bienvenido a VENEZUELA-SISMO 3D</h2>
+                <p>Plataforma de Evaluación, Gestión de Riesgo Sísmico y Simulación Estructural (COVENIN 1756)</p>
+                <div class="portal-subtitle-tag"><i class="fa-solid fa-layer-group"></i> Selecciona tu perfil de uso para ingresar:</div>
+            </div>
+
+            <div class="portal-grid">
+                <!-- OPCIÓN 1: PÚBLICO GENERAL & COMUNIDAD -->
+                <div class="portal-mode-card portal-mode-public">
+                    <div class="portal-card-header">
+                        <span class="portal-badge badge-public"><i class="fa-solid fa-users"></i> Evaluación &amp; Comunidad</span>
+                        <h3>Público General</h3>
+                        <p>Acceso directo a mapas de afectación, boletines de inspección visual rápida post-sismo y reporte oficial de daños.</p>
+                    </div>
+                    <div class="portal-card-actions">
+                        <button class="portal-btn btn-portal-damage-map" id="portal-btn-map">
+                            <div class="portal-btn-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                            <div class="portal-btn-text">
+                                <strong>Mapa de Daño</strong>
+                                <span>Consulta zonas afectadas y sismos</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                        </button>
+
+                        <button class="portal-btn btn-portal-boletin" id="portal-btn-boletin">
+                            <div class="portal-btn-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+                            <div class="portal-btn-text">
+                                <strong>Boletín de Evaluación</strong>
+                                <span>Inspección visual rápida de edificaciones</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                        </button>
+
+                        <button class="portal-btn btn-portal-form" id="portal-btn-google-form">
+                            <div class="portal-btn-icon"><i class="fa-solid fa-file-pen"></i></div>
+                            <div class="portal-btn-text">
+                                <strong>Reportar Daño (Google Form)</strong>
+                                <span>Formulario oficial de reporte ciudadano</span>
+                            </div>
+                            <i class="fa-solid fa-arrow-up-right-from-square arrow-icon"></i>
+                        </button>
+
+                        <button class="portal-btn btn-portal-vision" id="portal-btn-vision">
+                            <div class="portal-btn-icon"><i class="fa-solid fa-eye"></i></div>
+                            <div class="portal-btn-text">
+                                <strong>Visión IA (Inspección)</strong>
+                                <span>Analizar grietas y fotos de daños con IA</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- OPCIÓN 2: INGENIERÍA & SIMULACIÓN TÉCNICA -->
+                <div class="portal-mode-card portal-mode-engineering">
+                    <div class="portal-card-header">
+                        <span class="portal-badge badge-engineering"><i class="fa-solid fa-compass-drafting"></i> COVENIN 1756 (2001 vs 2019)</span>
+                        <h3>Ingeniería &amp; Simulación</h3>
+                        <p>Herramientas avanzadas de cálculo sismorresistente, análisis dinámico, espectros y simulación 3D.</p>
+                    </div>
+                    <div class="portal-card-actions">
+                        <button class="portal-btn btn-portal-sim" id="portal-btn-3d">
+                            <div class="portal-btn-icon"><i class="fa-solid fa-cubes-stacked"></i></div>
+                            <div class="portal-btn-text">
+                                <strong>Simulador Estructural 3D</strong>
+                                <span>Modelado y deriva de entrepiso en vivo</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                        </button>
+
+                        <button class="portal-btn btn-portal-calc" id="portal-btn-calc">
+                            <div class="portal-btn-icon"><i class="fa-solid fa-calculator"></i></div>
+                            <div class="portal-btn-text">
+                                <strong>Memoria de Cálculo</strong>
+                                <span>Comparativa normativa y cortante basal</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                        </button>
+
+                        <button class="portal-btn btn-portal-spectra" id="portal-btn-spectra">
+                            <div class="portal-btn-icon"><i class="fa-solid fa-chart-line"></i></div>
+                            <div class="portal-btn-text">
+                                <strong>Espectros &amp; Gráficos</strong>
+                                <span>Curvas espectrales de aceleración y respuesta</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                        </button>
+
+                        <button class="portal-btn btn-portal-city" id="portal-btn-city">
+                            <div class="portal-btn-icon"><i class="fa-solid fa-city"></i></div>
+                            <div class="portal-btn-text">
+                                <strong>Simulación Urbana &amp; Sismos</strong>
+                                <span>Simulación de manzana y sismos históricos</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portal-footer">
+                <span class="portal-note"><i class="fa-solid fa-circle-info"></i> Puedes cambiar de perfil en cualquier momento desde el botón <strong>"Inicio / Modo"</strong> en la barra superior.</span>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- HEADER -->
         <header class="app-header">
@@ -678,14 +790,25 @@
 
             <!-- MAIN VIEWPORT AND PLOTS -->
             <main class="content-area">
-                <!-- TOP BAR (HAMBURGER & TITLE) -->
+                <!-- TOP BAR (HAMBURGER, MODO & TITLE) -->
                 <div class="top-bar">
-                    <button class="menu-toggle-btn" id="menu-toggle-btn" aria-label="Abrir menú de vistas">
-                        <span class="bar"></span>
-                        <span class="bar"></span>
-                        <span class="bar"></span>
-                    </button>
-                    <span class="active-tab-title" id="active-tab-title">Vista 3D</span>
+                    <div class="top-bar-left">
+                        <button class="menu-toggle-btn" id="menu-toggle-btn" aria-label="Abrir menú de vistas">
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                        </button>
+                        <button class="portal-home-btn" id="btn-portal-home" title="Volver al Portal de Entrada / Cambiar Perfil">
+                            <i class="fa-solid fa-house"></i> <span>Inicio / Modo</span>
+                        </button>
+                        <span class="active-tab-title" id="active-tab-title">Vista 3D</span>
+                    </div>
+                    <div class="top-bar-right">
+                        <span class="active-mode-badge" id="active-mode-badge"><i class="fa-solid fa-users"></i> Modo Público</span>
+                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSeLCR4CnpKBhJQy5EW6XFaJ-kZfnBgE6M0IoioaTrbWHloW6Q/viewform" target="_blank" rel="noopener" class="btn-top-google-form" id="btn-top-google-form" title="Abrir Formulario Oficial de Reporte de Daños">
+                            <i class="fa-solid fa-file-pen"></i> <span>Reportar Daño</span>
+                        </a>
+                    </div>
                 </div>
 
                 <!-- NAV DRAWER (TAB LIST) -->

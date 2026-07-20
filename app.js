@@ -11994,3 +11994,139 @@ function transferVisionToBoletin() {
 }
 
 
+
+
+/* ==========================================================================
+   GESTIÓN DEL PORTAL DE BIENVENIDA Y MODOS DE USO (PÚBLICO GENERAL VS INGENIERÍA)
+   ========================================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+    const portalOverlay = document.getElementById('portal-overlay');
+    const homeBtn = document.getElementById('btn-portal-home');
+    const activeModeBadge = document.getElementById('active-mode-badge');
+
+    // Función para cambiar de pestaña activa
+    function switchTab(tabId) {
+        const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+        if (targetBtn) {
+            targetBtn.click();
+        } else {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content, .control-panel');
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            const content = document.getElementById(tabId);
+            if (content) content.classList.add('active');
+        }
+    }
+
+    // Actualizar indicador de modo en el header
+    function setAppProfile(profileMode) {
+        localStorage.setItem('vzla_sismo_user_profile', profileMode);
+        if (activeModeBadge) {
+            if (profileMode === 'public') {
+                activeModeBadge.className = 'active-mode-badge mode-public-active';
+                activeModeBadge.innerHTML = '<i class="fa-solid fa-users"></i> Modo Público';
+            } else {
+                activeModeBadge.className = 'active-mode-badge mode-engineering-active';
+                activeModeBadge.innerHTML = '<i class="fa-solid fa-compass-drafting"></i> Modo Ingeniería';
+            }
+        }
+    }
+
+    // Abrir/Cerrar Portal
+    function openPortal() {
+        if (portalOverlay) portalOverlay.classList.add('active');
+    }
+
+    function closePortal() {
+        if (portalOverlay) portalOverlay.classList.remove('active');
+    }
+
+    if (homeBtn) {
+        homeBtn.addEventListener('click', () => {
+            openPortal();
+        });
+    }
+
+    // Handlers para botones del perfil Público General
+    const btnMap = document.getElementById('portal-btn-map');
+    if (btnMap) {
+        btnMap.addEventListener('click', () => {
+            setAppProfile('public');
+            switchTab('tab-damage-map');
+            closePortal();
+        });
+    }
+
+    const btnBoletin = document.getElementById('portal-btn-boletin');
+    if (btnBoletin) {
+        btnBoletin.addEventListener('click', () => {
+            setAppProfile('public');
+            switchTab('tab-boletin');
+            closePortal();
+        });
+    }
+
+    const btnGoogleForm = document.getElementById('portal-btn-google-form');
+    if (btnGoogleForm) {
+        btnGoogleForm.addEventListener('click', () => {
+            setAppProfile('public');
+            const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeLCR4CnpKBhJQy5EW6XFaJ-kZfnBgE6M0IoioaTrbWHloW6Q/viewform";
+            window.open(formUrl, '_blank');
+        });
+    }
+
+    const btnVision = document.getElementById('portal-btn-vision');
+    if (btnVision) {
+        btnVision.addEventListener('click', () => {
+            setAppProfile('public');
+            switchTab('tab-vision');
+            closePortal();
+        });
+    }
+
+    // Handlers para botones del perfil Ingeniería
+    const btn3D = document.getElementById('portal-btn-3d');
+    if (btn3D) {
+        btn3D.addEventListener('click', () => {
+            setAppProfile('engineering');
+            switchTab('tab-3d');
+            closePortal();
+        });
+    }
+
+    const btnCalc = document.getElementById('portal-btn-calc');
+    if (btnCalc) {
+        btnCalc.addEventListener('click', () => {
+            setAppProfile('engineering');
+            switchTab('tab-calc');
+            closePortal();
+        });
+    }
+
+    const btnSpectra = document.getElementById('portal-btn-spectra');
+    if (btnSpectra) {
+        btnSpectra.addEventListener('click', () => {
+            setAppProfile('engineering');
+            switchTab('tab-spectra');
+            closePortal();
+        });
+    }
+
+    const btnCity = document.getElementById('portal-btn-city');
+    if (btnCity) {
+        btnCity.addEventListener('click', () => {
+            setAppProfile('engineering');
+            switchTab('tab-city');
+            closePortal();
+        });
+    }
+
+    // Verificar perfil inicial guardado
+    const savedProfile = localStorage.getItem('vzla_sismo_user_profile');
+    if (savedProfile) {
+        setAppProfile(savedProfile);
+    } else {
+        setAppProfile('public');
+    }
+});
