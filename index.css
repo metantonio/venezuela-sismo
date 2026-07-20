@@ -3439,7 +3439,7 @@ select option { background-color: #11151f; color: #f1f5f9; }
 }
 
 /* ==========================================================================
-   SIMULACIÓN URBANA 3D — LA GUAIRA (tab-city)
+   SIMULACIï¿½N URBANA 3D ï¿½ LA GUAIRA (tab-city)
    ========================================================================== */
 .city-canvas-container {
     width: 100%;
@@ -3946,7 +3946,7 @@ select option { background-color: #11151f; color: #f1f5f9; }
     border-radius: 2px;
 }
 
-/* Visión IA Styles */
+/* Visiï¿½n IA Styles */
 .vision-sample-btn:hover { background: rgba(56, 189, 248, 0.15) !important; border-color: #38bdf8 !important; transform: translateY(-1px); }
 .vision-sample-btn.active { background: rgba(56, 189, 248, 0.25) !important; border-color: #38bdf8 !important; box-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
 @media (max-width: 900px) { .vision-grid-layout { grid-template-columns: 1fr !important; } }
@@ -4193,6 +4193,14 @@ select option { background-color: #11151f; color: #f1f5f9; }
     color: #c084fc;
 }
 
+.btn-portal-sismos .portal-btn-icon {
+    background: rgba(45, 212, 191, 0.2);
+    color: #2dd4bf;
+}
+    background: rgba(168, 85, 247, 0.2);
+    color: #c084fc;
+}
+
 .btn-portal-sim .portal-btn-icon {
     background: rgba(245, 158, 11, 0.2);
     color: #fbbf24;
@@ -4204,6 +4212,14 @@ select option { background-color: #11151f; color: #f1f5f9; }
 }
 
 .btn-portal-spectra .portal-btn-icon {
+    background: rgba(236, 72, 153, 0.2);
+    color: #f472b6;
+}
+
+.btn-portal-response .portal-btn-icon {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
     background: rgba(236, 72, 153, 0.2);
     color: #f472b6;
 }

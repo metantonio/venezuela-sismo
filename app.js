@@ -12085,6 +12085,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const btnSismos = document.getElementById('portal-btn-sismos');
+    if (btnSismos) {
+        btnSismos.addEventListener('click', () => {
+            setAppProfile('public');
+            switchTab('tab-sismos');
+            closePortal();
+        });
+    }
+
     // Handlers para botones del perfil Ingeniería
     const btn3D = document.getElementById('portal-btn-3d');
     if (btn3D) {
@@ -12113,11 +12122,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const btnResponse = document.getElementById('portal-btn-response');
+    if (btnResponse) {
+        btnResponse.addEventListener('click', () => {
+            setAppProfile('engineering');
+            switchTab('tab-response');
+            closePortal();
+        });
+    }
+
     const btnCity = document.getElementById('portal-btn-city');
     if (btnCity) {
         btnCity.addEventListener('click', () => {
             setAppProfile('engineering');
             switchTab('tab-city');
+            closePortal();
+        });
+    }
+
+    // Handler para Info Técnica en la parte inferior del portal
+    const btnInfo = document.getElementById('portal-btn-info');
+    if (btnInfo) {
+        btnInfo.addEventListener('click', () => {
+            switchTab('tab-info');
             closePortal();
         });
     }
