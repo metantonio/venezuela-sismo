@@ -123,6 +123,19 @@
         "real": true
     },
     {
+        "id": "ee983e73-68a2-4342-ad09-02b98e3dceba",
+        "name": "Aeropuerto Internacional Simón Bolívar",
+        "zone": "Aeropuerto",
+        "address": "Aeropuerto Internacional Simón Bolívar, Maiquetía 1162, La Guaira, Venezuela",
+        "lat": 10.597882,
+        "lng": -67.005433,
+        "floors": 2,
+        "status": "damaged",
+        "damage_level": "severo",
+        "photo": "https://www.canal26.com/resizer/v2/A5NHUSF3DVB3ND67S3BQE4SF2A.JPG?auth=2ad5eb3ead67e25fed46039b33724627ec5d94db722c1921abfde38e23416247&smart=true&width=1200&height=2136&quality=70",
+        "real": true
+    },
+    {
         "id": "fb5a3364-76bc-46ee-a542-21a38617cebc",
         "name": "Aguja Azul Maiquetía",
         "zone": "Playa Grande",
