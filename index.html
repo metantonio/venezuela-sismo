@@ -2262,6 +2262,10 @@
                                         <input type="checkbox" id="city-toggle-fans" style="accent-color: #ffb703; cursor: pointer;">
                                         <span>Abanicos Fluviales (Vulnerabilidad y Licuación)</span>
                                     </label>
+                                    <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none;">
+                                        <input type="checkbox" id="city-toggle-bedrock" style="accent-color: #38bdf8; cursor: pointer;">
+                                        <span>Profundidad a Roca Dura (0–450m)</span>
+                                    </label>
                                 </div>
 
                                 <!-- CONTROLES DE LA SIMULACIÓN -->
@@ -2322,6 +2326,15 @@
                                         <div id="city-legend-fans" style="display: none; border-bottom: 1px solid rgba(255,255,255,0.12); margin-bottom: 6px; padding-bottom: 6px; flex-direction: column; gap: 4px;">
                                             <span><i style="background:rgba(239, 68, 68, 0.45); border: 1px solid #ef4444;"></i> Riesgo Alto (Licuación)</span>
                                             <span><i style="background:rgba(245, 158, 11, 0.45); border: 1px solid #f59e0b;"></i> Riesgo Moderado-Alto</span>
+                                        </div>
+                                        <!-- Referencias para Capa de Profundidad a Roca Dura -->
+                                        <div id="city-legend-bedrock" style="display: none; border-bottom: 1px solid rgba(255,255,255,0.12); margin-bottom: 6px; padding-bottom: 6px; flex-direction: column; gap: 5px;">
+                                            <span style="font-weight: 700; font-size: 11px; color: #38bdf8; margin-bottom: 2px;"><i class="fa-solid fa-layer-group"></i> Profundidad a Roca Dura:</span>
+                                            <span><i style="background:rgba(16, 185, 129, 0.8); border: 1px solid #10b981;"></i> 0 – 50 m (Roca Superficial)</span>
+                                            <span><i style="background:rgba(132, 204, 22, 0.8); border: 1px solid #84cc16;"></i> 50 – 150 m (Profundidad Moderada)</span>
+                                            <span><i style="background:rgba(250, 204, 21, 0.8); border: 1px solid #facc15;"></i> 150 – 250 m (Profundidad Intermedia)</span>
+                                            <span><i style="background:rgba(249, 115, 22, 0.8); border: 1px solid #f97316;"></i> 250 – 350 m (Profundidad Alta / Resonancia)</span>
+                                            <span><i style="background:rgba(239, 68, 68, 0.8); border: 1px solid #ef4444;"></i> 350 – 450 m (Basamento Muy Profundo)</span>
                                         </div>
                                         <span><i style="background:#9fb4c8;"></i> Catálogo real</span>
                                         <span><i style="background:#f59e0b;"></i> Dañado</span>

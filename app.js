@@ -8540,6 +8540,108 @@ function createAlluvialFanMesh(centerX, centerZ, radius, startAngle, endAngle, c
     return mesh;
 }
 
+// --- Datos y Funciones para Profundidad a Roca Dura (0-450m) ---
+function getBedrockDepth(lat, lng) {
+    const dSouth = Math.max(0, (lat - 10.592) * 110540); // metros al norte del pie de monte de El Ávila
+    let depth = dSouth * 0.13;
+
+    // Depresión aluvial profunda en Caraballeda / San Julián
+    const dCaraballeda = Math.sqrt(Math.pow((lat - 10.612) * 110540, 2) + Math.pow((lng - (-66.832)) * 98000, 2));
+    if (dCaraballeda < 2400) {
+        const basinFactor = Math.max(0, 1 - dCaraballeda / 2400);
+        depth += 240 * Math.pow(basinFactor, 1.1);
+    }
+
+    // Depresión secundaria en Macuto / Tanaguarena
+    const dMacuto = Math.sqrt(Math.pow((lat - 10.608) * 110540, 2) + Math.pow((lng - (-66.885)) * 98000, 2));
+    if (dMacuto < 1600) {
+        depth += 85 * (1 - dMacuto / 1600);
+    }
+
+    return Math.max(5, Math.min(445, depth));
+}
+
+function getBedrockDepthRangeInfo(depth) {
+    if (depth <= 50) {
+        return { id: '0-50', label: '0 – 50 m (Roca Superficial)', colorHex: 0x10b981, colorCss: '#10b981' };
+    } else if (depth <= 150) {
+        return { id: '50-150', label: '50 – 150 m (Profundidad Moderada)', colorHex: 0x84cc16, colorCss: '#84cc16' };
+    } else if (depth <= 250) {
+        return { id: '150-250', label: '150 – 250 m (Profundidad Intermedia)', colorHex: 0xfacc15, colorCss: '#facc15' };
+    } else if (depth <= 350) {
+        return { id: '250-350', label: '250 – 350 m (Profundidad Alta / Resonancia)', colorHex: 0xf97316, colorCss: '#f97316' };
+    } else {
+        return { id: '350-450', label: '350 – 450 m (Basamento Muy Profundo)', colorHex: 0xef4444, colorCss: '#ef4444' };
+    }
+}
+
+function createBedrockDepthBandsMesh(toScene, ext) {
+    const meshes = [];
+    const rows = 45;
+    const cols = 55;
+    const latStep = (ext.latMax - ext.latMin) / rows;
+    const lngStep = (ext.lngMax - ext.lngMin) / cols;
+
+    const ranges = [
+        { id: '0-50', maxD: 50, colorHex: 0x10b981, vertices: [] },
+        { id: '50-150', maxD: 150, colorHex: 0x84cc16, vertices: [] },
+        { id: '150-250', maxD: 250, colorHex: 0xfacc15, vertices: [] },
+        { id: '250-350', maxD: 350, colorHex: 0xf97316, vertices: [] },
+        { id: '350-450', maxD: 450, colorHex: 0xef4444, vertices: [] }
+    ];
+
+    const terr = citySim.terrain;
+
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            const lat0 = ext.latMin + r * latStep;
+            const lat1 = lat0 + latStep;
+            const lng0 = ext.lngMin + c * lngStep;
+            const lng1 = lng0 + lngStep;
+
+            const latC = (lat0 + lat1) / 2;
+            const lngC = (lng0 + lng1) / 2;
+            const depth = getBedrockDepth(latC, lngC);
+
+            const targetRange = ranges.find(rng => depth <= rng.maxD) || ranges[4];
+
+            const p00 = toScene(lat0, lng0);
+            const p10 = toScene(lat1, lng0);
+            const p11 = toScene(lat1, lng1);
+            const p01 = toScene(lat0, lng1);
+
+            const getY = (pos) => (terr && typeof terr.heightAt === 'function') ? terr.heightAt(pos.x, pos.z) + 3.8 : 3.8;
+
+            const y00 = getY(p00), y10 = getY(p10), y11 = getY(p11), y01 = getY(p01);
+
+            targetRange.vertices.push(
+                p00.x, y00, p00.z,  p10.x, y10, p10.z,  p11.x, y11, p11.z,
+                p00.x, y00, p00.z,  p11.x, y11, p11.z,  p01.x, y01, p01.z
+            );
+        }
+    }
+
+    ranges.forEach(rng => {
+        if (rng.vertices.length === 0) return;
+        const geom = new THREE.BufferGeometry();
+        geom.setAttribute('position', new THREE.Float32BufferAttribute(rng.vertices, 3));
+        geom.computeVertexNormals();
+
+        const mat = new THREE.MeshBasicMaterial({
+            color: rng.colorHex,
+            transparent: true,
+            opacity: 0.38,
+            side: THREE.DoubleSide,
+            depthWrite: false
+        });
+
+        const mesh = new THREE.Mesh(geom, mat);
+        meshes.push(mesh);
+    });
+
+    return meshes;
+}
+
 async function initCitySim() {
     const container = document.getElementById('city-canvas-container');
     const loadingEl = document.getElementById('city-loading');
@@ -8663,6 +8765,20 @@ async function initCitySim() {
         const mesh = createAlluvialFanMesh(centerPos.x, centerPos.z, fan.radius, fan.startAngle, fan.endAngle, fan.color);
         fansGroup.add(mesh);
     });
+
+    // --- Capa de Profundidad a Roca Dura (0-450m) ---
+    const bedrockGroup = new THREE.Group();
+    bedrockGroup.visible = false; // oculto por defecto
+    group.add(bedrockGroup);
+    citySim.bedrockGroup = bedrockGroup;
+
+    try {
+        const bedrockBands = createBedrockDepthBandsMesh(toScene, ext);
+        bedrockBands.forEach(m => bedrockGroup.add(m));
+    } catch (e) {
+        console.warn('[city-sim] Error al generar mallas de profundidad a roca dura:', e);
+    }
+
     console.info(`[city-sim] Terreno: ${citySim.groundType}, DEM: ${terr.demType}, altura máx ≈ ${Math.round(terr.maxH)} m, onda oeste→este a ${CITY_CFG.waveSpeed} m/s`);
 
     // --- Frentes de onda sísmica (uno por evento del doblete) ---
@@ -8955,6 +9071,26 @@ function wireCityControls() {
             }
         });
     }
+
+    const toggleBedrock = document.getElementById('city-toggle-bedrock');
+    if (toggleBedrock) {
+        toggleBedrock.addEventListener('change', (e) => {
+            if (!citySim || !citySim.bedrockGroup) return;
+            citySim.bedrockGroup.visible = e.target.checked;
+            
+            // Toggle legend 3D
+            const legendBedrock = document.getElementById('city-legend-bedrock');
+            if (legendBedrock) {
+                legendBedrock.style.display = e.target.checked ? 'flex' : 'none';
+            }
+
+            // Toggle leyenda inline
+            const inlineLegend = document.getElementById('city-inline-bedrock-legend');
+            if (inlineLegend) {
+                inlineLegend.style.display = e.target.checked ? 'flex' : 'none';
+            }
+        });
+    }
 }
 
 function updateCityPlayButton() {
@@ -9241,6 +9377,12 @@ function cityFrameLoop(now) {
             if (mesh.material) mesh.material.opacity = pulse;
         });
     }
+    if (citySim.bedrockGroup && citySim.bedrockGroup.visible) {
+        const pulseB = 0.35 + Math.sin(now * 0.0018) * 0.06;
+        citySim.bedrockGroup.children.forEach(mesh => {
+            if (mesh.material) mesh.material.opacity = pulseB;
+        });
+    }
 
     citySim.controls.update();
     citySim.renderer.render(citySim.scene, citySim.camera);
@@ -9273,6 +9415,9 @@ function showCityBuildingCard(st) {
     if (Array.isArray(b.photo) && b.photo.length) photo = b.photo[0];
     else if (typeof b.photo === 'string' && b.photo.startsWith('http')) photo = b.photo;
 
+    const bDepth = getBedrockDepth(b.lat, b.lng);
+    const bRangeInfo = getBedrockDepthRangeInfo(bDepth);
+
     card.innerHTML = `
         <button class="city-card-close" title="Cerrar"><i class="fa-solid fa-xmark"></i></button>
         <h4><i class="fa-solid fa-building"></i> ${b.name || 'Sin nombre'}</h4>
@@ -9282,6 +9427,7 @@ function showCityBuildingCard(st) {
         <div class="city-card-row"><span>Nivel de daño</span><b>${dmgTxt}</b></div>
         <div class="city-card-row"><span>${isCol ? 'Colapsa en' : 'Se daña en'}</span><b>${eventTxt}</b></div>
         <div class="city-card-row"><span>P(colapso) MC 2019</span><b>${pMC}</b></div>
+        <div class="city-card-row"><span>Roca Dura</span><b style="color: ${bRangeInfo.colorCss}; font-weight: 700;">${bDepth.toFixed(0)} m (${bRangeInfo.id}m)</b></div>
         <div style="margin-top: 6px; font-size: 10.5px; opacity: 0.75;">${b.address || ''}</div>
         ${photo ? `<img src="${photo}" alt="Foto de ${b.name}" loading="lazy" onerror="this.style.display='none'">` : ''}
     `;
@@ -9619,6 +9765,36 @@ async function initDamageMap() {
         </div>
     `);
 
+    // 4. Capa de Profundidad a Roca Dura (0 - 450m)
+    const bedrockMapGroup = L.layerGroup();
+    const bedrockRanges2D = [
+        { label: '0 – 50 m (Roca Superficial)', latMin: 10.590, latMax: 10.598, color: '#10b981', opacity: 0.28 },
+        { label: '50 – 150 m (Profundidad Moderada)', latMin: 10.598, latMax: 10.604, color: '#84cc16', opacity: 0.28 },
+        { label: '150 – 250 m (Profundidad Intermedia)', latMin: 10.604, latMax: 10.609, color: '#facc15', opacity: 0.28 },
+        { label: '250 – 350 m (Profundidad Alta / Resonancia)', latMin: 10.609, latMax: 10.614, color: '#f97316', opacity: 0.32 },
+        { label: '350 – 450 m (Basamento Muy Profundo)', latMin: 10.614, latMax: 10.622, color: '#ef4444', opacity: 0.36 }
+    ];
+
+    bedrockRanges2D.forEach(rng => {
+        const rect = L.rectangle([[rng.latMin, -67.15], [rng.latMax, -66.65]], {
+            color: rng.color,
+            weight: 1.5,
+            dashArray: '5, 5',
+            fillColor: rng.color,
+            fillOpacity: rng.opacity
+        }).addTo(bedrockMapGroup);
+
+        rect.bindPopup(`
+            <div style="font-family:'Inter',sans-serif; font-size:12px; color:#fff;">
+                <strong style="color:${rng.color};"><i class="fa-solid fa-layer-group"></i> Profundidad a Roca Dura: ${rng.label}</strong><br>
+                <p style="margin:6px 0 0 0; line-height:1.4; color:#94a3b8;">
+                    Espesor sedimentario estimado sobre la roca dura metamórfica del macizo de El Ávila (Formación Las Mercedes / Las Brisas).
+                </p>
+            </div>
+        `);
+        rect.bindTooltip(`Roca Dura: ${rng.label}`, { sticky: true });
+    });
+
     // Añadir al mapa por defecto
     faultsGroup.addTo(map);
 
@@ -9626,7 +9802,8 @@ async function initDamageMap() {
     const overlayLayers = {
         '<span style="color:#f87171; font-weight:600;"><i class="fa-solid fa-bolt"></i> Fallas Geológicas (FUNVISIS)</span>': faultsGroup,
         '<span style="color:#fb923c; font-weight:600;"><i class="fa-solid fa-house-crack"></i> Zonas de Intensidad (MMI 1967)</span>': impactZonesGroup,
-        '<span style="color:#e63946; font-weight:600;"><i class="fa-solid fa-gauge-high"></i> Aceleración de Suelo (PGA 2026)</span>': pgaGroup
+        '<span style="color:#e63946; font-weight:600;"><i class="fa-solid fa-gauge-high"></i> Aceleración de Suelo (PGA 2026)</span>': pgaGroup,
+        '<span style="color:#38bdf8; font-weight:600;"><i class="fa-solid fa-layer-group"></i> Profundidad a Roca Dura (0–450m)</span>': bedrockMapGroup
     };
     L.control.layers(null, overlayLayers, {
         collapsed: false,
@@ -9647,6 +9824,10 @@ async function initDamageMap() {
             const el = document.getElementById('legend-pga');
             if (el) el.style.display = 'flex';
         }
+        if (e.name.includes("Roca Dura")) {
+            const el = document.getElementById('legend-bedrock');
+            if (el) el.style.display = 'flex';
+        }
     });
 
     map.on('overlayremove', (e) => {
@@ -9660,6 +9841,10 @@ async function initDamageMap() {
         }
         if (e.name.includes("PGA")) {
             const el = document.getElementById('legend-pga');
+            if (el) el.style.display = 'none';
+        }
+        if (e.name.includes("Roca Dura")) {
+            const el = document.getElementById('legend-bedrock');
             if (el) el.style.display = 'none';
         }
     });
