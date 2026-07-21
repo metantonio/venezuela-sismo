@@ -2279,165 +2279,144 @@
                                     <!-- Leaflet map rendered here -->
                                 </div>
 
-                                <!-- LEYENDA -->
-                                <div class="damage-map-legend" id="damage-map-legend">
-                                    <div class="legend-title-map"><i class="fa-solid fa-palette"></i> Probabilidad de
-                                        Colapso</div>
-                                    <div class="legend-row-map">
-                                        <span class="legend-dot-map" style="background: #2ec4b6;"></span>
-                                        <span>Baja (&lt; 40%)</span>
-                                    </div>
-                                    <div class="legend-row-map">
-                                        <span class="legend-dot-map" style="background: #ffb703;"></span>
-                                        <span>Media (40% – 60%)</span>
-                                    </div>
-                                    <div class="legend-row-map">
-                                        <span class="legend-dot-map" style="background: #fb8500;"></span>
-                                        <span>Alta (60% – 80%)</span>
-                                    </div>
-                                    <div class="legend-row-map">
-                                        <span class="legend-dot-map" style="background: #e63946;"></span>
-                                        <span>Muy Alta (80% – 100%)</span>
-                                    </div>
-                                    <div class="legend-row-map">
-                                        <span class="legend-dot-map"
-                                            style="background: #111; border: 2px solid #e63946; animation: pulse-legend 1.5s infinite;"></span>
-                                        <span>Colapso Seguro (100%)</span>
-                                    </div>
-                                </div>
-
-                                <!-- TABLA RESUMEN -->
-                                <div style="margin-top: 24px;">
-                                    <div
-                                        style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px;">
-                                        <h4
-                                            style="color: var(--color-2019); font-size: 15px; margin: 0; display: flex; align-items: center; gap: 8px;">
-                                            <i class="fa-solid fa-table-list"></i> Resumen de Edificaciones Evaluadas
-                                            <span id="damage-map-count-badge"
-                                                style="font-size: 11px; background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 600;">
-                                                198 edificaciones
-                                            </span>
-                                        </h4>
-
-                                        <!-- CONTROLES DE BÚSQUEDA Y FILTRADO -->
-                                        <div
-                                            style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%; max-width: 560px;">
-                                            <div style="position: relative; flex: 1; min-width: 220px;">
-                                                <i class="fa-solid fa-magnifying-glass"
-                                                    style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px;"></i>
-                                                <input type="text" id="damage-map-search"
-                                                    placeholder="Buscar edificación o sector (ej. OPPPE, Caribe, Solymar)..."
-                                                    style="width: 100%; padding: 8px 12px 8px 34px; background: rgba(20, 25, 40, 0.6); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #fff; font-size: 13px; outline: none; transition: border-color 0.2s;"
-                                                    onfocus="this.style.borderColor='#00f2fe'"
-                                                    onblur="this.style.borderColor='rgba(255, 255, 255, 0.15)'">
-                                            </div>
-
-                                            <!-- LEYENDA FALLAS GEOLÓGICAS (ACTIVACIÓN DINÁMICA) -->
-                                            <div class="damage-map-legend" id="legend-geological"
-                                                style="margin-top: 10px; display: flex;">
-                                                <div class="legend-title-map"><i class="fa-solid fa-bolt"
-                                                        style="color: #ef4444;"></i> Fallas Geológicas (FUNVISIS)</div>
-                                                <div class="legend-row-map">
-                                                    <span
-                                                        style="display: inline-block; width: 20px; border-bottom: 3px dashed #f87171; margin-right: 6px; vertical-align: middle;"></span>
-                                                    <span>F. de San Sebastián (Principal/Offshore)</span>
-                                                </div>
-                                                <div class="legend-row-map">
-                                                    <span
-                                                        style="display: inline-block; width: 20px; border-bottom: 3px dashed #fb923c; margin-right: 6px; vertical-align: middle;"></span>
-                                                    <span>F. de Tacagua - El Ávila (Frente Montañoso)</span>
-                                                </div>
-                                                <div class="legend-row-map">
-                                                    <span
-                                                        style="display: inline-block; width: 20px; border-bottom: 3px dashed #facc15; margin-right: 6px; vertical-align: middle;"></span>
-                                                    <span>F. de Macuto (Costera Secundaria)</span>
-                                                </div>
-                                            </div>
-
-                                            <!-- LEYENDA INTENSIDADES SÍSMICAS (ACTIVACIÓN DINÁMICA) -->
-                                            <div class="damage-map-legend" id="legend-intensities"
-                                                style="margin-top: 10px; display: none;">
-                                                <div class="legend-title-map"><i class="fa-solid fa-house-crack"
-                                                        style="color: #fb923c;"></i> Intensidades MMI (Terremoto 1967)
-                                                </div>
-                                                <div class="legend-row-map">
-                                                    <span class="legend-dot-map"
-                                                        style="background: rgba(127, 29, 29, 0.6); border: 1px solid #ef4444;"></span>
-                                                    <span>Zona VIII - IX (Caraballeda - Amplificación Severa)</span>
-                                                </div>
-                                                <div class="legend-row-map">
-                                                    <span class="legend-dot-map"
-                                                        style="background: rgba(194, 65, 12, 0.5); border: 1px solid #fb923c;"></span>
-                                                    <span>Zona VII - VIII (Macuto / Tanaguarena - Daño Alto)</span>
-                                                </div>
-                                                <div class="legend-row-map">
-                                                    <span class="legend-dot-map"
-                                                        style="background: rgba(133, 77, 14, 0.4); border: 1px solid #facc15;"></span>
-                                                    <span>Zona VI - VII (La Guaira / Maiquetía - Daño Moderado)</span>
-                                                </div>
-                                            </div>
-
-                                            <!-- LEYENDA PGA (ACTIVACIÓN DINÁMICA) -->
-                                            <div class="damage-map-legend" id="legend-pga"
-                                                style="margin-top: 10px; display: none;">
-                                                <div class="legend-title-map"><i class="fa-solid fa-gauge-high"
-                                                        style="color: #ef4444;"></i> Aceleración de Suelo Pico (PGA
-                                                    USGS)</div>
-                                                <div class="legend-row-map">
-                                                    <span
-                                                        style="display: inline-block; width: 20px; border-bottom: 3px dashed #ef4444; margin-right: 6px; vertical-align: middle;"></span>
-                                                    <span>&ge; 0.50g (Extremo)</span>
-                                                </div>
-                                                <div class="legend-row-map">
-                                                    <span
-                                                        style="display: inline-block; width: 20px; border-bottom: 3px dashed #fb923c; margin-right: 6px; vertical-align: middle;"></span>
-                                                    <span>0.20g – 0.50g (Severo)</span>
-                                                </div>
-                                                <div class="legend-row-map">
-                                                    <span
-                                                        style="display: inline-block; width: 20px; border-bottom: 3px dashed #facc15; margin-right: 6px; vertical-align: middle;"></span>
-                                                    <span>0.10g – 0.20g (Muy Fuerte)</span>
-                                                </div>
-                                                <div class="legend-row-map">
-                                                    <span
-                                                        style="display: inline-block; width: 20px; border-bottom: 3px dashed #4ade80; margin-right: 6px; vertical-align: middle;"></span>
-                                                    <span>0.05g – 0.10g (Fuerte)</span>
-                                                </div>
-                                                <div class="legend-row-map">
-                                                    <span
-                                                        style="display: inline-block; width: 20px; border-bottom: 3px dashed #2ec4b6; margin-right: 6px; vertical-align: middle;"></span>
-                                                    <span>&lt; 0.05g (Moderado-Leve)</span>
-                                                </div>
-                                            </div>
-                                            <select id="damage-map-status-filter"
-                                                style="padding: 8px 12px; background: rgba(20, 25, 40, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #fff; font-size: 13px; outline: none; cursor: pointer;">
-                                                <option value="all">Todos los Estados</option>
-                                                <option value="collapsed">🔴 Colapsadas (Colapso Total)</option>
-                                                <option value="damaged">🟠 Daño Severo / Moderado</option>
-                                                <option value="survived">🟢 Resistieron / Leve</option>
-                                            </select>
+                                <!-- PANEL DESPLEGABLE INFERIOR (BOTTOM SHEET) ESTILO GOOGLE MAPS -->
+                                <div class="mobile-bottom-sheet">
+                                    <div class="mobile-sheet-handle-bar">
+                                        <div class="mobile-sheet-pill"></div>
+                                        <div class="mobile-sheet-title">
+                                            <span><i class="fa-solid fa-table-list" style="color: #00f2fe;"></i> Tabla de Edificaciones &amp; Leyendas</span>
+                                            <i class="fa-solid fa-chevron-up sheet-arrow"></i>
                                         </div>
                                     </div>
+                                    <div class="mobile-sheet-body">
+                                        <!-- LEYENDA -->
+                                        <div class="damage-map-legend" id="damage-map-legend">
+                                            <div class="legend-title-map"><i class="fa-solid fa-palette"></i> Probabilidad de Colapso</div>
+                                            <div class="legend-row-map">
+                                                <span class="legend-dot-map" style="background: #2ec4b6;"></span>
+                                                <span>Baja (&lt; 40%)</span>
+                                            </div>
+                                            <div class="legend-row-map">
+                                                <span class="legend-dot-map" style="background: #ffb703;"></span>
+                                                <span>Media (40% – 60%)</span>
+                                            </div>
+                                            <div class="legend-row-map">
+                                                <span class="legend-dot-map" style="background: #fb8500;"></span>
+                                                <span>Alta (60% – 80%)</span>
+                                            </div>
+                                            <div class="legend-row-map">
+                                                <span class="legend-dot-map" style="background: #e63946;"></span>
+                                                <span>Muy Alta (80% – 100%)</span>
+                                            </div>
+                                            <div class="legend-row-map">
+                                                <span class="legend-dot-map" style="background: #111; border: 2px solid #e63946; animation: pulse-legend 1.5s infinite;"></span>
+                                                <span>Colapso Seguro (100%)</span>
+                                            </div>
+                                        </div>
 
-                                    <div
-                                        style="overflow-x: auto; max-height: 480px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
-                                        <table class="calc-table" id="damage-map-summary-table" style="width: 100%;">
-                                            <thead
-                                                style="position: sticky; top: 0; background: rgba(15, 20, 32, 0.95); backdrop-filter: blur(8px); z-index: 5;">
-                                                <tr>
-                                                    <th style="width: 5%;">#</th>
-                                                    <th style="width: 25%;">Edificación / Ubicación</th>
-                                                    <th style="width: 8%;">Pisos</th>
-                                                    <th style="width: 16%;">P. Colapso 2001</th>
-                                                    <th style="width: 16%;">P. Colapso 2019</th>
-                                                    <th style="width: 16%;">Estado</th>
-                                                    <th style="width: 14%;">Acción</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="damage-map-table-body">
-                                                <!-- Filled by JS -->
-                                            </tbody>
-                                        </table>
+                                        <!-- TABLA RESUMEN -->
+                                        <div style="margin-top: 14px;">
+                                            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px;">
+                                                <h4 style="color: var(--color-2019); font-size: 15px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                                    <i class="fa-solid fa-table-list"></i> Resumen de Edificaciones Evaluadas
+                                                    <span id="damage-map-count-badge" style="font-size: 11px; background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 600;">
+                                                        198 edificaciones
+                                                    </span>
+                                                </h4>
+
+                                                <!-- CONTROLES DE BÚSQUEDA Y FILTRADO -->
+                                                <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%; max-width: 560px;">
+                                                    <div style="position: relative; flex: 1; min-width: 220px;">
+                                                        <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px;"></i>
+                                                        <input type="text" id="damage-map-search" placeholder="Buscar edificación o sector (ej. OPPPE, Caribe, Solymar)..." style="width: 100%; padding: 8px 12px 8px 34px; background: rgba(20, 25, 40, 0.6); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #fff; font-size: 13px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#00f2fe'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.15)'">
+                                                    </div>
+
+                                                    <!-- LEYENDA FALLAS GEOLÓGICAS (ACTIVACIÓN DINÁMICA) -->
+                                                    <div class="damage-map-legend" id="legend-geological" style="margin-top: 10px; display: flex;">
+                                                        <div class="legend-title-map"><i class="fa-solid fa-bolt" style="color: #ef4444;"></i> Fallas Geológicas (FUNVISIS)</div>
+                                                        <div class="legend-row-map">
+                                                            <span style="display: inline-block; width: 20px; border-bottom: 3px dashed #f87171; margin-right: 6px; vertical-align: middle;"></span>
+                                                            <span>F. de San Sebastián (Principal/Offshore)</span>
+                                                        </div>
+                                                        <div class="legend-row-map">
+                                                            <span style="display: inline-block; width: 20px; border-bottom: 3px dashed #fb923c; margin-right: 6px; vertical-align: middle;"></span>
+                                                            <span>F. de Tacagua - El Ávila (Frente Montañoso)</span>
+                                                        </div>
+                                                        <div class="legend-row-map">
+                                                            <span style="display: inline-block; width: 20px; border-bottom: 3px dashed #facc15; margin-right: 6px; vertical-align: middle;"></span>
+                                                            <span>F. de Macuto (Costera Secundaria)</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- LEYENDA INTENSIDADES SÍSMICAS (ACTIVACIÓN DINÁMICA) -->
+                                                    <div class="damage-map-legend" id="legend-intensities" style="margin-top: 10px; display: none;">
+                                                        <div class="legend-title-map"><i class="fa-solid fa-house-crack" style="color: #fb923c;"></i> Intensidades MMI (Terremoto 1967)</div>
+                                                        <div class="legend-row-map">
+                                                            <span class="legend-dot-map" style="background: rgba(127, 29, 29, 0.6); border: 1px solid #ef4444;"></span>
+                                                            <span>Zona VIII - IX (Caraballeda - Amplificación Severa)</span>
+                                                        </div>
+                                                        <div class="legend-row-map">
+                                                            <span class="legend-dot-map" style="background: rgba(194, 65, 12, 0.5); border: 1px solid #fb923c;"></span>
+                                                            <span>Zona VII - VIII (Macuto / Tanaguarena - Daño Alto)</span>
+                                                        </div>
+                                                        <div class="legend-row-map">
+                                                            <span class="legend-dot-map" style="background: rgba(133, 77, 14, 0.4); border: 1px solid #facc15;"></span>
+                                                            <span>Zona VI - VII (La Guaira / Maiquetía - Daño Moderado)</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- LEYENDA PGA (ACTIVACIÓN DINÁMICA) -->
+                                                    <div class="damage-map-legend" id="legend-pga" style="margin-top: 10px; display: none;">
+                                                        <div class="legend-title-map"><i class="fa-solid fa-gauge-high" style="color: #ef4444;"></i> Aceleración de Suelo Pico (PGA USGS)</div>
+                                                        <div class="legend-row-map">
+                                                            <span style="display: inline-block; width: 20px; border-bottom: 3px dashed #ef4444; margin-right: 6px; vertical-align: middle;"></span>
+                                                            <span>&ge; 0.50g (Extremo)</span>
+                                                        </div>
+                                                        <div class="legend-row-map">
+                                                            <span style="display: inline-block; width: 20px; border-bottom: 3px dashed #fb923c; margin-right: 6px; vertical-align: middle;"></span>
+                                                            <span>0.20g – 0.50g (Severo)</span>
+                                                        </div>
+                                                        <div class="legend-row-map">
+                                                            <span style="display: inline-block; width: 20px; border-bottom: 3px dashed #facc15; margin-right: 6px; vertical-align: middle;"></span>
+                                                            <span>0.10g – 0.20g (Muy Fuerte)</span>
+                                                        </div>
+                                                        <div class="legend-row-map">
+                                                            <span style="display: inline-block; width: 20px; border-bottom: 3px dashed #4ade80; margin-right: 6px; vertical-align: middle;"></span>
+                                                            <span>0.05g – 0.10g (Fuerte)</span>
+                                                        </div>
+                                                        <div class="legend-row-map">
+                                                            <span style="display: inline-block; width: 20px; border-bottom: 3px dashed #2ec4b6; margin-right: 6px; vertical-align: middle;"></span>
+                                                            <span>&lt; 0.05g (Moderado-Leve)</span>
+                                                        </div>
+                                                    </div>
+                                                    <select id="damage-map-status-filter" style="padding: 8px 12px; background: rgba(20, 25, 40, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #fff; font-size: 13px; outline: none; cursor: pointer;">
+                                                        <option value="all">Todos los Estados</option>
+                                                        <option value="collapsed">🔴 Colapsadas (Colapso Total)</option>
+                                                        <option value="damaged">🟠 Daño Severo / Moderado</option>
+                                                        <option value="survived">🟢 Resistieron / Leve</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div style="overflow-x: auto; max-height: 480px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                                <table class="calc-table" id="damage-map-summary-table" style="width: 100%;">
+                                                    <thead style="position: sticky; top: 0; background: rgba(15, 20, 32, 0.95); backdrop-filter: blur(8px); z-index: 5;">
+                                                        <tr>
+                                                            <th style="width: 5%;">#</th>
+                                                            <th style="width: 25%;">Edificación / Ubicación</th>
+                                                            <th style="width: 8%;">Pisos</th>
+                                                            <th style="width: 16%;">P. Colapso 2001</th>
+                                                            <th style="width: 16%;">P. Colapso 2019</th>
+                                                            <th style="width: 16%;">Estado</th>
+                                                            <th style="width: 14%;">Acción</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="damage-map-table-body">
+                                                        <!-- Filled by JS -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
