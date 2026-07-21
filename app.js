@@ -9033,34 +9033,43 @@ async function initCitySim() {
 
 function wireCityControls() {
     const btnPlay = document.getElementById('city-btn-play');
+    const floatBtnPlay = document.getElementById('city-float-btn-play');
     const btnRestart = document.getElementById('city-btn-restart');
+    const floatBtnRestart = document.getElementById('city-float-btn-restart');
     const scrubber = document.getElementById('city-scrubber');
 
-    if (btnPlay) {
-        btnPlay.addEventListener('click', () => {
-            if (!citySim) return;
-            if (citySim.t >= CITY_CFG.duration) applyCityState(0, 0, false);
-            citySim.playing = !citySim.playing;
-            updateCityPlayButton();
-        });
-    }
-    if (btnRestart) {
-        btnRestart.addEventListener('click', () => {
-            if (!citySim) return;
-            citySim.playing = false;
-            clearCityDust();
-            applyCityState(0, 0, false);
-            updateCityPlayButton();
-            updateCityUI();
-        });
-    }
+    const handlePlayToggle = () => {
+        if (!citySim) return;
+        if (citySim.t >= CITY_CFG.duration) applyCityState(0, 0, false);
+        citySim.playing = !citySim.playing;
+        updateCityPlayButton();
+    };
+
+    const handleRestart = () => {
+        if (!citySim) return;
+        citySim.playing = false;
+        clearCityDust();
+        applyCityState(0, 0, false);
+        updateCityPlayButton();
+        updateCityUI();
+    };
+
+    if (btnPlay) btnPlay.addEventListener('click', handlePlayToggle);
+    if (floatBtnPlay) floatBtnPlay.addEventListener('click', handlePlayToggle);
+
+    if (btnRestart) btnRestart.addEventListener('click', handleRestart);
+    if (floatBtnRestart) floatBtnRestart.addEventListener('click', handleRestart);
+
     document.querySelectorAll('.city-speed-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('.city-speed-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            if (citySim) citySim.speed = parseFloat(btn.dataset.speed) || 1;
+            const speedVal = btn.dataset.speed;
+            document.querySelectorAll('.city-speed-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.speed === speedVal);
+            });
+            if (citySim) citySim.speed = parseFloat(speedVal) || 1;
         });
     });
+
     if (scrubber) {
         scrubber.addEventListener('input', () => {
             if (!citySim) return;
@@ -9101,17 +9110,20 @@ function wireCityControls() {
 }
 
 function updateCityPlayButton() {
-    const btn = document.getElementById('city-btn-play');
-    if (!btn || !citySim) return;
-    const icon = btn.querySelector('i');
-    const label = btn.querySelector('span');
-    if (citySim.playing) {
-        if (icon) icon.className = 'fa-solid fa-pause';
-        if (label) label.textContent = 'Pausar';
-    } else {
-        if (icon) icon.className = 'fa-solid fa-play';
-        if (label) label.textContent = (citySim.t >= CITY_CFG.duration) ? 'Repetir' : 'Reproducir';
-    }
+    if (!citySim) return;
+    const playBtns = [document.getElementById('city-btn-play'), document.getElementById('city-float-btn-play')];
+    playBtns.forEach(btn => {
+        if (!btn) return;
+        const icon = btn.querySelector('i');
+        const label = btn.querySelector('span');
+        if (citySim.playing) {
+            if (icon) icon.className = 'fa-solid fa-pause';
+            if (label) label.textContent = 'Pausar';
+        } else {
+            if (icon) icon.className = 'fa-solid fa-play';
+            if (label) label.textContent = (citySim.t >= CITY_CFG.duration) ? 'Repetir' : 'Reproducir';
+        }
+    });
 }
 
 // Aplica el estado completo de la ciudad en el instante t (determinístico).
