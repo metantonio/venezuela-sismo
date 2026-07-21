@@ -1,0 +1,2826 @@
+{
+  "1010": {
+    "lat": 10.529754,
+    "lng": -66.9189632,
+    "display": "1010, Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "Solymar, J56H+54G, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Solymar, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6128387,
+    "lng": -66.8498125,
+    "display": "Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Edificio Punta Piedra, J437+PWV, Macuto 1164, La Guaira, Venezuela": null,
+  "Edificio Punta Piedra, Macuto 1164, La Guaira, Venezuela": null,
+  "Macuto 1164, La Guaira, Venezuela": {
+    "lat": 10.6064747,
+    "lng": -66.8922851,
+    "display": "Macuto, Parroquia Macuto, Municipio Vargas, Estado Vargas, 1164, Venezuela"
+  },
+  "RESIDENCIAS GRAÑAMAR, Av. Terepaima, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Av. Terepaima, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6107667,
+    "lng": -66.8426858,
+    "display": "Avenida Terepaima, El Palmar Este, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Residencias Marena, Vía Catia La Mar, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Vía Catia La Mar, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Edificio Cambural cerca de la panadería almendrina playa grande la guaira, Playa Grande, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Playa Grande, Maiquetía 1162, La Guaira, Venezuela": {
+    "lat": 10.6134425,
+    "lng": -67.0137069,
+    "display": "Playa Club Marina Grande, Calle Real de Playa Verde, Playa Verde, Catia La Mar, Parroquia Urimare, Municipio Vargas, Estado Vargas, 1162, Venezuela"
+  },
+  "Qta. Mariangela, Calle 4, Catia La Mar 1162, playa grande. Circunvalación norteLa Guaira, Venezuela": null,
+  "Calle 4, Catia La Mar 1162, playa grande. Circunvalación norteLa Guaira, Venezuela": null,
+  "Residencias Caribe, J592+G2Q, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Caribe, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6147164,
+    "lng": -66.8389212,
+    "display": "Residencias Caribe, Avenida Principal de Caribe, Urbanización Caribe, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Residencias Orca, JX5R+RV6, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Residencias Orca, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Maiquetía 1162, La Guaira, Venezuela": {
+    "lat": 10.6031377,
+    "lng": -66.9966802,
+    "display": "Aeropuerto Internacional de Maiquetía Simón Bolívar, Avenida La Armada, Montesano, El Trébol, Catia La Mar, Parroquia Urimare, Municipio Vargas, Estado Vargas, 1162, Venezuela"
+  },
+  "Hotel Aeropuerto, Calle 3, Catia La Mar 1162, La Guaira, Venezuela": {
+    "lat": 10.608038,
+    "lng": -67.0326532,
+    "display": "Hotel Aeropuerto, Calle 3 de La Atlántida, Las Colinas, Parroquia Catia La Mar, Municipio Vargas, Estado Vargas, 1162, Venezuela"
+  },
+  "Aeropuerto Internacional Simón Bolívar, Aeropuerto Internacional Simón Bolívar, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Aeropuerto Internacional Simón Bolívar, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Aguja Azul Maiquetía, 10.611169, -67.017788, Maiquetía 1162, La Guaira, Venezuela": null,
+  "10.611169, -67.017788, Maiquetía 1162, La Guaira, Venezuela": null,
+  "CARABALLEDA SOL, Calle Bajada El Caribe, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Calle Bajada El Caribe, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Edificio El Jurel, Playa Grande, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Residencias Capri, Playa Grande, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Edificio Marú, Av. La Atlántida, Catia La Mar, calle 11, La Guaira, Venezuela": null,
+  "Av. La Atlántida, Catia La Mar, calle 11, La Guaira, Venezuela": null,
+  "Camuri grande Edo la Guaira, La Guaira, Venezuela": null,
+  "La Guaira, Venezuela": {
+    "lat": 10.6000384,
+    "lng": -66.9296405,
+    "display": "La Guaira, Parroquia La Guaira, Municipio Vargas, Estado Vargas, 1160, Venezuela"
+  },
+  "Residencias Mansión Club Caraballeda, Av. José María España, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Av. José María España, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.619373,
+    "lng": -66.847828,
+    "display": "Avenida La Playa, Los Corales, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Residencias CELTAMAR I, J592+82Q, Caraballeda, La Guaira, Venezuela": null,
+  "Residencias CELTAMAR I, Caraballeda, La Guaira, Venezuela": null,
+  "Caraballeda, La Guaira, Venezuela": {
+    "lat": 10.6128387,
+    "lng": -66.8498125,
+    "display": "Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Residencia Costa Brava, Avenida Guaicaipuro, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Avenida Guaicaipuro, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6114736,
+    "lng": -66.842596,
+    "display": "Avenida Guaicaipuro, Urbanización Caribe, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Edificio Las Aves, Calle 1, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "Calle 1, Catia La Mar 1162, La Guaira, Venezuela": {
+    "lat": 10.6036308,
+    "lng": -67.036503,
+    "display": "Calle 1, La Zorra, Las Colinas, Parroquia Catia La Mar, Municipio Vargas, Estado Vargas, 1162, Venezuela"
+  },
+  "C.C Costa del Sol, J593+7J, Caraballeda, La Guaira, Venezuela": null,
+  "C.C Costa del Sol, Caraballeda, La Guaira, Venezuela": {
+    "lat": 10.6183592,
+    "lng": -66.8461338,
+    "display": "Mercantil, Avenida La Costanera, Los Corales, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Malibu Suite, Tanaguarena, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Tanaguarena, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.611929,
+    "lng": -66.8268559,
+    "display": "Tanaguarena, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Los Tamarindos II, Caraballeda, La Guaira, Venezuela": {
+    "lat": 10.6104712,
+    "lng": -66.8408026,
+    "display": "Los Tamarindos II, Avenida Guaicaipuro, Urbanización Caribe, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Rocapark, J584+J29, Caraballeda, La Guaira, Venezuela": null,
+  "Rocapark, Caraballeda, La Guaira, Venezuela": null,
+  "Edificio Dist. Rosanday, J46P+P73, Av. José María España, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Edificio Dist. Rosanday, Av. José María España, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencia Ilona, Av. José María España, Caraballeda, La Guaira, Venezuela": null,
+  "Av. José María España, Caraballeda, La Guaira, Venezuela": {
+    "lat": 10.6157423,
+    "lng": -66.8603725,
+    "display": "Avenida La Playa, El Palmar Oeste, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Res. Mansión del Mar, J579+55R, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Res. Mansión del Mar, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencia Avilamar, C. Los Apamates, Caraballeda 1165, La Guaira, Venezuela": null,
+  "C. Los Apamates, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6116486,
+    "lng": -66.8275964,
+    "display": "Calle Los Apamates, Tanaguarena, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Residencias Vallarta, JX5J+Q99, Avenida Nte., Maiquetía 1162, La Guaira, Venezuela": null,
+  "Residencias Vallarta, Avenida Nte., Maiquetía 1162, La Guaira, Venezuela": null,
+  "Avenida Nte., Maiquetía 1162, La Guaira, Venezuela": null,
+  "Residencias Cumanagoto, Playa Grande, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Edificio pelicano, Av Principal de Playa Grande, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "Av Principal de Playa Grande, Catia La Mar 1162, La Guaira, Venezuela": {
+    "lat": 10.6096012,
+    "lng": -67.025621,
+    "display": "Avenida Principal de Playa Grande, Ciudad Chávez, Playa Grande, Catia La Mar, Parroquia Urimare, Municipio Vargas, Estado Vargas, 1162, Venezuela"
+  },
+  "Comercial la Goleta ( Celicor ), Avenida Principal de la costanera con calle 4, los corales caraballeda": null,
+  "Avenida Principal de la costanera con calle 4, los corales caraballeda": null,
+  "Residencias Auro, J592+J7M, Av. José María España, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Auro, Av. José María España, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6187251,
+    "lng": -66.8492008,
+    "display": "Residencias Auro, Avenida La Playa, Los Corales, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Tanamar, 1165 Av La Playa, Caraballeda 1165, La Guaira, Venezuela": null,
+  "1165 Av La Playa, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6125816,
+    "lng": -66.8304754,
+    "display": "Avenida La Playa, Tanaguarena, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Pez Vela, Playa Grande, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Edif Malecon, Calle 5, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Calle 5, Maiquetía 1162, La Guaira, Venezuela": {
+    "lat": 10.5966074,
+    "lng": -66.9597542,
+    "display": "Maiquetía, Parroquia Maiquetía, Municipio Vargas, Estado Vargas, 1161, Venezuela"
+  },
+  "Residencias Mediterranee, JX5C+74V, Calle 4, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Residencias Mediterranee, Calle 4, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Calle 4, Maiquetía 1162, La Guaira, Venezuela": {
+    "lat": 10.5966074,
+    "lng": -66.9597542,
+    "display": "Maiquetía, Parroquia Maiquetía, Municipio Vargas, Estado Vargas, 1161, Venezuela"
+  },
+  "Residencias Belair, Calle Charaima c/c Los Apamates, Urb. Tanaguarenas": null,
+  "Calle Charaima c/c Los Apamates, Urb. Tanaguarenas": null,
+  "Escuela Naval, C. Alferez de Fragata Don Vicente Parrado, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "C. Alferez de Fragata Don Vicente Parrado, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "Edificio Álamo, Av. Álamo, Macuto 1164, La Guaira, Venezuela": null,
+  "Av. Álamo, Macuto 1164, La Guaira, Venezuela": {
+    "lat": 10.603172,
+    "lng": -66.9019796,
+    "display": "Avenida Álamo, Urbanización Álamo, Macuto, Parroquia Macuto, Municipio Vargas, Estado Vargas, 1164, Venezuela"
+  },
+  "Mediterraneo, Caribe, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6123016,
+    "lng": -66.8403422,
+    "display": "Residencias Mediterraneo, Avenida Granada, Urbanización Caribe, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Edificio Rompemar II, J594+756 Edificio Rompemar II, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Edificio Rompemar II, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6183636,
+    "lng": -66.8445423,
+    "display": "Edificio Rompemar II, Urbanización Caribe, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, Venezuela"
+  },
+  "Residencias Karina, J565+XF7, Av. Granada, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Karina, Av. Granada, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6114534,
+    "lng": -66.8384717,
+    "display": "Residencias Karina, Avenida Granada, Urbanización Caribe, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1030, Venezuela"
+  },
+  "Residencia relax Vista Mar, JX6Q+3V7, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Residencia relax Vista Mar, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Aguja Azul, Frente a las canchas deportivas, Residencias Aguja Azul, C. Coromoto, Naiguatá 1166, La Guaira, Venezuela": null,
+  "Frente a las canchas deportivas, Residencias Aguja Azul, C. Coromoto, Naiguatá 1166, La Guaira, Venezuela": null,
+  "Residencias Palma Real -La Guaira, CALLE LA PLAYA, RESIDENCIAS PALMA REAL, ZONA CARIBE, PARROQUIA CARABALLEDA, FRENTE AL ANTIGUO HOTEL MELIÁ, LA GUAIRA.": null,
+  "CALLE LA PLAYA, RESIDENCIAS PALMA REAL, ZONA CARIBE, PARROQUIA CARABALLEDA, FRENTE AL ANTIGUO HOTEL MELIÁ, LA GUAIRA.": null,
+  "Residencias Marycielo, J574+288, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Marycielo, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencia Botánico, Jardín botánico": null,
+  "Jardín botánico": {
+    "lat": 10.5874339,
+    "lng": -71.7138391,
+    "display": "Jardín Botánico, Caujarito, Parroquia Marcial Hernández, Municipio San Francisco, Estado Zulia, Venezuela"
+  },
+  "Residencia Gradisca, Av. José María España, Macuto, La Guaira, Venezuela": null,
+  "Av. José María España, Macuto, La Guaira, Venezuela": {
+    "lat": 10.6112688,
+    "lng": -66.8721531,
+    "display": "Avenida La Playa, Camuri Chico, Macuto, Parroquia Macuto, Municipio Vargas, Estado Vargas, 1164, Venezuela"
+  },
+  "Marianamar, J586+CF7, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Marianamar, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Ibiza, J56G+35V Urbanizacion Tanaguarena, Av La Playa, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Ibiza, Av La Playa, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6116746,
+    "lng": -66.8210852,
+    "display": "Residencias Ibiza, Avenida La Playa, Tanaguarena, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Porto Fino Beach, Tanaguarena, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Puerto Coral, J437+PWV, Macuto 1164, La Guaira, Venezuela": null,
+  "Residencias Puerto Coral, Macuto 1164, La Guaira, Venezuela": {
+    "lat": 10.6111905,
+    "lng": -66.8842676,
+    "display": "Residencias Puerto Coral, Calle 1, El Teleférico, Macuto, Parroquia Macuto, Municipio Vargas, Estado Vargas, 1164, Venezuela"
+  },
+  "edificio Mónaco naiguata, Av. José María Vargas, Naiguatá 1166, La Guaira, Venezuela": null,
+  "Av. José María Vargas, Naiguatá 1166, La Guaira, Venezuela": {
+    "lat": 10.6229718,
+    "lng": -66.7376907,
+    "display": "Avenida José María Vargas, La Planta, Naiguatá, Parroquia Naiguatá, Municipio Vargas, Estado Vargas, 1166, Venezuela"
+  },
+  "La Joya, Caraballeda, La Guaira, Venezuela": {
+    "lat": 10.6163432,
+    "lng": -66.8423973,
+    "display": "La Joya, Automac, Urbanización Caribe, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Naiguata, La Guaira, Venezuela": {
+    "lat": 10.6204787,
+    "lng": -66.7394524,
+    "display": "Naiguatá, Parroquia Naiguatá, Municipio Vargas, Estado Vargas, 1166, Venezuela"
+  },
+  "Edificio costa brava los corales, Los Corales, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Los Corales, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6135241,
+    "lng": -66.8565287,
+    "display": "Los Corales, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Res Punta Brisas, Calle san Andrés Res punta Brisas": null,
+  "Calle san Andrés Res punta Brisas": null,
+  "Residencias Coral Park, Residencias Coral Beach, Av. La Costanera, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Coral Beach, Av. La Costanera, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Edificio Las Palmas o punta piedra (ver video), Avenida José María España, Macuto 1164, La Guaira, Venezuela": null,
+  "Avenida José María España, Macuto 1164, La Guaira, Venezuela": {
+    "lat": 10.6093847,
+    "lng": -66.8747572,
+    "display": "Avenida La Playa, Camuri Chico, Macuto, Parroquia Macuto, Municipio Vargas, Estado Vargas, 1164, Venezuela"
+  },
+  "Victor, 7076 Coronado Way": null,
+  "7076 Coronado Way": null,
+  "Residencias Playate “Playa T”, JX5P+V4V, Maiquetía, La Guaira, Venezuela": null,
+  "Residencias Playate “Playa T”, Maiquetía, La Guaira, Venezuela": null,
+  "Maiquetía, La Guaira, Venezuela": {
+    "lat": 10.6031377,
+    "lng": -66.9966802,
+    "display": "Aeropuerto Internacional de Maiquetía Simón Bolívar, Avenida La Armada, Sotavento II, Santa Eduvigis, Catia La Mar, Parroquia Urimare, Municipio Vargas, Estado Vargas, 1162, Venezuela"
+  },
+  "Residencias Perlamar, Caribe, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Caribe, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.613203,
+    "lng": -66.8389126,
+    "display": "Urbanización Caribe, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Restaurar rompeolas, Av Principal de Playa Grande, Catia La Mar 1162, La Guaira, Venezuela rompeolas": null,
+  "Av Principal de Playa Grande, Catia La Mar 1162, La Guaira, Venezuela rompeolas": null,
+  "Residencia oasis beach, JX6Q+2M8, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Residencia oasis beach, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Residencia Bellevue, Caraballeda, 1165, La Guaira, Venezuela": null,
+  "Caraballeda, 1165, La Guaira, Venezuela": {
+    "lat": 10.6128387,
+    "lng": -66.8498125,
+    "display": "Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "caraballeda beach, 1165 Av La Playa, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Nautilus, Av Principal de Playa Grande, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "Residencias Bravamar, Av. Circunvalacion, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Av. Circunvalacion, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.608353,
+    "lng": -66.8425218,
+    "display": "Avenida Circunvalación, El Palmar Este, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Residencia Camuri Park, residencia Camuri Park, Naiguatá 1166, La Guaira, Venezuela": null,
+  "residencia Camuri Park, Naiguatá 1166, La Guaira, Venezuela": {
+    "lat": 10.6216705,
+    "lng": -66.7126057,
+    "display": "Residencia Camuri Park, Avenida Principal de Naiguatá, Camurí Grande, Parroquia Naiguatá, Municipio Vargas, Estado Vargas, 1166, Venezuela"
+  },
+  "Residencia Carmela Mar, J55F+WPG, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencia Carmela Mar, Caraballeda 1165, La Guaira, Venezuela": null,
+  "La Estrella, Avenida La Playa, Macuto 1164, La Guaira, Venezuela": null,
+  "Avenida La Playa, Macuto 1164, La Guaira, Venezuela": {
+    "lat": 10.6046226,
+    "lng": -66.901844,
+    "display": "Avenida La Playa, Urbanización Álamo, Macuto, Parroquia Macuto, Municipio Vargas, Estado Vargas, 1164, Venezuela"
+  },
+  "Residencias Aquarium, Av. La Atlántida, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "Av. La Atlántida, Catia La Mar 1162, La Guaira, Venezuela": {
+    "lat": 10.6034275,
+    "lng": -67.0284782,
+    "display": "Edificio Banco de Venezuela, Avenida La Atlantida, Las Angustias, La Atlántida, Catia La Mar, Parroquia Catia La Mar, Municipio Vargas, Estado Vargas, 1162, Venezuela"
+  },
+  "Residencias Airemar, J56F+W47, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Airemar, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Bloque 3 la Paez, Av. La Páez, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "Av. La Páez, Catia La Mar 1162, La Guaira, Venezuela": {
+    "lat": 10.6037292,
+    "lng": -67.0269477,
+    "display": "Avenida Tacagua, Las Angustias, La Páez, Parroquia Catia La Mar, Municipio Vargas, Estado Vargas, 1162, Venezuela"
+  },
+  "Edificio Caribe detras de las 15 letras, J577+G33, paso 3, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Edificio Caribe detras de las 15 letras, paso 3, Caraballeda 1165, La Guaira, Venezuela": null,
+  "paso 3, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Maria Andreina Castillo en Velo horizonte, Catia La Mar, La Guaira, Venezuela": null,
+  "Catia La Mar, La Guaira, Venezuela": {
+    "lat": 10.5992669,
+    "lng": -67.0145106,
+    "display": "Catia La Mar, Parroquia Urimare, Municipio Vargas, Estado Vargas, 1162, Venezuela"
+  },
+  "Tanaguarena, Tanaguarena, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6123237,
+    "lng": -66.8170635,
+    "display": "Playa Club Tanaguarena 2, Avenida La Playa, Tanaguarena, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Residencia la Trinidad, Calle 9 playa grande Edo la Guaira": null,
+  "Calle 9 playa grande Edo la Guaira": null,
+  "Residencias Club Bahía Mar, J49W+6GR, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Club Bahía Mar, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Supermercado El Rey de Carayaca, Calle principal de, GVMM+85Q, C. Real, Carayaca 1167, La Guaira, Venezuela": null,
+  "Supermercado El Rey de Carayaca, Calle principal de, C. Real, Carayaca 1167, La Guaira, Venezuela": null,
+  "Calle principal de, C. Real, Carayaca 1167, La Guaira, Venezuela": null,
+  "La lucha, C. interna de La Lucha, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "C. interna de La Lucha, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "Mision vivienda OPP av cariaco oeste, J586+63P, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Mision vivienda OPP av cariaco oeste, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencia Tamiami, Av. Caraballeda, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Av. Caraballeda, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6132087,
+    "lng": -66.8469493,
+    "display": "Avenida Caraballeda, El Palmar Este, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Hotel Chipi’s beach, HOTEL CHIPIS BEACH, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "HOTEL CHIPIS BEACH, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "Iglesia San Sebastian de Maiquetia, C. Real de Maiquetía, Maiquetía 1161, La Guaira, Venezuela": {
+    "lat": 10.5943531,
+    "lng": -66.9524315,
+    "display": "Iglesia San Sebastián, Calle Real de Maiquetía, Casco Central de Maiquetía, El Rincón, Maiquetía, Parroquia Maiquetía, Municipio Vargas, Estado Vargas, 1161, Venezuela"
+  },
+  "Mini CC K-rol, Av. La Costanera, Caraballeda, La Guaira, Venezuela": null,
+  "Av. La Costanera, Caraballeda, La Guaira, Venezuela": {
+    "lat": 10.6152595,
+    "lng": -66.8590593,
+    "display": "Avenida La Costanera, El Palmar Oeste, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Edificio Agua Marina, Macuto 1164, La Guaira, Venezuela. Al lado del hotel las 15 letras": null,
+  "Macuto 1164, La Guaira, Venezuela. Al lado del hotel las 15 letras": null,
+  "Edificio Miramar, Caribe, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias El Molino, Avenida Guaicaipuro, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Mar de Leva, J49W+HV4, Av. José María España, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Mar de Leva, Av. José María España, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Torre F Catia La Mar, HXW5+RQ6, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "Torre F Catia La Mar, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "Catia La Mar 1162, La Guaira, Venezuela": {
+    "lat": 10.5992669,
+    "lng": -67.0145106,
+    "display": "Catia La Mar, Parroquia Urimare, Municipio Vargas, Estado Vargas, 1162, Venezuela"
+  },
+  "Residencias Arichuna Los Corales, J48R+RQP, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Arichuna Los Corales, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Edificio Residencial Los Corsarios, Avenida 1, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Avenida 1, Maiquetía 1162, La Guaira, Venezuela": {
+    "lat": 10.5990165,
+    "lng": -66.9627336,
+    "display": "Carril VAO Avenida Carlos Soublette, Maiquetía, Parroquia Maiquetía, Municipio Vargas, Estado Vargas, 1161, Venezuela"
+  },
+  "Residencia Los Monjes, Calle 3 con Av. Central de Playa Grande, frente al Club Deportivo Ariel, Playa Grande": null,
+  "Calle 3 con Av. Central de Playa Grande, frente al Club Deportivo Ariel, Playa Grande": null,
+  "Supermercado Roca Azul, J592+22W, Boulevard Monteclaro, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Supermercado Roca Azul, Boulevard Monteclaro, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Boulevard Monteclaro, Caraballeda 1165, La Guaira, Venezuela": null,
+  "OPP 33, Caribe, Caraballeda 1165, opp 33": null,
+  "Caribe, Caraballeda 1165, opp 33": null,
+  "Hotel Catimar, Urb Puerto Viejo, 2da Calle, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "Urb Puerto Viejo, 2da Calle, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "Edificio Sayemar, J569+P77, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Edificio Sayemar, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Hotel Santuario La Llanada, 10.60642187610977": null,
+  "10.60642187610977": null,
+  "Residencia Elite Beach, Caribe, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Bucaneros, Playa Grande, Maiquetía 1162, La Guaira, Venezuela": null,
+  "La Guaira, La Guaira, 1160, La Guaira, Venezuela": {
+    "lat": 10.6000384,
+    "lng": -66.9296405,
+    "display": "La Guaira, Parroquia La Guaira, Municipio Vargas, Estado Vargas, 1160, Venezuela"
+  },
+  "Residencias El Nazareno, J456+235, C. Guaicamacuto, Macuto 1164, La Guaira, Venezuela": null,
+  "Residencias El Nazareno, C. Guaicamacuto, Macuto 1164, La Guaira, Venezuela": null,
+  "C. Guaicamacuto, Macuto 1164, La Guaira, Venezuela": null,
+  "Tahiti, J592+95G Edificio Tahiti, Boulevard Monteclaro, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Tahiti, Boulevard Monteclaro, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Palafito del mar, C. Cariaco, La Guaira 1160, La Guaira, Venezuela": null,
+  "C. Cariaco, La Guaira 1160, La Guaira, Venezuela": {
+    "lat": 10.5860341,
+    "lng": -66.9075966,
+    "display": "Cariaco, Parroquia La Guaira, Municipio Vargas, Estado Vargas, 1160, Venezuela"
+  },
+  "Residencia la cascada, J584+66C, 1165 Av. José María España, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencia la cascada, 1165 Av. José María España, Caraballeda 1165, La Guaira, Venezuela": null,
+  "1165 Av. José María España, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.619373,
+    "lng": -66.847828,
+    "display": "Avenida La Playa, Los Corales, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "El Tanagua, Av. José María España, Caraballeda, La Guaira, Venezuela": null,
+  "Edificio Maratea, Av. José María España, Caraballeda, La Guaira, Venezuela": null,
+  "Edificio Estrella, J34X+3VJ, Macuto 1164, La Guaira, Venezuela": null,
+  "Edificio Estrella, Macuto 1164, La Guaira, Venezuela": null,
+  "Residencias Puerto Coral, J468+F86, Macuto 1164, La Guaira, Venezuela": null,
+  "Residencias Aguamarina, J466+FW, La Guaira, Venezuela": null,
+  "Residencias Aguamarina, La Guaira, Venezuela": {
+    "lat": 10.6110342,
+    "lng": -66.8874966,
+    "display": "Residencias Aguamarina, El Cojo, La Guaira, Parroquia Macuto, Municipio Vargas, Estado Vargas, 1164, Venezuela"
+  },
+  "Res Mariola y maribel, El Palmar Este, Caraballeda 1165, La Guaira, Venezuela": null,
+  "El Palmar Este, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6096176,
+    "lng": -66.8489119,
+    "display": "El Palmar Este, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Edificio Arcángel, Avenida La Playa, Macuto 1164, La Guaira, Venezuela": null,
+  "Edificio La Gabarra, Los Corales, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Res. Gran Terraza, Av. José María España, Caraballeda, La Guaira, Venezuela": null,
+  "Res. Breña sol, Av. José María España, Caraballeda, La Guaira, Venezuela": null,
+  "Residencias Dorado, Calle 4, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Centro Comercial IP5, J49X+FM8, Av. José María España, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Centro Comercial IP5, Av. José María España, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6185016,
+    "lng": -66.8506809,
+    "display": "Centro Comercial IP5, Avenida La Playa, Los Corales, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Supermercado Roca Azul, Boulevard Monte carlo con Av. Cannes. Urb. Palmar Este. Caraballeda, Edo. La Guaira.": null,
+  "Boulevard Monte carlo con Av. Cannes. Urb. Palmar Este. Caraballeda, Edo. La Guaira.": null,
+  "Edificio Gabarra, Los Corales, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Edificio Costa Brava, J48V+Q5G, Av. La Costanera, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Edificio Costa Brava, Av. La Costanera, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Av. La Costanera, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6152595,
+    "lng": -66.8590593,
+    "display": "Avenida La Costanera, El Palmar Oeste, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Recidencias NewPort, C. La Playa, La Guaira, Venezuela": null,
+  "C. La Playa, La Guaira, Venezuela": {
+    "lat": 10.5913924,
+    "lng": -67.0593203,
+    "display": "C. La Playa, Mamo, Terrazas de Alto Picure, Parroquia Catia La Mar, Municipio Vargas, Estado Vargas, 1162, Venezuela"
+  },
+  "Residencias Villa Mar, Av. del Hotel, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Av. del Hotel, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Espomar, J579+57M, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Espomar, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6130093,
+    "lng": -66.8318172,
+    "display": "Espomar, Avenida La Playa, Tanaguarena, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Residencia Acuario, Tanaguarena, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Costabella, Av. Cannes, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Av. Cannes, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Conjunto Residencial Montemar II, Playa Grande, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Edificio Laguna Mar, Edificio Laguna Mar, Caraballeda Frente al Sheraton": null,
+  "Edificio Laguna Mar, Caraballeda Frente al Sheraton": null,
+  "Auraima, Av. Jardín Botánico, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.611782,
+    "lng": -66.8264648,
+    "display": "Auraima, Av. Jardin Botánico, Tanaguarena, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Edificio Sayemar, Edificio Sayemar. La Guaira": null,
+  "Edificio Sayemar. La Guaira": null,
+  "Edificio Tahiti, Edificio Tahiti. Caraballeda": null,
+  "Edificio Tahiti. Caraballeda": null,
+  "Residencia Alamar, JX5M+QCH, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Residencia Alamar, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Casa, Cjón. Royal, Maiquetía 1161, La Guaira, Venezuela": null,
+  "Cjón. Royal, Maiquetía 1161, La Guaira, Venezuela": null,
+  "Posada la ciénaga, La Sabana, parroquia Caruao en la Guaira, La Sabana, La Guaira, Venezuela": null,
+  "La Sabana, La Guaira, Venezuela": {
+    "lat": 10.6182428,
+    "lng": -66.3824282,
+    "display": "La Sabana, Parroquia Caruao, Municipio Vargas, Estado Vargas, 1168, Venezuela"
+  },
+  "Residencias La Laguna, Torre 3, Los Magallanes de Catia, Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.5155587,
+    "lng": -66.9534788,
+    "display": "Residencias La Laguna, Los Magallanes, Catia, Caracas, Parroquia Sucre, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1030, Venezuela"
+  },
+  "LidoSol, Av. Jose Maria Vargas, esquina con Biarritz (Corapalito)": null,
+  "Av. Jose Maria Vargas, esquina con Biarritz (Corapalito)": null,
+  "Manuelita Saenz, H2XP+X6J, C. José María Vargas, Maiquetía 1161, La Guaira, Venezuela": null,
+  "Manuelita Saenz, C. José María Vargas, Maiquetía 1161, La Guaira, Venezuela": null,
+  "C. José María Vargas, Maiquetía 1161, La Guaira, Venezuela": {
+    "lat": 10.5969942,
+    "lng": -66.9657246,
+    "display": "Calle Real Dos Cerritos, 10 de Marzo, Urbanización José María Vargas, Pariata, Parroquia Carlos Soublette, Municipio Vargas, Estado Vargas, Venezuela"
+  },
+  "Urb. Continente, Av. El Cuartel Urdaneta, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Av. El Cuartel Urdaneta, Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.5066451,
+    "lng": -66.959305,
+    "display": "Avenida El Cuartel, Parcelamiento Urdaneta, Propatria, Caracas, Parroquia Sucre, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1100, Venezuela"
+  },
+  "Edificio Selena, C. Real de Los Flores de Catia, Caracas 1030, Distrito Capital, Venezuela": null,
+  "C. Real de Los Flores de Catia, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Edificio Tamarumo, C. Las Acacias, Caraballeda 1165, La Guaira, Venezuela": null,
+  "C. Las Acacias, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6108225,
+    "lng": -66.8278212,
+    "display": "Calle Las Acacias, Tanaguarena, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Residencia Palmeira, J56G+R3R, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencia Palmeira, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Anduriña Mar, Residencias Anduriña Mar, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Anduriña Mar, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6109208,
+    "lng": -66.8214695,
+    "display": "Residencias Anduriña Mar, Carretera Tanaguarenas - Naiguatá, Tanaguarena, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Espomar, Tanaguarena, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6130093,
+    "lng": -66.8318172,
+    "display": "Espomar, Avenida La Playa, Tanaguarena, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Golf Club. Caribe, Av. ppal de Caribe con av Guaicaipuro": null,
+  "Av. ppal de Caribe con av Guaicaipuro": null,
+  "Marina grande I, Calle Real De Playa Verde, Maiquetía, La Guaira, Venezuela": null,
+  "Calle Real De Playa Verde, Maiquetía, La Guaira, Venezuela": null,
+  "Residencias atlantico, Catia, caracas, G342+JM9, Av. El Atlántico, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Residencias atlantico, Catia, caracas, Av. El Atlántico, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Av. El Atlántico, Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.5022072,
+    "lng": -66.9475119,
+    "display": "Avenida El Atlántico, Urbanización El Atlántico, Barrio La Silsa, 23 de Enero, Caracas, Parroquia 23 de Enero, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Pin High, Avenida Guaicamacuto, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Avenida Guaicamacuto, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Camuri Mar, J7CP+WVJ, Care 1166, La Guaira, Venezuela": null,
+  "Camuri Mar, Care 1166, La Guaira, Venezuela": null,
+  "Care 1166, La Guaira, Venezuela": {
+    "lat": 10.6205869,
+    "lng": -66.6916734,
+    "display": "Punta Care, Parroquia Naiguatá, Municipio Vargas, Estado Vargas, 1166, Venezuela"
+  },
+  "CONJUNTO RESIDENCIAL LA FUNDACION MENDOZA Res 20 2DA ETAPA, Avenida Principal de Altavista, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Avenida Principal de Altavista, Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.5187079,
+    "lng": -66.9417933,
+    "display": "Avenida Principal de Altavista, El Refugio, Alta Vista, Caracas, Parroquia Sucre, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Conjunto Residencial Playamar, JX7G+6RX, Maiquetía 1162, Vargas, Venezuela": null,
+  "Conjunto Residencial Playamar, Maiquetía 1162, Vargas, Venezuela": null,
+  "Maiquetía 1162, Vargas, Venezuela": {
+    "lat": 10.6031377,
+    "lng": -66.9966802,
+    "display": "Aeropuerto Internacional de Maiquetía Simón Bolívar, Avenida La Armada, Sotavento II, Santa Eduvigis, Catia La Mar, Parroquia Urimare, Municipio Vargas, Estado Vargas, 1162, Venezuela"
+  },
+  "Bleu Marine, JX5M+MW8, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Bleu Marine, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Residencias Avila Caribe, Urbanizacion Tanaguarenas, Avenida del Club Entre Av Cerro Grande y Bulevard Naiguata, Residencias Avila Caribe, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Urbanizacion Tanaguarenas, Avenida del Club Entre Av Cerro Grande y Bulevard Naiguata, Residencias Avila Caribe, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Quinta San jose, Urbanización Palmar este avenida Acapulco": null,
+  "Urbanización Palmar este avenida Acapulco": null,
+  "Residencias Capri Club XVI, Urb Av. La Costanera, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Urb Av. La Costanera, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias Altomar - Alto mar, JX5Q+RHP, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Residencias Altomar - Alto mar, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Parque del Caribe, J468+7FR, Macuto 1164, La Guaira, Venezuela": null,
+  "Parque del Caribe, Macuto 1164, La Guaira, Venezuela": {
+    "lat": 10.6108562,
+    "lng": -66.8839137,
+    "display": "Residencias Parque del Caribe, Calle 1, El Teleférico, Macuto, Parroquia Macuto, Municipio Vargas, Estado Vargas, 1164, Venezuela"
+  },
+  "Playa Alí Babá, Playa Alí Babá, Av. José María España, Caraballeda, La Guaira, Venezuela": null,
+  "Playa Alí Babá, Av. José María España, Caraballeda, La Guaira, Venezuela": null,
+  "Residencias Altamar, J456+H2R, Macuto 1164, La Guaira, Venezuela": null,
+  "Residencias Altamar, Macuto 1164, La Guaira, Venezuela": null,
+  "Remanso II, J57G+43F, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Remanso II, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Edificio Avila Mar, Caraballeda, La Guaira, Venezuela": null,
+  "Residencias Brisamar, Subida Teleferico, Macuto 1164, La Guaira, Venezuela": null,
+  "Subida Teleferico, Macuto 1164, La Guaira, Venezuela": null,
+  "Residencias Newport, C. Charaima, Caraballeda 1165, La Guaira, Venezuela": null,
+  "C. Charaima, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6100626,
+    "lng": -66.8328092,
+    "display": "Calle Charaima, Tanaguarena, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Edificio MIRANDA 20A, G383+V7V, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Edificio MIRANDA 20A, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.5060934,
+    "lng": -66.9146008,
+    "display": "Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "Residencia Cima Del Mar, J45M+72C, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencia Cima Del Mar, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencias arrecife, Av. José María España, Caraballeda, La Guaira, Venezuela": null,
+  "Las brisas, Parque Mar, Avenida17-A, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Parque Mar, Avenida17-A, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Edificio David, Av. Miramar, Maiquetía 1161, La Guaira, Venezuela": null,
+  "Av. Miramar, Maiquetía 1161, La Guaira, Venezuela": {
+    "lat": 10.5968716,
+    "lng": -66.9609192,
+    "display": "Avenida Miramar, El Rincón, Maiquetía, Parroquia Maiquetía, Municipio Vargas, Estado Vargas, 1161, Venezuela"
+  },
+  "Es una casa de ladrillo con color verde y rejas negras pequeñas de 3 pisos, C. Perro Seco, Caraballeda 1165, La Guaira, Venezuela": null,
+  "C. Perro Seco, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Resd Mar Azul, JX5Q+XFQ, Av. 1, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Resd Mar Azul, Av. 1, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Av. 1, Maiquetía 1162, La Guaira, Venezuela": {
+    "lat": 10.5966074,
+    "lng": -66.9597542,
+    "display": "Maiquetía, Parroquia Maiquetía, Municipio Vargas, Estado Vargas, 1161, Venezuela"
+  },
+  "Coral Plaza, J46W+CJP, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Coral Plaza, Caraballeda 1165, La Guaira, Venezuela": null,
+  "La riviera, Playa Grande, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Celtamar II, Ave plaza el parque, la guaira, tanaguarena": null,
+  "Ave plaza el parque, la guaira, tanaguarena": null,
+  "Edificio club de playa, Avenida la playa,sector el ceibo,Macuto,edificio club de playa": null,
+  "Edificio club de playa, Avenida la playa, sector el ceibo, Macuto, edificio club de playa": null,
+  "Avenida la playa, sector el ceibo, Macuto, edificio club de playa": null,
+  "Edificio San Pablo, Avenida baral esquina cuartel viejo a pineda ezifi": null,
+  "Avenida baral esquina cuartel viejo a pineda ezifi": null,
+  "Edificio Mafrem, avenida principal la costanera con calle 4, Los corales Caraballeda": null,
+  "avenida principal la costanera con calle 4, Los corales Caraballeda": null,
+  "Edificio 13 (antes casa #13) Calle real de Alta vista entre 1ra y 2da transversal, Catia parroquia Sucre municipio libertador, Calle Real de Alta Vista, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Calle Real de Alta Vista, Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.5223539,
+    "lng": -66.9430317,
+    "display": "Calle Real de Altavista, Alta Vista, Caracas, Parroquia Sucre, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Edif. Los 4 Vientos, G3F7+2V6, Calle Real de Los Frailes, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Edif. Los 4 Vientos, Calle Real de Los Frailes, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Calle Real de Los Frailes, Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.5173256,
+    "lng": -66.9378723,
+    "display": "Calle Real de Los Frailes, Cútira, Ruperto Lugo, Caracas, Parroquia Sucre, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Parque Azul, J57F+2XF, Av La Playa, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Parque Azul, Av La Playa, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Av La Playa, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6148023,
+    "lng": -66.8398293,
+    "display": "Avenida La Playa, Urbanización Caribe, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Torre 2 conjunto residencial La Laguna Catia, G28W+F3R, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Torre 2 conjunto residencial La Laguna Catia, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Residencias El Mástil, Resd. El Mastil, Calle 6, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Resd. El Mastil, Calle 6, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Residencia Bergantin, Urbanizacion Punta de Brisas, Macuto, La Guaira, Venezuela": null,
+  "Urbanizacion Punta de Brisas, Macuto, La Guaira, Venezuela": null,
+  "El Timonel, Calle 1. C. 2, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "Calle 1. C. 2, Catia La Mar 1162, La Guaira, Venezuela": {
+    "lat": 10.5962963,
+    "lng": -67.0151266,
+    "display": "Calle Alfareria, Guaracarumbo, Week-End, Catia La Mar, Parroquia Urimare, Municipio Vargas, Estado Vargas, 1162, Venezuela"
+  },
+  "Edificio Los Abuelos, Av. Este Dos, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Av. Este Dos, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Aletamar, Av. del Hotel, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Playa Verde, Playa Verde, Maiquetía, La Guaira, Venezuela": {
+    "lat": 10.6104582,
+    "lng": -67.0029786,
+    "display": "Pescadería Playa Verde, Calle Real de Playa Verde, Playa Verde, Catia La Mar, Parroquia Urimare, Municipio Vargas, Estado Vargas, 1162, Venezuela"
+  },
+  "Residencias Montemar, catia la mar av central de, Maiquetía 1162, La Guaira, Venezuela": null,
+  "catia la mar av central de, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Kozar, Calle Colombia No 15 Al Lado De La Clinica Panamericana, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Calle Colombia No 15 Al Lado De La Clinica Panamericana, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Oasis Camuri, 1 Av. Principal de Naiguatá, Naiguatá 1166, La Guaira, Venezuela": null,
+  "1 Av. Principal de Naiguatá, Naiguatá 1166, La Guaira, Venezuela": {
+    "lat": 10.6215018,
+    "lng": -66.7096252,
+    "display": "Avenida Principal de Naiguatá, Camurí Grande, Parroquia Naiguatá, Municipio Vargas, Estado Vargas, 1166, Venezuela"
+  },
+  "Costa Dorada, JX6H+HW7, Calle 9, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Costa Dorada, Calle 9, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Calle 9, Maiquetía 1162, La Guaira, Venezuela": {
+    "lat": 10.5966074,
+    "lng": -66.9597542,
+    "display": "Maiquetía, Parroquia Maiquetía, Municipio Vargas, Estado Vargas, 1161, Venezuela"
+  },
+  "Caraballeda Country residences Mar., J57C+466, Caraballeda, La Guaira, Venezuela": null,
+  "Caraballeda Country residences Mar., Caraballeda, La Guaira, Venezuela": null,
+  "URBANISMO HUGO CHAVEZ, Playa Grande, Maiquetía 1162, La Guaira, Venezuela": null,
+  "Urbanismo Cacique Caribe, Urbanización Urimare, Catia La Mar 1162, La Guaira, Venezuela": null,
+  "Urbanización Urimare, Catia La Mar 1162, La Guaira, Venezuela": {
+    "lat": 10.5864703,
+    "lng": -67.0163054,
+    "display": "Urbanización Martín Vegas, Week-End, Catia La Mar, Parroquia Urimare, Municipio Vargas, Estado Vargas, Venezuela"
+  },
+  "Residencia Ocean Caraballeda, J587+52G, C. La Playa, Caraballeda 1165, La Guaira, Venezuela": null,
+  "Residencia Ocean Caraballeda, C. La Playa, Caraballeda 1165, La Guaira, Venezuela": null,
+  "C. La Playa, Caraballeda 1165, La Guaira, Venezuela": {
+    "lat": 10.6125816,
+    "lng": -66.8304754,
+    "display": "Avenida La Playa, Tanaguarena, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Edificio 2H, FCGQ+83V, Guatire 1221, Miranda, Venezuela": null,
+  "Edificio 2H, Guatire 1221, Miranda, Venezuela": null,
+  "Guatire 1221, Miranda, Venezuela": {
+    "lat": 10.4684588,
+    "lng": -66.5431115,
+    "display": "Parroquia Guatire, Municipio Zamora, Estado Miranda, Venezuela"
+  },
+  "Edificio Cobo, F5RC+73M, Caracas 1071, Miranda, Venezuela": null,
+  "Edificio Cobo, Caracas 1071, Miranda, Venezuela": null,
+  "Caracas 1071, Miranda, Venezuela": {
+    "lat": 10.4707551,
+    "lng": -66.8372571,
+    "display": "Templo de Caracas, Avenida C, Caurimare, Sector Caurimare, Caracas, Parroquia El Cafetal, Municipio Baruta, Distrito Metropolitano de Caracas, Estado Miranda, 1061, Venezuela"
+  },
+  "Conjunto Residencial Santa Lucia, Conjunto Residencial Santa Lucia": null,
+  "Conjunto Residencial Santa Lucia": null,
+  "Edificio Residencia La quinta, Avenida Los Próceres, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Avenida Los Próceres, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5156867,
+    "lng": -66.9008096,
+    "display": "Avenida Los Próceres, San Bernardino, Caracas, Parroquia San Bernardino, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Edificio San Jacinto, Av. López Méndez, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Av. López Méndez, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5188835,
+    "lng": -66.9048294,
+    "display": "Avenida López Méndez, San Bernardino, Caracas, Parroquia San Bernardino, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Edificio La Floridiana, Av. Anauco, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Av. Anauco, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5127329,
+    "lng": -66.9043763,
+    "display": "Avenida Anauco, San Bernardino, Caracas, Parroquia San Bernardino, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Salerno, C. Páez, Guatire 1221, Miranda, Venezuela": null,
+  "C. Páez, Guatire 1221, Miranda, Venezuela": {
+    "lat": 10.4681364,
+    "lng": -66.5411643,
+    "display": "Calle Páez, El Desvío, Parroquia Guatire, Municipio Zamora, Estado Miranda, 1221, Venezuela"
+  },
+  "Stajak, Avenida Este 7, Caracas, Distrito Capital, Venezuela": null,
+  "Avenida Este 7, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5097109,
+    "lng": -66.9058574,
+    "display": "Avenida Este 7, San José, Caracas, Parroquia San José, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Castol, Av. Panteón, Caracas, Distrito Capital, Venezuela": null,
+  "Av. Panteón, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.510737,
+    "lng": -66.9031013,
+    "display": "Avenida Panteón, San Bernardino, Caracas, Parroquia San Bernardino, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Residencias Montalban, Calle 130 & Avenida 105 C, Valencia 2001, Carabobo, Venezuela": null,
+  "Calle 130 & Avenida 105 C, Valencia 2001, Carabobo, Venezuela": null,
+  "Residencias Darijak 1, Residencias Darijak 1, Av. Nte. 13, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Residencias Darijak 1, Av. Nte. 13, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Edf Fonseca, Esquina Reducto a Municipal Av. Baralt, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Esquina Reducto a Municipal Av. Baralt, Caracas 1010, Distrito Capital, Venezuela": null,
+  "EDIFICIO SAUMELL PALACE EN EL PARAÍSO, Av. José Antonio Páez, Caracas, Distrito Capital, Venezuela": null,
+  "Av. José Antonio Páez, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.4902986,
+    "lng": -66.9275773,
+    "display": "Avenida José Antonio Páez, Las Quintas, Brisas del Paraíso, El Paraíso, Caracas, Parroquia El Paraíso, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Casa no 50-2, Esq calero a chimborazo  la candelaria": null,
+  "Esq calero a chimborazo  la candelaria": null,
+  "Edificio Tierra Santa, Maiquetía, La Guaira, Venezuela": null,
+  "Residencias Beslu, G36V+8V2, Av. Nte. 11, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Residencias Beslu, Av. Nte. 11, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5106066,
+    "lng": -66.9055634,
+    "display": "Residencias Beslu, San José, Caracas, Parroquia San José, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Edificio Albatros, Avenida Granada, Caraballeda": null,
+  "Avenida Granada, Caraballeda": {
+    "lat": 10.611864,
+    "lng": -66.8396562,
+    "display": "Avenida Granada, Urbanización Caribe, Caraballeda, Parroquia Caraballeda, Municipio Vargas, Estado Vargas, 1165, Venezuela"
+  },
+  "Los Alpes, Av. La Salle, Caracas, Distrito Capital, Venezuela": null,
+  "Av. La Salle, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5029103,
+    "lng": -66.8845796,
+    "display": "Avenida La Salle, Barrio Los Manolos, Guaicaipuro, Los Caobos, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "casa, El Nogal, Santa Lucía 1214, Miranda, Venezuela": null,
+  "El Nogal, Santa Lucía 1214, Miranda, Venezuela": {
+    "lat": 10.3410329,
+    "lng": -66.6434139,
+    "display": "El Nogal, Parroquia Santa Lucía, Municipio Paz Castillo, Estado Miranda, 1214, Venezuela"
+  },
+  "Residencias La Arbolada, Avenida principal de Santa María. Mun sucre.": null,
+  "Avenida principal de Santa María. Mun sucre.": null,
+  "San Rafael, C. Caura, Caracas 1041, Distrito Capital, Venezuela": null,
+  "C. Caura, Caracas 1041, Distrito Capital, Venezuela": {
+    "lat": 10.4832567,
+    "lng": -66.8945857,
+    "display": "Calle Caura, Valle Abajo, Los Rosales, Caracas, Parroquia San Pedro, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1041, Venezuela"
+  },
+  "Araguaney II, Socorro a Calero Av. Este 3, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Socorro a Calero Av. Este 3, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Barro quemado, El Prado, San Diego de los Altos 1203, Miranda, Venezuela": null,
+  "El Prado, San Diego de los Altos 1203, Miranda, Venezuela": null,
+  "Orinoco, Gran Cacique Guaicaipuro Jefe de Jefes, Caracas, Distrito Capital, Venezuela": null,
+  "Gran Cacique Guaicaipuro Jefe de Jefes, Caracas, Distrito Capital, Venezuela": null,
+  "Sin nombre, Via principal el Junquito km 7 casa 37": null,
+  "Via principal el Junquito km 7 casa 37": null,
+  "Edificio Bancaribe, G522+352, Av. San Juan Bosco, Caracas 1060, Miranda, Venezuela": null,
+  "Edificio Bancaribe, Av. San Juan Bosco, Caracas 1060, Miranda, Venezuela": null,
+  "Av. San Juan Bosco, Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.5076983,
+    "lng": -66.85128,
+    "display": "Avenida San Juan Bosco, Sector Altamira, Altamira, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Residencia San Rafae, Av. Nivaldo, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Av. Nivaldo, Caracas 1050, Distrito Capital, Venezuela": {
+    "lat": 10.5027013,
+    "lng": -66.870824,
+    "display": "Avenida Nivaldo, Barrio Chapellín, Chapellín, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "Edificio san Miguel, Torre Delta, Avenida Francisco de Miranda, Caracas 1060, Miranda, Venezuela": null,
+  "Torre Delta, Avenida Francisco de Miranda, Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.494885,
+    "lng": -66.8498846,
+    "display": "Banco Del Sur, Avenida Francisco de Miranda, Barrio Bello Campo, Sector Bello Campo, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Edificio San Judas Tadeo, Las Fuentes, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Las Fuentes, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.5033425,
+    "lng": -66.9195781,
+    "display": "Las Toninas, Redoma O'Leary, Barrio Potrerito, Barrio El Guarataro, Caracas, Parroquia San Juan, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Traki san martin, Avenida San Martín, cruce, con C. B, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Avenida San Martín, cruce, con C. B, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Edificio el imperial, 1era avenida, de, con 2da. Trans., Caracas 1060, Miranda, Venezuela": null,
+  "1era avenida, de, con 2da. Trans., Caracas 1060, Miranda, Venezuela": null,
+  "Edificio Ávila, Avenida Fuerzas Armadas, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5110187,
+    "lng": -66.9079063,
+    "display": "Edificio Ávila, Avenida Fuerzas Armadas, San José, Caracas, Parroquia San José, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Casa 32-02, Av. Sucre manicomio calle santa Barbara callejón San Antonio casa 32-02": null,
+  "Av. Sucre manicomio calle santa Barbara callejón San Antonio casa 32-02": null,
+  "Casa 119, Ubicación GPS: 10.51975, -66.93179": null,
+  "Ubicación GPS: 10.51975, -66.93179": null,
+  "Residencia Franco Mar, Av La Playa, parroquia carballeda, sector tanaguarena, residencia Francomar": null,
+  "Av La Playa, parroquia carballeda, sector tanaguarena, residencia Francomar": null,
+  "Edificio Cediaz, Edificio Cediaz, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Edificio Cediaz, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Edificio Merex, Avenida Fuerzas Armadas, Caracas, Distrito Capital, Venezuela": null,
+  "Avenida Fuerzas Armadas, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.4913217,
+    "lng": -66.9114715,
+    "display": "Avenida Fuerzas Armadas, Las Flores de Puente Hierro, El León, El Cementerio, Caracas, Parroquia Santa Rosalia, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Residencias Gaby, Plaza de la soledad, Maracay 2101, Aragua, Venezuela": null,
+  "Plaza de la soledad, Maracay 2101, Aragua, Venezuela": null,
+  "Edificio Serenata, Centro, Caracas 1012, G34R+Q3G, Av. Urdaneta, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Edificio Serenata, Centro, Caracas 1012, Av. Urdaneta, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Centro, Caracas 1012, Av. Urdaneta, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Edificio San Bosco, F5W3+VVF Molina Agencia de ViajesCaracas, Av. Andrés Bello, Caracas 1060, Miranda, Venezuela": null,
+  "Edificio San Bosco, Av. Andrés Bello, Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.4974008,
+    "lng": -66.8453312,
+    "display": "Edificio San Bosco, Avenida Andrés Bello, Los Palos Grandes, Sector Los Palos Grandes, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Edificio Flor, Av. Francisco Javier Yánez, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Av. Francisco Javier Yánez, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5181707,
+    "lng": -66.9036607,
+    "display": "Avenida Francisco Javier Yánez, San Bernardino, Caracas, Parroquia San Bernardino, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Residencia contigua a Carmelandia Las Minas de Baruta, F42Q+G3X, Caracas 1080, Miranda, Venezuela": null,
+  "Residencia contigua a Carmelandia Las Minas de Baruta, Caracas 1080, Miranda, Venezuela": null,
+  "Caracas 1080, Miranda, Venezuela": {
+    "lat": 10.4707551,
+    "lng": -66.8372571,
+    "display": "Templo de Caracas, Avenida C, Caurimare, Sector Caurimare, Caracas, Parroquia El Cafetal, Municipio Baruta, Distrito Metropolitano de Caracas, Estado Miranda, 1061, Venezuela"
+  },
+  "Residencia Plaza Aventura, 1 Av. Sta. Eduvigis, Caracas 1071, Miranda, Venezuela": null,
+  "1 Av. Sta. Eduvigis, Caracas 1071, Miranda, Venezuela": {
+    "lat": 10.5002861,
+    "lng": -66.8384638,
+    "display": "Santa Eduvigis, Sector Santa Edivigis, Caracas, Parroquia Leoncio Martínez, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1071, Venezuela"
+  },
+  "Edificio bautista 25A, Ruperto Lugo, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Ruperto Lugo, Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.5208046,
+    "lng": -66.9376184,
+    "display": "Ruperto Lugo, Caracas, Parroquia Sucre, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "Ruperto lugo, 3 Transversal, Caracas 1030, Distrito Capital, Venezuela": null,
+  "3 Transversal, Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.4582601,
+    "lng": -66.9187986,
+    "display": "3.° Transversal, Urbanización Residencias Guardia Nacional, Los Jardines de El Valle, Caracas, Parroquia El Valle, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1090, Venezuela"
+  },
+  "Residencias Roa, 6MG9+H7J, La Victoria 2121, Aragua, Venezuela": null,
+  "Residencias Roa, La Victoria 2121, Aragua, Venezuela": null,
+  "La Victoria 2121, Aragua, Venezuela": {
+    "lat": 10.2276838,
+    "lng": -67.3246357,
+    "display": "La Victoria, Parroquia La Victoria, Municipio Ribas, Estado Aragua, 2121, Venezuela"
+  },
+  "Edificio Bicentenario, Calle 12 con Av. Universidad": null,
+  "Calle 12 con Av. Universidad": null,
+  "Residencias Morgana, Av. Andrés Bello, Caracas 1060, Miranda, Venezuela": null,
+  "Av. Andrés Bello, Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.5006567,
+    "lng": -66.8456452,
+    "display": "Avenida Andrés Bello, Los Palos Grandes, Sector Los Palos Grandes, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Edificio El Paseo, Av. Nueva Granada, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.4813395,
+    "lng": -66.9038367,
+    "display": "Edificio El Paseo, Avenida Nueva Granada, Las Acacias, Caracas, Parroquia San Pedro, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1040, Venezuela"
+  },
+  "San Filippo, C. Leoncio Martínez, Caracas 1020, Distrito Capital, Venezuela": null,
+  "C. Leoncio Martínez, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4988074,
+    "lng": -66.9330866,
+    "display": "Calle Leoncio Martínez, Barrio Los Eucaliptos, Los Eucaliptus, Barrio El Guarataro, Caracas, Parroquia San Juan, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Residencias Serenísima Sur, Av. Nte. 9, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Av. Nte. 9, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5060934,
+    "lng": -66.9146008,
+    "display": "Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "Conjunto residencial el Saman, F4M5+67X, Avenida Capanaparo, Caracas 1041, Distrito Capital, Venezuela": null,
+  "Conjunto residencial el Saman, Avenida Capanaparo, Caracas 1041, Distrito Capital, Venezuela": null,
+  "Avenida Capanaparo, Caracas 1041, Distrito Capital, Venezuela": null,
+  "5 héroes, Av. Bolívar, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Av. Bolívar, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5010009,
+    "lng": -66.9080762,
+    "display": "Avenida Bolívar, El Conde, Hornos de Cal, San Agustín Norte, Caracas, Parroquia San Agustín, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "RESIDENCIAS JUSTINA, Av. San Martín, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Av. San Martín, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.5011303,
+    "lng": -66.9222442,
+    "display": "Avenida San Martín, Barrio Potrerito, San Martín, Barrio El Guarataro, Caracas, Parroquia San Juan, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "REDI, Colinas de Bello Monte, Caracas, Miranda, Venezuela": null,
+  "Colinas de Bello Monte, Caracas, Miranda, Venezuela": {
+    "lat": 10.48509,
+    "lng": -66.8762134,
+    "display": "Colinas de Bello Monte, Bello Monte, Caracas, Parroquia Nuestra Señora del Rosario, Municipio Baruta, Distrito Metropolitano de Caracas, Estado Miranda, 1080, Venezuela"
+  },
+  "La Rita, Parroquia San Bernardino, Caracas, Distrito Capital, Venezuela": null,
+  "Parroquia San Bernardino, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5267511,
+    "lng": -66.8987516,
+    "display": "Parroquia San Bernardino, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Bloque 33 de menca residencias Santa Barbara, Menca, Guarenas 1220, Miranda, Venezuela": null,
+  "Menca, Guarenas 1220, Miranda, Venezuela": {
+    "lat": 10.4722792,
+    "lng": -66.6050656,
+    "display": "Escuela Básica Menca de Leoni II, 3.° Avenida, Urbanización 27 de Febrero, Trapichito, Guarenas, Parroquia Guarenas, Municipio Plaza, Estado Miranda, 1220, Venezuela"
+  },
+  "Edificio Don Pepe Bello campo Chacao, F4RW+XPW, Caracas 1060, Miranda, Venezuela": null,
+  "Edificio Don Pepe Bello campo Chacao, Caracas 1060, Miranda, Venezuela": null,
+  "Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.4707551,
+    "lng": -66.8372571,
+    "display": "Templo de Caracas, Avenida C, Caurimare, Sector Caurimare, Caracas, Parroquia El Cafetal, Municipio Baruta, Distrito Metropolitano de Caracas, Estado Miranda, 1061, Venezuela"
+  },
+  "Residencias Semar, Av. Sanz & C. Yumare, Caracas 1071, Miranda, Venezuela": null,
+  "Av. Sanz & C. Yumare, Caracas 1071, Miranda, Venezuela": null,
+  "Edificio Castillete, F5X3+FQ4, Caracas 1060, Miranda, Venezuela": null,
+  "Edificio Castillete, Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.499219,
+    "lng": -66.8453763,
+    "display": "Edificio Castillete, Avenida Andrés Bello, Los Palos Grandes, Sector Los Palos Grandes, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Residencias mil centros, Local 4, Res Mil Centros, pb Av. San Martín, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Local 4, Res Mil Centros, pb Av. San Martín, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Alianza, con Av 3, Caracas 1060, Miranda, Venezuela": null,
+  "con Av 3, Caracas 1060, Miranda, Venezuela": null,
+  "Carolina, Avenida Apure, Caracas 1041, Distrito Capital, Venezuela": null,
+  "Avenida Apure, Caracas 1041, Distrito Capital, Venezuela": {
+    "lat": 10.4813982,
+    "lng": -66.8952477,
+    "display": "Avenida Apure, Valle Abajo, Los Rosales, Caracas, Parroquia San Pedro, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1041, Venezuela"
+  },
+  "Edificio Los Riscos 2, Calle 3, Caracas, Miranda, Venezuela": null,
+  "Calle 3, Caracas, Miranda, Venezuela": {
+    "lat": 10.4251861,
+    "lng": -66.8398471,
+    "display": "Calle 3, La Cabaña, La Boyera, Caracas, Parroquia El Hatillo, Municipio El Hatillo, Distrito Metropolitano de Caracas, Estado Miranda, 1083, Venezuela"
+  },
+  "Edificio Nilo, Calle 12, Caracas, Distrito Capital, Venezuela": null,
+  "Calle 12, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.4927068,
+    "lng": -66.9504939,
+    "display": "Calle 12, Urbanización La Quebradita II, Barrio La Morán, Vista Alegre, Caracas, Parroquia El Paraíso, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Edificio Sofia, Conjunto Residencial Paulo VI, Caracas 1073, Miranda, Venezuela": null,
+  "Conjunto Residencial Paulo VI, Caracas 1073, Miranda, Venezuela": null,
+  "Edf. Trebol, Calle Zamora, Maracay 2103, Aragua, Venezuela": null,
+  "Calle Zamora, Maracay 2103, Aragua, Venezuela": {
+    "lat": 10.2342461,
+    "lng": -67.598125,
+    "display": "Calle Zamora, Urbanización Bermúdez, Campo Alegre, Maracay, Parroquia José Casanova Godoy, Municipio Girardot, Estado Aragua, 2103, Venezuela"
+  },
+  "Abitare 2002, C. Colón, Maracay 2103, Aragua, Venezuela": null,
+  "C. Colón, Maracay 2103, Aragua, Venezuela": {
+    "lat": 10.2594263,
+    "lng": -67.619936,
+    "display": "Calle Colón, Barrio Coromoto, Maracay, Parroquia Los Tacariguas, Municipio Girardot, Estado Aragua, 2104, Venezuela"
+  },
+  "Residencia Punta de Piedra torre “A”, F3WP+FF2, 41 Avenida Este 16, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Residencia Punta de Piedra torre “A”, 41 Avenida Este 16, Caracas 1014, Distrito Capital, Venezuela": null,
+  "41 Avenida Este 16, Caracas 1014, Distrito Capital, Venezuela": {
+    "lat": 10.4956487,
+    "lng": -66.9108974,
+    "display": "Avenida Este 16, San Agustín Norte, Caracas, Parroquia San Agustín, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Cielo azúl, C. Yuruari, Caracas 1071, Miranda, Venezuela": {
+    "lat": 10.4952901,
+    "lng": -66.8080263,
+    "display": "Residencias Cielo Azul, Calle Yuruarí, El Marqués Norte, Sector El Marqués, Caracas, Parroquia Petare, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1073, Venezuela"
+  },
+  "Don Germán B, G32M+42X, Caracas 1014, Capital District, Venezuela": null,
+  "Don Germán B, Caracas 1014, Capital District, Venezuela": {
+    "lat": 10.5000089,
+    "lng": -66.9172252,
+    "display": "Residencias Don Germán, Quinta Crespo, Caracas, Parroquia Santa Teresa, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Loma Alta, F653+824, Calle Principal, Caracas 1070, Miranda, Venezuela": null,
+  "Loma Alta, Calle Principal, Caracas 1070, Miranda, Venezuela": null,
+  "Calle Principal, Caracas 1070, Miranda, Venezuela": {
+    "lat": 10.4165465,
+    "lng": -66.8687067,
+    "display": "Calle Principal Monte Alto, Urbanización Monte Alto, Monterrey, Urbanización Manzanares, Hoyo de La Puerta, Caracas, Parroquia Nuestra Señora del Rosario, Municipio Baruta, Distrito Metropolitano de Caracas, Estado Miranda, 1080, Venezuela"
+  },
+  "Urbanización oasis de cua, Urb. Oasis de Cúa, Cúa 1211, Miranda, Venezuela": null,
+  "Urb. Oasis de Cúa, Cúa 1211, Miranda, Venezuela": null,
+  "Edificio Sebucán., Av. Principal de Sebucán, Caracas 1071, Miranda, Venezuela": null,
+  "Av. Principal de Sebucán, Caracas 1071, Miranda, Venezuela": {
+    "lat": 10.5000244,
+    "lng": -66.8359211,
+    "display": "Av. Principal de Sebucán, Sebucán, Los Dos Caminos, Sector Sebucán, Caracas, Parroquia Leoncio Martínez, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1071, Venezuela"
+  },
+  "La Colmena 78, Calle La Colmena, Caracas 1000, Distrito Capital, Venezuela": null,
+  "Calle La Colmena, Caracas 1000, Distrito Capital, Venezuela": {
+    "lat": 10.4642807,
+    "lng": -66.9846731,
+    "display": "Calle La Colmena, Barrio La Cumbre, Mamera, Parroquia Antímano, Caracas, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1100, Venezuela"
+  },
+  "Residencias Palma Real, Calle California, Caracas 1080, Distrito Capital, Venezuela": null,
+  "Calle California, Caracas 1080, Distrito Capital, Venezuela": null,
+  "Edificio Santa Eduviges, Calle Aranda, Caracas 1041, Distrito Capital, Venezuela": null,
+  "Calle Aranda, Caracas 1041, Distrito Capital, Venezuela": {
+    "lat": 10.4814665,
+    "lng": -66.8897067,
+    "display": "Calle Aranda, Valle Abajo, Los Rosales, Caracas, Parroquia San Pedro, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1041, Venezuela"
+  },
+  "Res. Cristal I, Sabana Larga, Valencia 2001, Carabobo, Venezuela": null,
+  "Sabana Larga, Valencia 2001, Carabobo, Venezuela": {
+    "lat": 10.2058497,
+    "lng": -68.0218935,
+    "display": "Sabana Larga, Urbanización Valle de Camoruco, Prebo, Valencia, Parroquia San José, Municipio Valencia, Estado Carabobo, 2001, Venezuela"
+  },
+  "Residencias Nivaldo, Av. Principal de Las Delicias, Residencias Nivaldo, PB, Locales N°. 1 al 5 Las Delicias, Maracay 2102, Aragua, Venezuela": null,
+  "Av. Principal de Las Delicias, Residencias Nivaldo, PB, Locales N°. 1 al 5 Las Delicias, Maracay 2102, Aragua, Venezuela": null,
+  "Res. Horizonte, San Martin, La quebradita I, Res. Horizonte": null,
+  "San Martin, La quebradita I, Res. Horizonte": null,
+  "Centro residencial Sonia - Torre B, F3WC+Q9G, Avenida, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Centro residencial Sonia - Torre B, Avenida, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Avenida, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4888303,
+    "lng": -66.9188927,
+    "display": "Avenida Guzmán Blanco, La Chivera, Guzmán Blanco, Cota 905, Caracas, Parroquia El Paraíso, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Centro Metropolitano, Av. Guaicaipuro, Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.4932403,
+    "lng": -66.857592,
+    "display": "Centro Comercial Metropolitano, Avenida Guaicaipuro, Campo Alegre, Chacao, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Urapal, Av. Urdaneta, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.506374,
+    "lng": -66.9035879,
+    "display": "Centro Urapal, Avenida Urdaneta, La Candelaria, Caracas, Parroquia La Candelaria, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Pasaje Sayegh, Calle de horno negro a rio, Caracas 1070, Distrito Capital, Venezuela": null,
+  "Calle de horno negro a rio, Caracas 1070, Distrito Capital, Venezuela": null,
+  "Quinta reiro, Montalbán I, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Montalbán I, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4745161,
+    "lng": -66.9506358,
+    "display": "Montalbán I, Calle 3, Urbanización Montalbán I, Montalbán, Caracas, Parroquia La Vega, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "El pedregal, Calle La Manguera, Caracas 1060, Miranda, Venezuela": null,
+  "Calle La Manguera, Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.5028463,
+    "lng": -66.8588205,
+    "display": "Calle La Manguera, El Pedregal, Sector El Pedregal, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Residencias IBIZA, Avenida 106, Valencia 2001, Carabobo, Venezuela": null,
+  "Avenida 106, Valencia 2001, Carabobo, Venezuela": {
+    "lat": 10.2165453,
+    "lng": -68.0168133,
+    "display": "Avenida 106, La Viña, Prebo, Valencia, Parroquia San José, Municipio Valencia, Estado Carabobo, 2001, Venezuela"
+  },
+  "Bloques de la trinidad, Polideportivo Rafael Vidal, Av. Principal de La Trinidad, Caracas 1080, Miranda, Venezuela": null,
+  "Polideportivo Rafael Vidal, Av. Principal de La Trinidad, Caracas 1080, Miranda, Venezuela": {
+    "lat": 10.4335429,
+    "lng": -66.8676636,
+    "display": "Polideportivo Rafael Vidal, Avenida Principal de La Trinidad, Zona Industrial La Trinidad, Baruta, Caracas, Parroquia Nuestra Señora del Rosario, Municipio Baruta, Distrito Metropolitano de Caracas, Estado Miranda, 1080, Venezuela"
+  },
+  "Edificio Chimborazo, Avenida Este 5, Caracas, Distrito Capital, Venezuela": null,
+  "Avenida Este 5, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.508232,
+    "lng": -66.9028334,
+    "display": "Avenida Este 5, La Candelaria, Caracas, Parroquia La Candelaria, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Miradores, Miradores, Caracas 1073, Miranda, Venezuela": null,
+  "Miradores, Caracas 1073, Miranda, Venezuela": null,
+  "el progreso sector las flores, F432+F38, Caracas 1090, Miranda, Venezuela": null,
+  "el progreso sector las flores, Caracas 1090, Miranda, Venezuela": null,
+  "Caracas 1090, Miranda, Venezuela": {
+    "lat": 10.4707551,
+    "lng": -66.8372571,
+    "display": "Templo de Caracas, Avenida C, Caurimare, Sector Caurimare, Caracas, Parroquia El Cafetal, Municipio Baruta, Distrito Metropolitano de Caracas, Estado Miranda, 1061, Venezuela"
+  },
+  "Edificio Los Maristas, C. Maristas, Caracas 1060, Distrito Capital, Venezuela": null,
+  "C. Maristas, Caracas 1060, Distrito Capital, Venezuela": null,
+  "Rubherman, C. Del medio, Caracas, Distrito Capital, Venezuela": null,
+  "C. Del medio, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.4618129,
+    "lng": -66.9846386,
+    "display": "Calle del Medio, Barrio La Cumbre, Mamera, Parroquia Antímano, Caracas, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1100, Venezuela"
+  },
+  "Tecoteca, Avenida Francisco de Miranda, Caracas, Distrito Capital, Venezuela": null,
+  "Avenida Francisco de Miranda, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.4916413,
+    "lng": -66.8637211,
+    "display": "BBVA Provincial, Avenida Francisco de Miranda, El Rosal, Sector Campo Alegre, Caracas, Municipio Libertador, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Edif. Los Andes, Santa Eduvigis, Caracas, Miranda, Venezuela": null,
+  "Santa Eduvigis, Caracas, Miranda, Venezuela": {
+    "lat": 10.5002861,
+    "lng": -66.8384638,
+    "display": "Santa Eduvigis, Sector Santa Edivigis, Caracas, Parroquia Leoncio Martínez, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1071, Venezuela"
+  },
+  "Edif. Santo Tomas, Avenida Este 7 cruce, con Av. Nte. 9, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Avenida Este 7 cruce, con Av. Nte. 9, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Recidencia Madre Cabrini, F4F4+9PF, C. Lisandro Alvarado, Caracas 1041, Distrito Capital, Venezuela": null,
+  "Recidencia Madre Cabrini, C. Lisandro Alvarado, Caracas 1041, Distrito Capital, Venezuela": null,
+  "C. Lisandro Alvarado, Caracas 1041, Distrito Capital, Venezuela": {
+    "lat": 10.476035,
+    "lng": -66.8905581,
+    "display": "Calle Lisandro Alvarado, Santa Mónica, Los Rosales, Caracas, Parroquia San Pedro, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1041, Venezuela"
+  },
+  "Centro Candoral Torre C, Av. Urdaneta al Frente de la Plaza Candelaria": null,
+  "Av. Urdaneta al Frente de la Plaza Candelaria": null,
+  "Res. San Miguel, Trocadero a San Gabriel, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Trocadero a San Gabriel, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Bloque 2, El Ingenio, Guatire 1221, Miranda, Venezuela": {
+    "lat": 10.4760806,
+    "lng": -66.5726424,
+    "display": "El Ingenio, Parroquia Guatire, Municipio Zamora, Estado Miranda, 1221, Venezuela"
+  },
+  "Edificio Santa Rosalía, Av. Sur 3, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.4993132,
+    "lng": -66.9108616,
+    "display": "Edificio El Rosario, Avenida Sur 3, Casco Central de Santa Rosalía, Caracas, Parroquia Santa Rosalia, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Residencias Plaza Jardín, Blvr. Amador Bendayán, Caracas, Distrito Capital, Venezuela": null,
+  "Blvr. Amador Bendayán, Caracas, Distrito Capital, Venezuela": null,
+  "Antes de llegar al mcdonals de la carretera nacional, 39-18 C. Independencia, Cagua 2122, Aragua, Venezuela": null,
+  "39-18 C. Independencia, Cagua 2122, Aragua, Venezuela": {
+    "lat": 10.1894141,
+    "lng": -67.4605586,
+    "display": "Calle 10 Independencia, Zona Industrial Santa Rosalía, Cagua, Parroquia Cagua, Municipio Sucre, Estado Aragua, 2122, Venezuela"
+  },
+  "Aldomar, G34Q+9J4, Caracas 1012, Capital District, Venezuela": null,
+  "Aldomar, Caracas 1012, Capital District, Venezuela": null,
+  "Caracas 1012, Capital District, Venezuela": {
+    "lat": 10.5060934,
+    "lng": -66.9146008,
+    "display": "Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "De Vinci, De Vinci, Av. Leonardo da Vinci, Caracas 1041, Miranda, Venezuela": null,
+  "De Vinci, Av. Leonardo da Vinci, Caracas 1041, Miranda, Venezuela": null,
+  "Pórtico del Ávila Torre C y D, Av. Panteón, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Av. Panteón, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5108075,
+    "lng": -66.9021546,
+    "display": "Avenida Panteón, San Bernardino, Caracas, Parroquia San Bernardino, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Edificio 24 y 23 Las acacias Maracay, Avenida Los Chaguaramos, Maracay 2103, Aragua, Venezuela": null,
+  "Avenida Los Chaguaramos, Maracay 2103, Aragua, Venezuela": {
+    "lat": 10.3150242,
+    "lng": -67.5570422,
+    "display": "Avenida Los Chaguaramos, El Castaño, Maracay, Parroquia Las Delicias, Municipio Girardot, Estado Aragua, Venezuela"
+  },
+  "Misión Vivienda, Av. Bolívar, Caracas, Distrito Capital, Venezuela": null,
+  "Av. Bolívar, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5020601,
+    "lng": -66.9133005,
+    "display": "Avenida Bolívar, Centro Simón Bolívar, Casco Central de Santa Rosalía, Caracas, Parroquia Santa Rosalia, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Bloque 5, Barrio Pinto Salinas, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Barrio Pinto Salinas, Caracas 1050, Distrito Capital, Venezuela": {
+    "lat": 10.4999226,
+    "lng": -66.9424009,
+    "display": "Barrio Pinto Salinas, Los Eucaliptus, Artigas, Caracas, Parroquia San Juan, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "sector la colmena antimano, Carr. De Antímano, Caracas, Distrito Capital, Venezuela": null,
+  "Carr. De Antímano, Caracas, Distrito Capital, Venezuela": null,
+  "Edificio rosella, Av. Universidad, Caracas, Distrito Capital, Venezuela": null,
+  "Av. Universidad, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5027574,
+    "lng": -66.907737,
+    "display": "Avenida Universidad, La Candelaria, Caracas, Parroquia La Candelaria, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "City park, Av. José Antonio Páez, Caracas, Distrito Capital, Venezuela": null,
+  "Residencias El Centro, Av El Centro, Caracas 1071, Miranda, Venezuela": null,
+  "Av El Centro, Caracas 1071, Miranda, Venezuela": {
+    "lat": 10.4965322,
+    "lng": -66.8324453,
+    "display": "Avenida El Centro, Los Dos Caminos, Montecristo, Sector Montecristo, Caracas, Parroquia Leoncio Martínez, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1071, Venezuela"
+  },
+  "Bloque 12 UD-3 Caricuao, UD-3, Bloque 12": null,
+  "UD-3, Bloque 12": null,
+  "Urbanización Bosque Lindo, 6G79+3P4, Turmero, Aragua, Venezuela": null,
+  "Urbanización Bosque Lindo, Turmero, Aragua, Venezuela": null,
+  "Turmero, Aragua, Venezuela": {
+    "lat": 10.2217183,
+    "lng": -67.4865808,
+    "display": "Turmero, Parroquia Turmero, Municipio Mariño, Estado Aragua, 2115, Venezuela"
+  },
+  "Casa nro 1, Calle La Lucha, Maracay 2101, Aragua, Venezuela": null,
+  "Calle La Lucha, Maracay 2101, Aragua, Venezuela": null,
+  "Bloque 2 de simon rodriguez, Bloque 2, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Bloque 2, Caracas 1050, Distrito Capital, Venezuela": {
+    "lat": 10.512046,
+    "lng": -66.8888908,
+    "display": "Bloque 2, Avenida Trujillo, Simón Rodríguez, Guaicaipuro, Maripérez, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "elmas, Los Sauces, Valencia 2001, Carabobo, Venezuela": null,
+  "Los Sauces, Valencia 2001, Carabobo, Venezuela": {
+    "lat": 10.2073445,
+    "lng": -68.0052847,
+    "display": "Los Sauces, El Trigal, Valencia, Parroquia San José, Municipio Valencia, Estado Carabobo, 2001, Venezuela"
+  },
+  "Colegio San Martin, Av. San Martín, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4940353,
+    "lng": -66.934702,
+    "display": "Colegio San Martín, Avenida San Martín, Consejo Comunal Urb. San Martín I, Caracas, Parroquia San Juan, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Edificio Perla, Avenida Francisco Solano Lopez & Calle Paraiso, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Avenida Francisco Solano Lopez & Calle Paraiso, Caracas 1050, Distrito Capital, Venezuela": null,
+  "El Almendrón, Residencias Fruta's Condominiums, Guatire 1221, Miranda, Venezuela": null,
+  "Residencias Fruta's Condominiums, Guatire 1221, Miranda, Venezuela": null,
+  "residencias solange, F3WM+5GG, Av. Sur 1, Caracas 1014, Distrito Capital, Venezuela": null,
+  "residencias solange, Av. Sur 1, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Av. Sur 1, Caracas 1014, Distrito Capital, Venezuela": {
+    "lat": 10.4978015,
+    "lng": -66.9144358,
+    "display": "Avenida Sur 1, Quinta Crespo, Caracas, Parroquia Santa Teresa, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Cristal palace, 2da. Avenida, Caracas 1060, Miranda, Venezuela": null,
+  "2da. Avenida, Caracas 1060, Miranda, Venezuela": null,
+  "Edificio Venezia, Calle Madariaga, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Calle Madariaga, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4890233,
+    "lng": -66.9244355,
+    "display": "Calle Madariaga, Barrio 21 de Julio, Brisas del Paraíso, Cota 905, Caracas, Parroquia El Paraíso, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Llaguaral, Av. Baralt, Caracas, Distrito Capital, Venezuela": null,
+  "Av. Baralt, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5006026,
+    "lng": -66.9186048,
+    "display": "Avenida Baralt, El Silencio, Caracas, Parroquia Santa Teresa, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Bloque 7 y 8 Simón Rodríguez, C. Real de Sarria, Caracas, Distrito Capital, Venezuela": null,
+  "C. Real de Sarria, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5105981,
+    "lng": -66.8943607,
+    "display": "Calle Real de Sarría, Sarría, Caracas, Parroquia La Candelaria, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Centro Parque Caracas Torre D, Avenida Sur 21 & Avenida Este 2, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Avenida Sur 21 & Avenida Este 2, Caracas 1011, Distrito Capital, Venezuela": null,
+  "BLOQUE 9 EDIFICIO 1 LOS TEQUES EDO. MIRANDA., Sector El Paso, Los Teques 1201, Miranda, Venezuela": null,
+  "Sector El Paso, Los Teques 1201, Miranda, Venezuela": null,
+  "Edificio San Carlos, F4PG+GC5, Avenida Miguelangel, Caracas 1080, Miranda, Venezuela": null,
+  "Edificio San Carlos, Avenida Miguelangel, Caracas 1080, Miranda, Venezuela": null,
+  "Avenida Miguelangel, Caracas 1080, Miranda, Venezuela": {
+    "lat": 10.4862757,
+    "lng": -66.8732865,
+    "display": "Avenida Miguelangel, Colinas de Bello Monte, Bello Monte, Caracas, Parroquia Nuestra Señora del Rosario, Municipio Baruta, Distrito Metropolitano de Caracas, Estado Miranda, 1080, Venezuela"
+  },
+  "Edificio flamenco, F3WJ+8Q6, Avenida Oeste 18, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Edificio flamenco, Avenida Oeste 18, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Avenida Oeste 18, Caracas 1014, Distrito Capital, Venezuela": {
+    "lat": 10.495712,
+    "lng": -66.9178715,
+    "display": "Avenida Oeste 18, Quinta Crespo, Caracas, Parroquia Santa Teresa, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Residencias Madrid, Calle 137-A, Valencia 2001, Carabobo, Venezuela": null,
+  "Calle 137-A, Valencia 2001, Carabobo, Venezuela": {
+    "lat": 10.153426,
+    "lng": -67.9708599,
+    "display": "Calle, La Isabélica, Valencia, Parroquia Rafael Urdaneta, Municipio Valencia, Estado Carabobo, 2003, Venezuela"
+  },
+  "Residencias Jardininfan, La Candelaria, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5045988,
+    "lng": -66.9056986,
+    "display": "Residencias Jardininfan, Avenida Este 0, La Candelaria, Caracas, Parroquia La Candelaria, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "CONJUNTO RESIDENCIAL LOS DOS CAMINOS, Av. Sucre & Av. Rómulo Gallegos, Caracas 1071, Miranda, Venezuela": null,
+  "Av. Sucre & Av. Rómulo Gallegos, Caracas 1071, Miranda, Venezuela": {
+    "lat": 10.4933636,
+    "lng": -66.8160675,
+    "display": "Edificio Venezuela, Avenida Rómulo Gallegos, Horizonte, Sector El Marqués, Caracas, Parroquia Petare, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1071, Venezuela"
+  },
+  "Edificio Perez bonalde, Pérez Bonalde, Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.5085438,
+    "lng": -66.9479665,
+    "display": "Banco Caroní, Boulevard de Catia, Pérez Bonalde, Catia, Caracas, Parroquia Sucre, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1030, Venezuela"
+  },
+  "Edificio delta, Av baralt, esquina dos pilitas, frente al tsj": null,
+  "Av baralt, esquina dos pilitas, frente al tsj": null,
+  "Edificio El Casquillo, Calle Vuelta Del Casquillo, Caracas, Distrito Capital, Venezuela": null,
+  "Calle Vuelta Del Casquillo, Caracas, Distrito Capital, Venezuela": null,
+  "Los 7, Avenida Sur 4, Caracas, Distrito Capital, Venezuela": null,
+  "Avenida Sur 4, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5003398,
+    "lng": -66.9175295,
+    "display": "Avenida Sur 4, El Silencio, Caracas, Parroquia Santa Teresa, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Casa en Las Flores - Guatire., Las Flores, Guatire 1221, Miranda, Venezuela": null,
+  "Las Flores, Guatire 1221, Miranda, Venezuela": {
+    "lat": 10.4732049,
+    "lng": -66.5309586,
+    "display": "Av ppal Las Flores, Conjunto Residencial Las Flores de Valle Arriba, El Desvío, Parroquia Guatire, Municipio Zamora, Estado Miranda, 1221, Venezuela"
+  },
+  "Edificio en Las Fuentes, Av Las Fuentes, El Paraiso": null,
+  "Av Las Fuentes, El Paraiso": {
+    "lat": 10.4857666,
+    "lng": -66.9363835,
+    "display": "Avenida Las Fuentes, Barrio Sinaí, El Pinar, La Quebradita, Caracas, Parroquia El Paraíso, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Carambú, 528F+5M9, Valencia 2003, Carabobo, Venezuela": null,
+  "Carambú, Valencia 2003, Carabobo, Venezuela": null,
+  "Valencia 2003, Carabobo, Venezuela": {
+    "lat": 10.170026,
+    "lng": -68.0003987,
+    "display": "Valencia, Parroquia Santa Rosa, Municipio Valencia, Estado Carabobo, 2001, Venezuela"
+  },
+  "Edificio Don Eduardo, G35Q+VX3, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Edificio Don Eduardo, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5060934,
+    "lng": -66.9146008,
+    "display": "Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "COnjunto residencial FE Y ALEGRIA, La Bombilla, Caracas 1073, Miranda, Venezuela": null,
+  "La Bombilla, Caracas 1073, Miranda, Venezuela": null,
+  "Residencias Vista Bella, G634+6W7, Calle 5, Caracas 1073, Distrito Capital, Venezuela": null,
+  "Residencias Vista Bella, Calle 5, Caracas 1073, Distrito Capital, Venezuela": null,
+  "Calle 5, Caracas 1073, Distrito Capital, Venezuela": {
+    "lat": 10.479765,
+    "lng": -66.9450626,
+    "display": "Calle 5, Deyber, Urbanización La Paz, La Quebradita, Caracas, Parroquia El Paraíso, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Conjunto Residencial Los Frailes I, C. Martín, Maracay 2103, Aragua, Venezuela": null,
+  "C. Martín, Maracay 2103, Aragua, Venezuela": {
+    "lat": 10.2423383,
+    "lng": -67.6335532,
+    "display": "Calle San Martin, Barrio San Vicente, Base Sucre, Maracay, Parroquia Los Tacariguas, Municipio Girardot, Estado Aragua, 2104, Venezuela"
+  },
+  "Edificio Centro Profesional Oeste, F3VF+HC4, Cjón. Machado, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Edificio Centro Profesional Oeste, Cjón. Machado, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Cjón. Machado, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Res. Parque Sebucán, Av. Rómulo Gallegos, Caracas, Miranda, Venezuela": null,
+  "Av. Rómulo Gallegos, Caracas, Miranda, Venezuela": {
+    "lat": 10.4949295,
+    "lng": -66.8292122,
+    "display": "Avenida Rómulo Gallegos, Los Dos Caminos, Montecristo, Sector Montecristo, Caracas, Parroquia Leoncio Martínez, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1071, Venezuela"
+  },
+  "Canac, 1 era. avenida Flores de Puente Hierro": null,
+  "1 era. avenida Flores de Puente Hierro": {
+    "lat": 10.4910675,
+    "lng": -66.9114382,
+    "display": "Avenida Fuerzas Armadas, Puente Hierro, El León, El Cementerio, Caracas, Parroquia Santa Rosalia, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Caribbean, Carr. Morón - Coro, Tucacas 2055, Falcón, Venezuela": null,
+  "Carr. Morón - Coro, Tucacas 2055, Falcón, Venezuela": null,
+  "Edificio Las Laderas, G623+CV5, Caracas 1073, Miranda, Venezuela": null,
+  "Edificio Las Laderas, Caracas 1073, Miranda, Venezuela": null,
+  "Caracas 1073, Miranda, Venezuela": {
+    "lat": 10.4707551,
+    "lng": -66.8372571,
+    "display": "Templo de Caracas, Avenida C, Caurimare, Sector Caurimare, Caracas, Parroquia El Cafetal, Municipio Baruta, Distrito Metropolitano de Caracas, Estado Miranda, 1061, Venezuela"
+  },
+  "Club Altamira. Torre B, 68PJ+XX2 Altamira, Avenida Ayacucho, Santa Teresa 1215, Miranda, Venezuela": null,
+  "Club Altamira. Torre B, Avenida Ayacucho, Santa Teresa 1215, Miranda, Venezuela": null,
+  "Avenida Ayacucho, Santa Teresa 1215, Miranda, Venezuela": null,
+  "Residencia Santa Inés, G36R+J7M, Av. Panteón, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Residencia Santa Inés, Av. Panteón, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Av. Panteón, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5118126,
+    "lng": -66.9098793,
+    "display": "Avenida Panteón, San José, Caracas, Parroquia San José, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Centro Parque Carabobo (CPC), Av. Universidad, Caracas, Distrito Capital, Venezuela": null,
+  "Boulevard plaza, Avenida Nte., Caracas, Distrito Capital, Venezuela": null,
+  "Avenida Nte., Caracas, Distrito Capital, Venezuela": null,
+  "Edificio Bloque 3, C2MC+QWF, Caracas 1000, Distrito Capital, Venezuela": null,
+  "Edificio Bloque 3, Caracas 1000, Distrito Capital, Venezuela": {
+    "lat": 10.4346158,
+    "lng": -66.9843818,
+    "display": "Bloque 3, 3, Avenida Principal de Caricuao, Barrio El Onoto, Ruiz Pineda, Caricuao, Caracas, Parroquia Caricuao, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1000, Venezuela"
+  },
+  "Enzino, Calle 300, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Calle 300, Caracas 1014, Distrito Capital, Venezuela": {
+    "lat": 10.4939588,
+    "lng": -66.9191336,
+    "display": "Calle 300, Quinta Crespo, Caracas, Parroquia Santa Teresa, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Sin nombres, Bello Monte I, Zuata 2121, Aragua, Venezuela": null,
+  "Bello Monte I, Zuata 2121, Aragua, Venezuela": {
+    "lat": 10.1675312,
+    "lng": -67.3929699,
+    "display": "Urb Bello Monte, Zuata, Parroquia Zuata, Municipio Ribas, Estado Aragua, 2121, Venezuela"
+  },
+  "Edificio París, B Avenida, Caracas 1071, Miranda, Venezuela": null,
+  "B Avenida, Caracas 1071, Miranda, Venezuela": {
+    "lat": 10.4964106,
+    "lng": -66.8223071,
+    "display": "Mabe de Venezuela, Avenida Sanatorio del Ávila, Barrio La Lucha, Boleíta Norte, Sector Boleíta Norte, Caracas, Parroquia Leoncio Martínez, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1071, Venezuela"
+  },
+  "Residencias Jardín La Florida, 1050 LAS ACACIAS C/C, AV Av. Andrés Bello, Caracas 1050, Distrito Capital, Venezuela": null,
+  "1050 LAS ACACIAS C/C, AV Av. Andrés Bello, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Bloque 6, Bloque 6, UD-7 Avenida Principal de Ruiz Pineda, Caracas 1000, Distrito Capital, Venezuela": null,
+  "Bloque 6, UD-7 Avenida Principal de Ruiz Pineda, Caracas 1000, Distrito Capital, Venezuela": null,
+  "Guacara Centro, 7474+VWF, Guacara 2015, Carabobo, Venezuela": null,
+  "Guacara Centro, Guacara 2015, Carabobo, Venezuela": {
+    "lat": 10.2324695,
+    "lng": -67.8805027,
+    "display": "Centro Comercial Guacara Plaza, Negro Primero, Guacara, Parroquia Guacara, Municipio Guacara, Estado Carabobo, Venezuela"
+  },
+  "Colegio Jesus Maestro Fe y Alegria, F6Q2+QXJ, Calle Fe Y Alegria, Caracas 1073, Distrito Capital, Venezuela": null,
+  "Colegio Jesus Maestro Fe y Alegria, Calle Fe Y Alegria, Caracas 1073, Distrito Capital, Venezuela": null,
+  "Calle Fe Y Alegria, Caracas 1073, Distrito Capital, Venezuela": {
+    "lat": 10.5063536,
+    "lng": -66.9660287,
+    "display": "Calle Fe y Alegría, Mario Briceño Iragorry, Brisas de Propatria, Caracas, Parroquia Sucre, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1100, Venezuela"
+  },
+  "Residencias Los Manrgos, Av. Constitución, Maracay, Aragua, Venezuela": null,
+  "Av. Constitución, Maracay, Aragua, Venezuela": {
+    "lat": 10.2407099,
+    "lng": -67.5738232,
+    "display": "Avenida Constitución, Sector 1 de Girardot, Las Acacias, Maracay, Parroquia Joaquín Crespo, Municipio Girardot, Estado Aragua, 2102, Venezuela"
+  },
+  "Bloque 45, C. E, Maracay 2103, Aragua, Venezuela": {
+    "lat": 10.2314092,
+    "lng": -67.5825656,
+    "display": "Bloque 45, Urb. Las Acacias, Calle E, Las Acacias, Maracay, Parroquia Joaquín Crespo, Municipio Girardot, Estado Aragua, 2103, Venezuela"
+  },
+  "Opp09, Avenida Lecuna Parroquia santa Teresa esquina de candilito a tablita": null,
+  "Avenida Lecuna Parroquia santa Teresa esquina de candilito a tablita": null,
+  "Casa, Avenida Principal Vivienda Popular Los Guayos, Los Guayos 2011, Carabobo, Venezuela": null,
+  "Avenida Principal Vivienda Popular Los Guayos, Los Guayos 2011, Carabobo, Venezuela": {
+    "lat": 10.1779068,
+    "lng": -67.9370384,
+    "display": "Avenida Principal La Vivienda, La Vivienda Popular, Sector Antonieta de Celli, Los Guayos, Parroquia Los Guayos, Municipio Los Guayos, Estado Carabobo, 2011, Venezuela"
+  },
+  "Edificio Lander, Av. Urdaneta, Caracas, Distrito Capital, Venezuela": null,
+  "Av. Urdaneta, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5055721,
+    "lng": -66.9015219,
+    "display": "Avenida Urdaneta, San Bernardino, Caracas, Parroquia San Bernardino, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Residencia Roda, Av. Nte. 15, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Av. Nte. 15, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5060934,
+    "lng": -66.9146008,
+    "display": "Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "Torres De San José, Avenida fuerzas armadas esquina San José a San Luis edificio torres de San José": null,
+  "Avenida fuerzas armadas esquina San José a San Luis edificio torres de San José": null,
+  "La Gioconda, F4Q9+QG3, Av. Leonardo da Vinci, Caracas 1050, Distrito Capital": null,
+  "La Gioconda, Av. Leonardo da Vinci, Caracas 1050, Distrito Capital": null,
+  "Av. Leonardo da Vinci, Caracas 1050, Distrito Capital": {
+    "lat": 10.4895094,
+    "lng": -66.880483,
+    "display": "Avenida Leonardo Da Vinci, Colinas de Santa Mónica, Los Chaguaramos, Ciudad Universitaria, Caracas, Parroquia San Pedro, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1041, Venezuela"
+  },
+  "Edificio Imper, Planta Baja, Edificio Imper, Local C Calle Miranda, Caracas 1060, Miranda, Venezuela": null,
+  "Planta Baja, Edificio Imper, Local C Calle Miranda, Caracas 1060, Miranda, Venezuela": null,
+  "Parque Central Torre El Tejar piso 19 apto C, Parque Central, Av. Lecuna, Caracas 1015, Distrito Capital, Venezuela": null,
+  "Parque Central, Av. Lecuna, Caracas 1015, Distrito Capital, Venezuela": {
+    "lat": 10.4978934,
+    "lng": -66.9020852,
+    "display": "Parque Central, Avenida Lecuna, El Conde, Hornos de Cal, San Agustín Norte, Caracas, Parroquia San Agustín, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1015, Venezuela"
+  },
+  "Edificio asuncion, C. Villaflor, Caracas 1050, Distrito Capital, Venezuela": null,
+  "C. Villaflor, Caracas 1050, Distrito Capital, Venezuela": {
+    "lat": 10.4949233,
+    "lng": -66.8784102,
+    "display": "Calle Villaflor, Las Delicias, Sabana Grande, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "Edf Res San Erasmo, Av Lucas Manzano, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Av Lucas Manzano, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Kerdell Valencia Estado Carabobo, Av. Miranda, Valencia 2001, Carabobo, Venezuela": null,
+  "Av. Miranda, Valencia 2001, Carabobo, Venezuela": {
+    "lat": 10.1276873,
+    "lng": -68.0537628,
+    "display": "Avenida Miranda, El Socorro, Valencia, Parroquia Miguel Peña, Municipio Valencia, Estado Carabobo, 2001, Venezuela"
+  },
+  "C.C Metropolis Barquisimeto, Av. La Salle & Av. Florencio Jiménez, Barquisimeto 3001, Lara, Venezuela": null,
+  "Av. La Salle & Av. Florencio Jiménez, Barquisimeto 3001, Lara, Venezuela": null,
+  "Siko, Av. Andrés Bello, Caracas, Distrito Capital, Venezuela": null,
+  "Av. Andrés Bello, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5044013,
+    "lng": -66.8857559,
+    "display": "Avenida Andrés Bello, Pinto Salinas, Guaicaipuro, Maripérez, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "#12, C. La Amargura, el silencio Caracas 1000, Distrito Capital, Venezuela": null,
+  "C. La Amargura, el silencio Caracas 1000, Distrito Capital, Venezuela": null,
+  "San Bernardino Plaza, Av. Panteón, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5105204,
+    "lng": -66.904195,
+    "display": "San Bernardino Plaza, Avenida Panteón, San José, Caracas, Parroquia San José, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Iglesia las mercedes, G36P+588, Avenida Este 5, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Iglesia las mercedes, Avenida Este 5, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Avenida Este 5, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5094115,
+    "lng": -66.9103203,
+    "display": "Avenida Este 5, Altagracia, Caracas, Parroquia Altagracia, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Residencias Misamac, Avenida Sur & Avenida Oeste 16, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Avenida Sur & Avenida Oeste 16, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Residencias Costa Azul, Av. Cajigal, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Av. Cajigal, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5128677,
+    "lng": -66.902404,
+    "display": "Avenida Cajigal, San Bernardino, Caracas, Parroquia San Bernardino, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Doral, 1ra avenida de Los Palos grandes": null,
+  "1ra avenida de Los Palos grandes": {
+    "lat": 10.5044093,
+    "lng": -66.8428119,
+    "display": "4.ª Avenida de Los Palos Grandes, Los Palos Grandes, Sector Los Palos Grandes, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Edificio Country Park, F4WJ+7WM, Avenida del Golf, Caracas 1060, Distrito Capital, Venezuela": null,
+  "Edificio Country Park, Avenida del Golf, Caracas 1060, Distrito Capital, Venezuela": null,
+  "Avenida del Golf, Caracas 1060, Distrito Capital, Venezuela": null,
+  "Diego de lozada, Casa de la Enfermera, Avenida Norte 1, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Casa de la Enfermera, Avenida Norte 1, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Centro Comercial Concepto La Granja, 6XWQ+CRG, Naguanagua 2005, Carabobo, Venezuela": null,
+  "Centro Comercial Concepto La Granja, Naguanagua 2005, Carabobo, Venezuela": {
+    "lat": 10.2458198,
+    "lng": -68.0104921,
+    "display": "C.C. Concepto La Granja, Avenida Salvador Feo La Cruz Norte - Sur, Cantapiedra, Las Quintas, Mañongo, Valencia, Parroquia Naguanagua, Municipio Naguanagua, Estado Carabobo, 2005, Venezuela"
+  },
+  "Edificio los Taguanes, Las Delicias 2101, Aragua, Venezuela": null,
+  "Las Delicias 2101, Aragua, Venezuela": {
+    "lat": 10.2947578,
+    "lng": -67.562399,
+    "display": "Las Delicias, Maracay, Parroquia Las Delicias, Municipio Girardot, Estado Aragua, 2101, Venezuela"
+  },
+  "Terraza 16, Urb. Bosque Valle, 1090, Distrito Capital, Venezuela": null,
+  "Urb. Bosque Valle, 1090, Distrito Capital, Venezuela": {
+    "lat": 10.4199505,
+    "lng": -66.917624,
+    "display": "Urbanización Bosque Valle, La Mariposa, Caracas, Parroquia Coche, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1090, Venezuela"
+  },
+  "Residencias el Panorama, Res. El Panorama, Los Riscos, C. Central, Caracas 1080, Miranda, Venezuela": null,
+  "Res. El Panorama, Los Riscos, C. Central, Caracas 1080, Miranda, Venezuela": null,
+  "12C, Nueva Casarapa, Guarenas 1220, Miranda, Venezuela": {
+    "lat": 10.460424,
+    "lng": -66.5873838,
+    "display": "Nueva Casarapa, Guarenas, Parroquia Guarenas, Municipio Plaza, Estado Miranda, 1220, Venezuela"
+  },
+  "El nacional el progreso, Los Teques, Miranda, Venezuela": null,
+  "Los Teques, Miranda, Venezuela": {
+    "lat": 10.3437382,
+    "lng": -67.0453091,
+    "display": "Los Teques, Parroquia Los Teques, Municipio Guaicaipuro, Estado Miranda, 1201, Venezuela"
+  },
+  "Torre Petunia I y II, 1ra transversal de los palos grandes frente al Hotel Altamira Suits": null,
+  "1ra transversal de los palos grandes frente al Hotel Altamira Suits": null,
+  "Residencias El condado, Avenida Perimetral, Cúa 1211, Miranda, Venezuela": null,
+  "Avenida Perimetral, Cúa 1211, Miranda, Venezuela": {
+    "lat": 10.1643235,
+    "lng": -66.8952954,
+    "display": "Avenida Perimetral, Pinto Salinas, Cúa, Parroquia Cúa, Municipio Urdaneta, Estado Miranda, 1211, Venezuela"
+  },
+  "Torre 29 urbanismo ciudad tiuna  Simon Rodriguez, C3GH+F4H, Caracas 1090, Distrito Capital, Venezuela": null,
+  "Torre 29 urbanismo ciudad tiuna  Simon Rodriguez, Caracas 1090, Distrito Capital, Venezuela": null,
+  "Caracas 1090, Distrito Capital, Venezuela": {
+    "lat": 10.5060934,
+    "lng": -66.9146008,
+    "display": "Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "Conjunto Residencial El Savil los teques, C. Ribas, Los Teques 1201, Miranda, Venezuela": null,
+  "C. Ribas, Los Teques 1201, Miranda, Venezuela": {
+    "lat": 10.3448442,
+    "lng": -67.0426591,
+    "display": "Calle Ribas, Centro, Los Teques, Parroquia Los Teques, Municipio Guaicaipuro, Estado Miranda, 1201, Venezuela"
+  },
+  "Contemporary Suites, Trans. 2, Caracas 1060, Miranda, Venezuela": null,
+  "Trans. 2, Caracas 1060, Miranda, Venezuela": null,
+  "Torre edipsos, Av Francisco Solano Lopez, calle los mangos Caracas, Distrito Capital, Venezuela": null,
+  "Av Francisco Solano Lopez, calle los mangos Caracas, Distrito Capital, Venezuela": null,
+  "Centro Residencial Mirador, Av. Nte. 13, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5079578,
+    "lng": -66.9042642,
+    "display": "Centro Residencial Mirador, Torres A, B, C, D, 58-62, Avenida Norte 13, La Candelaria, Caracas, Parroquia La Candelaria, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Golden village, Av. Anauco, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Edificio Freites, G427+3CR, Caracas, Capital District, Venezuela": null,
+  "Edificio Freites, Caracas, Capital District, Venezuela": null,
+  "Caracas, Capital District, Venezuela": {
+    "lat": 10.5060934,
+    "lng": -66.9146008,
+    "display": "Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "Bloque 4 letra A, Prol. C 1, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Prol. C 1, Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.4999441,
+    "lng": -66.9546929,
+    "display": "Prolongación Calle 1, Urbanización Francisco de Miranda, Casalta II, Propatria, Caracas, Parroquia Sucre, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1100, Venezuela"
+  },
+  "VARADERO, F4XX+XP6, C/ Ciega, Caracas 1060, Miranda, Venezuela": null,
+  "VARADERO, C/ Ciega, Caracas 1060, Miranda, Venezuela": null,
+  "C/ Ciega, Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.4998569,
+    "lng": -66.8509962,
+    "display": "Calle Ciega, La Castellana, Sector La Castellana, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Las Vegas, Av. Las Acacias & Av. Libertador, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Av. Las Acacias & Av. Libertador, Caracas 1050, Distrito Capital, Venezuela": {
+    "lat": 10.4957773,
+    "lng": -66.8811441,
+    "display": "Bici Estación Plaza Venezuela, Avenida Las Acacias, Sabana Grande, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "Residencia Morichal, G32Q+52C, esquina com a 3 rua 8, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Residencia Morichal, esquina com a 3 rua 8, Caracas 1014, Distrito Capital, Venezuela": null,
+  "esquina com a 3 rua 8, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Segunda etapa manzana 8, Maracay 2117 2010, 5C8P+XGP, Av. 1, Palo Negro 2117, Aragua, Venezuela": null,
+  "Segunda etapa manzana 8, Maracay 2117 2010, Av. 1, Palo Negro 2117, Aragua, Venezuela": null,
+  "Maracay 2117 2010, Av. 1, Palo Negro 2117, Aragua, Venezuela": null,
+  "Shopping Center, Av. Andrés Eloy Blanco, Valencia 2001, Carabobo, Venezuela": null,
+  "Av. Andrés Eloy Blanco, Valencia 2001, Carabobo, Venezuela": {
+    "lat": 10.1991559,
+    "lng": -68.0104252,
+    "display": "Avenida Andrés Eloy Blanco, Santa Cecilia, Prebo, Valencia, Parroquia San José, Municipio Valencia, Estado Carabobo, 2001, Venezuela"
+  },
+  "Residencias La mar suites, Residencias la mar suites, QM8G+G45, Tucacas 2055, Falcón, Venezuela": null,
+  "Residencias La mar suites, Residencias la mar suites, Tucacas 2055, Falcón, Venezuela": null,
+  "Residencias la mar suites, Tucacas 2055, Falcón, Venezuela": null,
+  "Ribera 7A, La Ribera, Guarenas 1220, Miranda, Venezuela": null,
+  "La Ribera, Guarenas 1220, Miranda, Venezuela": null,
+  "Tamayo & Cia, F3MR+RXG, Av. Nueva Granada, Caracas 1041, Distrito Capital, Venezuela": null,
+  "Tamayo & Cia, Av. Nueva Granada, Caracas 1041, Distrito Capital, Venezuela": {
+    "lat": 10.4847005,
+    "lng": -66.907363,
+    "display": "Edificio Tamayo & Cia., Avenida Nueva Granada, Las Acacias, Caracas, Parroquia San Pedro, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1040, Venezuela"
+  },
+  "Conjunto residencial san Antonio, F3CX+PPF, Caracas 1090, Distrito Capital, Venezuela": null,
+  "Conjunto residencial san Antonio, Caracas 1090, Distrito Capital, Venezuela": {
+    "lat": 10.4719206,
+    "lng": -66.9006118,
+    "display": "Conjunto Residencial San Antonio, San Antonio, El Valle, Caracas, Parroquia El Valle, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1040, Venezuela"
+  },
+  "Centro Candoral, Av. Urdaneta, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5062331,
+    "lng": -66.9044359,
+    "display": "Centro Comercial Candoral, Avenida Urdaneta, La Candelaria, Caracas, Parroquia La Candelaria, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Residencias Villas Sol, Paseo Valencia, C. 179 Paseo Valencia, Naguanagua 2005, Carabobo, Venezuela": null,
+  "Paseo Valencia, C. 179 Paseo Valencia, Naguanagua 2005, Carabobo, Venezuela": null,
+  "Residencias Nagua 2, 7X6P+CG7, Av. 100 Bolívar, Naguanagua 2005, Carabobo, Venezuela": null,
+  "Residencias Nagua 2, Av. 100 Bolívar, Naguanagua 2005, Carabobo, Venezuela": null,
+  "Av. 100 Bolívar, Naguanagua 2005, Carabobo, Venezuela": {
+    "lat": 10.1697918,
+    "lng": -68.0014842,
+    "display": "Banco de Venezuela, Avenida 100 Bolívar Sur, El Palotal, Santa Rosa, Centro de Valencia, Valencia, Parroquia Santa Rosa, Municipio Valencia, Estado Carabobo, 2001, Venezuela"
+  },
+  "Acacias 37, A.v. Las acacias Edf. Acacias 37 la Florida": null,
+  "A.v. Las acacias Edf. Acacias 37 la Florida": null,
+  "Edificio Santa Bárbara, Altavista. Urbanización El Caribe. Tercera calle parte baja": null,
+  "Altavista. Urbanización El Caribe. Tercera calle parte baja": null,
+  "Edificio Deco, 2da. Avenida, Caracas 1060, Miranda, Venezuela": null,
+  "Edificio Santa Rita, G36R+62H Edificio Santa Rita, Esperanza, Avenida Este 7, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Edificio Santa Rita, Esperanza, Avenida Este 7, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Esperanza, Avenida Este 7, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5106018,
+    "lng": -66.9100136,
+    "display": "Edificio La Esperanza, Avenida Este 7, Altagracia, Caracas, Parroquia San José, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Edificio la línea, Edificio La Linea, Av. Libertador, Caracas 1052, Distrito Capital, Venezuela": null,
+  "Edificio La Linea, Av. Libertador, Caracas 1052, Distrito Capital, Venezuela": {
+    "lat": 10.4980327,
+    "lng": -66.8815717,
+    "display": "Edificio La Línea, Avenida Libertador, Los Caobos, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "Casa, C. Aparición, San Mateo 2120, Aragua, Venezuela": null,
+  "C. Aparición, San Mateo 2120, Aragua, Venezuela": {
+    "lat": 10.2100217,
+    "lng": -67.4226723,
+    "display": "Calle Aparición, Barrio Unión, San Mateo, Parroquia San Mateo, Municipio Bolívar, Estado Aragua, 2120, Venezuela"
+  },
+  "Edificio Residencial Las Acacias, Av. Principal Las Acacias, cerca de la plaza": null,
+  "Av. Principal Las Acacias, cerca de la plaza": null,
+  "Edificio Domusqui, Villa Panamericana, Av. Intercomunal Guarenas - Guatire, Guarenas 1220, Miranda, Venezuela": null,
+  "Villa Panamericana, Av. Intercomunal Guarenas - Guatire, Guarenas 1220, Miranda, Venezuela": null,
+  "Residencia Tiziana, Avenida El Parque, Caracas 1041, Distrito Capital, Venezuela": null,
+  "Avenida El Parque, Caracas 1041, Distrito Capital, Venezuela": {
+    "lat": 10.4843014,
+    "lng": -66.8989378,
+    "display": "Avenida El Parque, Valle Abajo, Las Acacias, Caracas, Parroquia San Pedro, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1040, Venezuela"
+  },
+  "Residencias Midoral, Residencias Midoral, Av. Este 3, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Residencias Midoral, Av. Este 3, Caracas 1011, Distrito Capital, Venezuela": null,
+  "OPPPE 67 SAN MARTIN CALLE SUR, Calle Sur, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Calle Sur, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.495947,
+    "lng": -66.9306593,
+    "display": "Calle Sur, San Martín, Barrio El Guarataro, Caracas, Parroquia San Juan, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Km12  al lado del ambulatorio Luis hurtado higuera, C. Monte Verde, del junquito Caracas 1030, Distrito Capital, Venezuela": null,
+  "C. Monte Verde, del junquito Caracas 1030, Distrito Capital, Venezuela": null,
+  "Torre Adriática de Seguros, Adriática de Seguros, Avenida Francisco de Miranda, Caracas 1060, Miranda, Venezuela": null,
+  "Adriática de Seguros, Avenida Francisco de Miranda, Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.4954727,
+    "lng": -66.8495003,
+    "display": "Adriática de Seguros, Avenida Francisco de Miranda, Sector Altamira, La Castellana, Sector La Castellana, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Valle lindo, P.º Los Ilustres, Caracas, Distrito Capital, Venezuela": null,
+  "P.º Los Ilustres, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.484691,
+    "lng": -66.8939822,
+    "display": "Paseo Los Ilustres, Valle Abajo, Los Rosales, Caracas, Parroquia San Pedro, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "Bloque 13 Caricuao, Bloque 13, Av. Ppal de La Hacienda, Caracas 1000, Distrito Capital, Venezuela": null,
+  "Bloque 13, Av. Ppal de La Hacienda, Caracas 1000, Distrito Capital, Venezuela": null,
+  "Lekeitio, F3P8+VHQ Edificio Lekeitío, PB Avenida Santander, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Lekeitio, PB Avenida Santander, Caracas 1020, Distrito Capital, Venezuela": null,
+  "PB Avenida Santander, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4886934,
+    "lng": -66.9342889,
+    "display": "Avenida Santander, Barrio Sinaí, El Pinar, El Paraíso, Caracas, Parroquia El Paraíso, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Edificio Magdalena, Av. Universidad, Caracas, Distrito Capital, Venezuela": null,
+  "Hospital Dr. Francisco A. Risquez, Calle Cotiza, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5161274,
+    "lng": -66.9054695,
+    "display": "Hospital Dr. Francisco A. Risquéz, Calle Cotiza, San José, Caracas, Parroquia San José, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Edificio Laurindad, Av. La Paz, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Av. La Paz, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4854981,
+    "lng": -66.9467498,
+    "display": "Avenida La Paz, La Paz, Urbanización La Paz, La Quebradita, Caracas, Parroquia El Paraíso, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Edificio Las Palmeras Torre B, Av. Las Palmeras, Torre B": null,
+  "Av. Las Palmeras, Torre B": null,
+  "Centro comercial Las Garzas, Av. Las Garzas": {
+    "lat": 10.1808863,
+    "lng": -64.6760398,
+    "display": "Centro Comercial Las Garzas, Avenida Intercomunal Andrés Bello, Parcelamiento Magüey Sur, Las Garzas, Lechería, Parroquia El Morro, Municipio Urbaneja, Estado Anzoátegui, 6016, Venezuela"
+  },
+  "Residencias Kiara, 58Q3+H6W, Av. Bolívar, Lechería 6016, Anzoátegui, Venezuela": null,
+  "Residencias Kiara, Av. Bolívar, Lechería 6016, Anzoátegui, Venezuela": {
+    "lat": 10.1890192,
+    "lng": -64.6967135,
+    "display": "Residencias Kiara, Avenida Bolívar, Urbanización Morro I, Complejo Turístico El Morro, Lechería, Parroquia Lechería, Municipio Urbaneja, Estado Anzoátegui, 6016, Venezuela"
+  },
+  "Residencias Velasquez, Av. Sur 1, Caracas, Distrito Capital, Venezuela": null,
+  "Av. Sur 1, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.4978015,
+    "lng": -66.9144358,
+    "display": "Avenida Sur 1, Quinta Crespo, Caracas, Parroquia Santa Teresa, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Edificio DOLORES, Av. Caracas, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5079839,
+    "lng": -66.9004191,
+    "display": "Edificio Dolores, Avenida Ávila, San Bernardino, Caracas, Parroquia San Bernardino, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Residencia palma dorada, F4M4+7FP, Caracas 1041, Distrito Capital, Venezuela": null,
+  "Residencia palma dorada, Caracas 1041, Distrito Capital, Venezuela": null,
+  "Caracas 1041, Distrito Capital, Venezuela": {
+    "lat": 10.5060934,
+    "lng": -66.9146008,
+    "display": "Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "Panadería/ Hotel, Carr. Nacional, Mariara, Carabobo, Venezuela": null,
+  "Carr. Nacional, Mariara, Carabobo, Venezuela": null,
+  "Res Cham Palace, Av. 19 de Abril, Maracay 2101, Aragua, Venezuela": null,
+  "Av. 19 de Abril, Maracay 2101, Aragua, Venezuela": {
+    "lat": 10.2533669,
+    "lng": -67.6005514,
+    "display": "Avenida 19 de Abril, Calicanto, Maracay, Parroquia María de San José, Municipio Girardot, Estado Aragua, 2101, Venezuela"
+  },
+  "Rosa elena, G35Q+RJG, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Rosa elena, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Todas las etapas fueron afectadas, Loma Linda, Guatire 1221, Miranda, Venezuela": null,
+  "Loma Linda, Guatire 1221, Miranda, Venezuela": null,
+  "Edificio Imataca, F4WJ+279, Av. Libertador, Caracas 1060, Distrito Capital, Venezuela": null,
+  "Edificio Imataca, Av. Libertador, Caracas 1060, Distrito Capital, Venezuela": null,
+  "Av. Libertador, Caracas 1060, Distrito Capital, Venezuela": {
+    "lat": 10.4954397,
+    "lng": -66.8694194,
+    "display": "Avenida Libertador, Barrio Chino, El Bosque, Sector El Bosque, Caracas, Parroquia El Recreo, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Residencias Mariposa, Los Dos Caminos, Caracas 1071, Miranda, Venezuela": null,
+  "Los Dos Caminos, Caracas 1071, Miranda, Venezuela": {
+    "lat": 10.4941844,
+    "lng": -66.832339,
+    "display": "Los Dos Caminos, Avenida Principal de La Carlota, Los Dos Caminos, Sector Los Dos Caminos, Caracas, Parroquia Leoncio Martínez, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1071, Venezuela"
+  },
+  "Edificio lepanto, Calle Don Bosco, Caracas 1080, Distrito Capital, Venezuela": null,
+  "Calle Don Bosco, Caracas 1080, Distrito Capital, Venezuela": null,
+  "Edificio 207, Av Este 2, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5047927,
+    "lng": -66.9113304,
+    "display": "Bancaribe, Avenida Este 2, El Silencio, Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Edificio Ema, Avenida Rotaria, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Avenida Rotaria, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4857399,
+    "lng": -66.947685,
+    "display": "Avenida La Rotaria, La Paz, Urbanización La Paz, La Quebradita, Caracas, Parroquia El Paraíso, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Bologna, C. Comercio, Morón 2051, Carabobo, Venezuela": {
+    "lat": 10.4884882,
+    "lng": -68.1988675,
+    "display": "Edificio Bologna, Calle Comercio, Casco Central de Morón, 23 de Enero (Morón), Morón, Parroquia Morón, Municipio Mora, Estado Carabobo, Venezuela"
+  },
+  "Bloque 1, Calle Principal Pinto Salinas, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Calle Principal Pinto Salinas, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Residencias Urama, F4PC+WGM, Calle Sorbona, Caracas 1080, Miranda, Venezuela": null,
+  "Residencias Urama, Calle Sorbona, Caracas 1080, Miranda, Venezuela": null,
+  "Calle Sorbona, Caracas 1080, Miranda, Venezuela": null,
+  "Residencias Jardín Santa Eduvigis, G536+789, Caracas 1071, Miranda, Venezuela": null,
+  "Residencias Jardín Santa Eduvigis, Caracas 1071, Miranda, Venezuela": {
+    "lat": 10.5032037,
+    "lng": -66.8388074,
+    "display": "Residencias Jardín Santa Eduvigis, 2.ª Avenida de Santa Eduvigis, Santa Eduvigis, Sector Santa Edivigis, Caracas, Parroquia Leoncio Martínez, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1071, Venezuela"
+  },
+  "Edificio navarino, Av. 190 & Av. Universidad, Naguanagua 2005, Carabobo, Venezuela": null,
+  "Av. 190 & Av. Universidad, Naguanagua 2005, Carabobo, Venezuela": null,
+  "Edificio OPPPE2, G38R+63R, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Edificio OPPPE2, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Las torres, Avenida Principal de Los Chorros con avd Rómulo Gallegos residencias las torres , Cc Milenium Capital, Venezuela": null,
+  "Las torres, Avenida Principal de Los Chorros con avd Rómulo Gallegos residencias las torres, Cc Milenium Capital, Venezuela": null,
+  "Avenida Principal de Los Chorros con avd Rómulo Gallegos residencias las torres, Cc Milenium Capital, Venezuela": null,
+  "Residencias Monte Pino, C4FG+5FQ, Carr. Baruta - El Placer, Caracas 1080, Miranda, Venezuela": null,
+  "Residencias Monte Pino, Carr. Baruta - El Placer, Caracas 1080, Miranda, Venezuela": null,
+  "Carr. Baruta - El Placer, Caracas 1080, Miranda, Venezuela": null,
+  "Res. Don Manuel, Av. Principal de Los Ruices, Caracas 1071, Miranda, Venezuela": null,
+  "Av. Principal de Los Ruices, Caracas 1071, Miranda, Venezuela": {
+    "lat": 10.4811369,
+    "lng": -66.8316356,
+    "display": "Puente Los Ruices, Los Ruices Sur, Santa Cecilia, Los Ruices, Caracas, Parroquia Leoncio Martínez, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1071, Venezuela"
+  },
+  "Colegio Agustiniano San Judas Tadeo, Puerta de Caracas, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Puerta de Caracas, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5221859,
+    "lng": -66.9211397,
+    "display": "Puerta de Caracas, Avenida Norte 10, Sabana de Blanco, El Polvorín, Los Mecedores, Conejo Blanco, Caracas, Parroquia La Pastora, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Casa esquina Calle Bolívar, Calle Bolívar con Carrera 5": null,
+  "Calle Bolívar con Carrera 5": null,
+  "747, Trans. 22, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Trans. 22, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Edificio Torre carabobo, C. Guillermo José Schael, Caracas 1011, Distrito Capital, Venezuela": null,
+  "C. Guillermo José Schael, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Residencias Millenium San Bernardino, Calle Paraiso, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Calle Paraiso, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.4971623,
+    "lng": -66.8790747,
+    "display": "Calle Paraíso, Las Delicias, Sabana Grande, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "Alambique 1C, Nueva Casarapa, Guarenas 1220, Miranda, Venezuela": {
+    "lat": 10.4667199,
+    "lng": -66.5921515,
+    "display": "Residencias Alambique, Ciudad Casarapa, Nueva Casarapa, Guarenas, Parroquia Guarenas, Municipio Plaza, Estado Miranda, Venezuela"
+  },
+  "Themis Mary, C. París & C. Nueva York, Caracas 1080, Miranda, Venezuela": null,
+  "C. París & C. Nueva York, Caracas 1080, Miranda, Venezuela": null,
+  "Edificio Gladys, Av. Pdte. Medina, Caracas, Distrito Capital, Venezuela": null,
+  "Av. Pdte. Medina, Caracas, Distrito Capital, Venezuela": null,
+  "Residencias Villa Diana, F3FV+XHV, Caracas 1040, Distrito Capital, Venezuela": null,
+  "Residencias Villa Diana, Caracas 1040, Distrito Capital, Venezuela": {
+    "lat": 10.4920377,
+    "lng": -66.9353065,
+    "display": "Residencias Villa Diana, Avenida Santander, Barrio Sinaí, El Pinar, El Paraíso, Caracas, Parroquia El Paraíso, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Iglesia Nuestra Señora del Socorro, WM7R+XGR, Tinaquillo 2209, Cojedes, Venezuela": null,
+  "Iglesia Nuestra Señora del Socorro, Tinaquillo 2209, Cojedes, Venezuela": {
+    "lat": 9.9150804,
+    "lng": -68.3086716,
+    "display": "Iglesia de Nuestra Señora del Socorro, Calle Silva, Casco Central, Tinaquillo, Parroquia Tinaquillo, Municipio Tinaquillo, Estado Cojedes, 2209, Venezuela"
+  },
+  "Maori 6, Puerto Cabello, Carabobo, Venezuela": null,
+  "Puerto Cabello, Carabobo, Venezuela": {
+    "lat": 10.4677932,
+    "lng": -68.0436682,
+    "display": "Puerto Cabello, Parroquia Juan José Flores, Municipio Puerto Cabello, Estado Carabobo, Venezuela"
+  },
+  "Lombardo, G3C4+RXV, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Lombardo, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Parque Araguaney, Av. Las Delicias, Maracay 2101, Aragua, Venezuela": null,
+  "Av. Las Delicias, Maracay 2101, Aragua, Venezuela": {
+    "lat": 10.2758964,
+    "lng": -67.5763389,
+    "display": "Avenida Las Delicias, Andrés Bello, Maracay, Parroquia Las Delicias, Municipio Girardot, Estado Aragua, 2101, Venezuela"
+  },
+  "Solanas del Ávila, Etapa 2, FCFG+6JW, Carr. Guarenas, Guatire 1221, Miranda, Venezuela": null,
+  "Solanas del Ávila, Etapa 2, Carr. Guarenas, Guatire 1221, Miranda, Venezuela": null,
+  "Carr. Guarenas, Guatire 1221, Miranda, Venezuela": null,
+  "Solanas del Ávila, Etapa 1, FCCG+W8Q, Guatire 1221, Miranda, Venezuela": null,
+  "Solanas del Ávila, Etapa 1, Guatire 1221, Miranda, Venezuela": null,
+  "Raams, Calle La Iglesia, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Calle La Iglesia, Caracas 1050, Distrito Capital, Venezuela": {
+    "lat": 10.4840681,
+    "lng": -66.950721,
+    "display": "Calle La Iglesia, Urbanización Bella Vista, Urbanización La Paz, Vista Alegre, Caracas, Parroquia El Paraíso, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "QUADRA LOS CHORROS, Los Dos Caminos, Caracas 1071, Miranda, Venezuela": null,
+  "Edificio Delta, G472+MRQ, Av. Los Próceres & Av. Marqués del Toro, Parque Residencial Anauco, C. Interna, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Edificio Delta, Av. Los Próceres & Av. Marqués del Toro, Parque Residencial Anauco, C. Interna, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Av. Los Próceres & Av. Marqués del Toro, Parque Residencial Anauco, C. Interna, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Urb. Diego de Losada Bloque 4, Calle real de los mecedores subida al cardon": null,
+  "Calle real de los mecedores subida al cardon": null,
+  "Torre Tabaré, Urbanización Las Delicias, Maracay 2101, Aragua, Venezuela": null,
+  "Urbanización Las Delicias, Maracay 2101, Aragua, Venezuela": {
+    "lat": 10.2652085,
+    "lng": -67.58371,
+    "display": "Urbanización Andrés Bello, Maracay, Parroquia Las Delicias, Municipio Girardot, Estado Aragua, Venezuela"
+  },
+  "Los ilustres, Edf. Los Ilustres, Caracas 1071, Miranda, Venezuela": null,
+  "Edf. Los Ilustres, Caracas 1071, Miranda, Venezuela": null,
+  "Unidad Educativa Maria Antonia Bolivar, F3C2+9FF, C. El Rosario, & C. la Pl., Caracas 1020, Distrito Capital, Venezuela": null,
+  "Unidad Educativa Maria Antonia Bolivar, C. El Rosario, & C. la Pl., Caracas 1020, Distrito Capital, Venezuela": null,
+  "C. El Rosario, & C. la Pl., Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4666325,
+    "lng": -66.9479613,
+    "display": "Calle El Rosario, El Petróleo, San Miguel, La Vega, Caracas, Parroquia La Vega, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Catedral de la Victoria, La Victoria 2121, Aragua, Venezuela": null,
+  "Calle 133 Lopez Latouche, Calle 133 Lopez Latouche, Valencia 2001, Carabobo, Venezuela": null,
+  "Calle 133 Lopez Latouche, Valencia 2001, Carabobo, Venezuela": null,
+  "Edificio Excelsior, Edificio Trieste, Av. Cristóbal Mendoza, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Edificio Trieste, Av. Cristóbal Mendoza, Caracas 1011, Distrito Capital, Venezuela": null,
+  "edificio de Oro, G34R+59F, Av. Este 0, Caracas 1011, Distrito Capital, Venezuela": null,
+  "edificio de Oro, Av. Este 0, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Av. Este 0, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5029385,
+    "lng": -66.8976555,
+    "display": "Avenida Este 0, Sarría, Caracas, Parroquia La Candelaria, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Edf. Iskia, Avenida Bogotá & Avenida Rio de Janeiro, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Avenida Bogotá & Avenida Rio de Janeiro, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Farsalia García, 2001, Valencia 2001, Carabobo, Venezuela": null,
+  "2001, Valencia 2001, Carabobo, Venezuela": {
+    "lat": 10.170026,
+    "lng": -68.0003987,
+    "display": "Valencia, Parroquia Santa Rosa, Municipio Valencia, Estado Carabobo, 2001, Venezuela"
+  },
+  "San Judas Tadeo, Italia, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Italia, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Montaña Alta, Av. La Montaña, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Av. La Montaña, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4862631,
+    "lng": -66.9309771,
+    "display": "Avenida Guzmán Blanco, Barrio Sinaí, Brisas del Paraíso, Cota 905, Caracas, Parroquia El Paraíso, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Casa ocumare de la costa el playon, Ocumare de la Costa de Oro, 2112, Aragua, Venezuela": null,
+  "Ocumare de la Costa de Oro, 2112, Aragua, Venezuela": null,
+  "Casa familia Pérez, Sector La Cuesta, casa 27": null,
+  "Sector La Cuesta, casa 27": {
+    "lat": 9.4428941,
+    "lng": -70.4767011,
+    "display": "Sector La Cuesta, Pampán, Parroquia Pampán, Municipio Pampán, Estado Trujillo, 0132, Venezuela"
+  },
+  "Robin, G439+H46 Policlínica Méndez Gimón, Av. Andrés Bello, Caracas 1059, Distrito Capital, Venezuela": null,
+  "Robin, Av. Andrés Bello, Caracas 1059, Distrito Capital, Venezuela": null,
+  "Av. Andrés Bello, Caracas 1059, Distrito Capital, Venezuela": {
+    "lat": 10.5012369,
+    "lng": -66.8767491,
+    "display": "Avenida Andrés Bello, San Rafael de La Florida, La Florida, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "San Giorgio, 5ta Avenida, Caracas 1060, Miranda, Venezuela": null,
+  "5ta Avenida, Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.5380133,
+    "lng": -66.8489206,
+    "display": "Silla de Caracas, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Manella, Av. José Félix Sosa, Caracas 1060, Miranda, Venezuela": null,
+  "Av. José Félix Sosa, Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.4934027,
+    "lng": -66.8487344,
+    "display": "Avenida José Felix Sosa, Sector Altamira, Sector El Dorado, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Residencias Rag, Av. José Félix Ribas, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Av. José Félix Ribas, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5148362,
+    "lng": -66.9019812,
+    "display": "Avenida José Félix Ribas, San Bernardino, Caracas, Parroquia San Bernardino, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Edificio Alicia, G3F4+293, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Edificio Alicia, Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.4968777,
+    "lng": -66.8745097,
+    "display": "Dra. Alicia Beatriz Sánchez de Revello, Avenida Libertador, El Mirador, La Campiña, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "Edificio Gobernador, G37H+6XR Resd. Las Delicias, Av. Norte Esq. Delicias a, Esq Gobernador, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Edificio Gobernador, Av. Norte Esq. Delicias a, Esq Gobernador, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Av. Norte Esq. Delicias a, Esq Gobernador, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Residencias Nathalie, Av. Bermúdez & C. Ribas, Cagua 2122, Aragua, Venezuela": null,
+  "Av. Bermúdez & C. Ribas, Cagua 2122, Aragua, Venezuela": null,
+  "Edificio Arismendi, Av. Roosevelt, entre calles Cortijo y Paseo, edificio Arismendi, justo al lado de la Torre Los Rosales, frente a los consultorios de la Clínica Atias, parroquia San Pedro. Municipio Libertador": null,
+  "Av. Roosevelt, entre calles Cortijo y Paseo, edificio Arismendi, justo al lado de la Torre Los Rosales, frente a los consultorios de la Clínica Atias, parroquia San Pedro. Municipio Libertador": null,
+  "Residencias plazas, Cjón. Machado & Av. El Ejército, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Cjón. Machado & Av. El Ejército, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Residencia Avileña, Altagracia, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Altagracia, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5111256,
+    "lng": -66.9147635,
+    "display": "Altagracia, Caracas, Parroquia Altagracia, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "GALPON INDUSTRIAL TERRINCA, FF87+WV5, Guatire 1221, Miranda, Venezuela": null,
+  "GALPON INDUSTRIAL TERRINCA, Guatire 1221, Miranda, Venezuela": {
+    "lat": 10.466718,
+    "lng": -66.5362653,
+    "display": "Galpon Industrial #1, Avenida Principal de Terrinca, El Desvío, Guarenas, Municipio Zamora, Estado Miranda, 1221, Venezuela"
+  },
+  "Nuevo Catuche, G3CH+CPH, C. Real de Puerta Caracas, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Nuevo Catuche, C. Real de Puerta Caracas, Caracas 1010, Distrito Capital, Venezuela": null,
+  "C. Real de Puerta Caracas, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5123402,
+    "lng": -66.9190081,
+    "display": "Avenida Norte 10, Altagracia, Caracas, Parroquia Altagracia, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Torre Vivienda C.C Los Chaguaramos, Av. Neveri, Caracas, Distrito Capital, Venezuela": null,
+  "Av. Neveri, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.4856821,
+    "lng": -66.8819144,
+    "display": "Avenida Neverí, Colinas de Santa Mónica, Los Chaguaramos, Ciudad Universitaria, Caracas, Parroquia San Pedro, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1041, Venezuela"
+  },
+  "Galpón industrial sector La Yaguara, Calle Industrial La Yaguara": null,
+  "Calle Industrial La Yaguara": null,
+  "Karamacate, Sta. Fe Nte., Caracas 1080, Distrito Capital, Venezuela": null,
+  "Sta. Fe Nte., Caracas 1080, Distrito Capital, Venezuela": {
+    "lat": 10.5060934,
+    "lng": -66.9146008,
+    "display": "Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "Torres las Cibeles, Urb. Andrés Bello, Maracay 2101, Aragua, Venezuela": null,
+  "Urb. Andrés Bello, Maracay 2101, Aragua, Venezuela": {
+    "lat": 10.2668599,
+    "lng": -67.5841095,
+    "display": "Andrés Bello, Maracay, Parroquia Las Delicias, Municipio Girardot, Estado Aragua, 2101, Venezuela"
+  },
+  "Iglesia San José, Iglesia San Jose, Av. Nte. 9, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Iglesia San Jose, Av. Nte. 9, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5128044,
+    "lng": -66.9070451,
+    "display": "Iglesia San Jose, Avenida Norte 9, San José, Caracas, Parroquia San José, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Residencia colonial, Calle Pocaterra, Valencia 2001, Carabobo, Venezuela": null,
+  "Calle Pocaterra, Valencia 2001, Carabobo, Venezuela": {
+    "lat": 10.2155988,
+    "lng": -67.995166,
+    "display": "Calle Pocaterra, Parque El Trigal, El Trigal, Valencia, Parroquia San José, Municipio Valencia, Estado Carabobo, 2001, Venezuela"
+  },
+  "Residencias Suites Palace, Av. Principal de Sebucán, Caracas 1071, Miranda, Venezuela": null,
+  "Residencias la Paz, C. Vuelvan Caras, Altagracia De Orituco 2320, Guárico, Venezuela": null,
+  "C. Vuelvan Caras, Altagracia De Orituco 2320, Guárico, Venezuela": {
+    "lat": 9.854739,
+    "lng": -66.3829302,
+    "display": "Avenida Vuelvan Caras, Casco Central, Altagracia de Orituco, Parroquia Altagracia, Municipio Monagas, Estado Guárico, 2320, Venezuela"
+  },
+  "Facultad de Ingeniería, Unviersidad de Carabobo, 7XHM+389, Naguanagua 2005, Carabobo, Venezuela": null,
+  "Facultad de Ingeniería, Unviersidad de Carabobo, Naguanagua 2005, Carabobo, Venezuela": null,
+  "Unviersidad de Carabobo, Naguanagua 2005, Carabobo, Venezuela": null,
+  "Residencias Riviera, Av. José Antonio Páez, Caracas, Distrito Capital, Venezuela": null,
+  "Los Pirineos, 92QR+74 Urb. Las Salias, San Antonio de Los Altos 1204, Miranda, Venezuela": null,
+  "Los Pirineos, San Antonio de Los Altos 1204, Miranda, Venezuela": null,
+  "San Antonio de Los Altos 1204, Miranda, Venezuela": {
+    "lat": 10.3751347,
+    "lng": -66.9665409,
+    "display": "San Antonio de Los Altos, Municipio Los Salias, Estado Miranda, 1204, Venezuela"
+  },
+  "Residencias INA, Av. Este 0, Caracas, Distrito Capital, Venezuela": null,
+  "Av. Este 0, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5049187,
+    "lng": -66.9058533,
+    "display": "Avenida Este 0, La Candelaria, Caracas, Parroquia La Candelaria, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Residencias Caroní, Cjón. Machado, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Residencias Don Manuel, 6X4M+6JW, Calle 133, Valencia 2001, Carabobo, Venezuela": null,
+  "Residencias Don Manuel, Calle 133, Valencia 2001, Carabobo, Venezuela": null,
+  "Calle 133, Valencia 2001, Carabobo, Venezuela": {
+    "lat": 10.170026,
+    "lng": -68.0003987,
+    "display": "Valencia, Parroquia Santa Rosa, Municipio Valencia, Estado Carabobo, 2001, Venezuela"
+  },
+  "La arboleda, Av. O'Higgins, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Av. O'Higgins, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4773438,
+    "lng": -66.9469872,
+    "display": "Avenida O'Higgins, Urbanización Montalbán I, Montalbán, Caracas, Parroquia La Vega, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Edificio Carlos, Av. Rómulo Gallegos, Caracas, Miranda, Venezuela": {
+    "lat": 10.496584,
+    "lng": -66.8353803,
+    "display": "Edificio Carlos, Av. Rómulo Gallegos, Los Dos Caminos, Sector Sebucán, Caracas, Parroquia Leoncio Martínez, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1071, Venezuela"
+  },
+  "Proyecto la esperanza, C. Principal de Casalta 3, Caracas, Distrito Capital, Venezuela": null,
+  "C. Principal de Casalta 3, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.495962,
+    "lng": -66.9538509,
+    "display": "Calle Principal de Casalta III, Casalta III, Propatria, Caracas, Parroquia Sucre, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1100, Venezuela"
+  },
+  "Residencia San Juan, Avenida Sur 16, Caracas, Distrito Capital, Venezuela": null,
+  "Avenida Sur 16, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.4963876,
+    "lng": -66.926651,
+    "display": "Avenida Sur 16, San Martín, Barrio El Guarataro, Caracas, Parroquia San Juan, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Residencias Atalaya, Edificio Atalaya, Av. Andrés Bello, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Edificio Atalaya, Av. Andrés Bello, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Altamira, Santa Teresa, Miranda, Venezuela": null,
+  "Santa Teresa, Miranda, Venezuela": {
+    "lat": 10.2388567,
+    "lng": -66.6722608,
+    "display": "Parroquia Santa Teresa, Municipio Independencia, Estado Miranda, 1215, Venezuela"
+  },
+  "Res. Lucania, C. Cristóbal Rojas, Caracas 1041, Distrito Capital, Venezuela": null,
+  "C. Cristóbal Rojas, Caracas 1041, Distrito Capital, Venezuela": {
+    "lat": 10.4762837,
+    "lng": -66.8911702,
+    "display": "Calle Cristóbal Rojas, Santa Mónica, Los Rosales, Caracas, Parroquia San Pedro, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1041, Venezuela"
+  },
+  "Residencias Nelcar, Av. Cdad. Universitaria, Caracas 1041, Distrito Capital, Venezuela": null,
+  "Av. Cdad. Universitaria, Caracas 1041, Distrito Capital, Venezuela": null,
+  "Urb. Diego de Losada Bloque 2, Colegio San Jose del Ávila, Caracas, Distrito Metropolitano de Caracas, G3CM+H4M, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Urb. Diego de Losada Bloque 2, Colegio San Jose del Ávila, Caracas, Distrito Metropolitano de Caracas, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Colegio San Jose del Ávila, Caracas, Distrito Metropolitano de Caracas, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Edificio Yanoral, Avenida sur 11, con Av Este 2, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Avenida sur 11, con Av Este 2, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Edificio Piñalva, Residencias Avilanes, Av. Este 3, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Residencias Avilanes, Av. Este 3, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Edificio Proma, Plaza La Concordia, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Plaza La Concordia, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Residencias Alce, G34H+QJC, Av Este 2, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Residencias Alce, Av Este 2, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Av Este 2, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.505325,
+    "lng": -66.9136441,
+    "display": "Avenida Este 2, El Silencio, Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1012, Venezuela"
+  },
+  "Residencias de los Mecedores, G3CJ+49F, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Residencias de los Mecedores, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5135545,
+    "lng": -66.928464,
+    "display": "Residencias Naiguatá, El Polvorín, El Manicomio, Caracas, Parroquia La Pastora, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "RESIDENCIAS SORBONA, Prolongacion Calle Sorbona, Caracas 1080, Distrito Capital, Venezuela": null,
+  "Prolongacion Calle Sorbona, Caracas 1080, Distrito Capital, Venezuela": null,
+  "Res. Acosta Ferro V, G33V+35V, Caracas, Capital District, Venezuela": null,
+  "Res. Acosta Ferro V, Caracas, Capital District, Venezuela": null,
+  "Residencias Igmase, Avenida Sur, Caracas, Distrito Capital, Venezuela": null,
+  "Avenida Sur, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5003398,
+    "lng": -66.9175295,
+    "display": "Avenida Sur 4, El Silencio, Caracas, Parroquia Santa Teresa, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Edificio Krimea, C. La Venezolana, Caracas 1071, Distrito Capital, Venezuela": null,
+  "C. La Venezolana, Caracas 1071, Distrito Capital, Venezuela": null,
+  "Avenida principal el tostao, Av Principal El Tostao, Barquisimeto 3001, Lara, Venezuela": null,
+  "Av Principal El Tostao, Barquisimeto 3001, Lara, Venezuela": null,
+  "Residencias Atlántica, Av. Silva, Tucacas 2055, Falcón, Venezuela": null,
+  "Av. Silva, Tucacas 2055, Falcón, Venezuela": {
+    "lat": 10.7828888,
+    "lng": -68.323715,
+    "display": "Avenida Silva, Tucacas, Parroquia Tucacas, Municipio Silva, Estado Falcón, 2054, Venezuela"
+  },
+  "Edf Panamá Urbanización las Américas, Av. San Martín, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Edificio VAM, G435+QHV Edificio Andres Bello, Av. Andrés Bello, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Edificio VAM, Av. Andrés Bello, Caracas 1050, Distrito Capital, Venezuela": {
+    "lat": 10.5042313,
+    "lng": -66.8908205,
+    "display": "Edificio VAM, Avenida Andrés Bello, Guaicaipuro Sur, Guaicaipuro, Maripérez, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "Calle 9 de Diciembre, Calle 9 de Diciembre, Guatire 1221, Miranda, Venezuela": {
+    "lat": 10.4708332,
+    "lng": -66.5408921,
+    "display": "Banco de Venezuela, Calle 9 de Diciembre, El Desvío, Parroquia Guatire, Municipio Zamora, Estado Miranda, 1221, Venezuela"
+  },
+  "Casa 16, trapichito, Guarenas 1220, Miranda, Venezuela": {
+    "lat": 10.4690963,
+    "lng": -66.6033965,
+    "display": "Trapichito, Guarenas, Parroquia Guarenas, Municipio Plaza, Estado Miranda, 1220, Venezuela"
+  },
+  "Torre Mega III al lado de restaurante Rubén express, Avenida Los Manguitos, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Avenida Los Manguitos, Caracas 1050, Distrito Capital, Venezuela": {
+    "lat": 10.4948408,
+    "lng": -66.8737517,
+    "display": "Avenida Los Manguitos, Las Delicias, La Campiña, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "Residencias Grano de Oro, Calle Altamira, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Calle Altamira, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.4846773,
+    "lng": -66.9154309,
+    "display": "Calle Altamira, Barrio La Vereda, El León, El Cementerio, Caracas, Parroquia Santa Rosalia, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Res. Doryon, F3WQ+H5F, Av. Sur 5, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Res. Doryon, Av. Sur 5, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Av. Sur 5, Caracas 1014, Distrito Capital, Venezuela": {
+    "lat": 10.4973679,
+    "lng": -66.9120621,
+    "display": "Avenida Sur 5, Casco Central de Santa Rosalía, Caracas, Parroquia Santa Rosalia, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Residencias El Cortijo, F3W7+GP3, C. Andalucía, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Residencias El Cortijo, C. Andalucía, Caracas 1020, Distrito Capital, Venezuela": null,
+  "C. Andalucía, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4968199,
+    "lng": -66.934382,
+    "display": "Calle Andalucía, Consejo Comunal Urb. San Martín I, Caracas, Parroquia San Juan, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Residencias Yutaje, F5X8+H63, Av. Sucre, Caracas 1071, Miranda, Venezuela": null,
+  "Residencias Yutaje, Av. Sucre, Caracas 1071, Miranda, Venezuela": {
+    "lat": 10.4987455,
+    "lng": -66.834062,
+    "display": "BBVA Provincial, Avenida Sucre, Los Dos Caminos, Sector Sebucán, Caracas, Parroquia Leoncio Martínez, Municipio Libertador, Distrito Metropolitano de Caracas, Estado Miranda, 1071, Venezuela"
+  },
+  "Edificio monseñor, Montecristo, Caracas 1071, Miranda, Venezuela": null,
+  "Montecristo, Caracas 1071, Miranda, Venezuela": {
+    "lat": 10.4964202,
+    "lng": -66.8277097,
+    "display": "Montecristo, Sector Montecristo, Caracas, Parroquia Leoncio Martínez, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1071, Venezuela"
+  },
+  "Edificio Beta, Av. San Martín, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Edificio Altair, San Antonio de Los Altos 1204, Miranda, Venezuela": null,
+  "Jardín Los Ruices, Avenida Francisco de Miranda, Caracas, Distrito Capital, Venezuela": null,
+  "Residencias Otama suites, 5XWP+X98, Calle 114, Valencia 2001, Carabobo, Venezuela": null,
+  "Residencias Otama suites, Calle 114, Valencia 2001, Carabobo, Venezuela": null,
+  "Calle 114, Valencia 2001, Carabobo, Venezuela": {
+    "lat": 10.1973133,
+    "lng": -68.0155679,
+    "display": "Calle 114, Valle Blanco, Urbanización Valle de Camoruco, Prebo, Valencia, Parroquia San José, Municipio Valencia, Estado Carabobo, 2001, Venezuela"
+  },
+  "Edificio el Mirador, Av. Miguel Otero Silva, Caracas 1071, Distrito Capital, Venezuela": null,
+  "Av. Miguel Otero Silva, Caracas 1071, Distrito Capital, Venezuela": null,
+  "Conjunto Residencial Uslar, Edificio 3. Primera calle de Montalban Uno., Montalban I, Caracas 1020, Capital District, Venezuela": null,
+  "Montalban I, Caracas 1020, Capital District, Venezuela": {
+    "lat": 10.4745161,
+    "lng": -66.9506358,
+    "display": "Montalbán I, Calle 3, Urbanización Montalbán I, Montalbán, Caracas, Parroquia La Vega, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Edificio Marintusa Tucacas, QMWJ+R5V, Tucacas 2055, Falcón, Venezuela": null,
+  "Edificio Marintusa Tucacas, Tucacas 2055, Falcón, Venezuela": null,
+  "Tucacas 2055, Falcón, Venezuela": {
+    "lat": 10.7933,
+    "lng": -68.3177858,
+    "display": "Tucacas, Parroquia Tucacas, Municipio Silva, Estado Falcón, 2055, Venezuela"
+  },
+  "Residencias Dallas, Res. Dallas, Calle 2, Caracas 1060, Distrito Capital, Venezuela": null,
+  "Res. Dallas, Calle 2, Caracas 1060, Distrito Capital, Venezuela": null,
+  "Tirrenia, Tranvía Colón con Prolongación Av Montevideo Los Caobos Caracas": null,
+  "Tranvía Colón con Prolongación Av Montevideo Los Caobos Caracas": null,
+  "Oram 5, Urb. Andrés Bello, Maracay 2101, Aragua, Venezuela": null,
+  "El Parque, Av. Roosevelt, Caracas, Distrito Capital, Venezuela": null,
+  "Av. Roosevelt, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.4797745,
+    "lng": -66.9075024,
+    "display": "Avenida Roosevelt, Los Rosales, Prado de María, El Cementerio, Caracas, Parroquia Santa Rosalia, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1040, Venezuela"
+  },
+  "Residencias Danoral, 9 Av. Panteón, Caracas 1010, Distrito Capital, Venezuela": null,
+  "9 Av. Panteón, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5115826,
+    "lng": -66.9084372,
+    "display": "Avenida Panteón, San José, Caracas, Parroquia San José, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "El Samán, Conjunto Residencial Los Caracaros, Av. 100 Bolívar, Naguanagua 2005, Carabobo, Venezuela": null,
+  "Conjunto Residencial Los Caracaros, Av. 100 Bolívar, Naguanagua 2005, Carabobo, Venezuela": null,
+  "Centro Residencial la candelaria, G33V+XV5, Avenida Este 0, & Av. Nte. 13, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Centro Residencial la candelaria, Avenida Este 0, & Av. Nte. 13, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5030348,
+    "lng": -66.9007381,
+    "display": "Centro Parque Caracas, Avenida Este 0, La Candelaria, Caracas, Parroquia La Candelaria, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Edificio Centro Seguros La Metropolitana, Esquinas Monroy a Perico., G33R+2VM, Av. Universidad, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Edificio Centro Seguros La Metropolitana, Esquinas Monroy a Perico., Av. Universidad, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Esquinas Monroy a Perico., Av. Universidad, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Edf. Capri, Cjón. San Pedro, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Cjón. San Pedro, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Habitat, Plaza Bélgica, Caracas 1060, Miranda, Venezuela": null,
+  "Plaza Bélgica, Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.4963799,
+    "lng": -66.8503136,
+    "display": "Plaza Bélgica, La Castellana, Sector La Castellana, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Monaco, Edificio Mónaco, Av. San Juan Bosco, Caracas 1060, Miranda, Venezuela": null,
+  "Edificio Mónaco, Av. San Juan Bosco, Caracas 1060, Miranda, Venezuela": null,
+  "C.C. Mazzilli, Tacarigua de Mamporal 1228, Miranda, Venezuela": null,
+  "Tacarigua de Mamporal 1228, Miranda, Venezuela": {
+    "lat": 10.4013575,
+    "lng": -66.1519379,
+    "display": "Tacarigua de Mamporal, Parroquia Tacarigua de Brión, Municipio Brión, Estado Miranda, 1228, Venezuela"
+  },
+  "Edificio plades, La Candelaria, Caracas, Distrito Capital, Venezuela": null,
+  "La Candelaria, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5048254,
+    "lng": -66.9036822,
+    "display": "La Candelaria, Caracas, Parroquia La Candelaria, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Edficio  Victoria, 1010": null,
+  "Edf Santa Helena, G37H+3VM, Avenida Oeste 7, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Edf Santa Helena, Avenida Oeste 7, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Avenida Oeste 7, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5120863,
+    "lng": -66.9171311,
+    "display": "Avenida Oeste 7, Altagracia, Caracas, Parroquia Altagracia, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Las palmas, 8XVX+Q6, Municipio Carrizal 1203, Miranda, Venezuela": null,
+  "Las palmas, Municipio Carrizal 1203, Miranda, Venezuela": null,
+  "Municipio Carrizal 1203, Miranda, Venezuela": {
+    "lat": 10.3506224,
+    "lng": -66.997427,
+    "display": "Municipio Carrizal, Estado Miranda, Venezuela"
+  },
+  "Residencias Palma Li, Av. Manuel Felipe Tovar, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Av. Manuel Felipe Tovar, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5180497,
+    "lng": -66.9001627,
+    "display": "Avenida Manuel Felipe Tovar, San Bernardino, Caracas, Parroquia San Bernardino, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Hospital General Guatire Guarenas, C. El Rosario, Guatire 1221, Miranda, Venezuela": null,
+  "C. El Rosario, Guatire 1221, Miranda, Venezuela": {
+    "lat": 10.4780155,
+    "lng": -66.5444609,
+    "display": "Avenida El Rosario, Las Barrancas, Parroquia Guatire, Municipio Zamora, Estado Miranda, 1221, Venezuela"
+  },
+  "Condominio cochera uno, F3XH+74X, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Condominio cochera uno, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Caracas 1014, Distrito Capital, Venezuela": {
+    "lat": 10.5060934,
+    "lng": -66.9146008,
+    "display": "Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "Residencias Paraiso, Av. San Martín, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Edificio Nisolm, Los Palos Grandes, Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.4968431,
+    "lng": -66.8475179,
+    "display": "Edificio Nisolm, 1.ª Avenida de Los Palos Grandes, Los Palos Grandes, Sector Los Palos Grandes, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Residencia hacienda coche, con Carr. Panamericana, Caracas 1090, Distrito Capital, Venezuela": null,
+  "con Carr. Panamericana, Caracas 1090, Distrito Capital, Venezuela": null,
+  "Edificio Pascal, Final Av. Rómulo Gallegos, Caracas 1071, Miranda, Venezuela": null,
+  "Final Av. Rómulo Gallegos, Caracas 1071, Miranda, Venezuela": null,
+  "Edificio los Ayacuchos, El Valle, Caracas 1090, Distrito Capital, Venezuela": null,
+  "El Valle, Caracas 1090, Distrito Capital, Venezuela": {
+    "lat": 10.4684663,
+    "lng": -66.904964,
+    "display": "El Valle, Avenida Intercomunal de El Valle, Barrio Las Malvinas, San Antonio, El Valle, Caracas, Parroquia El Valle, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1040, Venezuela"
+  },
+  "Edificio Bloque 24, C2MC+QWF, Caracas 1000, Distrito Capital, Venezuela": null,
+  "Edificio Bloque 24, Caracas 1000, Distrito Capital, Venezuela": {
+    "lat": 10.4324497,
+    "lng": -66.9806106,
+    "display": "Bloque 24, 24, Avenida Principal de Caricuao, Urbanización UD-2, La Hacienda, Caricuao, Caracas, Parroquia Caricuao, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1000, Venezuela"
+  },
+  "Anatony, C. Yumare, Caracas 1071, Miranda, Venezuela": null,
+  "C. Yumare, Caracas 1071, Miranda, Venezuela": {
+    "lat": 10.4964033,
+    "lng": -66.8098213,
+    "display": "Calle Yumare, El Marqués Norte, Sector El Marqués, Caracas, Parroquia Petare, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1073, Venezuela"
+  },
+  "Edificio Tulipán, G36R+XWV, Avenida Este 11, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Edificio Tulipán, Avenida Este 11, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Avenida Este 11, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5124008,
+    "lng": -66.9073222,
+    "display": "Avenida Este 11, San José, Caracas, Parroquia San José, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Sara, F5MH+8XV, Caracas 1071, Miranda, Venezuela": null,
+  "Sara, Caracas 1071, Miranda, Venezuela": {
+    "lat": 10.4832815,
+    "lng": -66.819831,
+    "display": "Edificio Sara, Avenida Francisco de Miranda, La California Norte, Sector La California Norte, Caracas, Parroquia Petare, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1071, Venezuela"
+  },
+  "Roxul, Los Palos Grandes, Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.4961433,
+    "lng": -66.847491,
+    "display": "IPOSTEL, 1.ª Avenida de Los Palos Grandes, Los Palos Grandes, Sector Los Palos Grandes, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Villa Savoya, G472+V9M, Caracas, Distrito Capital, Venezuela": null,
+  "Villa Savoya, Caracas, Distrito Capital, Venezuela": null,
+  "Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5060934,
+    "lng": -66.9146008,
+    "display": "Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "Torre Cuatricentenaria, Torre Cuatricentenaria de Cagua, Cagua 2122, Aragua, Venezuela": null,
+  "Torre Cuatricentenaria de Cagua, Cagua 2122, Aragua, Venezuela": null,
+  "Residencia Orsaria, Propatria, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Propatria, Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.5047389,
+    "lng": -66.9559588,
+    "display": "Propatria, Avenida Principal de Propatria, Propatria, Caracas, Parroquia Sucre, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1100, Venezuela"
+  },
+  "International, Av Francisco de Miranda La Carlota frente a la estación de los Dos Caminos": null,
+  "Av Francisco de Miranda La Carlota frente a la estación de los Dos Caminos": null,
+  "Cocoyal, Primera Transversal, Caracas 1060, Distrito Capital, Venezuela": null,
+  "Primera Transversal, Caracas 1060, Distrito Capital, Venezuela": null,
+  "Edificio ciudad Mariche 3eta K11 petare santa lucia, Carretera petare santa Lucia K11 Urbanismo Ciudad Mariche": null,
+  "Carretera petare santa Lucia K11 Urbanismo Ciudad Mariche": null,
+  "Panadería la reina del Mar, Av. Libertador, Tucacas 2055, Falcón, Venezuela": null,
+  "Av. Libertador, Tucacas 2055, Falcón, Venezuela": {
+    "lat": 10.7890675,
+    "lng": -68.3292685,
+    "display": "Avenida Libertador, Barrio Alí Primera, El Cuatro, Tucacas, Parroquia Tucacas, Municipio Silva, Estado Falcón, 2054, Venezuela"
+  },
+  "conjunto residencial las americas, F3R6+FFG, Calle Sucre, Caracas 1020, Distrito Capital, Venezuela": null,
+  "conjunto residencial las americas, Calle Sucre, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Calle Sucre, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4902807,
+    "lng": -66.9382252,
+    "display": "Calle Sucre, Urbanización Los Molinos, Urbanización Industrial San Martín, Artigas, Caracas, Parroquia San Juan, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Doramil, Avenida Sur 13, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5033717,
+    "lng": -66.9051551,
+    "display": "Edificio Doramil, Avenida Sur 13, La Candelaria, Caracas, Parroquia La Candelaria, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Antiguo CUAM, Av. Universidad, Naguanagua 2005, Carabobo, Venezuela": null,
+  "Av. Universidad, Naguanagua 2005, Carabobo, Venezuela": {
+    "lat": 10.2492637,
+    "lng": -68.0140999,
+    "display": "Avenida Universidad, La Granja, Mañongo, Valencia, Parroquia Naguanagua, Municipio Naguanagua, Estado Carabobo, 2005, Venezuela"
+  },
+  "Edificio Tavares, G35V+FCV, Avenida Este 5, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Edificio Tavares, Avenida Este 5, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Avenida Este 5, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.508232,
+    "lng": -66.9028334,
+    "display": "Avenida Este 5, La Candelaria, Caracas, Parroquia La Candelaria, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "IPASOLAZ, G523+5MQ, Av. Andrés Bello, Caracas 1060, Distrito Capital, Venezuela": null,
+  "IPASOLAZ, Av. Andrés Bello, Caracas 1060, Distrito Capital, Venezuela": null,
+  "Av. Andrés Bello, Caracas 1060, Distrito Capital, Venezuela": {
+    "lat": 10.5013038,
+    "lng": -66.876722,
+    "display": "Avenida Andrés Bello, San Rafael de La Florida, La Florida, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "Edificio Esperanza 64, G36Q+9V3, Avenida Norte 3, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Edificio Esperanza 64, Avenida Norte 3, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Avenida Norte 3, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5147597,
+    "lng": -66.9098214,
+    "display": "Avenida Norte 3, Cotiza, Caracas, Parroquia San José, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Centro comercial Los Ruices, Av. Ppal de Los Ruices, C. La Venezolana, Caracas 1071, Miranda, Venezuela": null,
+  "Av. Ppal de Los Ruices, C. La Venezolana, Caracas 1071, Miranda, Venezuela": null,
+  "Sun and sea, FXJ6+3W6, Puerto Cabello 2050, Carabobo, Venezuela": null,
+  "Sun and sea, Puerto Cabello 2050, Carabobo, Venezuela": null,
+  "Puerto Cabello 2050, Carabobo, Venezuela": {
+    "lat": 10.4677932,
+    "lng": -68.0436682,
+    "display": "Puerto Cabello, Parroquia Juan José Flores, Municipio Puerto Cabello, Estado Carabobo, Venezuela"
+  },
+  "residencias la floresta torre norte, Residencias La Floresta, Calle Los Clubes, Maracay 2102, Aragua, Venezuela": null,
+  "Residencias La Floresta, Calle Los Clubes, Maracay 2102, Aragua, Venezuela": null,
+  "Torre Castel Grande, Av. Baralt, Caracas, Distrito Capital, Venezuela": null,
+  "Edificio Atahualpa, Torre C, Avenida Libertador, Caracas, F4WF+VJF, Av. Libertador, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Edificio Atahualpa, Torre C, Avenida Libertador, Caracas, Av. Libertador, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Av. Libertador, Caracas 1050, Distrito Capital, Venezuela": {
+    "lat": 10.5017175,
+    "lng": -66.8927969,
+    "display": "Avenida Libertador, Guaicaipuro Sur, Guaicaipuro, Santa Rosa, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "Central Palace, G35V+RP3 Esquina teñidero, Av. Nte. 11, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Central Palace, Av. Nte. 11, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5091412,
+    "lng": -66.9059695,
+    "display": "Residencias Central Palace, 91, Avenida Norte 11, La Candelaria, Caracas, Parroquia La Candelaria, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Casa, km 11 El Junquito, Caracas 1030, Distrito Capital, Venezuela": null,
+  "km 11 El Junquito, Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.4614338,
+    "lng": -67.0806217,
+    "display": "El Junquito, Caracas, Parroquia El Junquito, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "Santa Marta, Av. Los Samanes, & 2da Transversal, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Av. Los Samanes, & 2da Transversal, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Edificio Soares, G37H+RX7, Avenida Norte 12, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Edificio Soares, Avenida Norte 12, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Avenida Norte 12, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5126181,
+    "lng": -66.9203384,
+    "display": "Avenida Norte 12, Altagracia, Caracas, Parroquia Altagracia, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "RESIDENCIA BEATRIZ JULIETA, Residencias Beatriz Julieta Esquina de Amadores a puente Miraflores, residencia, Av. Nte. 10, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Residencias Beatriz Julieta Esquina de Amadores a puente Miraflores, residencia, Av. Nte. 10, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Residencia Cuyagua, C. 1, Maracay 2101, Aragua, Venezuela": null,
+  "C. 1, Maracay 2101, Aragua, Venezuela": {
+    "lat": 10.2543555,
+    "lng": -67.5892495,
+    "display": "Calle 1, Base Aragua, Maracay, Parroquia María de San José, Municipio Girardot, Estado Aragua, 2101, Venezuela"
+  },
+  "3era etapa, Avenida Principal de Altavista, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Residencias Cilyex, Av. Este 12, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Av. Este 12, Caracas 1014, Distrito Capital, Venezuela": {
+    "lat": 10.498596,
+    "lng": -66.9130596,
+    "display": "Avenida Este 12, Casco Central de Santa Rosalía, Caracas, Parroquia Santa Rosalia, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Estoril Palace, G522+6RX, Caracas 1060, Miranda, Venezuela": null,
+  "Estoril Palace, Caracas 1060, Miranda, Venezuela": null,
+  "KFC - Los Cortijos, F5QF+M78, Avenida Francisco de Miranda, Caracas 1071, Distrito Capital, Venezuela": null,
+  "KFC - Los Cortijos, Avenida Francisco de Miranda, Caracas 1071, Distrito Capital, Venezuela": null,
+  "Avenida Francisco de Miranda, Caracas 1071, Distrito Capital, Venezuela": {
+    "lat": 10.4916413,
+    "lng": -66.8637211,
+    "display": "BBVA Provincial, Avenida Francisco de Miranda, El Rosal, Sector Campo Alegre, Caracas, Municipio Libertador, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Torre del Oeste, Torre del Oeste, Avenida Sur 8, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Torre del Oeste, Avenida Sur 8, Caracas 1014, Distrito Capital, Venezuela": {
+    "lat": 10.5007352,
+    "lng": -66.9197859,
+    "display": "Torre del Oeste, Avenida Sur 8, Barrio Potrerito, San Martín, Barrio El Guarataro, Caracas, Parroquia San Juan, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Edificio Bancaribe, Caracas (ubicación exacta por confirmar)": null,
+  "Caracas (ubicación exacta por confirmar)": null,
+  "Bloque 17, Pedro Camejo, Caracas, Distrito Capital, Venezuela": null,
+  "Pedro Camejo, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.5105522,
+    "lng": -66.8924865,
+    "display": "Pedro Camejo, Calle Real de Los Cortijos de Sarría, La Veguita, Guaicaipuro, Santa Rosa, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "Opppe18, Av. Las Acacias, Caracas, Distrito Capital, Venezuela": null,
+  "Av. Las Acacias, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.504456,
+    "lng": -66.8778272,
+    "display": "Avenida Las Acacias, San Rafael de La Florida, La Florida, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "Mallorca, C. Roscio, Los Teques 1201, Miranda, Venezuela": null,
+  "C. Roscio, Los Teques 1201, Miranda, Venezuela": {
+    "lat": 10.340182,
+    "lng": -67.0444453,
+    "display": "Calle Roscio, Urbanización San Camilo, Centro, Los Teques, Parroquia Los Teques, Municipio Guaicaipuro, Estado Miranda, 1201, Venezuela"
+  },
+  "Residencias Obelisco, G532+8MG, Av. Luis Roche, Caracas 1060, Miranda, Venezuela": null,
+  "Residencias Obelisco, Av. Luis Roche, Caracas 1060, Miranda, Venezuela": null,
+  "Av. Luis Roche, Caracas 1060, Miranda, Venezuela": {
+    "lat": 10.5084171,
+    "lng": -66.8476805,
+    "display": "Avenida Luis Roche, Sector Altamira, Altamira, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Conjunto Residencial ASR, Av. Sucre, Caracas 1071, Miranda, Venezuela": null,
+  "Av. Sucre, Caracas 1071, Miranda, Venezuela": {
+    "lat": 10.5046359,
+    "lng": -66.8323982,
+    "display": "Avenida Sucre, Los Dos Caminos, Sector Sebucán, Caracas, Parroquia Leoncio Martínez, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1071, Venezuela"
+  },
+  "Residencias Anaro, C. Elice, Caracas 1060, Distrito Capital, Venezuela": null,
+  "C. Elice, Caracas 1060, Distrito Capital, Venezuela": null,
+  "Residencias Liliana, Terrazas del Ávila, Caracas 1073, Miranda, Venezuela": {
+    "lat": 10.5006692,
+    "lng": -66.7969652,
+    "display": "Residencias Liliana, Calle 5, Terrazas del Ávila, Sector Terrazas del Ávila, Caracas, Parroquia Petare, Municipio Sucre, Distrito Metropolitano de Caracas, Estado Miranda, 1073, Venezuela"
+  },
+  "Residencias Concord Plaza, Avenida Bolívar, Charallave 1210, Miranda, Venezuela": null,
+  "Avenida Bolívar, Charallave 1210, Miranda, Venezuela": {
+    "lat": 10.232733,
+    "lng": -66.8589835,
+    "display": "Avenida 2 Bolívar, Urbanización Los Samanes, Urbanización Paso Real, La Peña, Parroquia Charallave, Municipio Cristóbal Rojas, Estado Miranda, 1210, Venezuela"
+  },
+  "Iglesia Santa Teresa, Av Lecuna con Avenida Sur": null,
+  "Av Lecuna con Avenida Sur": null,
+  "Residencias Parque Tiuna, Residencias Parque Tiuna, Avenida Soublette, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Residencias Parque Tiuna, Avenida Soublette, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Edificio rosabel, Av. Nte. 5, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Av. Nte. 5, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5060934,
+    "lng": -66.9146008,
+    "display": "Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "Residencias Coromar, C. Ricaurte, Maracay 2106, Aragua, Venezuela": null,
+  "C. Ricaurte, Maracay 2106, Aragua, Venezuela": {
+    "lat": 10.2527298,
+    "lng": -67.6213766,
+    "display": "Avenida Ricaurte, La Romana, Maracay, Parroquia Los Tacariguas, Municipio Girardot, Estado Aragua, 2104, Venezuela"
+  },
+  "Edificio Torre Imperial, Calle Boyaca entre calle carabobo y, 794R+7M5, Calle Pichincha, Maracay 2103, Aragua, Venezuela": null,
+  "Edificio Torre Imperial, Calle Boyaca entre calle carabobo y, Calle Pichincha, Maracay 2103, Aragua, Venezuela": null,
+  "Calle Boyaca entre calle carabobo y, Calle Pichincha, Maracay 2103, Aragua, Venezuela": null,
+  "Edf 31, C. El Club, Caracas 1030, Distrito Capital, Venezuela": null,
+  "C. El Club, Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.5210286,
+    "lng": -66.9422742,
+    "display": "Calle El Club, Alta Vista, Caracas, Parroquia Sucre, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Residencias Miranda, Av. José Antonio Páez & Av. Miranda, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Av. José Antonio Páez & Av. Miranda, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Edificios Soledad, Calle Anauco, Caracas 1020, Distrito Capital, Venezuela": null,
+  "Calle Anauco, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4896006,
+    "lng": -66.9418342,
+    "display": "Calle Anauco, Urbanización Las Fuentes, El Pinar, La Quebradita, Caracas, Parroquia El Paraíso, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Edf. Los pinos, Av. José Antonio Páez, Caracas, Distrito Capital, Venezuela": null,
+  "Edificio Ambos Mundos, Locatel plaza": null,
+  "Locatel plaza": {
+    "lat": 10.474078,
+    "lng": -66.8944448,
+    "display": "Locatel, Avenida Francisco Lazo Martí, Santa Mónica, Los Rosales, Caracas, Parroquia San Pedro, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1040, Venezuela"
+  },
+  "Los Ilustres, Calle Rivas & Calle Pichincha, Maracay 2103, Aragua, Venezuela": null,
+  "Calle Rivas & Calle Pichincha, Maracay 2103, Aragua, Venezuela": null,
+  "UNEXPO, terrazas, F98W+2MM, Av. Principal Vicente Emilio Sojo, Guarenas 1220, Miranda, Venezuela": null,
+  "UNEXPO, terrazas, Av. Principal Vicente Emilio Sojo, Guarenas 1220, Miranda, Venezuela": null,
+  "Av. Principal Vicente Emilio Sojo, Guarenas 1220, Miranda, Venezuela": null,
+  "Edificio alfa, avenida el rosario, los chorros., Avenida el Rosario, Caracas 1071, Distrito Capital, Venezuela": null,
+  "Avenida el Rosario, Caracas 1071, Distrito Capital, Venezuela": null,
+  "Hospital de clínicas las delicias, Callejon Bocono, Hospital de Clínicas las Delicias, Avenida Las Delicias, Maracay 2021, Aragua, Venezuela": null,
+  "Callejon Bocono, Hospital de Clínicas las Delicias, Avenida Las Delicias, Maracay 2021, Aragua, Venezuela": null,
+  "Bloque 11, F2WX+R3H, Caracas 1030, Distrito Capital, Venezuela": null,
+  "Bloque 11, Caracas 1030, Distrito Capital, Venezuela": {
+    "lat": 10.5100686,
+    "lng": -66.9262004,
+    "display": "Bloque 11, Avenida Principal del 23 de Enero, Zona A, Monte Piedad, 23 de Enero, Caracas, Parroquia 23 de Enero, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1030, Venezuela"
+  },
+  "edificio los indios, Avenida Francisco de Miranda, Caracas, Distrito Capital, Venezuela": null,
+  "Centro Comercial Los Jarales, San Diego c.c Los Jarales Local LM-19, Valencia 2006, Carabobo, Venezuela": null,
+  "San Diego c.c Los Jarales Local LM-19, Valencia 2006, Carabobo, Venezuela": null,
+  "Edificio Icoa uru, F5RC+VHG, Caracas 1071, Miranda, Venezuela": null,
+  "Edificio Icoa uru, Caracas 1071, Miranda, Venezuela": null,
+  "Edificio San Mateo, Av. Lecuna, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Av. Lecuna, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5019315,
+    "lng": -66.9206224,
+    "display": "Avenida Lecuna, Barrio Potrerito, San Martín, Barrio El Guarataro, Caracas, Parroquia San Juan, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Bloque 8, F97R+H37, Guarenas 1220, Miranda, Venezuela": null,
+  "Bloque 8, Guarenas 1220, Miranda, Venezuela": {
+    "lat": 10.4714992,
+    "lng": -66.6119554,
+    "display": "Bloque 8, 2.° Avenida, Urbanización 27 de Febrero, Trapichito, Guarenas, Parroquia Guarenas, Municipio Plaza, Estado Miranda, 1220, Venezuela"
+  },
+  "Residencias Sorocaima, San Bernardino, Av. Panteón, Caracas 1011, Distrito Capital, Venezuela": null,
+  "San Bernardino, Av. Panteón, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5105204,
+    "lng": -66.904195,
+    "display": "San Bernardino Plaza, Avenida Panteón, San José, Caracas, Parroquia San José, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Edificio jardín minalta, Urb. Las Minas, San Antonio de Los Altos 1204, Miranda, Venezuela": null,
+  "Urb. Las Minas, San Antonio de Los Altos 1204, Miranda, Venezuela": {
+    "lat": 10.3681231,
+    "lng": -66.9775154,
+    "display": "Campo de Futbol Urb. Las Minas, Avenida Paseo Los Andes, Las Minas Sur, San Antonio de Los Altos, Municipio Los Salias, Estado Miranda, 1204, Venezuela"
+  },
+  "Valle Arriba suites, Carretera vieja de baruta, los Naranjos de las Mercedes Valle Arriba suites": null,
+  "Carretera vieja de baruta, los Naranjos de las Mercedes Valle Arriba suites": null,
+  "Bahía Real, Residencias Bahía Real, C. Arismendi, Lechería 6016, Anzoátegui, Venezuela": null,
+  "Residencias Bahía Real, C. Arismendi, Lechería 6016, Anzoátegui, Venezuela": null,
+  "Residencias Centro Caracas, G32H+FFC, Caracas 1080, Distrito Capital, Venezuela": null,
+  "Residencias Centro Caracas, Caracas 1080, Distrito Capital, Venezuela": {
+    "lat": 10.4995223,
+    "lng": -66.9060665,
+    "display": "Residencias Centro Parque Carabobo, Hornos de Cal, San Agustín Norte, Caracas, Parroquia San Agustín, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Francisqui suites, PMPM+MCW, Par Vial Moron, Tucacas 2047, Falcón, Venezuela": null,
+  "Francisqui suites, Par Vial Moron, Tucacas 2047, Falcón, Venezuela": null,
+  "Par Vial Moron, Tucacas 2047, Falcón, Venezuela": {
+    "lat": 10.7341535,
+    "lng": -68.31626,
+    "display": "Par Vial Morón - Tucacas, Tucacas, Parroquia Tucacas, Municipio Silva, Estado Falcón, 2055, Venezuela"
+  },
+  "Torre 5 - Parque Habitat El Ingenio, Parque Habitat El Ingenio, Guatire 1221, Miranda, Venezuela": null,
+  "Parque Habitat El Ingenio, Guatire 1221, Miranda, Venezuela": null,
+  "Bloque 28 el plan, Barrio Pinto Salinas, Caracas 1050, Distrito Capital, Venezuela": null,
+  "Residencias Copacabana, C. Argentina, Guarenas 1220, Miranda, Venezuela": {
+    "lat": 10.4645369,
+    "lng": -66.6235146,
+    "display": "Residencias Copacabana, c. Argentina, Casco Central, La Vaquera, Guarenas, Parroquia Guarenas, Municipio Plaza, Estado Miranda, 1220, Venezuela"
+  },
+  "Edificio Alfa, C. Dr. Carías Nte., La Victoria 2121, Aragua, Venezuela": null,
+  "C. Dr. Carías Nte., La Victoria 2121, Aragua, Venezuela": null,
+  "Doral plaza, G33W+8J4, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Doral plaza, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5033911,
+    "lng": -66.9033211,
+    "display": "Residencias Doral Plaza, Avenida Este 2, La Candelaria, Caracas, Parroquia La Candelaria, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Toronkey, 1020 Avenida Santander, Caracas 1020, Distrito Capital, Venezuela": null,
+  "1020 Avenida Santander, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4886934,
+    "lng": -66.9342889,
+    "display": "Avenida Santander, Barrio Sinaí, El Pinar, El Paraíso, Caracas, Parroquia El Paraíso, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Edificio Fandav, G39W+MW7, Av. José Manuel Sanz, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Edificio Fandav, Av. José Manuel Sanz, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Av. José Manuel Sanz, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.5189171,
+    "lng": -66.9027233,
+    "display": "Avenida José Manuel Sanz, San Bernardino, Caracas, Parroquia San Bernardino, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Quinta Aquitania, Av. El Parque, Caracas 1011, Distrito Capital, Venezuela": null,
+  "Av. El Parque, Caracas 1011, Distrito Capital, Venezuela": {
+    "lat": 10.4843014,
+    "lng": -66.8989378,
+    "display": "Avenida El Parque, Valle Abajo, Las Acacias, Caracas, Parroquia San Pedro, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1040, Venezuela"
+  },
+  "Urbanizacion Bosque Valle, terraza 06, casa 04, Tazón, Caracas 1090, Distrito Capital, Venezuela": null,
+  "Tazón, Caracas 1090, Distrito Capital, Venezuela": {
+    "lat": 10.4229686,
+    "lng": -66.9241887,
+    "display": "Bajada de Tazón, Turmerito, Las Mayas, Caracas, Parroquia Coche, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1090, Venezuela"
+  },
+  "Residencias Las Americas, Av 103, Valencia 2001, Carabobo, Venezuela": null,
+  "Av 103, Valencia 2001, Carabobo, Venezuela": {
+    "lat": 10.1567034,
+    "lng": -67.9901209,
+    "display": "Avenida 103, Santa Rosa, Zona Industrial Michelena, Valencia, Parroquia Santa Rosa, Municipio Valencia, Estado Carabobo, 2001, Venezuela"
+  },
+  "Santa Rita, C. Barcelona, Guatire 1221, Miranda, Venezuela": null,
+  "C. Barcelona, Guatire 1221, Miranda, Venezuela": null,
+  "Residencias Anabella, F5QF+XRV, Caracas 1071, Distrito Capital, Venezuela": null,
+  "Residencias Anabella, Caracas 1071, Distrito Capital, Venezuela": null,
+  "Caracas 1071, Distrito Capital, Venezuela": {
+    "lat": 10.5060934,
+    "lng": -66.9146008,
+    "display": "Caracas, Parroquia Catedral, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, Venezuela"
+  },
+  "edificio punta de piedras torre B, F3WQ+93Q, Av. Sur 5, Caracas 1014, Distrito Capital, Venezuela": null,
+  "edificio punta de piedras torre B, Av. Sur 5, Caracas 1014, Distrito Capital, Venezuela": null,
+  "Los Samanes, Urb. Base Aragua, Maracay 2101, Aragua, Venezuela": null,
+  "Urb. Base Aragua, Maracay 2101, Aragua, Venezuela": {
+    "lat": 10.2548742,
+    "lng": -67.5891566,
+    "display": "Base Aragua, Maracay, Parroquia María de San José, Municipio Girardot, Estado Aragua, 2101, Venezuela"
+  },
+  "TAURUS 3, G36H+3Q5, Norte 12, Caracas 1010, Distrito Capital, Venezuela": null,
+  "TAURUS 3, Norte 12, Caracas 1010, Distrito Capital, Venezuela": null,
+  "Norte 12, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5104343,
+    "lng": -66.9067938,
+    "display": "12, Avenida Norte 9, La Candelaria, Caracas, Parroquia San José, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1011, Venezuela"
+  },
+  "Edificio Romeo, F4J7+96V, Avenida Alma.Mater, Caracas 1041, Distrito Capital, Venezuela": null,
+  "Edificio Romeo, Avenida Alma.Mater, Caracas 1041, Distrito Capital, Venezuela": null,
+  "Avenida Alma.Mater, Caracas 1041, Distrito Capital, Venezuela": null,
+  "Avenida Norte 5, Av. Nte. 5, Caracas 1010, Distrito Capital, Venezuela": {
+    "lat": 10.5153838,
+    "lng": -66.9086495,
+    "display": "Avenida Norte 5, Cotiza, Caracas, Parroquia San José, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1010, Venezuela"
+  },
+  "Casa Nro 8 - 17, C. Sucre & C. Carabobo, Puerto Cabello 2050, Carabobo, Venezuela": null,
+  "C. Sucre & C. Carabobo, Puerto Cabello 2050, Carabobo, Venezuela": {
+    "lat": 10.472931,
+    "lng": -68.0124403,
+    "display": "Calle Sucre, Barrio Playa Blanca, Casco Histórico, Puerto Cabello, Parroquia Unión, Municipio Puerto Cabello, Estado Carabobo, 2050, Venezuela"
+  },
+  "Edif murachi, Av. Casanova, Caracas, Distrito Capital, Venezuela": null,
+  "Av. Casanova, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.4943736,
+    "lng": -66.8808707,
+    "display": "Avenida Casanova, Sabana Grande, Caracas, Parroquia El Recreo, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1050, Venezuela"
+  },
+  "Residencias Miriam, Av Sur 2, Caracas, Distrito Capital, Venezuela": null,
+  "Av Sur 2, Caracas, Distrito Capital, Venezuela": {
+    "lat": 10.4967145,
+    "lng": -66.9170107,
+    "display": "Avenida Sur 2, Quinta Crespo, Caracas, Parroquia Santa Teresa, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1014, Venezuela"
+  },
+  "Centro Comercial Ciudad Traki, Av. Intercomunal Barquisimeto, Cabudare 3023, Lara, Venezuela": null,
+  "Av. Intercomunal Barquisimeto, Cabudare 3023, Lara, Venezuela": {
+    "lat": 10.0395586,
+    "lng": -69.2596033,
+    "display": "Avenida Intercomunal de Cabudare, El Tamarindo, Parroquia Cabudare, Municipio Palavecino, Estado Lara, 3023, Venezuela"
+  },
+  "Padula, Av. Ávila, Caracas, Miranda, Venezuela": {
+    "lat": 10.4910691,
+    "lng": -66.8501517,
+    "display": "Residencias Padula, Avenida Ávila, Barrio La Cruz, Sector Bello Campo, Caracas, Municipio Chacao, Distrito Metropolitano de Caracas, Estado Miranda, 1060, Venezuela"
+  },
+  "Argentum, Trans. 2, Caracas 1060, Miranda, Venezuela": null,
+  "Edificio Don Samuel, C. Boyacá, Caracas 1020, Distrito Capital, Venezuela": {
+    "lat": 10.4780238,
+    "lng": -66.9463761,
+    "display": "Edificio Don Samuel, Calle Boyacá, Deyber, Urbanización La Paz, Vista Alegre, Caracas, Parroquia El Paraíso, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  },
+  "Astra, C. Sucre, Caracas 1060, Distrito Capital, Venezuela": null,
+  "C. Sucre, Caracas 1060, Distrito Capital, Venezuela": {
+    "lat": 10.4962042,
+    "lng": -66.9307496,
+    "display": "Calle Sucre, San Martín, Barrio El Guarataro, Caracas, Parroquia San Juan, Municipio Libertador, Distrito Metropolitano de Caracas, Distrito Capital, 1020, Venezuela"
+  }
+}
