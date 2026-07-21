@@ -9072,13 +9072,14 @@ function wireCityControls() {
         });
     }
 
-    const toggleFans = document.getElementById('city-toggle-fans');
-    if (toggleFans) {
-        toggleFans.addEventListener('change', (e) => {
-            if (!citySim || !citySim.fansGroup) return;
-            citySim.fansGroup.visible = e.target.checked;
-            
-            // Toggle legend
+    const floatToggleFans = document.getElementById('city-float-toggle-fans');
+    const floatToggleBedrock = document.getElementById('city-float-toggle-bedrock');
+
+    if (floatToggleFans) {
+        floatToggleFans.addEventListener('change', (e) => {
+            if (citySim && citySim.fansGroup) {
+                citySim.fansGroup.visible = e.target.checked;
+            }
             const legendFans = document.getElementById('city-legend-fans');
             if (legendFans) {
                 legendFans.style.display = e.target.checked ? 'flex' : 'none';
@@ -9086,22 +9087,14 @@ function wireCityControls() {
         });
     }
 
-    const toggleBedrock = document.getElementById('city-toggle-bedrock');
-    if (toggleBedrock) {
-        toggleBedrock.addEventListener('change', (e) => {
-            if (!citySim || !citySim.bedrockGroup) return;
-            citySim.bedrockGroup.visible = e.target.checked;
-            
-            // Toggle legend 3D
+    if (floatToggleBedrock) {
+        floatToggleBedrock.addEventListener('change', (e) => {
+            if (citySim && citySim.bedrockGroup) {
+                citySim.bedrockGroup.visible = e.target.checked;
+            }
             const legendBedrock = document.getElementById('city-legend-bedrock');
             if (legendBedrock) {
                 legendBedrock.style.display = e.target.checked ? 'flex' : 'none';
-            }
-
-            // Toggle leyenda inline
-            const inlineLegend = document.getElementById('city-inline-bedrock-legend');
-            if (inlineLegend) {
-                inlineLegend.style.display = e.target.checked ? 'flex' : 'none';
             }
         });
     }

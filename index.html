@@ -2489,25 +2489,7 @@
                                     </p>
                                 </div>
 
-                                <!-- CAPAS GEOESPACIALES -->
-                                <div class="city-layers-control"
-                                    style="display: flex; gap: 12px; margin-bottom: 14px; align-items: center; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 8px; flex-wrap: wrap;">
-                                    <span
-                                        style="font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.5px;">Capas
-                                        de Riesgo:</span>
-                                    <label
-                                        style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none;">
-                                        <input type="checkbox" id="city-toggle-fans"
-                                            style="accent-color: #ffb703; cursor: pointer;">
-                                        <span>Abanicos Fluviales (Vulnerabilidad y Licuación)</span>
-                                    </label>
-                                    <label
-                                        style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none;">
-                                        <input type="checkbox" id="city-toggle-bedrock"
-                                            style="accent-color: #38bdf8; cursor: pointer;">
-                                        <span>Profundidad a Roca Dura (0–450m)</span>
-                                    </label>
-                                </div>
+                                
 
                                 <!-- CONTROLES DE LA SIMULACIÓN -->
                                 <div class="city-controls">
@@ -2560,6 +2542,23 @@
 
                                 <!-- VIEWPORT 3D -->
                                 <div id="city-canvas-container" class="city-canvas-container">
+                                    <!-- PANEL FLOTANTE DE CAPAS DE RIESGO 3D -->
+                                    <div class="city-floating-layers-panel">
+                                        <div class="city-floating-layers-header">
+                                            <i class="fa-solid fa-layer-group" style="color: #00f2fe;"></i>
+                                            <span>Capas de Riesgo 3D</span>
+                                        </div>
+                                        <div class="city-floating-layers-body">
+                                            <label class="city-floating-layer-item">
+                                                <input type="checkbox" id="city-float-toggle-fans" style="accent-color: #ffb703;">
+                                                <span><i class="fa-solid fa-water" style="color: #ffb703;"></i> Abanicos Fluviales (Licuación)</span>
+                                            </label>
+                                            <label class="city-floating-layer-item">
+                                                <input type="checkbox" id="city-float-toggle-bedrock" style="accent-color: #38bdf8;">
+                                                <span><i class="fa-solid fa-mountain" style="color: #38bdf8;"></i> Profundidad a Roca Dura</span>
+                                            </label>
+                                        </div>
+                                    </div>
                                     <div id="city-loading" class="city-loading">
                                         <i class="fa-solid fa-circle-notch fa-spin"></i>
                                         <span>Cargando relieve, imagen satelital y ciudad de La Guaira…</span>
