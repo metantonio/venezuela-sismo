@@ -18,7 +18,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="index.css?v=1131">
+    <link rel="stylesheet" href="index.css?v=1132">
     <!-- Leaflet.js Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -2523,6 +2523,16 @@
                                 <div id="city-canvas-container" class="city-canvas-container">
                                     <!-- PANEL FLOTANTE DE CAPAS DE RIESGO 3D -->
                                     <div class="city-floating-layers-panel">
+                                        <!-- Barra de título clicable para minimizar/expandir -->
+                                        <div class="city-floating-layers-title-bar" id="city-floating-layers-title-bar">
+                                            <i class="fa-solid fa-sliders"></i>
+                                            <span>Controles</span>
+                                        </div>
+                                        <button class="city-floating-layers-toggle" id="city-floating-layers-toggle" title="Minimizar / Expandir panel" aria-label="Minimizar panel">
+                                            <i class="fa-solid fa-chevron-up"></i>
+                                        </button>
+                                        <!-- Contenido colapsable -->
+                                        <div class="city-floating-layers-collapsible">
                                         <!-- SECCIÓN CONTROLES DE SIMULACIÓN -->
                                         <div class="city-floating-layers-header">
                                             <i class="fa-solid fa-gamepad" style="color: #00f2fe;"></i>
@@ -2561,6 +2571,7 @@
                                                 <span><i class="fa-solid fa-mountain" style="color: #38bdf8;"></i> Profundidad a Roca Dura</span>
                                             </label>
                                         </div>
+                                        </div><!-- /city-floating-layers-collapsible -->
                                     </div>
                                     <div id="city-loading" class="city-loading">
                                         <i class="fa-solid fa-circle-notch fa-spin"></i>
@@ -3604,7 +3615,7 @@
             </div>
 
             <!-- Custom JavaScript -->
-            <script src="app.js?v=1131"></script>
+            <script src="app.js?v=1132"></script>
 </body>
 
 </html>

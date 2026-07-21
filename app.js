@@ -12226,3 +12226,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+// Handler para minimizar/expandir el panel flotante de controles de simulación urbana
+document.addEventListener('DOMContentLoaded', () => {
+    const floatingPanel = document.querySelector('.city-floating-layers-panel');
+    const toggleBtn = document.getElementById('city-floating-layers-toggle');
+    const titleBar = document.getElementById('city-floating-layers-title-bar');
+
+    function toggleFloatingPanel(e) {
+        e.stopPropagation();
+        if (floatingPanel) floatingPanel.classList.toggle('collapsed');
+    }
+
+    if (toggleBtn) toggleBtn.addEventListener('click', toggleFloatingPanel);
+    if (titleBar) titleBar.addEventListener('click', toggleFloatingPanel);
+});
