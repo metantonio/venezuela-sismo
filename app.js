@@ -8835,7 +8835,7 @@ async function initCitySim() {
     });
 
     // --- Edificios del catálogo (extrusión de rectángulos reales) ---
-    const baseColor = new THREE.Color(0x9fb4c8);
+    const baseColor = new THREE.Color(0xa855f7); // Violeta para catálogo real
     vargas.forEach((b) => {
         const rngB = cityMulberry32(cityHashStr(b.id || b.name));
         const N = Math.max(2, b.floors || 5);
@@ -8912,11 +8912,11 @@ async function initCitySim() {
     
     // Paleta de colores urbanos realistas y variados (pasteles desaturados)
     const fPalette = [
-        new THREE.Color(0x6b7c85), // Gris azulado frío
-        new THREE.Color(0x8f9a9c), // Cemento claro
-        new THREE.Color(0xa39b8f), // Arena / Adobe cálido
-        new THREE.Color(0x9e8677), // Terracota claro / Ladrillo
-        new THREE.Color(0x828c82)  // Gris verdoso suave
+        new THREE.Color(0x334155), // Gris oscuro pizarra (Slate 700)
+        new THREE.Color(0x1e293b), // Gris muy oscuro (Slate 800)
+        new THREE.Color(0x27272a), // Gris carbón (Zinc 800)
+        new THREE.Color(0x3f3f46), // Gris zinc (Zinc 700)
+        new THREE.Color(0x475569)  // Gris medio oscuro (Slate 600)
     ];
     
     const fBase = new Float32Array(fillerCount * 3);   // x, y, z base por instancia

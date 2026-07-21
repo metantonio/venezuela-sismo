@@ -4080,20 +4080,26 @@ select option {
 
 .city-info-card {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 280px;
-    max-width: calc(100% - 24px);
-    background: rgba(10, 14, 24, 0.92);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 10px;
+    top: 16px;
+    left: 16px;
+    width: 300px;
+    max-width: calc(100% - 32px);
+    max-height: calc(100% - 32px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 242, 254, 0.3) transparent;
+    background: rgba(8, 12, 22, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    border-radius: 12px;
     padding: 14px 16px;
-    z-index: 15;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    z-index: 40;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
     font-size: 12px;
     color: var(--text-muted);
     line-height: 1.55;
+    pointer-events: auto;
 }
 
 .city-info-card h4 {
@@ -4103,6 +4109,7 @@ select option {
     display: flex;
     align-items: center;
     gap: 7px;
+    padding-right: 20px;
 }
 
 .city-info-card .city-card-zone {
@@ -4138,9 +4145,13 @@ select option {
 
 .city-info-card img {
     width: 100%;
-    border-radius: 6px;
+    height: 140px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 8px;
     margin-top: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    display: block;
 }
 
 .city-info-card .city-card-close {
