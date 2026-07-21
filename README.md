@@ -118,6 +118,18 @@ node tools/verificar-edificios.js --limit 20       # geocodifica solo 20 (para p
 ⚠️ Matiz importante: en Venezuela OSM rara vez tiene el edificio exacto — a menudo geocodifica a nivel de calle o urbanización. Un "discrepante" no significa que tu coordenada esté mal, sino que OSM no pudo confirmarla (el reporte incluye qué encontró OSM para que juzgues). Es una herramienta de cribado, no de verdad absoluta.
 
 2. Duplicados con revisión caso a caso — Agrupa por: mismas coordenadas (<10 m), nombre casi idéntico + cercanía, o nombre casi idéntico + misma dirección (normaliza tildes, mayúsculas y prefijos como "Edificio/Residencias/Torre").
+
+### Aplicar Coordenadas Confirmadas por OSM
+
+Script creado: `tools/aplicar-coordenadas-osm.js`
+
+Permite tomar los 137 edificios confirmados por OpenStreetMap (estado `ok` con distancia ≤200 m) del reporte existente y actualizar sus coordenadas en `buildings.json`.
+
+```bash
+node tools/aplicar-coordenadas-osm.js             # Modo simulación (Dry Run, muestra cambios sin modificar)
+node tools/aplicar-coordenadas-osm.js --aplicar   # Aplica cambios y genera respaldo automático buildings.backup-*.json
+node tools/aplicar-coordenadas-osm.js --umbral-m 100 --aplicar # Exige umbral estricto <=100m
+```
 ---
 
 ## 📝 Autor e Información Académica
