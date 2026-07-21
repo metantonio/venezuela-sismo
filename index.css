@@ -3292,23 +3292,41 @@ select option {
         height: 46px !important;
     }
 
-    /* Pestaña 3D */
-    #tab-3d {
+    /* Pestañas 3D (Estructural y Simulación Urbana) */
+    #tab-3d,
+    #tab-city {
         flex: 1 !important;
         display: none;
         height: calc(100% - 46px) !important;
         position: relative !important;
+        padding: 0 !important;
     }
 
-    #tab-3d.active {
+    #tab-3d.active,
+    #tab-city.active {
         display: flex !important;
         flex-direction: column !important;
     }
 
-    #canvas-3d-container {
+    #tab-city .tab-info-container,
+    #tab-city .info-section {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        position: relative !important;
+    }
+
+    #canvas-3d-container,
+    .city-canvas-container {
         flex: 1 !important;
         height: 100% !important;
-        min-height: 200px !important;
+        min-height: 350px !important;
+        width: 100% !important;
+        position: relative !important;
     }
 
     /* Métricas con snap-scroll horizontal */
@@ -4958,4 +4976,217 @@ select option {
     cursor: pointer;
     width: 15px;
     height: 15px;
+}
+
+
+/* ==========================================================================
+   GOOGLE MAPS STYLE MOBILE FULL-SCREEN & BOTTOM SHEET FOR MAPS & 3D SIM
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* Pantalla completa para Mapa de Daño y Simulación Urbana */
+    #tab-damage-map,
+    #tab-city {
+        position: relative !important;
+        height: calc(100dvh - 60px - 46px) !important;
+        height: calc(100vh - 60px - 46px) !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    #tab-damage-map .tab-info-container,
+    #tab-city .tab-info-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        height: 100% !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
+
+    /* El mapa Leaflet y el visor 3D Three.js ocupan el 100% del viewport */
+    #damage-map-container,
+    #city-canvas-container {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0 !important;
+        z-index: 1 !important;
+        margin: 0 !important;
+    }
+
+    /* Ocultar encabezados redundantes de texto en vista mapa móvil */
+    #tab-damage-map .info-section > h3,
+    #tab-damage-map .info-section > p,
+    #tab-damage-map details,
+    #tab-damage-map .btn-primary,
+    #tab-damage-map .disclaimer-box {
+        display: none !important;
+    }
+
+    /* Controles superiores flotantes sobre el mapa en móvil */
+    .damage-map-controls {
+        position: absolute !important;
+        top: 10px !important;
+        left: 10px !important;
+        z-index: 20 !important;
+        background: rgba(8, 12, 22, 0.88) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        padding: 6px 10px !important;
+        border-radius: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        max-width: calc(100% - 20px) !important;
+    }
+
+    /* Panel desplegable inferior (Bottom Sheet) estilo Google Maps */
+    .mobile-bottom-sheet {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(8, 12, 22, 0.96);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border-top: 1px solid rgba(0, 242, 254, 0.35);
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.85);
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        transform: translateY(calc(100% - 52px));
+        max-height: 84vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mobile-bottom-sheet.expanded {
+        transform: translateY(0) !important;
+    }
+
+    .mobile-sheet-handle-bar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        cursor: pointer;
+        user-select: none;
+        height: 52px;
+        background: rgba(15, 22, 38, 0.98);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px 16px 0 0;
+        touch-action: pan-y;
+        flex-shrink: 0;
+    }
+
+    .mobile-sheet-pill {
+        width: 38px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 2px;
+        margin-bottom: 6px;
+    }
+
+    .mobile-sheet-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .mobile-sheet-title .sheet-arrow {
+        transition: transform 0.3s ease;
+        color: #00f2fe;
+    }
+
+    .mobile-bottom-sheet.expanded .sheet-arrow {
+        transform: rotate(180deg);
+    }
+
+    .mobile-sheet-body {
+        overflow-y: auto;
+        padding: 16px;
+        -webkit-overflow-scrolling: touch;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+}
+
+
+/* ==========================================================================
+   SMARTPHONE VIEW FOR SIMULACIÓN URBANA 3D (tab-city)
+   ========================================================================== */
+@media (max-width: 768px) {
+    #tab-city.tab-content {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    #tab-city .tab-info-container,
+    #tab-city .info-section {
+        position: relative !important;
+        width: 100% !important;
+        height: 100% !important;
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+    }
+
+    #tab-city .city-canvas-container {
+        position: relative !important;
+        width: 100% !important;
+        height: 100% !important;
+        flex: 1 !important;
+        min-height: 320px !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        background: radial-gradient(ellipse at 50% 120%, #16222e 0%, #0a0e18 70%) !important;
+    }
+
+    #tab-city .city-canvas-container canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+    }
+
+    /* Ocultar párrafos estáticos pesados fuera de pantalla en smartphone */
+    #tab-city .info-section > h3,
+    #tab-city .info-section > p,
+    #tab-city .info-section > div[style*="background: rgba(255, 183, 3"],
+    #tab-city .city-controls,
+    #tab-city .city-stats {
+        display: none !important;
+    }
+
+    /* Optimizar el panel flotante de controles sobre el visor 3D */
+    .city-floating-layers-panel {
+        top: 8px !important;
+        right: 8px !important;
+        max-width: calc(100% - 16px) !important;
+        z-index: 30 !important;
+        padding: 8px 10px !important;
+        font-size: 11px !important;
+    }
 }

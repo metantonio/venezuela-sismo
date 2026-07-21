@@ -208,7 +208,12 @@ function initUI() {
 
             btn.classList.add("active");
             const tabId = btn.getAttribute("data-tab");
-            document.getElementById(tabId).classList.add("active");
+            if (tabId) {
+                const targetTab = document.getElementById(tabId);
+                if (targetTab) {
+                    targetTab.classList.add("active");
+                }
+            }
 
             // Actualizar título de la barra superior (removiendo el icono)
             if (activeTabTitle) {
@@ -8710,7 +8715,9 @@ async function initCitySim() {
     scene.fog = new THREE.FogExp2(0x0d1420, 0.000055);
     citySim.scene = scene;
 
-    const camera = new THREE.PerspectiveCamera(46, container.clientWidth / container.clientHeight, 5, 120000);
+    const initW = container.clientWidth || container.offsetWidth || window.innerWidth;
+    const initH = container.clientHeight || container.offsetHeight || Math.max(480, window.innerHeight - 110);
+    const camera = new THREE.PerspectiveCamera(46, initW / initH, 5, 120000);
     citySim.camera = camera;
 
     // Anclar el encuadre inicial al clúster más denso del catálogo (vista de barrio;
@@ -8729,7 +8736,7 @@ async function initCitySim() {
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setSize(initW, initH);
     renderer.outputEncoding = THREE.sRGBEncoding;
     container.appendChild(renderer.domElement);
     citySim.renderer = renderer;
@@ -9418,7 +9425,9 @@ function resizeCityRenderer() {
     if (!citySim || !citySim.renderer) return;
     const container = document.getElementById('city-canvas-container');
     if (!container) return;
-    const w = container.clientWidth, h = container.clientHeight;
+    const rect = container.getBoundingClientRect();
+    const w = rect.width || container.clientWidth || container.offsetWidth || window.innerWidth;
+    const h = rect.height || container.clientHeight || container.offsetHeight || Math.max(350, window.innerHeight - 110);
     if (w < 10 || h < 10) return;
     citySim.camera.aspect = w / h;
     citySim.camera.updateProjectionMatrix();
@@ -12204,4 +12213,16 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         setAppProfile('public');
     }
+});
+
+
+// Handlers para desplegar Bottom Sheet estilo Google Maps en Smartphone
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.mobile-sheet-handle-bar').forEach(handle => {
+        handle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const sheet = handle.closest('.mobile-bottom-sheet');
+            if (sheet) sheet.classList.toggle('expanded');
+        });
+    });
 });
