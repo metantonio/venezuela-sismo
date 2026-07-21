@@ -1975,7 +1975,7 @@
         "address": "JX7G+6RX, Maiquetía 1162, Vargas, Venezuela",
         "lat": 10.61275,
         "lng": -67.02187,
-        "floors": 5,
+        "floors": 15,
         "status": "damaged",
         "damage_level": "severo",
         "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/4b0f74fd-e835-4160-8b55-56d7ffdee793.jpg",
