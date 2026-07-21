@@ -9403,6 +9403,12 @@ function cityFrameLoop(now) {
         });
     }
 
+    // Animar pulsación de resplandor del edificio seleccionado en el mapa
+    if (citySim && citySim.selectedState && citySim.selectedState.mesh && citySim.selectedState.mesh.material) {
+        const glowPulse = 0.60 + Math.sin(now * 0.007) * 0.35;
+        citySim.selectedState.mesh.material.emissiveIntensity = glowPulse;
+    }
+
     citySim.controls.update();
     citySim.renderer.render(citySim.scene, citySim.camera);
     requestAnimationFrame(cityFrameLoop);
@@ -9419,9 +9425,33 @@ function resizeCityRenderer() {
     citySim.renderer.setSize(w, h);
 }
 
+function highlightCityBuilding(st) {
+    if (!citySim) return;
+    if (citySim.selectedState && citySim.selectedState.mesh && citySim.selectedState.mesh.material) {
+        citySim.selectedState.mesh.material.emissive.setHex(0x000000);
+        citySim.selectedState.mesh.material.emissiveIntensity = 0;
+    }
+    if (!st || !st.mesh || !st.mesh.material) {
+        citySim.selectedState = null;
+        return;
+    }
+    citySim.selectedState = st;
+    st.mesh.material.emissive.setHex(0x00f2fe);
+    st.mesh.material.emissiveIntensity = 0.85;
+}
+
+function clearCityBuildingHighlight() {
+    if (citySim && citySim.selectedState && citySim.selectedState.mesh && citySim.selectedState.mesh.material) {
+        citySim.selectedState.mesh.material.emissive.setHex(0x000000);
+        citySim.selectedState.mesh.material.emissiveIntensity = 0;
+    }
+    if (citySim) citySim.selectedState = null;
+}
+
 function showCityBuildingCard(st) {
     const card = document.getElementById('city-info-card');
     if (!card || !st) return;
+    highlightCityBuilding(st);
     const b = st.b;
     const isCol = st.status === 'collapsed';
     const statusTxt = isCol ? 'Colapsado' : 'Dañado (en pie)';
@@ -9456,6 +9486,7 @@ function showCityBuildingCard(st) {
 }
 
 function hideCityBuildingCard() {
+    clearCityBuildingHighlight();
     const card = document.getElementById('city-info-card');
     if (card) card.style.display = 'none';
 }
