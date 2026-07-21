@@ -5014,8 +5014,8 @@ select option {
     #tab-damage-map,
     #tab-city {
         position: relative !important;
-        height: calc(100dvh - 60px - 46px) !important;
         height: calc(100vh - 60px - 46px) !important;
+        height: calc(100dvh - 60px - 46px) !important;
         overflow: hidden !important;
         padding: 0 !important;
         margin: 0 !important;
@@ -5073,6 +5073,7 @@ select option {
     .mobile-bottom-sheet {
         position: absolute;
         bottom: 0;
+        bottom: env(safe-area-inset-bottom, 0px);
         left: 0;
         right: 0;
         z-index: 100;
@@ -5083,10 +5084,12 @@ select option {
         border-radius: 16px 16px 0 0;
         box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.85);
         transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        transform: translateY(calc(100% - 52px));
+        transform: translateY(calc(100% - 60px));
         max-height: 84vh;
+        max-height: 84dvh;
         display: flex;
         flex-direction: column;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 
     .mobile-bottom-sheet.expanded {
@@ -5098,14 +5101,15 @@ select option {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 8px 16px;
+        padding: 10px 16px;
         cursor: pointer;
         user-select: none;
-        height: 52px;
+        min-height: 60px;
         background: rgba(15, 22, 38, 0.98);
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 16px 16px 0 0;
-        touch-action: pan-y;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
         flex-shrink: 0;
     }
 
