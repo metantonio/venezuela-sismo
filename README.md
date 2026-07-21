@@ -99,6 +99,27 @@ El simulador implementa las siguientes diferencias técnicas clave dictadas por 
 
 ---
 
+## Comprobación de coordenadas en building.json
+
+
+Script creado: tools/verificar-edificios.js
+
+Sin dependencias (Node ≥18, que ya tienes). Uso:
+
+```bash
+node tools/verificar-edificios.js                  # verificación completa + revisión interactiva
+node tools/verificar-edificios.js --no-geocode     # solo duplicados (rápido, sin internet)
+node tools/verificar-edificios.js --solo-reporte   # solo informa, no pregunta ni toca nada
+node tools/verificar-edificios.js --limit 20       # geocodifica solo 20 (para probar)
+```
+
+1. Comprobación de coordenadas — Consulta Nominatim (OpenStreetMap) con nombre + dirección, restringido a Venezuela, y compara contra tus lat/lng guardadas (clasifica: ok ≤200 m, sospechoso, discrepante, no encontrado). Respeta la política de uso (1 req/s, User-Agent identificado) y guarda caché en tools/cache-geocodificacion.json: la primera corrida tarda ~12–15 min con 667 edificios, pero las siguientes solo consultan los edificios nuevos. Escribe el detalle en tools/reporte-geocodificacion.json.
+
+⚠️ Matiz importante: en Venezuela OSM rara vez tiene el edificio exacto — a menudo geocodifica a nivel de calle o urbanización. Un "discrepante" no significa que tu coordenada esté mal, sino que OSM no pudo confirmarla (el reporte incluye qué encontró OSM para que juzgues). Es una herramienta de cribado, no de verdad absoluta.
+
+2. Duplicados con revisión caso a caso — Agrupa por: mismas coordenadas (<10 m), nombre casi idéntico + cercanía, o nombre casi idéntico + misma dirección (normaliza tildes, mayúsculas y prefijos como "Edificio/Residencias/Torre").
+---
+
 ## 📝 Autor e Información Académica
 
 Este proyecto ha sido desarrollado como una herramienta educativa e interactiva para ingenieros civiles, estudiantes de ingeniería estructural y profesionales interesados en la sismología de la región de Venezuela.

@@ -1449,6 +1449,19 @@
         "real": true
     },
     {
+        "id": "232adae6-6fc1-4c73-8a19-e969ac432b06",
+        "name": "Residencia karina",
+        "zone": "Caribe",
+        "address": "Av. Granada, Caraballeda 1165, La Guaira, Venezuela",
+        "lat": 10.61147,
+        "lng": -66.83846,
+        "floors": 5,
+        "status": "collapsed",
+        "damage_level": "total",
+        "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/00f15a93-a2a9-43af-848a-d76fa98846b7.jpg",
+        "real": true
+    },
+    {
         "id": "b20f95af-c836-4b66-83e1-a8599b2dee12",
         "name": "Residencias Aguamarina",
         "zone": "Macuto",
@@ -1563,6 +1576,32 @@
         "status": "collapsed",
         "damage_level": "total",
         "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/c505d082-b0f2-476e-9002-bb15b04b8218.png",
+        "real": true
+    },
+    {
+        "id": "ee743536-a421-4544-af81-2d1431ba3f96",
+        "name": "Residencia Solymar",
+        "zone": "Caraballeda",
+        "address": "J56H+54G, Caraballeda 1165, La Guaira, Venezuela",
+        "lat": 10.61044,
+        "lng": -66.82217,
+        "floors": 5,
+        "status": "collapsed",
+        "damage_level": "total",
+        "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/8f0fd972-1e99-46fd-aede-4baf89a51e26.jpg",
+        "real": true
+    },
+    {
+        "id": "45a21cfe-abef-4a71-b183-b9e882522f50",
+        "name": "Solymar",
+        "zone": "Caraballeda",
+        "address": "J56H+54G, Caraballeda 1165, La Guaira, Venezuela",
+        "lat": 10.61044,
+        "lng": -66.82217,
+        "floors": 4,
+        "status": "damaged",
+        "damage_level": "severo",
+        "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/f5849148-0b78-41fd-a3f1-df5895f6bb4f.jpg",
         "real": true
     },
     {
@@ -1729,6 +1768,19 @@
         "lat": 10.61255,
         "lng": -66.84954,
         "floors": 4,
+        "status": "damaged",
+        "damage_level": "parcial",
+        "photo": null,
+        "real": true
+    },
+    {
+        "id": "2284045f-0b12-4b1e-aff7-bff41de7875d",
+        "name": "Edificio Solymar",
+        "zone": "Caraballeda",
+        "address": "J56H+54G, Caraballeda 1165, La Guaira, Venezuela",
+        "lat": 10.61044,
+        "lng": -66.82217,
+        "floors": 5,
         "status": "damaged",
         "damage_level": "parcial",
         "photo": null,
