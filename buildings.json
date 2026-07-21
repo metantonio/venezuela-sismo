@@ -2209,7 +2209,7 @@
         "address": "C. Perro Seco, Caraballeda 1165, La Guaira, Venezuela",
         "lat": 10.60612,
         "lng": -66.84508,
-        "floors": 2,
+        "floors": 3,
         "status": "damaged",
         "damage_level": "severo",
         "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/7df385f2-2dea-4e3d-990e-ce366933bf52.jpg",
