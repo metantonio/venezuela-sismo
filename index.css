@@ -1168,7 +1168,9 @@ select option {
 }
 
 /* Ocultar la franja de métricas en pestañas sin simulación (Mapa de Daño, Boletín) */
-.metrics-board.metrics-hidden {
+.metrics-board.metrics-hidden,
+.mobile-floating-controls.controls-hidden,
+.control-panel.panel-hidden {
     display: none !important;
 }
 

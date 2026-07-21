@@ -225,11 +225,23 @@ function initUI() {
                 menuToggle.classList.remove("active");
             }
 
-            // La franja de métricas sísmicas solo aplica a pestañas de simulación
+            // Ocultar controles de simulación 3D y cinta de tiempo en vistas secundarias / especializadas
+            const nonSimTabs = ["tab-vision", "tab-vargas", "tab-calc", "tab-damage-map", "tab-city", "tab-boletin", "tab-sismos", "tab-info"];
+            const isNonSimTab = nonSimTabs.includes(tabId);
+
             const metricsBoard = document.querySelector(".metrics-board");
             if (metricsBoard) {
-                const hideMetrics = (tabId === "tab-damage-map" || tabId === "tab-boletin" || tabId === "tab-city");
-                metricsBoard.classList.toggle("metrics-hidden", hideMetrics);
+                metricsBoard.classList.toggle("metrics-hidden", isNonSimTab);
+            }
+
+            const mobileControls = document.querySelector(".mobile-floating-controls");
+            if (mobileControls) {
+                mobileControls.classList.toggle("controls-hidden", isNonSimTab);
+            }
+
+            const controlPanel = document.querySelector(".control-panel");
+            if (controlPanel) {
+                controlPanel.classList.toggle("panel-hidden", isNonSimTab);
             }
 
             // El render 3D de la ciudad solo corre mientras su pestaña está activa
