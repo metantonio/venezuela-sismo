@@ -18,7 +18,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="index.css?v=1132">
+    <link rel="stylesheet" href="index.css?v=1133">
     <!-- Leaflet.js Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -1010,6 +1010,25 @@
                                     </div>
                                     <div class="chart-wrapper-small">
                                         <canvas id="hysteresis-2019-chart"></canvas>
+                                        <div class="hyst-label font-2019">COVENIN 2019</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- BALANCE DE ENERGÍA SÍSMICA -->
+                            <div class="chart-container-full">
+                                <h4><i class="fa-solid fa-bolt-lightning"></i> Balance de Energía Sísmica</h4>
+                                <p style="font-size: 12px; color: var(--text-muted); margin: -4px 0 10px; line-height: 1.5;">
+                                    Descomposición energética: E<sub>input</sub> = E<sub>cinética</sub> + E<sub>elástica</sub> + E<sub>amortiguamiento</sub> + E<sub>histerética</sub>.
+                                    La energía histerética (rojo) representa daño irreversible acumulado en la estructura.
+                                </p>
+                                <div class="grid-hysteresis">
+                                    <div class="chart-wrapper-small">
+                                        <canvas id="energy-2001-chart"></canvas>
+                                        <div class="hyst-label font-2001">COVENIN 2001</div>
+                                    </div>
+                                    <div class="chart-wrapper-small">
+                                        <canvas id="energy-2019-chart"></canvas>
                                         <div class="hyst-label font-2019">COVENIN 2019</div>
                                     </div>
                                 </div>
@@ -3424,6 +3443,14 @@
                             <span class="m-label">Evacuación:</span>
                             <span class="m-value" id="evac-2001" style="font-weight: 600;">Desactivada</span>
                         </div>
+                        <div class="metric-row">
+                            <span class="m-label"><i class="fa-solid fa-bolt-lightning" style="color: #f59e0b;"></i> E. Entrada:</span>
+                            <span class="m-value" id="energy-input-2001" style="font-weight: 600;">0 kJ</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="m-label"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> Disipación:</span>
+                            <span class="m-value" id="energy-ratio-2001" style="font-size: 11px;">—</span>
+                        </div>
                         <div class="metric-status" id="status-2001">Estable</div>
                     </div>
 
@@ -3440,6 +3467,14 @@
                         <div class="metric-row">
                             <span class="m-label">Evacuación:</span>
                             <span class="m-value" id="evac-2019" style="font-weight: 600;">Desactivada</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="m-label"><i class="fa-solid fa-bolt-lightning" style="color: #f59e0b;"></i> E. Entrada:</span>
+                            <span class="m-value" id="energy-input-2019" style="font-weight: 600;">0 kJ</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="m-label"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> Disipación:</span>
+                            <span class="m-value" id="energy-ratio-2019" style="font-size: 11px;">—</span>
                         </div>
                         <div class="metric-status" id="status-2019">Estable</div>
                     </div>
@@ -3615,7 +3650,7 @@
             </div>
 
             <!-- Custom JavaScript -->
-            <script src="app.js?v=1132"></script>
+            <script src="app.js?v=1133"></script>
 </body>
 
 </html>

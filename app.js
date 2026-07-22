@@ -28,6 +28,8 @@ let accelChartInstance = null;
 let dispChartInstance = null;
 let hyst2001ChartInstance = null;
 let hyst2019ChartInstance = null;
+let energy2001ChartInstance = null;
+let energy2019ChartInstance = null;
 let vargasChartInstance = null;
 let damageMapInstance = null; // Leaflet map for damage visualization
 
@@ -260,6 +262,8 @@ function initUI() {
                 if (dispChartInstance) dispChartInstance.resize();
                 if (hyst2001ChartInstance) hyst2001ChartInstance.resize();
                 if (hyst2019ChartInstance) hyst2019ChartInstance.resize();
+                if (energy2001ChartInstance) energy2001ChartInstance.resize();
+                if (energy2019ChartInstance) energy2019ChartInstance.resize();
             } else if (tabId === "tab-sismos") {
                 const container = document.getElementById("sismos-list-container");
                 if (container && container.children.length === 0) {
@@ -1265,6 +1269,17 @@ class BuildingModel {
 
         this.history = { time: [], roofDisp: [], groundDrift: [], groundShear: [] };
 
+        // --- Balance de Energía Sísmica ---
+        this.energyHistory = {
+            input: [],      // E_input acumulada (J)
+            kinetic: [],    // E_cinética instantánea (J)
+            strain: [],     // E_deformación elástica instantánea (J)
+            damping: [],    // E_amortiguamiento acumulada (J)
+            hysteretic: []  // E_histerética acumulada (J)
+        };
+        this.E_input_cum = 0;    // Energía de entrada acumulada
+        this.E_damping_cum = 0;  // Energía de amortiguamiento acumulada
+
         const w1_x = 2.0 * Math.sqrt(this.k_init_x / this.m) * Math.sin(Math.PI / (4.0 * N + 2.0));
         const w2_x = 2.0 * Math.sqrt(this.k_init_x / this.m) * Math.sin(3.0 * Math.PI / (4.0 * N + 2.0));
         const w1_y = 2.0 * Math.sqrt(this.k_init_y / this.m) * Math.sin(Math.PI / (4.0 * N + 2.0));
@@ -1423,6 +1438,48 @@ class BuildingModel {
         this.history.roofDisp.push(this.x[N - 1]);
         this.history.groundDrift.push(this.x[0] / this.h);
         this.history.groundShear.push(storyForces[0]);
+
+        // --- Balance de Energía Sísmica ---
+        // E_input: Energía inyectada por el sismo = ∑ (-m × a_g × G × v_i) × dt
+        let dE_input = 0;
+        for (let i = 0; i < N; i++) {
+            dE_input += -this.m * a_ground * G * this.v[i] * dt;
+        }
+        this.E_input_cum += dE_input;
+
+        // E_kinetic: Energía cinética instantánea = ∑ ½ × m × v²
+        let E_kinetic = 0;
+        for (let i = 0; i < N; i++) {
+            E_kinetic += 0.5 * this.m * this.v[i] * this.v[i];
+        }
+
+        // E_strain: Energía de deformación elástica recuperable = ∑ ½ × k × (u - u_p)²
+        let E_strain = 0;
+        for (let i = 0; i < N; i++) {
+            const u_i = this.x[i] - ((i === 0) ? 0 : this.x[i - 1]);
+            const u_elastic = u_i - this.u_p[i];
+            E_strain += 0.5 * this.k[i] * u_elastic * u_elastic;
+        }
+
+        // E_damping: Energía disipada por amortiguamiento viscoso (acumulada)
+        let dE_damping = 0;
+        for (let i = 0; i < N; i++) {
+            dE_damping += f_damp[i] * this.v[i] * dt;
+        }
+        this.E_damping_cum += Math.abs(dE_damping);
+
+        // E_hysteretic: Energía histerética acumulada = ∑ E_h[i]
+        let E_hysteretic = 0;
+        for (let i = 0; i < N; i++) {
+            E_hysteretic += this.E_h[i];
+        }
+
+        // Guardar en historial (en kJ para legibilidad)
+        this.energyHistory.input.push(Math.abs(this.E_input_cum) / 1000);
+        this.energyHistory.kinetic.push(E_kinetic / 1000);
+        this.energyHistory.strain.push(E_strain / 1000);
+        this.energyHistory.damping.push(this.E_damping_cum / 1000);
+        this.energyHistory.hysteretic.push(E_hysteretic / 1000);
     }
 }
 
@@ -4834,6 +4891,109 @@ function resetChartsData() {
             plugins: { legend: { display: false } }
         }
     });
+
+    // Gráficos de Balance de Energía Sísmica (áreas apiladas)
+    function createEnergyChart(canvasId) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        const datasets = [
+            {
+                label: 'E. Histerética (Daño)',
+                data: [],
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.35)',
+                borderWidth: 1.2,
+                pointRadius: 0,
+                fill: true,
+                order: 4
+            },
+            {
+                label: 'E. Amortiguamiento',
+                data: [],
+                borderColor: '#f59e0b',
+                backgroundColor: 'rgba(245, 158, 11, 0.30)',
+                borderWidth: 1.2,
+                pointRadius: 0,
+                fill: true,
+                order: 3
+            },
+            {
+                label: 'E. Deformación',
+                data: [],
+                borderColor: '#22c55e',
+                backgroundColor: 'rgba(34, 197, 94, 0.25)',
+                borderWidth: 1.2,
+                pointRadius: 0,
+                fill: true,
+                order: 2
+            },
+            {
+                label: 'E. Cinética',
+                data: [],
+                borderColor: '#06b6d4',
+                backgroundColor: 'rgba(6, 182, 212, 0.25)',
+                borderWidth: 1.2,
+                pointRadius: 0,
+                fill: true,
+                order: 1
+            },
+            {
+                label: 'E. Entrada (Input)',
+                data: [],
+                borderColor: '#e2e8f0',
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                borderDash: [6, 3],
+                pointRadius: 0,
+                fill: false,
+                order: 0
+            }
+        ];
+        return new Chart(ctx, {
+            type: 'line',
+            data: { labels: [], datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 0 },
+                interaction: { mode: 'index', intersect: false },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Tiempo (s)', color: '#94a3b8' },
+                        grid: { color: 'rgba(255,255,255,0.03)' },
+                        ticks: { color: '#94a3b8', maxTicksLimit: 10 }
+                    },
+                    y: {
+                        title: { display: true, text: 'Energía (kJ)', color: '#94a3b8' },
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#94a3b8' },
+                        stacked: true,
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: '#cbd5e1', font: { size: 10 }, boxWidth: 12, padding: 8 },
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(ctx) {
+                                return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + ' kJ';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    if (energy2001ChartInstance) energy2001ChartInstance.destroy();
+    energy2001ChartInstance = createEnergyChart('energy-2001-chart');
+
+    if (energy2019ChartInstance) energy2019ChartInstance.destroy();
+    energy2019ChartInstance = createEnergyChart('energy-2019-chart');
 }
 
 // Actualizar gráficos en tiempo real con decimación para mejorar performance
@@ -4883,6 +5043,33 @@ function updateChartsRealTime(step) {
         if (data.length > 1000) data.shift();
         hyst2019ChartInstance.update('none');
     }
+
+    // Balance de Energía Sísmica
+    function updateEnergyChart(chartInstance, eqModel) {
+        if (!chartInstance || !eqModel) return;
+        const eh = eqModel.energyHistory;
+        const len = eh.input.length;
+        if (len === 0) return;
+        const idx = len - 1;
+
+        chartInstance.data.labels.push(t.toFixed(1));
+        // datasets[0]=histerética, [1]=amortiguamiento, [2]=deformación, [3]=cinética, [4]=input
+        chartInstance.data.datasets[0].data.push(eh.hysteretic[idx]);
+        chartInstance.data.datasets[1].data.push(eh.damping[idx]);
+        chartInstance.data.datasets[2].data.push(eh.strain[idx]);
+        chartInstance.data.datasets[3].data.push(eh.kinetic[idx]);
+        chartInstance.data.datasets[4].data.push(eh.input[idx]);
+
+        // Mantener máximo 300 puntos
+        if (chartInstance.data.labels.length > 300) {
+            chartInstance.data.labels.shift();
+            chartInstance.data.datasets.forEach(ds => ds.data.shift());
+        }
+        chartInstance.update('none');
+    }
+
+    updateEnergyChart(energy2001ChartInstance, eq2001);
+    updateEnergyChart(energy2019ChartInstance, eq2019);
 }
 
 // --- SIMULACIÓN 3D CON THREE.JS ---
@@ -7916,6 +8103,37 @@ function updateMetricsUI() {
 
     const evac2019El = document.getElementById("evac-2019");
     if (evac2019El) evac2019El.innerHTML = getEvacStatusText(evacuation2019);
+
+    // Métricas de Energía Sísmica
+    function updateEnergyMetric(eqModel, suffix) {
+        const eh = eqModel.energyHistory;
+        const len = eh.input.length;
+        if (len === 0) return;
+        const idx = len - 1;
+
+        const eInputEl = document.getElementById("energy-input-" + suffix);
+        const eRatioEl = document.getElementById("energy-ratio-" + suffix);
+
+        if (eInputEl) {
+            const eInput_kJ = eh.input[idx];
+            eInputEl.textContent = eInput_kJ < 10 ? eInput_kJ.toFixed(2) + " kJ" : eInput_kJ.toFixed(1) + " kJ";
+        }
+        if (eRatioEl) {
+            const eInput = eh.input[idx];
+            const eHyst = eh.hysteretic[idx];
+            const eDamp = eh.damping[idx];
+            if (eInput > 0.001) {
+                const hystPct = ((eHyst / eInput) * 100).toFixed(1);
+                const dampPct = ((eDamp / eInput) * 100).toFixed(1);
+                eRatioEl.innerHTML = `<span style="color: #ef4444;">${hystPct}%</span> daño · <span style="color: #f59e0b;">${dampPct}%</span> amort.`;
+            } else {
+                eRatioEl.textContent = "—";
+            }
+        }
+    }
+
+    updateEnergyMetric(eq2001, "2001");
+    updateEnergyMetric(eq2019, "2019");
 
     // Actualizar datos de la columna seleccionada
     updateSelectedColumnPanel();
