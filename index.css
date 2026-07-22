@@ -1155,14 +1155,16 @@ select option {
 
 /* ---------- METRICS BOARD ---------- */
 .metrics-board {
-    height: 104px;
+    height: auto;
+    min-height: 112px;
+    max-height: 125px;
     background: rgba(6, 9, 16, 0.88);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-top: 1px solid var(--border-color);
     display: flex;
-    padding: 13px 20px;
-    gap: 16px;
+    padding: 8px 16px;
+    gap: 12px;
     z-index: 10;
     flex-shrink: 0;
 }
@@ -1179,7 +1181,7 @@ select option {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    padding: 8px 16px;
+    padding: 6px 14px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1187,6 +1189,32 @@ select option {
     overflow: hidden;
     box-shadow: var(--shadow-card);
     min-width: 0;
+}
+
+.building-card-2001,
+.building-card-2019 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto auto;
+    grid-auto-flow: column;
+    gap: 1px 14px;
+    align-content: center;
+    padding: 6px 12px 6px 16px !important;
+}
+
+.building-card-2001 .metric-header,
+.building-card-2019 .metric-header {
+    grid-column: 1 / -1;
+    margin-bottom: 2px;
+}
+
+.building-card-2001 .metric-status,
+.building-card-2019 .metric-status {
+    justify-self: end;
+    margin-top: 0 !important;
+    padding: 1px 7px !important;
+    font-size: 9px !important;
+    align-self: center !important;
 }
 
 .metric-card::before {
