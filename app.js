@@ -10161,7 +10161,25 @@ async function initDamageMap() {
 
                     <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 8px 0;"></div>
 
-                    <!-- Sección 2: Capas Activas del Mapa -->
+                    <!-- Sección 2: Filtrar por Boletín / Estado -->
+                    <div style="margin-bottom: 10px;">
+                        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 6px; display: flex; align-items: center; gap: 5px;">
+                            <i class="fa-solid fa-filter" style="color: #38bdf8;"></i> Filtrar por Boletín / Estado:
+                        </div>
+                        <select id="map-panel-status-filter" style="width: 100%; padding: 5px 8px; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; color: #fff; font-size: 11px; outline: none; cursor: pointer;">
+                            <option value="all">Todos los Registros</option>
+                            <option value="boletin-rojo">🔴 Boletín Rojo (Inhabitable en Pie)</option>
+                            <option value="boletin-amarillo">🟡 Boletín Amarillo (Restringido)</option>
+                            <option value="boletin-verde">🟢 Boletín Verde (Habitable)</option>
+                            <option value="collapsed">⬛ Colapso Estructural (Derrumbados)</option>
+                            <option value="requested">📋 Evaluaciones Solicitadas</option>
+                            <option value="atr">⚠️ En Zona ATR (Riesgo)</option>
+                        </select>
+                    </div>
+
+                    <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 8px 0;"></div>
+
+                    <!-- Sección 3: Capas Activas del Mapa -->
                     <div>
                         <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 6px; display: flex; align-items: center; gap: 5px;">
                             <i class="fa-solid fa-layer-group" style="color: #00f2fe;"></i> Capas activas del mapa:
@@ -10295,7 +10313,7 @@ async function initDamageMap() {
         }
     });
 
-    // --- Color coding by building status and probability ---
+    // --- Color coding by building status, boletin, and probability ---
     function getColor(input, norm = currentNorm) {
         if (input === null || input === undefined) return '#ffb703';
         if (typeof input === 'number') {
@@ -10307,8 +10325,11 @@ async function initDamageMap() {
             return '#2ec4b6';
         }
         if (typeof input === 'object') {
-            if (input.status === 'collapsed') return '#111111';
-            if (input.status === 'damaged') return '#fb8500'; // Naranja para estructuras en pie con daño
+            if (input.status === 'collapsed') return '#111111'; // Colapso total (Negro)
+            if (input.boletin === 'rojo') return '#e63946';     // Boletín Rojo / Inhabitable en pie (Rojo)
+            if (input.boletin === 'amarillo') return '#ffb703'; // Boletín Amarillo / Restringido (Amarillo)
+            if (input.boletin === 'verde') return '#2ec4b6';    // Boletín Verde / Habitable (Verde)
+            if (input.status === 'damaged') return '#fb8500';   // Dañado sin boletín especificado (Naranja)
             if (input.status === 'survived') return '#2ec4b6';
 
             const prob = norm === '2001' ? input.p2001 : input.p2019;
@@ -10323,17 +10344,21 @@ async function initDamageMap() {
     }
 
     function getStatusLabel(b) {
-        const buildingStatus = typeof b === 'object' ? b.status : arguments[1];
-        if (buildingStatus === 'collapsed') return { text: 'COLAPSÓ', cls: 'popup-status-collapsed', icon: 'fa-house-chimney-crack' };
-        if (buildingStatus === 'damaged') return { text: 'DAÑO SEVERO (EN PIE)', cls: 'popup-status-damaged', icon: 'fa-house-crack' };
-        if (buildingStatus === 'survived') return { text: 'RESISTIÓ', cls: 'popup-status-survived', icon: 'fa-shield-halved' };
+        if (typeof b === 'object') {
+            if (b.status === 'collapsed') return { text: 'COLAPSO ESTRUCTURAL', cls: 'popup-status-collapsed', icon: 'fa-house-chimney-crack' };
+            if (b.boletin === 'rojo') return { text: 'INHABITABLE (BOLETÍN ROJO)', cls: 'popup-status-collapsed', icon: 'fa-ban' };
+            if (b.boletin === 'amarillo') return { text: 'USO RESTRINGIDO (AMARILLO)', cls: 'popup-status-damaged', icon: 'fa-triangle-exclamation' };
+            if (b.boletin === 'verde') return { text: 'HABITABLE (BOLETÍN VERDE)', cls: 'popup-status-survived', icon: 'fa-circle-check' };
+            if (b.status === 'damaged') return { text: 'DAÑO ESTRUCTURAL (EN PIE)', cls: 'popup-status-damaged', icon: 'fa-house-crack' };
+            if (b.status === 'survived') return { text: 'ESTRUCTURA SEGURA', cls: 'popup-status-survived', icon: 'fa-shield-halved' };
+        }
 
         const prob = typeof b === 'object' ? (currentNorm === '2001' ? b.p2001 : b.p2019) : b;
-        if (prob === null || prob === undefined) return { text: 'DAÑO SEVERO (EN PIE)', cls: 'popup-status-damaged', icon: 'fa-house-crack' };
-        if (prob >= 100) return { text: 'COLAPSÓ', cls: 'popup-status-collapsed', icon: 'fa-house-chimney-crack' };
+        if (prob === null || prob === undefined) return { text: 'DAÑO ESTRUCTURAL (EN PIE)', cls: 'popup-status-damaged', icon: 'fa-house-crack' };
+        if (prob >= 100) return { text: 'COLAPSO ESTRUCTURAL', cls: 'popup-status-collapsed', icon: 'fa-house-chimney-crack' };
         if (prob >= 70) return { text: 'DAÑO SEVERO', cls: 'popup-status-damaged', icon: 'fa-house-crack' };
         if (prob >= 40) return { text: 'DAÑO MODERADO', cls: 'popup-status-damaged', icon: 'fa-exclamation-triangle' };
-        return { text: 'RESISTIÓ', cls: 'popup-status-survived', icon: 'fa-shield-halved' };
+        return { text: 'ESTRUCTURA SEGURA', cls: 'popup-status-survived', icon: 'fa-shield-halved' };
     }
 
     // --- Create markers ---
@@ -10561,11 +10586,12 @@ async function initDamageMap() {
     // --- Search & Filter Logic ---
     const searchInput = document.getElementById('damage-map-search');
     const statusSelect = document.getElementById('damage-map-status-filter');
+    const panelStatusSelect = document.getElementById('map-panel-status-filter');
     const countBadge = document.getElementById('damage-map-count-badge');
 
     function applyFilters() {
         const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
-        const selectedStatus = statusSelect ? statusSelect.value : 'all';
+        const selectedStatus = statusSelect ? statusSelect.value : (panelStatusSelect ? panelStatusSelect.value : 'all');
 
         const filtered = buildings.filter(b => {
             // Text search match (name, zone, address)
@@ -10574,16 +10600,26 @@ async function initDamageMap() {
                 (b.zone && b.zone.toLowerCase().includes(query)) ||
                 (b.address && b.address.toLowerCase().includes(query));
 
-            // Status filter match
+            // Status & Boletin filter match
             let matchStatus = true;
             const prob = currentNorm === '2001' ? b.p2001 : b.p2019;
 
-            if (selectedStatus === 'collapsed') {
+            if (selectedStatus === 'boletin-rojo') {
+                matchStatus = b.boletin === 'rojo';
+            } else if (selectedStatus === 'boletin-amarillo') {
+                matchStatus = b.boletin === 'amarillo';
+            } else if (selectedStatus === 'boletin-verde') {
+                matchStatus = b.boletin === 'verde';
+            } else if (selectedStatus === 'collapsed') {
                 matchStatus = b.status === 'collapsed' || prob >= 100;
             } else if (selectedStatus === 'damaged') {
                 matchStatus = b.status === 'damaged' || (prob >= 40 && prob < 100);
             } else if (selectedStatus === 'survived') {
                 matchStatus = b.status === 'survived' || prob < 40;
+            } else if (selectedStatus === 'requested') {
+                matchStatus = !!b.requested;
+            } else if (selectedStatus === 'atr') {
+                matchStatus = !!b.atr;
             }
 
             return matchText && matchStatus;
@@ -10613,7 +10649,16 @@ async function initDamageMap() {
         searchInput.addEventListener('input', applyFilters);
     }
     if (statusSelect) {
-        statusSelect.addEventListener('change', applyFilters);
+        statusSelect.addEventListener('change', (e) => {
+            if (panelStatusSelect) panelStatusSelect.value = e.target.value;
+            applyFilters();
+        });
+    }
+    if (panelStatusSelect) {
+        panelStatusSelect.addEventListener('change', (e) => {
+            if (statusSelect) statusSelect.value = e.target.value;
+            applyFilters();
+        });
     }
 
     // --- Summary Table Rendering ---

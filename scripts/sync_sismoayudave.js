@@ -163,12 +163,20 @@ async function runSync() {
 
         let status = 'damaged';
         let damageLevel = 'parcial';
-        if (boletin === 'rojo') {
+
+        const etiquetaLower = (attr.etiqueta || '').toLowerCase();
+        const decLower = (attr.decision_final || '').toLowerCase();
+        const riesgoLower = (attr.riesgo_estructural || '').toLowerCase();
+
+        if (etiquetaLower.includes('colapso') || decLower.includes('colapso') || riesgoLower.includes('colapso')) {
             status = 'collapsed';
             damageLevel = 'total';
-        } else if (boletin === 'amarillo') {
+        } else if (boletin === 'rojo') {
             status = 'damaged';
             damageLevel = 'severo';
+        } else if (boletin === 'amarillo') {
+            status = 'damaged';
+            damageLevel = 'parcial';
         } else if (boletin === 'verde') {
             status = 'damaged';
             damageLevel = 'leve';
@@ -197,9 +205,13 @@ async function runSync() {
             const existing = localBuildings[existingIdx];
             if (boletin) existing.boletin = boletin;
             if (attr.codigo) existing.code_civ = attr.codigo;
-            if (existing.status !== 'collapsed' && civBuilding.status === 'collapsed') {
+            if (civBuilding.status === 'collapsed') {
                 existing.status = 'collapsed';
                 existing.damage_level = 'total';
+            } else if (existing.status === 'collapsed' && civBuilding.status === 'damaged') {
+                // Se corrige la asignación previa: Boletín Rojo = Inhabitable En Pie (Daño Severo)
+                existing.status = 'damaged';
+                existing.damage_level = 'severo';
             }
             updatedCount++;
         } else {
