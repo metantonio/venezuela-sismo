@@ -10072,11 +10072,50 @@ async function initDamageMap() {
         rect.bindTooltip(`Roca Dura: ${rng.label}`, { sticky: true });
     });
 
+    // 5. Zonas de Riesgo ATR (SismoAyuda VE / CIV)
+    const atrGroup = L.layerGroup();
+    try {
+        const atrResponse = await fetch('zonas_atr.json');
+        if (atrResponse.ok) {
+            const atrData = await atrResponse.json();
+            L.geoJSON(atrData, {
+                style: function () {
+                    return {
+                        color: '#ef4444',
+                        weight: 1.5,
+                        dashArray: '4, 4',
+                        fillColor: '#dc2626',
+                        fillOpacity: 0.22
+                    };
+                },
+                onEachFeature: function (feature, layer) {
+                    const props = feature.properties || {};
+                    const zoneId = props.ZoneID || props.OBJECTID || '';
+                    const parroquia = props.PARROQUIA || props.MUNICIPIO || 'Vargas';
+                    layer.bindPopup(`
+                        <div style="font-family:'Inter',sans-serif; font-size:12px; color:#fff;">
+                            <strong style="color:#ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Zona ATR - Área de Tratamiento de Riesgo</strong><br>
+                            <p style="margin:6px 0 0 0; line-height:1.4; color:#94a3b8;">
+                                <strong>Zona ID:</strong> ${zoneId} (${parroquia})<br>
+                                Zona delimitada por vulnerabilidad sísmica, geotécnica y riesgo de colapso estructurado (SismoAyuda VE / CIV).
+                            </p>
+                        </div>
+                    `);
+                    layer.bindTooltip(`Zona ATR: ${zoneId}`, { sticky: true, className: "fault-tooltip" });
+                }
+            }).addTo(atrGroup);
+        }
+    } catch (err) {
+        console.error('Error al cargar capa de Zonas ATR:', err);
+    }
+
     // Añadir al mapa por defecto
     faultsGroup.addTo(map);
+    atrGroup.addTo(map);
 
     // Controles de capas
     const overlayLayers = {
+        '<span style="color:#ef4444; font-weight:600;"><i class="fa-solid fa-triangle-exclamation"></i> Zonas de Riesgo ATR (SismoAyuda VE)</span>': atrGroup,
         '<span style="color:#f87171; font-weight:600;"><i class="fa-solid fa-bolt"></i> Fallas Geológicas (FUNVISIS)</span>': faultsGroup,
         '<span style="color:#fb923c; font-weight:600;"><i class="fa-solid fa-house-crack"></i> Zonas de Intensidad (MMI 1967)</span>': impactZonesGroup,
         '<span style="color:#e63946; font-weight:600;"><i class="fa-solid fa-gauge-high"></i> Aceleración de Suelo (PGA 2026)</span>': pgaGroup,
@@ -10255,6 +10294,28 @@ async function initDamageMap() {
             }
         }
 
+        let atrHtml = '';
+        if (b.atr) {
+            atrHtml = `
+                <div style="text-align: center; margin-top: 4px;">
+                    <span class="popup-status-badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); text-transform: none; letter-spacing: normal;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> En Zona ATR (${b.atr_zone || 'Riesgo'})
+                    </span>
+                </div>
+            `;
+        }
+
+        let requestedHtml = '';
+        if (b.requested) {
+            requestedHtml = `
+                <div style="text-align: center; margin-top: 4px;">
+                    <span class="popup-status-badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); text-transform: none; letter-spacing: normal;">
+                        <i class="fa-solid fa-clipboard-list"></i> Evaluación Solicitada
+                    </span>
+                </div>
+            `;
+        }
+
         return `
             <div class="popup-building-name">
                 <i class="fa-solid fa-building" style="color: ${color};"></i>
@@ -10278,6 +10339,8 @@ async function initDamageMap() {
                 </span>
             </div>
             ${boletinHtml}
+            ${atrHtml}
+            ${requestedHtml}
             ${confirmedBadge}
             ${photoHtml}
         `;

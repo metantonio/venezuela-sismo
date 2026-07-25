@@ -132,6 +132,23 @@ node tools/aplicar-coordenadas-osm.js --umbral-m 100 --aplicar # Exige umbral es
 ```
 ---
 
+## 🗺️ Sincronización de Datos con SismoAyuda VE (ArcGIS)
+
+Script creado: `scripts/sync_sismoayudave.js`
+
+Permite sincronizar automáticamente los datos abiertos del operativo post-sismo desde la plataforma SismoAyuda VE (ArcGIS Online):
+- Inspecciones presenciales del CIV (etiquetas de boletín: verde, amarillo, rojo).
+- Solicitudes de inspección de edificaciones.
+- Evaluación espacial de pertenencia a Zonas ATR (Áreas de Tratamiento de Riesgo).
+
+```bash
+node scripts/sync_sismoayudave.js
+```
+El script genera un respaldo automático `buildings.backup-<timestamp>.json` antes de actualizar `buildings.json`.
+
+---
+
+
 ## 📝 Autor e Información Académica
 
 Este proyecto ha sido desarrollado como una herramienta educativa e interactiva para ingenieros civiles, estudiantes de ingeniería estructural y profesionales interesados en la sismología de la región de Venezuela.
