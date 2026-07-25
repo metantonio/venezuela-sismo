@@ -9850,53 +9850,6 @@ async function initDamageMap() {
         positionControl.updateHTML(e.latlng.lat, e.latlng.lng);
     });
 
-    // --- Control de Enfoque Geográfico (Caracas / La Guaira / Ver Todo) ---
-    const RegionControl = L.Control.extend({
-        options: { position: 'topleft' },
-        onAdd: function () {
-            const div = L.DomUtil.create('div', 'leaflet-control-region-preset');
-            L.DomEvent.disableClickPropagation(div);
-            div.style.display = 'flex';
-            div.style.gap = '4px';
-            div.style.background = 'rgba(15, 23, 42, 0.85)';
-            div.style.padding = '4px 6px';
-            div.style.borderRadius = '8px';
-            div.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-            div.style.backdropFilter = 'blur(6px)';
-            div.style.boxShadow = '0 4px 12px rgba(0,0,0,0.5)';
-            div.innerHTML = `
-                <button id="btn-region-petunia" title="Enfocar Torre Petunia (Los Palos Grandes)" style="background: rgba(255,255,255,0.18); border: 1px solid rgba(239, 68, 68, 0.6); color: #ef4444; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-building" style="color: #ef4444;"></i> Torre Petunia</button>
-                <button id="btn-region-all" title="Ver toda la región central" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-globe" style="color: #38bdf8;"></i> Ver Todo</button>
-                <button id="btn-region-caracas" title="Enfocar Área Metropolitana de Caracas" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-city" style="color: #00f2fe;"></i> Caracas</button>
-                <button id="btn-region-vargas" title="Enfocar Corredor Costero de La Guaira" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-water" style="color: #ffb703;"></i> La Guaira</button>
-            `;
-            return div;
-        }
-    });
-    new RegionControl().addTo(map);
-
-    setTimeout(() => {
-        document.getElementById('btn-region-petunia')?.addEventListener('click', () => {
-            map.setView([10.498354, -66.847530], 16);
-            const petuniaObj = markers.find(m => m.building.name && m.building.name.toLowerCase().includes('petunia'));
-            if (petuniaObj) petuniaObj.marker.openPopup();
-        });
-        document.getElementById('btn-region-all')?.addEventListener('click', () => {
-            if (markers.length > 0) {
-                const group = L.featureGroup(markers.map(m => m.marker));
-                map.fitBounds(group.getBounds().pad(0.05));
-            } else {
-                map.setView([10.5400, -66.8800], 11);
-            }
-        });
-        document.getElementById('btn-region-caracas')?.addEventListener('click', () => {
-            map.setView([10.4900, -66.8850], 13);
-        });
-        document.getElementById('btn-region-vargas')?.addEventListener('click', () => {
-            map.setView([10.6140, -66.8650], 13);
-        });
-    }, 200);
-
     // --- Capas de Fallas Geológicas y Zonas de Intensidad (Doublete Sísmico 1967) ---
     const faultsGroup = L.layerGroup();
     const impactZonesGroup = L.layerGroup();
@@ -10161,18 +10114,147 @@ async function initDamageMap() {
     faultsGroup.addTo(map);
     atrGroup.addTo(map);
 
-    // Controles de capas
-    const overlayLayers = {
-        '<span style="color:#ef4444; font-weight:600;"><i class="fa-solid fa-triangle-exclamation"></i> Zonas de Riesgo ATR (SismoAyuda VE)</span>': atrGroup,
-        '<span style="color:#f87171; font-weight:600;"><i class="fa-solid fa-bolt"></i> Fallas Geológicas (FUNVISIS)</span>': faultsGroup,
-        '<span style="color:#fb923c; font-weight:600;"><i class="fa-solid fa-house-crack"></i> Zonas de Intensidad (MMI 1967)</span>': impactZonesGroup,
-        '<span style="color:#e63946; font-weight:600;"><i class="fa-solid fa-gauge-high"></i> Aceleración de Suelo (PGA 2026)</span>': pgaGroup,
-        '<span style="color:#38bdf8; font-weight:600;"><i class="fa-solid fa-layer-group"></i> Profundidad a Roca Dura (0–450m)</span>': bedrockMapGroup
-    };
-    L.control.layers(null, overlayLayers, {
-        collapsed: false,
-        position: 'topright'
-    }).addTo(map);
+    // --- Control Unificado Desplegable: Capas & Ubicaciones ---
+    const UnifiedMapPanel = L.Control.extend({
+        options: { position: 'topright' },
+        onAdd: function () {
+            const container = L.DomUtil.create('div', 'leaflet-control-unified-panel');
+            L.DomEvent.disableClickPropagation(container);
+            L.DomEvent.disableScrollPropagation(container);
+
+            container.style.background = 'rgba(15, 23, 42, 0.92)';
+            container.style.border = '1px solid rgba(255, 255, 255, 0.18)';
+            container.style.borderRadius = '10px';
+            container.style.backdropFilter = 'blur(12px)';
+            container.style.boxShadow = '0 8px 28px rgba(0, 0, 0, 0.55)';
+            container.style.color = '#fff';
+            container.style.fontFamily = "'Inter', system-ui, sans-serif";
+            container.style.fontSize = '12px';
+            container.style.minWidth = '240px';
+            container.style.maxWidth = '280px';
+            container.style.overflow = 'hidden';
+
+            container.innerHTML = `
+                <!-- Cabecera Desplegable -->
+                <button id="unified-panel-toggle" title="Haga clic para desplegar u ocultar opciones" style="width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: rgba(30, 41, 59, 0.85); border: none; padding: 9px 12px; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; border-bottom: 1px solid rgba(255, 255, 255, 0.1); transition: background 0.2s;">
+                    <span style="display: flex; align-items: center; gap: 7px;">
+                        <i class="fa-solid fa-sliders" style="color: #00f2fe;"></i>
+                        Capas &amp; Ubicación
+                    </span>
+                    <i id="unified-panel-arrow" class="fa-solid fa-chevron-down" style="color: #94a3b8; transition: transform 0.25s ease;"></i>
+                </button>
+
+                <!-- Cuerpo Desplegable -->
+                <div id="unified-panel-body" style="padding: 10px 12px; display: block;">
+                    <!-- Sección 1: Ir a Ubicación -->
+                    <div style="margin-bottom: 10px;">
+                        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 6px; display: flex; align-items: center; gap: 5px;">
+                            <i class="fa-solid fa-location-dot" style="color: #ffb703;"></i> Ir a lugar específico:
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                            <button id="btn-loc-petunia" style="background: rgba(239, 68, 68, 0.18); border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171; padding: 5px 6px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; text-align: left; transition: background 0.2s;"><i class="fa-solid fa-building"></i> Torre Petunia</button>
+                            <button id="btn-loc-all" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #e2e8f0; padding: 5px 6px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: left; transition: background 0.2s;"><i class="fa-solid fa-globe" style="color: #38bdf8;"></i> Ver Todo</button>
+                            <button id="btn-loc-caracas" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #e2e8f0; padding: 5px 6px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: left; transition: background 0.2s;"><i class="fa-solid fa-city" style="color: #00f2fe;"></i> Caracas</button>
+                            <button id="btn-loc-vargas" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #e2e8f0; padding: 5px 6px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: left; transition: background 0.2s;"><i class="fa-solid fa-water" style="color: #ffb703;"></i> La Guaira</button>
+                        </div>
+                    </div>
+
+                    <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 8px 0;"></div>
+
+                    <!-- Sección 2: Capas Activas del Mapa -->
+                    <div>
+                        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 6px; display: flex; align-items: center; gap: 5px;">
+                            <i class="fa-solid fa-layer-group" style="color: #00f2fe;"></i> Capas activas del mapa:
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 11px; user-select: none;">
+                                <input type="checkbox" id="chk-layer-atr" checked style="accent-color: #ef4444; cursor: pointer;">
+                                <span style="color: #ef4444; font-weight: 600;"><i class="fa-solid fa-triangle-exclamation"></i> Zonas ATR (SismoAyuda VE)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 11px; user-select: none;">
+                                <input type="checkbox" id="chk-layer-faults" checked style="accent-color: #f87171; cursor: pointer;">
+                                <span style="color: #f87171; font-weight: 600;"><i class="fa-solid fa-bolt"></i> Fallas Geológicas (FUNVISIS)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 11px; user-select: none;">
+                                <input type="checkbox" id="chk-layer-intensities" style="accent-color: #fb923c; cursor: pointer;">
+                                <span style="color: #fb923c; font-weight: 600;"><i class="fa-solid fa-house-crack"></i> Zonas Intensidad (MMI 1967)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 11px; user-select: none;">
+                                <input type="checkbox" id="chk-layer-pga" style="accent-color: #e63946; cursor: pointer;">
+                                <span style="color: #e63946; font-weight: 600;"><i class="fa-solid fa-gauge-high"></i> PGA (Aceleración Suelo 2026)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 11px; user-select: none;">
+                                <input type="checkbox" id="chk-layer-bedrock" style="accent-color: #38bdf8; cursor: pointer;">
+                                <span style="color: #38bdf8; font-weight: 600;"><i class="fa-solid fa-layer-group"></i> Roca Dura (0–450m)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return container;
+        }
+    });
+    new UnifiedMapPanel().addTo(map);
+
+    setTimeout(() => {
+        const toggleBtn = document.getElementById('unified-panel-toggle');
+        const panelBody = document.getElementById('unified-panel-body');
+        const arrow = document.getElementById('unified-panel-arrow');
+
+        if (toggleBtn && panelBody) {
+            toggleBtn.addEventListener('click', () => {
+                const isHidden = panelBody.style.display === 'none';
+                panelBody.style.display = isHidden ? 'block' : 'none';
+                if (arrow) arrow.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(-90deg)';
+            });
+        }
+
+        document.getElementById('btn-loc-petunia')?.addEventListener('click', () => {
+            map.setView([10.498354, -66.847530], 16);
+            const petuniaObj = markers.find(m => m.building.name && m.building.name.toLowerCase().includes('petunia'));
+            if (petuniaObj) petuniaObj.marker.openPopup();
+        });
+        document.getElementById('btn-loc-all')?.addEventListener('click', () => {
+            if (markers.length > 0) {
+                const group = L.featureGroup(markers.map(m => m.marker));
+                map.fitBounds(group.getBounds().pad(0.05));
+            } else {
+                map.setView([10.5400, -66.8800], 11);
+            }
+        });
+        document.getElementById('btn-loc-caracas')?.addEventListener('click', () => {
+            map.setView([10.4900, -66.8850], 13);
+        });
+        document.getElementById('btn-loc-vargas')?.addEventListener('click', () => {
+            map.setView([10.6140, -66.8650], 13);
+        });
+
+        const bindLayerChk = (chkId, layerGroup, legendId) => {
+            const chk = document.getElementById(chkId);
+            if (!chk) return;
+            chk.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    map.addLayer(layerGroup);
+                    if (legendId) {
+                        const el = document.getElementById(legendId);
+                        if (el) el.style.display = 'flex';
+                    }
+                } else {
+                    map.removeLayer(layerGroup);
+                    if (legendId) {
+                        const el = document.getElementById(legendId);
+                        if (el) el.style.display = 'none';
+                    }
+                }
+            });
+        };
+
+        bindLayerChk('chk-layer-atr', atrGroup, null);
+        bindLayerChk('chk-layer-faults', faultsGroup, 'legend-geological');
+        bindLayerChk('chk-layer-intensities', impactZonesGroup, 'legend-intensities');
+        bindLayerChk('chk-layer-pga', pgaGroup, 'legend-pga');
+        bindLayerChk('chk-layer-bedrock', bedrockMapGroup, 'legend-bedrock');
+    }, 200);
 
     // Eventos de leyendas dinámicas
     map.on('overlayadd', (e) => {
