@@ -10172,7 +10172,7 @@ async function initDamageMap() {
                             <option value="boletin-amarillo">🟡 Boletín Amarillo (Restringido)</option>
                             <option value="boletin-verde">🟢 Boletín Verde (Habitable)</option>
                             <option value="collapsed">⬛ Colapso Estructural (Derrumbados)</option>
-                            <option value="requested">📋 Evaluaciones Solicitadas</option>
+                            <option value="requested">📋 Solicitudes Pendientes (Sin Inspección)</option>
                             <option value="atr">⚠️ En Zona ATR (Riesgo)</option>
                         </select>
                     </div>
@@ -10461,11 +10461,11 @@ async function initDamageMap() {
         }
 
         let requestedHtml = '';
-        if (b.requested) {
+        if (b.requested && !b.boletin) {
             requestedHtml = `
                 <div style="text-align: center; margin-top: 4px;">
                     <span class="popup-status-badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); text-transform: none; letter-spacing: normal;">
-                        <i class="fa-solid fa-clipboard-list"></i> Evaluación Solicitada
+                        <i class="fa-solid fa-clipboard-list"></i> Solicitud Pendiente
                     </span>
                 </div>
             `;
@@ -10617,7 +10617,8 @@ async function initDamageMap() {
             } else if (selectedStatus === 'survived') {
                 matchStatus = b.status === 'survived' || prob < 40;
             } else if (selectedStatus === 'requested') {
-                matchStatus = !!b.requested;
+                // Solicitudes PENDIENTES (excluye las que ya fueron inspeccionadas y tienen boletín confirmado)
+                matchStatus = !!b.requested && !b.boletin;
             } else if (selectedStatus === 'atr') {
                 matchStatus = !!b.atr;
             }
