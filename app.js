@@ -9800,9 +9800,10 @@ async function initDamageMap() {
     });
 
     // --- Create Leaflet Map ---
+    // Encuadre inicial por defecto centrado en Torre Petunia (Los Palos Grandes, Caracas: [10.498354, -66.847530])
     const map = L.map(container, {
-        center: [10.6140, -66.8650],
-        zoom: 13,
+        center: [10.498354, -66.847530],
+        zoom: 16,
         zoomControl: true,
         attributionControl: true
     });
@@ -9848,6 +9849,53 @@ async function initDamageMap() {
     map.on('mousemove', function (e) {
         positionControl.updateHTML(e.latlng.lat, e.latlng.lng);
     });
+
+    // --- Control de Enfoque Geográfico (Caracas / La Guaira / Ver Todo) ---
+    const RegionControl = L.Control.extend({
+        options: { position: 'topleft' },
+        onAdd: function () {
+            const div = L.DomUtil.create('div', 'leaflet-control-region-preset');
+            L.DomEvent.disableClickPropagation(div);
+            div.style.display = 'flex';
+            div.style.gap = '4px';
+            div.style.background = 'rgba(15, 23, 42, 0.85)';
+            div.style.padding = '4px 6px';
+            div.style.borderRadius = '8px';
+            div.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+            div.style.backdropFilter = 'blur(6px)';
+            div.style.boxShadow = '0 4px 12px rgba(0,0,0,0.5)';
+            div.innerHTML = `
+                <button id="btn-region-petunia" title="Enfocar Torre Petunia (Los Palos Grandes)" style="background: rgba(255,255,255,0.18); border: 1px solid rgba(239, 68, 68, 0.6); color: #ef4444; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-building" style="color: #ef4444;"></i> Torre Petunia</button>
+                <button id="btn-region-all" title="Ver toda la región central" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-globe" style="color: #38bdf8;"></i> Ver Todo</button>
+                <button id="btn-region-caracas" title="Enfocar Área Metropolitana de Caracas" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-city" style="color: #00f2fe;"></i> Caracas</button>
+                <button id="btn-region-vargas" title="Enfocar Corredor Costero de La Guaira" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-water" style="color: #ffb703;"></i> La Guaira</button>
+            `;
+            return div;
+        }
+    });
+    new RegionControl().addTo(map);
+
+    setTimeout(() => {
+        document.getElementById('btn-region-petunia')?.addEventListener('click', () => {
+            map.setView([10.498354, -66.847530], 16);
+            const petuniaObj = markers.find(m => m.building.name && m.building.name.toLowerCase().includes('petunia'));
+            if (petuniaObj) petuniaObj.marker.openPopup();
+        });
+        document.getElementById('btn-region-all')?.addEventListener('click', () => {
+            if (markers.length > 0) {
+                const group = L.featureGroup(markers.map(m => m.marker));
+                map.fitBounds(group.getBounds().pad(0.05));
+            } else {
+                map.setView([10.5400, -66.8800], 11);
+            }
+        });
+        document.getElementById('btn-region-caracas')?.addEventListener('click', () => {
+            map.setView([10.4900, -66.8850], 13);
+        });
+        document.getElementById('btn-region-vargas')?.addEventListener('click', () => {
+            map.setView([10.6140, -66.8650], 13);
+        });
+    }, 200);
 
     // --- Capas de Fallas Geológicas y Zonas de Intensidad (Doublete Sísmico 1967) ---
     const faultsGroup = L.layerGroup();
@@ -10375,6 +10423,14 @@ async function initDamageMap() {
         marker.addTo(map);
         markers.push({ marker, building: b, index: idx });
     });
+
+    // Abrir popup de Torre Petunia por defecto si está presente
+    setTimeout(() => {
+        const petuniaObj = markers.find(m => m.building.name && m.building.name.toLowerCase().includes('petunia'));
+        if (petuniaObj) {
+            petuniaObj.marker.openPopup();
+        }
+    }, 300);
 
     // --- Norm Toggle ---
     function updateMarkersForNorm(norm) {
