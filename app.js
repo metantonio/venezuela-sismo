@@ -9800,10 +9800,10 @@ async function initDamageMap() {
     });
 
     // --- Create Leaflet Map ---
-    // Encuadre inicial por defecto centrado en Torre Petunia (Los Palos Grandes, Caracas: [10.498354, -66.847530])
+    // Encuadre inicial por defecto centrado en el Área Metropolitana de Caracas ([10.4900, -66.8850], zoom: 13)
     const map = L.map(container, {
-        center: [10.498354, -66.847530],
-        zoom: 16,
+        center: [10.4900, -66.8850],
+        zoom: 13,
         zoomControl: true,
         attributionControl: true
     });
@@ -10531,13 +10531,7 @@ async function initDamageMap() {
         markers.push({ marker, building: b, index: idx });
     });
 
-    // Abrir popup de Torre Petunia por defecto si está presente
-    setTimeout(() => {
-        const petuniaObj = markers.find(m => m.building.name && m.building.name.toLowerCase().includes('petunia'));
-        if (petuniaObj) {
-            petuniaObj.marker.openPopup();
-        }
-    }, 300);
+
 
     // --- Norm Toggle ---
     function updateMarkersForNorm(norm) {
