@@ -1,0 +1,48 @@
+{
+  "active_provider": "local",
+  "ai_providers": {
+    "local": {
+      "name": "Local AI (llama.cpp / Ollama)",
+      "type": "llama.cpp",
+      "endpoint": "http://127.0.0.1:8080",
+      "model": "Ternary-Bonsai-27B-Q2_0.gguf",
+      "api_key": "no-needed",
+      "timeout_seconds": 60,
+      "max_tokens": 32000,
+      "temperature": 0.7
+    },
+    "gemini": {
+      "name": "Google Gemini 3.6 Pro",
+      "type": "gemini",
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta",
+      "model": "gemini-3.6-pro",
+      "api_key": "",
+      "timeout_seconds": 120,
+      "max_tokens": 8192
+    },
+    "ollama": {
+      "name": "Ollama Local Model",
+      "type": "openai_compatible",
+      "endpoint": "http://127.0.0.1:11434/v1",
+      "model": "qwen3.6-27b.gguf",
+      "api_key": "",
+      "timeout_seconds": 60,
+      "max_tokens": 8192
+    }
+  },
+  "testing": {
+    "auto_detect_stack": true,
+    "custom_test_command": null,
+    "timeout_seconds": 120
+  },
+  "logging": {
+    "log_file": "QUALEX_LOG.md",
+    "auto_append": true,
+    "max_log_size_kb": 250,
+    "max_recent_entries": 10
+  },
+  "$schema": "https://json.schemastore.org/json",
+  "name": "QualexDev Configuration",
+  "version": "7.6.0",
+  "config_file_used": "qualex_config.json"
+}

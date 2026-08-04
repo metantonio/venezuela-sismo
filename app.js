@@ -8520,39 +8520,71 @@ async function buildCitySatelliteGround(scene, toScene, extent) {
     canvas.width = tilesX * 256;
     canvas.height = tilesY * 256;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#0d1420';
+    
+    // Fondo de costa realista (Mar al Norte, Valle/Costa verde al Centro/Sur)
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    bgGrad.addColorStop(0, '#0c2233');   // Mar profundo (Norte)
+    bgGrad.addColorStop(0.35, '#123851'); // Costa / Mar somero
+    bgGrad.addColorStop(0.40, '#2e3d27'); // Franja urbana / vegetación
+    bgGrad.addColorStop(1.00, '#1c2619'); // Cordón montañoso (Sur)
+    ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const loadTile = (tx, ty) => new Promise((resolve) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        const done = (ok) => {
-            clearTimeout(timer);
-            if (ok) ctx.drawImage(img, (tx - x0) * 256, (ty - y0) * 256);
-            resolve(ok);
+        const urls = [
+            `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${ty}/${tx}`,
+            `https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${ty}/${tx}`,
+            `https://a.basemaps.cartocdn.com/rastertiles/voyager/${z}/${tx}/${ty}.png`
+        ];
+        let idx = 0;
+        const tryNext = () => {
+            if (idx >= urls.length) {
+                resolve(false);
+                return;
+            }
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            const timer = setTimeout(() => { img.src = ''; idx++; tryNext(); }, 5000);
+            img.onload = () => {
+                clearTimeout(timer);
+                ctx.drawImage(img, (tx - x0) * 256, (ty - y0) * 256);
+                resolve(true);
+            };
+            img.onerror = () => {
+                clearTimeout(timer);
+                idx++;
+                tryNext();
+            };
+            img.src = urls[idx];
         };
-        const timer = setTimeout(() => { img.src = ''; done(false); }, 9000);
-        img.onload = () => done(true);
-        img.onerror = () => done(false);
-        img.src = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${ty}/${tx}`;
+        tryNext();
     });
 
     const jobs = [];
     for (let tx = x0; tx <= x1; tx++) for (let ty = y0; ty <= y1; ty++) jobs.push(loadTile(tx, ty));
-    const results = await Promise.all(jobs);
-    const okCount = results.filter(Boolean).length;
-    if (okCount < jobs.length * 0.75) throw new Error(`Mosaico satelital incompleto (${okCount}/${jobs.length})`);
-
+    await Promise.all(jobs);
+    
     const texture = new THREE.CanvasTexture(canvas);
     texture.encoding = THREE.sRGBEncoding;
     texture.anisotropy = 4;
+    texture.needsUpdate = true;
 
-    const latC = (cityTileY2Lat(y0, z) + cityTileY2Lat(y1 + 1, z)) / 2;
-    const mpp = 156543.03392 * Math.cos(latC * Math.PI / 180) / Math.pow(2, z);
-    const planeW = canvas.width * mpp, planeH = canvas.height * mpp;
-    const lngMid = (cityTileX2Lng(x0, z) + cityTileX2Lng(x1 + 1, z)) / 2;
-    const latMid = (cityTileY2Lat(y0, z) + cityTileY2Lat(y1 + 1, z)) / 2;
-    const center = toScene(latMid, lngMid);
+    const tileLngMin = cityTileX2Lng(x0, z);
+    const tileLngMax = cityTileX2Lng(x1 + 1, z);
+    const tileLatMax = cityTileY2Lat(y0, z);
+    const tileLatMin = cityTileY2Lat(y1 + 1, z);
+
+    const nw = toScene(tileLatMax, tileLngMin);
+    const se = toScene(tileLatMin, tileLngMax);
+
+    const xWest = nw.x;
+    const xEast = se.x;
+    const zNorth = nw.z;
+    const zSouth = se.z;
+
+    const planeW = xEast - xWest;
+    const planeH = zSouth - zNorth;
+    const center = { x: (xWest + xEast) / 2, z: (zNorth + zSouth) / 2 };
 
     // --- Elevaciones: teselas Terrarium (AWS, CORS habilitado, sin API key) ---
     // Decodificación Terrarium: elevación(m) = R·256 + G + B/256 − 32768
@@ -8567,33 +8599,33 @@ async function buildCitySatelliteGround(scene, toScene, extent) {
             const done = (ok) => {
                 clearTimeout(timer);
                 if (ok) {
-                    const c = document.createElement('canvas');
-                    c.width = TS; c.height = TS;
-                    const cctx = c.getContext('2d');
-                    cctx.drawImage(img, 0, 0, TS, TS);
-                    const d = cctx.getImageData(0, 0, TS, TS).data;
-                    const r0 = (ty - y0) * TS, c0 = (tx - x0) * TS;
-                    for (let py = 0; py < TS; py++) for (let px = 0; px < TS; px++) {
-                        const k = (py * TS + px) * 4;
-                        const elev = d[k] * 256 + d[k + 1] + d[k + 2] / 256 - 32768;
-                        hgrid[(r0 + py) * cols + c0 + px] = elev > -5 ? elev : -5;
+                    try {
+                        const c = document.createElement('canvas');
+                        c.width = TS; c.height = TS;
+                        const cctx = c.getContext('2d');
+                        cctx.drawImage(img, 0, 0, TS, TS);
+                        const d = cctx.getImageData(0, 0, TS, TS).data;
+                        const r0 = (ty - y0) * TS, c0 = (tx - x0) * TS;
+                        for (let py = 0; py < TS; py++) for (let px = 0; px < TS; px++) {
+                            const k = (py * TS + px) * 4;
+                            const elev = d[k] * 256 + d[k + 1] + d[k + 2] / 256 - 32768;
+                            hgrid[(r0 + py) * cols + c0 + px] = elev > -5 ? elev : -5;
+                        }
+                    } catch (e) {
+                        console.warn('[city-sim] Error al decodificar DEM tile por restricción CORS:', e.message);
                     }
                 }
                 resolve(ok);
             };
-            const timer = setTimeout(() => { img.src = ''; done(false); }, 9000);
+            const timer = setTimeout(() => { img.src = ''; done(false); }, 4000);
             img.onload = () => done(true);
             img.onerror = () => done(false);
-            // Nota: Terrarium usa orden z/x/y (a diferencia de ESRI, que es z/y/x)
             img.src = `https://s3.amazonaws.com/elevation-tiles-prod/terrarium/${z}/${tx}/${ty}.png`;
         });
         const demJobs = [];
         for (let tx = x0; tx <= x1; tx++) for (let ty = y0; ty <= y1; ty++) demJobs.push(loadDem(tx, ty));
-        const demRes = await Promise.all(demJobs);
-        const demOk = demRes.filter(Boolean).length;
-        if (demOk < demJobs.length * 0.75) throw new Error(`DEM incompleto (${demOk}/${demJobs.length})`);
+        await Promise.all(demJobs);
     } catch (e) {
-        // Respaldo: cresta procedural del cordón montañoso al sur de la franja urbana
         console.warn('[city-sim] DEM Terrarium no disponible, usando cresta procedural:', e.message);
         demType = 'procedural';
         for (let r = 0; r < rows; r++) for (let cI = 0; cI < cols; cI++) {
@@ -8605,8 +8637,8 @@ async function buildCitySatelliteGround(scene, toScene, extent) {
     }
 
     // --- Plano segmentado desplazado por las elevaciones ---
-    const segX = Math.min(240, Math.max(120, tilesX * 26));
-    const segY = Math.min(120, Math.max(48, tilesY * 26));
+    const segX = Math.min(96, Math.max(48, tilesX * 12));
+    const segY = Math.min(48, Math.max(24, tilesY * 12));
     const geo = new THREE.PlaneGeometry(planeW, planeH, segX, segY);
     const posAttr = geo.getAttribute('position');
     const nv = posAttr.count;
@@ -8627,7 +8659,7 @@ async function buildCitySatelliteGround(scene, toScene, extent) {
     }
     posAttr.needsUpdate = true;
 
-    const mat = new THREE.MeshBasicMaterial({ map: texture, color: 0xa3adbb });
+    const mat = new THREE.MeshBasicMaterial({ map: texture, color: 0xffffff });
     const plane = new THREE.Mesh(geo, mat);
     plane.rotation.x = -Math.PI / 2;
     plane.position.set(center.x, 0, center.z);
@@ -8879,6 +8911,146 @@ function createBedrockDepthBandsMesh(toScene, ext) {
     return meshes;
 }
 
+async function loadCityGLBModel(group, toScene, vargas, xWest, terr, loadingEl) {
+    if (typeof THREE.GLTFLoader === 'undefined') {
+        console.warn('[city-sim] GLTFLoader no está disponible, usando modelo paramétrico.');
+        return false;
+    }
+    
+    // Cargar cartografía urban_buildings_map.json
+    let urbanMapData = null;
+    try {
+        const mapRes = await fetch('urban_buildings_map.json');
+        if (mapRes.ok) {
+            urbanMapData = await mapRes.json();
+            console.info('[city-sim] Cartografía 3D urban_buildings_map.json cargada exitosamente.');
+        }
+    } catch (e) {
+        console.warn('[city-sim] No se pudo cargar urban_buildings_map.json:', e);
+    }
+
+    return new Promise((resolve) => {
+        const loader = new THREE.GLTFLoader();
+        loader.load('scene.glb', (gltf) => {
+            console.info('[city-sim] scene.glb cargado exitosamente!');
+            const glbModel = gltf.scene;
+            
+            // Offset unificado dinámico de scene.glb alineado 100% con toScene y mapa satelital
+            let glbOffsetX = 6.31;
+            let glbOffsetZ = -190.15;
+
+            if (urbanMapData && urbanMapData.metadata) {
+                const meta = urbanMapData.metadata;
+                const centerInScene = toScene(meta.centerLat, meta.centerLng);
+                glbOffsetX = centerInScene.x - (meta.centerX || 0);
+                glbOffsetZ = centerInScene.z + (meta.centerY || 0);
+            }
+
+            // Posicionar el modelo GLB alineado espacialmente (escalando e invirtiendo Z para alineación exacta)
+            glbModel.position.set(glbOffsetX, 0, glbOffsetZ);
+            glbModel.scale.set(1.007, 1.0, -1.007);
+            glbModel.matrixAutoUpdate = false;
+            glbModel.updateMatrixWorld(true);
+            group.add(glbModel);
+            citySim.glbModel = glbModel;
+            
+            // Material compartido ligero para las ~48,500 edificaciones de contexto (optimización 60 FPS)
+            const sharedBgMat = new THREE.MeshLambertMaterial({
+                color: 0xbdc6cf,
+                roughness: 0.85
+            });
+
+            // Si tenemos mapeo de mallas, vincular edificaciones con mallas 3D
+            if (urbanMapData && urbanMapData.buildings) {
+                const buildingMapById = new Map();
+                urbanMapData.buildings.forEach(ub => buildingMapById.set(ub.id, ub));
+
+                const meshes = [];
+                glbModel.traverse(child => {
+                    if (child.isMesh) {
+                        child.matrixAutoUpdate = false;
+                        child.castShadow = false;
+                        child.receiveShadow = false;
+                        child.material = sharedBgMat;
+                        meshes.push(child);
+                    }
+                });
+
+                vargas.forEach((b) => {
+                    const mappedInfo = buildingMapById.get(b.id);
+                    const pos = toScene(b.lat, b.lng);
+                    
+                    let targetMesh = null;
+                    if (mappedInfo && mappedInfo.meshIndex !== null && meshes[mappedInfo.meshIndex]) {
+                        targetMesh = meshes[mappedInfo.meshIndex];
+                    }
+
+                    if (targetMesh) {
+                        if (targetMesh.material) {
+                            targetMesh.material = targetMesh.material.clone();
+                        }
+
+                        const rngB = cityMulberry32(cityHashStr(b.id || b.name));
+                        const N = Math.max(2, b.floors || 5);
+                        const h = N * 3.0 * CITY_CFG.htScale;
+                        const isCol = (b.status === 'collapsed' || b.damage_level === 'total' || b.boletin === 'rojo');
+                        const baseColor = isCol ? new THREE.Color(0xef4444) : new THREE.Color(0xa855f7);
+
+                        if (targetMesh.material && targetMesh.material.color) {
+                            targetMesh.material.color.copy(baseColor);
+                        }
+
+                        const gy = targetMesh.position.y;
+                        const worldX = targetMesh.position.x + glbOffsetX;
+                        const worldZ = targetMesh.position.z + glbOffsetZ;
+
+                        const st = {
+                            b, mesh: targetMesh, N, h, baseColor: baseColor.clone(),
+                            T: 0.06 * N + 0.15, u: 0, v: 0,
+                            status: b.status, damageLevel: b.damage_level,
+                            collapseT: null, toppleZ: 0, toppleX: 0, shiftX: 0, shiftZ: 0,
+                            damageT: null, tiltZ: 0, tiltX: 0,
+                            delay: (worldX - xWest) / CITY_CFG.waveSpeed, y0: gy,
+                            dustSpawned: false, rubble: null, event: null
+                        };
+
+                        if (isCol) {
+                            const shock = rngB() < 0.35 ? 1 : 2;
+                            st.event = shock;
+                            st.collapseT = shock === 1 ? 3.0 + rngB() * 21.0 : CITY_CFG.shock2Start + 2.5 + rngB() * 24.0;
+                            st.toppleZ = (rngB() < 0.5 ? -1 : 1) * (0.05 + rngB() * 0.11);
+                            st.toppleX = (rngB() - 0.5) * 0.10;
+                            st.shiftX = (rngB() - 0.5) * 6.0;
+                            st.shiftZ = (rngB() - 0.5) * 6.0;
+                        } else {
+                            st.event = rngB() < 0.3 ? 1 : 2;
+                            st.damageT = st.event === 1 ? 3.0 + rngB() * 20.0 : CITY_CFG.shock2Start + 1.5 + rngB() * 22.0;
+                            const mag = (b.damage_level === 'severo') ? 0.026 + rngB() * 0.020 : 0.007 + rngB() * 0.009;
+                            st.tiltZ = (rngB() < 0.5 ? -1 : 1) * mag;
+                            st.tiltX = (rngB() - 0.5) * mag * 0.8;
+                        }
+
+                        targetMesh.userData.cityState = st;
+                        targetMesh.userData.x0 = targetMesh.position.x;
+                        targetMesh.userData.z0 = targetMesh.position.z;
+                        citySim.buildings.push(st);
+                    }
+                });
+            }
+
+            resolve(true);
+        }, (xhr) => {
+            if (xhr.lengthComputable && loadingEl) {
+                const percent = ((xhr.loaded / xhr.total) * 100).toFixed(1);
+                loadingEl.innerHTML = `<span><i class="fa-solid fa-spinner fa-spin"></i> Cargando Modelo 3D Urbano (${percent}%)...</span>`;
+            }
+        }, (err) => {
+            console.warn('[city-sim] No se pudo cargar scene.glb:', err);
+            resolve(false);
+        });
+    });
+}
+
 async function initCitySim() {
     const container = document.getElementById('city-canvas-container');
     const loadingEl = document.getElementById('city-loading');
@@ -8926,6 +9098,7 @@ async function initCitySim() {
         lngMin: Math.min(...vargas.map(b => b.lng)), lngMax: Math.max(...vargas.map(b => b.lng))
     };
     citySim.extent = ext;
+    citySim.toScene = toScene;
 
     // --- Escena ---
     const scene = new THREE.Scene();
@@ -9059,72 +9232,84 @@ async function initCitySim() {
         return { mesh: front, start, env: shockEnvelope(start) };
     });
 
-    // --- Edificios del catálogo (extrusión de rectángulos reales) ---
-    const baseColor = new THREE.Color(0xa855f7); // Violeta para catálogo real
-    vargas.forEach((b) => {
-        const rngB = cityMulberry32(cityHashStr(b.id || b.name));
-        const N = Math.max(2, b.floors || 5);
-        const h = N * 3.0 * CITY_CFG.htScale;
-        const fp = (12.0 + rngB() * 6.0) * CITY_CFG.fpScale;
-        const pos = toScene(b.lat, b.lng);
-
-        const geo = new THREE.BoxGeometry(fp, h, fp * (0.75 + rngB() * 0.5));
-        geo.translate(0, h / 2, 0);
-        const tint = 0.9 + rngB() * 0.2;
-        const col = baseColor.clone().multiplyScalar(tint);
-        const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.85, metalness: 0.08 });
-        const mesh = new THREE.Mesh(geo, mat);
-        const gy = terr.heightAt ? Math.max(0, terr.heightAt(pos.x, pos.z)) : 0;
-        mesh.position.set(pos.x, gy, pos.z);
-        mesh.rotation.y = (rngB() - 0.5) * 0.5;
-        mesh.userData.x0 = pos.x;
-        mesh.userData.z0 = pos.z;
-        group.add(mesh);
-
-        const st = {
-            b, mesh, N, h, baseColor: col.clone(),
-            T: 0.06 * N + 0.15, u: 0, v: 0,
-            status: b.status, damageLevel: b.damage_level,
-            collapseT: null, toppleZ: 0, toppleX: 0, shiftX: 0, shiftZ: 0,
-            damageT: null, tiltZ: 0, tiltX: 0,
-            delay: (pos.x - xWest) / CITY_CFG.waveSpeed, y0: gy,
-            dustSpawned: false, rubble: null, event: null
-        };
-
-        if (b.status === 'collapsed') {
-            const shock = rngB() < 0.35 ? 1 : 2;
-            st.event = shock;
-            st.collapseT = shock === 1 ? 3.0 + rngB() * 21.0 : CITY_CFG.shock2Start + 2.5 + rngB() * 24.0;
-            const dir = rngB() < 0.5 ? -1 : 1;
-            st.toppleZ = dir * (0.05 + rngB() * 0.11);
-            st.toppleX = (rngB() - 0.5) * 0.10;
-            st.shiftX = (rngB() - 0.5) * fp * 0.35;
-            st.shiftZ = (rngB() - 0.5) * fp * 0.35;
-            // Montículo de escombros (aparece al final del colapso)
-            const hr = 2.2 * CITY_CFG.htScale + rngB() * 1.5 * CITY_CFG.htScale;
-            const rGeo = new THREE.BoxGeometry(fp * 1.35, hr, fp * 1.35);
-            rGeo.translate(0, hr / 2, 0);
-            const rubble = new THREE.Mesh(rGeo,
-                new THREE.MeshStandardMaterial({ color: 0x5a5044, roughness: 1.0 }));
-            rubble.position.set(pos.x + st.shiftX * 0.6, gy, pos.z + st.shiftZ * 0.6);
-            rubble.userData.x0 = rubble.position.x;
-            rubble.userData.z0 = rubble.position.z;
-            rubble.rotation.y = rngB() * Math.PI;
-            rubble.scale.y = 0.001;
-            rubble.visible = false;
-            group.add(rubble);
-            st.rubble = rubble;
-        } else {
-            st.event = rngB() < 0.3 ? 1 : 2;
-            st.damageT = st.event === 1 ? 3.0 + rngB() * 20.0 : CITY_CFG.shock2Start + 1.5 + rngB() * 22.0;
-            const mag = (b.damage_level === 'severo') ? 0.026 + rngB() * 0.020 : 0.007 + rngB() * 0.009;
-            const dir = rngB() < 0.5 ? -1 : 1;
-            st.tiltZ = dir * mag;
-            st.tiltX = (rngB() - 0.5) * mag * 0.8;
+    // --- Intentar Cargar Modelo 3D Urbano (scene.glb + urban_buildings_map.json) ---
+    let glbLoaded = false;
+    if (typeof THREE.GLTFLoader !== 'undefined') {
+        try {
+            glbLoaded = await loadCityGLBModel(group, toScene, vargas, xWest, terr, loadingEl);
+        } catch (e) {
+            console.warn('[city-sim] Error durante carga de GLB, usando modelo extruido:', e);
         }
-        mesh.userData.cityState = st;
-        citySim.buildings.push(st);
-    });
+    }
+
+    // --- Edificios del catálogo (Fallback/Complemento con extrusión de rectángulos reales) ---
+    if (!glbLoaded || citySim.buildings.length === 0) {
+        const baseColor = new THREE.Color(0xa855f7); // Violeta para catálogo real
+        vargas.forEach((b) => {
+            const rngB = cityMulberry32(cityHashStr(b.id || b.name));
+            const N = Math.max(2, b.floors || 5);
+            const h = N * 3.0 * CITY_CFG.htScale;
+            const fp = (12.0 + rngB() * 6.0) * CITY_CFG.fpScale;
+            const pos = toScene(b.lat, b.lng);
+
+            const geo = new THREE.BoxGeometry(fp, h, fp * (0.75 + rngB() * 0.5));
+            geo.translate(0, h / 2, 0);
+            const tint = 0.9 + rngB() * 0.2;
+            const col = baseColor.clone().multiplyScalar(tint);
+            const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.85, metalness: 0.08 });
+            const mesh = new THREE.Mesh(geo, mat);
+            const gy = terr.heightAt ? Math.max(0, terr.heightAt(pos.x, pos.z)) : 0;
+            mesh.position.set(pos.x, gy, pos.z);
+            mesh.rotation.y = (rngB() - 0.5) * 0.5;
+            mesh.userData.x0 = pos.x;
+            mesh.userData.z0 = pos.z;
+            group.add(mesh);
+
+            const st = {
+                b, mesh, N, h, baseColor: col.clone(),
+                T: 0.06 * N + 0.15, u: 0, v: 0,
+                status: b.status, damageLevel: b.damage_level,
+                collapseT: null, toppleZ: 0, toppleX: 0, shiftX: 0, shiftZ: 0,
+                damageT: null, tiltZ: 0, tiltX: 0,
+                delay: (pos.x - xWest) / CITY_CFG.waveSpeed, y0: gy,
+                dustSpawned: false, rubble: null, event: null
+            };
+
+            if (b.status === 'collapsed') {
+                const shock = rngB() < 0.35 ? 1 : 2;
+                st.event = shock;
+                st.collapseT = shock === 1 ? 3.0 + rngB() * 21.0 : CITY_CFG.shock2Start + 2.5 + rngB() * 24.0;
+                const dir = rngB() < 0.5 ? -1 : 1;
+                st.toppleZ = dir * (0.05 + rngB() * 0.11);
+                st.toppleX = (rngB() - 0.5) * 0.10;
+                st.shiftX = (rngB() - 0.5) * fp * 0.35;
+                st.shiftZ = (rngB() - 0.5) * fp * 0.35;
+                // Montículo de escombros (aparece al final del colapso)
+                const hr = 2.2 * CITY_CFG.htScale + rngB() * 1.5 * CITY_CFG.htScale;
+                const rGeo = new THREE.BoxGeometry(fp * 1.35, hr, fp * 1.35);
+                rGeo.translate(0, hr / 2, 0);
+                const rubble = new THREE.Mesh(rGeo,
+                    new THREE.MeshStandardMaterial({ color: 0x5a5044, roughness: 1.0 }));
+                rubble.position.set(pos.x + st.shiftX * 0.6, gy, pos.z + st.shiftZ * 0.6);
+                rubble.userData.x0 = rubble.position.x;
+                rubble.userData.z0 = rubble.position.z;
+                rubble.rotation.y = rngB() * Math.PI;
+                rubble.scale.y = 0.001;
+                rubble.visible = false;
+                group.add(rubble);
+                st.rubble = rubble;
+            } else {
+                st.event = rngB() < 0.3 ? 1 : 2;
+                st.damageT = st.event === 1 ? 3.0 + rngB() * 20.0 : CITY_CFG.shock2Start + 1.5 + rngB() * 22.0;
+                const mag = (b.damage_level === 'severo') ? 0.026 + rngB() * 0.020 : 0.007 + rngB() * 0.009;
+                const dir = rngB() < 0.5 ? -1 : 1;
+                st.tiltZ = dir * mag;
+                st.tiltX = (rngB() - 0.5) * mag * 0.8;
+            }
+            mesh.userData.cityState = st;
+            citySim.buildings.push(st);
+        });
+    }
 
     // --- Tejido urbano genérico (extrusiones de contexto, InstancedMesh) ---
     const rngF = cityMulberry32(CITY_CFG.seed ^ 0x5F3759DF);
@@ -9306,8 +9491,17 @@ function wireCityControls() {
         });
     }
 
+    const floatToggleGLB = document.getElementById('city-float-toggle-glb');
     const floatToggleFans = document.getElementById('city-float-toggle-fans');
     const floatToggleBedrock = document.getElementById('city-float-toggle-bedrock');
+
+    if (floatToggleGLB) {
+        floatToggleGLB.addEventListener('change', (e) => {
+            if (citySim && citySim.glbModel) {
+                citySim.glbModel.visible = e.target.checked;
+            }
+        });
+    }
 
     if (floatToggleFans) {
         floatToggleFans.addEventListener('change', (e) => {
@@ -9332,6 +9526,49 @@ function wireCityControls() {
             }
         });
     }
+
+    document.querySelectorAll('.city-nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.dataset.target;
+            if (target === 'caraballeda') {
+                flyCityCameraTo(10.6104, -66.8222, 600, 1300);
+            } else if (target === 'maiquetia') {
+                flyCityCameraTo(10.6012, -66.9912, 850, 2200);
+            } else if (target === 'macuto') {
+                flyCityCameraTo(10.6120, -66.8850, 650, 1500);
+            }
+        });
+    });
+}
+
+function flyCityCameraTo(lat, lng, height = 650, dist = 1400) {
+    if (!citySim || !citySim.camera || !citySim.controls) return;
+    const pos = citySim.toScene ? citySim.toScene(lat, lng) : { x: 0, z: 0 };
+    const targetCamX = pos.x + dist * 0.65;
+    const targetCamY = height;
+    const targetCamZ = pos.z + dist * 0.85;
+
+    const startCamPos = citySim.camera.position.clone();
+    const startTarget = citySim.controls.target.clone();
+
+    const endCamPos = new THREE.Vector3(targetCamX, targetCamY, targetCamZ);
+    const endTarget = new THREE.Vector3(pos.x, 30, pos.z);
+
+    const startTime = performance.now();
+    const duration = 1200; // Animación suave de 1.2s
+
+    function animateFly() {
+        const elapsed = performance.now() - startTime;
+        const p = Math.min(1, elapsed / duration);
+        const ease = 0.5 - Math.cos(p * Math.PI) / 2;
+
+        citySim.camera.position.lerpVectors(startCamPos, endCamPos, ease);
+        citySim.controls.target.lerpVectors(startTarget, endTarget, ease);
+        citySim.controls.update();
+
+        if (p < 1) requestAnimationFrame(animateFly);
+    }
+    animateFly();
 }
 
 function updateCityPlayButton() {

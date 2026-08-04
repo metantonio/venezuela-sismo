@@ -1,0 +1,4750 @@
+{
+  "metadata": {
+    "generatedAt": "2026-08-04T10:44:50.361Z",
+    "totalBuildingsIn3D": 189,
+    "matchedCount": 167,
+    "collapsedMatchedCount": 72,
+    "centerLat": 10.610409,
+    "centerLng": -66.85192,
+    "centerX": -6.3067626953125,
+    "centerY": -190.14599609375,
+    "degToMetersLat": 110574,
+    "degToMetersLng": 109416.64109365191,
+    "glbBounds": {
+      "minX": -5584.387451171875,
+      "maxX": 5571.77392578125,
+      "minY": -1144.5459594726562,
+      "maxY": 764.2539672851562
+    }
+  },
+  "buildings": [
+    {
+      "id": "13b1edd2-bd7b-4e0d-b5ce-212427786425",
+      "name": "Solymar",
+      "zone": "Caraballeda",
+      "address": "J56H+54G, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61044,
+      "lng": -66.82217,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": [
+        "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/0afc4e1f-763e-4335-a86b-eab4940d7488.png",
+        "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/ee141332-9c40-40a1-bdbf-493005388747.jpg"
+      ],
+      "boletin": "rojo",
+      "projectedGLB": {
+        "x": 3248.838309841603,
+        "y": -186.71820209376193
+      },
+      "meshIndex": 39232,
+      "meshPosition": {
+        "x": 3371.256591796875,
+        "y": -157.7750473022461,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 125.8
+    },
+    {
+      "id": "fd9ad90f-5ad6-492b-9e4a-c086ba6885e2",
+      "name": "Edificio Punta Piedra",
+      "zone": "Hotel Las Quince Letras",
+      "address": "J437+PWV, Macuto 1164, La Guaira, Venezuela",
+      "lat": 10.60436,
+      "lng": -66.88521,
+      "floors": 6,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/ee141332-9c40-40a1-bdbf-493005388747.jpg",
+      "boletin": "rojo",
+      "projectedGLB": {
+        "x": -3648.786744702309,
+        "y": -859.008122093845
+      },
+      "meshIndex": 24446,
+      "meshPosition": {
+        "x": -3699.2427978515625,
+        "y": -781.90283203125,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 92.1
+    },
+    {
+      "id": "fc3b56e5-0425-42b4-8499-74f42b6fcf51",
+      "name": "RESIDENCIAS GRAÑAMAR",
+      "zone": "Caribe",
+      "address": "Av. Terepaima, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.610767,
+      "lng": -66.842686,
+      "floors": 9,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/7d591f0d-1a7f-4d3d-a369-d8d01eea7b69.jpeg",
+      "boletin": "rojo",
+      "projectedGLB": {
+        "x": 1004.0465011641699,
+        "y": -150.56050409391298
+      },
+      "meshIndex": 786,
+      "meshPosition": {
+        "x": 988.6188659667969,
+        "y": -134.1441993713379,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 22.5
+    },
+    {
+      "id": "f11ab6e5-c436-4a17-a9ee-a5caffbaf0a0",
+      "name": "Residencias Caribe",
+      "zone": "El Palmar Este",
+      "address": "J592+G2Q, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61229,
+      "lng": -66.83928,
+      "floors": 7,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/1fe649c5-7bb8-4307-a537-c9af99f892cd.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1376.719580728956,
+        "y": 17.843697906154176
+      },
+      "meshIndex": 17285,
+      "meshPosition": {
+        "x": 1366.95068359375,
+        "y": 21.64805030822754,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 10.5
+    },
+    {
+      "id": "eaaca355-fbd4-48a0-8e05-5a868775a73f",
+      "name": "CARABALLEDA SOL",
+      "zone": "Caraballeda",
+      "address": "Calle Bajada El Caribe, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.6119,
+      "lng": -66.84675,
+      "floors": 4,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/e0c0c7ec-6301-4c59-b3a0-54c75a838437.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 559.3772717596097,
+        "y": -25.28016209378461
+      },
+      "meshIndex": 2961,
+      "meshPosition": {
+        "x": 567.354248046875,
+        "y": -28.926100730895996,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 8.8
+    },
+    {
+      "id": "dbecd710-20fa-4419-b679-1b86b6f0d3ec",
+      "name": "Residencias Mansión Club Caraballeda",
+      "zone": "Caribe",
+      "address": "Av. José María España, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61239,
+      "lng": -66.83434,
+      "floors": 9,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/3cc388b8-1202-4100-942d-71153dc2570a.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1917.237787732125,
+        "y": 28.9010979061284
+      },
+      "meshIndex": 19830,
+      "meshPosition": {
+        "x": 1917.7053833007812,
+        "y": 28.86199951171875,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 0.5
+    },
+    {
+      "id": "daff2941-42a9-4153-8d59-b776fb8576b0",
+      "name": "Residencias CELTAMAR I",
+      "zone": "Caraballeda",
+      "address": "J592+82Q, Caraballeda, La Guaira, Venezuela",
+      "lat": 10.612839,
+      "lng": -66.849812,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/07853895-1007-4139-a7fa-5ffdbcb53e2f.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 224.34351673085874,
+        "y": 78.54882390609521
+      },
+      "meshIndex": 3888,
+      "meshPosition": {
+        "x": 243.84325408935547,
+        "y": -105.67855072021484,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 185.3
+    },
+    {
+      "id": "d9236806-ee17-4059-880d-07d1a5aec143",
+      "name": "Residencia Costa Brava",
+      "zone": "Caribe",
+      "address": "Avenida Guaicaipuro, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.6111,
+      "lng": -66.84572,
+      "floors": 7,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/bb6fdcff-f3c5-4f7a-80b3-7c94b40ea8dd.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 672.0764120860807,
+        "y": -113.73936209377487
+      },
+      "meshIndex": 4282,
+      "meshPosition": {
+        "x": 628.9700317382812,
+        "y": -141.35050201416016,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 51.2
+    },
+    {
+      "id": "d2fc90df-bf97-4db2-8dc8-67d54ecda3d7",
+      "name": "C.C Costa del Sol",
+      "zone": "Caraballeda",
+      "address": "J593+7J, Caraballeda, La Guaira, Venezuela",
+      "lat": 10.61108,
+      "lng": -66.84594,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/0c8635d6-cae6-446b-b2bf-33f5d9bcfa29.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 648.0047510456111,
+        "y": -115.95084209388756
+      },
+      "meshIndex": 4266,
+      "meshPosition": {
+        "x": 625.373291015625,
+        "y": -136.1688995361328,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 30.3
+    },
+    {
+      "id": "d0721aa0-02a8-45d5-ab67-3b9a5e746584",
+      "name": "Malibu Suite",
+      "zone": "Tanaguarena",
+      "address": "Tanaguarena, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61193,
+      "lng": -66.83805,
+      "floors": 6,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/ca1dc219-49fb-4724-8810-a7f1a5831946.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1511.302049274884,
+        "y": -21.962942093910186
+      },
+      "meshIndex": 17606,
+      "meshPosition": {
+        "x": 1507.1156616210938,
+        "y": -25.741150856018066,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 5.6
+    },
+    {
+      "id": "ce13c8cb-d3dc-405e-9162-e0fbf9775e85",
+      "name": "Los Tamarindos II",
+      "zone": "Caraballeda",
+      "address": "Caraballeda, La Guaira, Venezuela",
+      "lat": 10.61117,
+      "lng": -66.84718,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/d3236d14-d14a-4f2e-9d70-11df1e916828.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 512.3281160899544,
+        "y": -105.99918209387147
+      },
+      "meshIndex": 4438,
+      "meshPosition": {
+        "x": 512.0221099853516,
+        "y": -105.85960006713867,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 0.3
+    },
+    {
+      "id": "cd96295b-8073-44c8-8f44-d5991cab72e4",
+      "name": "Rocapark",
+      "zone": "Caraballeda",
+      "address": "J584+J29, Caraballeda, La Guaira, Venezuela",
+      "lat": 10.61245,
+      "lng": -66.84489,
+      "floors": 7,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/8f532181-bbe1-4910-acc4-e6d7adff1db0.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 762.8922241930948,
+        "y": 35.535537906270065
+      },
+      "meshIndex": 16828,
+      "meshPosition": {
+        "x": 830.1668395996094,
+        "y": -145.70590209960938,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 193.3
+    },
+    {
+      "id": "ca89c482-c5ff-4816-8420-55f4d8a1fc58",
+      "name": "Edificio Dist. Rosanday",
+      "zone": "El Palmar Oeste",
+      "address": "J46P+P73, Av. José María España, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61176,
+      "lng": -66.86431,
+      "floors": 6,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/2ca0081b-a29b-4dad-93d4-d61fd4bf03e5.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -1361.9789458452601,
+        "y": -40.76052209378781
+      },
+      "meshIndex": 5870,
+      "meshPosition": {
+        "x": -1348.4117431640625,
+        "y": -182.65029907226562,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 142.5
+    },
+    {
+      "id": "c52ce0c5-455d-4395-9630-1d4916c6be57",
+      "name": "Residencia Ilona",
+      "zone": "Caribe",
+      "address": "Av. José María España, Caraballeda, La Guaira, Venezuela",
+      "lat": 10.61295,
+      "lng": -66.83749,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/744330f8-9067-4eb4-adac-74f9ea81bc53.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1572.5753682865643,
+        "y": 90.82253790614124
+      },
+      "meshIndex": 18914,
+      "meshPosition": {
+        "x": 1557.0665283203125,
+        "y": 45.697099685668945,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 47.7
+    },
+    {
+      "id": "bcc628e5-414c-4b8b-84e8-a2b3876c5956",
+      "name": "Res. Mansión del Mar",
+      "zone": "Caraballeda",
+      "address": "J579+55R, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61268,
+      "lng": -66.83212,
+      "floors": 4,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/f440d782-0788-4566-8a90-fd346f0ad856.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2160.1427309593882,
+        "y": 60.96755790609296
+      },
+      "meshIndex": 19342,
+      "meshPosition": {
+        "x": 2159.980224609375,
+        "y": 59.33449935913086,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 1.6
+    },
+    {
+      "id": "bc6dfbee-b6fe-4f83-8332-0be2235310ce",
+      "name": "Residencia Avilamar",
+      "zone": "Tanaguarena",
+      "address": "C. Los Apamates, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.611649,
+      "lng": -66.827596,
+      "floors": 6,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/d8a601c1-ae6a-4f1a-b990-9b57cdab4203.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2655.1436152674555,
+        "y": -53.03423609383384
+      },
+      "meshIndex": 38454,
+      "meshPosition": {
+        "x": 2684.3345947265625,
+        "y": 27.416150093078613,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 85.6
+    },
+    {
+      "id": "d3c33fea-5104-41da-bb30-c1bdd620c7ec",
+      "name": "Comercial la Goleta ( Celicor )",
+      "zone": "Avenida la costanera",
+      "address": "Avenida Principal de la costanera con calle 4, los corales caraballeda",
+      "lat": 10.61168,
+      "lng": -66.85912,
+      "floors": 5,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/da82993a-52f6-45ee-8a48-0430cc5ba54f.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -794.1065785693252,
+        "y": -49.60644209384577
+      },
+      "meshIndex": 675,
+      "meshPosition": {
+        "x": -877.1211547851562,
+        "y": -264.3115005493164,
+        "z": 2.200000047683716
+      },
+      "meshHeight": 4.400000095367432,
+      "distToMeshMeters": 230.2
+    },
+    {
+      "id": "b0d051c8-4a85-4b0c-b34c-4efb9917c14c",
+      "name": "Residencias Auro",
+      "zone": "El Palmar Este",
+      "address": "J592+J7M, Av. José María España, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61143,
+      "lng": -66.84932,
+      "floors": 5,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/5e5a9246-b6e5-4349-ab40-b84c78472436.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 278.1765041482969,
+        "y": -77.24994209378134
+      },
+      "meshIndex": 4556,
+      "meshPosition": {
+        "x": 264.20555114746094,
+        "y": -112.53039932250977,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 37.9
+    },
+    {
+      "id": "af84a7d3-cc60-4224-bdac-3e546da2c9cb",
+      "name": "Tanamar",
+      "zone": "Tanaguarena",
+      "address": "1165 Av La Playa, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61205,
+      "lng": -66.8258,
+      "floors": 4,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/b29df80a-4113-4527-a05e-db4d3fdbf183.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2851.6559026715227,
+        "y": -8.694062093823277
+      },
+      "meshIndex": 38534,
+      "meshPosition": {
+        "x": 2827.5950927734375,
+        "y": 24.460700035095215,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 41
+    },
+    {
+      "id": "a416a5d8-589b-41e4-8ad6-6957f475a51e",
+      "name": "Edificio Álamo",
+      "zone": "Urbanización Álamo",
+      "address": "Av. Álamo, Macuto 1164, La Guaira, Venezuela",
+      "lat": 10.6026,
+      "lng": -66.9046,
+      "floors": 7,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/da0065d7-29c0-4ce9-99ee-78802ee03074.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -5770.375415508367,
+        "y": -1053.618362093745
+      },
+      "meshIndex": 30763,
+      "meshPosition": {
+        "x": -5577.04638671875,
+        "y": -1061.9999389648438,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 193.5
+    },
+    {
+      "id": "a25d0038-93ab-4cb4-a944-ab75eaf11078",
+      "name": "Mediterraneo",
+      "zone": "Caribe",
+      "address": "Caribe, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61022,
+      "lng": -66.84095,
+      "floors": 7,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/42732c8d-503a-43ef-ab79-eaa7e1ca093c.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1193.9937901020892,
+        "y": -211.04448209382306
+      },
+      "meshIndex": 18185,
+      "meshPosition": {
+        "x": 1168.6312255859375,
+        "y": -157.55064392089844,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 59.2
+    },
+    {
+      "id": "94697f0d-8d43-447d-b6b9-61cbc60d1e4e",
+      "name": "Edificio Rompemar II",
+      "zone": "Caraballeda",
+      "address": "J594+756 Edificio Rompemar II, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61131,
+      "lng": -66.84459,
+      "floors": 9,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/d64ee90a-93cd-4474-a401-41ca4c2cca36.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 795.71721652228,
+        "y": -90.51882209386827
+      },
+      "meshIndex": 16828,
+      "meshPosition": {
+        "x": 830.1668395996094,
+        "y": -145.70590209960938,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 65.1
+    },
+    {
+      "id": "943ceec0-936d-4363-bfe4-85af185049df",
+      "name": "Residencias Karina",
+      "zone": "Caribe",
+      "address": "J565+XF7, Av. Granada, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.611453,
+      "lng": -66.838472,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/62b81241-bc25-4217-ab7e-560baa66f361.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1465.1282267333227,
+        "y": -74.7067400939169
+      },
+      "meshIndex": 18451,
+      "meshPosition": {
+        "x": 1459.4482421875,
+        "y": -73.20429992675781,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 5.9
+    },
+    {
+      "id": "8fe92e10-249d-4c54-a3b3-a339067836f1",
+      "name": "Residencias Palma Real -La Guaira",
+      "zone": "Caribe",
+      "address": "CALLE LA PLAYA, RESIDENCIAS PALMA REAL, ZONA CARIBE, PARROQUIA CARABALLEDA, FRENTE AL ANTIGUO HOTEL MELIÁ, LA GUAIRA.",
+      "lat": 10.61107,
+      "lng": -66.83685,
+      "floors": 9,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/d9601488-8324-421a-8908-f4155076c88d.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1642.6020185869602,
+        "y": -117.0565820938457
+      },
+      "meshIndex": 18418,
+      "meshPosition": {
+        "x": 1680.9547119140625,
+        "y": -51.526750564575195,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 75.9
+    },
+    {
+      "id": "8bdb211c-d95e-4c51-b686-26220286d6b9",
+      "name": "Residencias Marycielo",
+      "zone": "Caribe",
+      "address": "J574+288, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61244,
+      "lng": -66.84384,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/968439fd-7386-47e0-8b73-a82033597b2b.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 877.7796973421333,
+        "y": 34.42979790611551
+      },
+      "meshIndex": 19423,
+      "meshPosition": {
+        "x": 977.0867309570312,
+        "y": -88.5578498840332,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 158.1
+    },
+    {
+      "id": "4fe6c04b-01b7-48b1-9864-740c08f8ac78",
+      "name": "Residencia Botánico",
+      "zone": "Av. Jardín Botánico",
+      "address": "Jardín botánico",
+      "lat": 10.61085,
+      "lng": -66.82662,
+      "floors": 9,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/93611bc7-c84a-4e03-ac80-0ca5e0d42623.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2761.9342569742375,
+        "y": -141.38286209390685
+      },
+      "meshIndex": 309,
+      "meshPosition": {
+        "x": 2760.8236083984375,
+        "y": 34.75504970550537,
+        "z": 5.5
+      },
+      "meshHeight": 11,
+      "distToMeshMeters": 176.1
+    },
+    {
+      "id": "7fbffebe-55b0-45d2-be4c-ef4e2910d374",
+      "name": "Residencia Gradisca",
+      "zone": "Macuto",
+      "address": "Av. José María España, Macuto, La Guaira, Venezuela",
+      "lat": 10.60992,
+      "lng": -66.881,
+      "floors": 7,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/46eb5694-b6ec-428f-b1ce-2673573e05c1.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -3188.1426856979806,
+        "y": -244.21668209374576
+      },
+      "meshIndex": 62,
+      "meshPosition": {
+        "x": -3120.090087890625,
+        "y": -379.9642028808594,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 151.9
+    },
+    {
+      "id": "77d3befd-e64e-413f-9cc1-9ad6d5debb24",
+      "name": "Marianamar",
+      "zone": "Caraballeda",
+      "address": "J586+CF7, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61288,
+      "lng": -66.83882,
+      "floors": 7,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/342f688e-7643-4edf-a20d-e3277184ddd6.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1427.051235632463,
+        "y": 83.0823579062378
+      },
+      "meshIndex": 19769,
+      "meshPosition": {
+        "x": 1411.0138549804688,
+        "y": 51.04699897766113,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 35.8
+    },
+    {
+      "id": "7251adbe-6f62-4a2a-b8d5-21537a9df522",
+      "name": "Residencias Ibiza",
+      "zone": "Tanaguarena",
+      "address": "J56G+35V Urbanizacion Tanaguarena, Av La Playa, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.611675,
+      "lng": -66.821085,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/27a3eed2-b21b-4b37-9de0-0261df2f0e5b.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 3367.55536542858,
+        "y": -50.15931209382484
+      },
+      "meshIndex": 43606,
+      "meshPosition": {
+        "x": 3363.108154296875,
+        "y": -39.789100646972656,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 11.3
+    },
+    {
+      "id": "722b92c4-f93a-41ed-8529-24cab0b06e3d",
+      "name": "Porto Fino Beach",
+      "zone": "Tanaguarena",
+      "address": "Tanaguarena, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61218,
+      "lng": -66.82286,
+      "floors": 4,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/063bb03a-166f-47d5-80b5-f5ebbc6acf34.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 3173.3408274863427,
+        "y": 5.680557906221793
+      },
+      "meshIndex": 44929,
+      "meshPosition": {
+        "x": 3160.1168212890625,
+        "y": 76.90655136108398,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 72.4
+    },
+    {
+      "id": "a2e49d2a-9aa9-4fbd-a866-79870afa8886",
+      "name": "Residencias Puerto Coral",
+      "zone": "Macuto",
+      "address": "J437+PWV, Macuto 1164, La Guaira, Venezuela",
+      "lat": 10.61119,
+      "lng": -66.884268,
+      "floors": 5,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/433f8771-5768-409f-81a0-b16d445d00e9.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -3545.716268792648,
+        "y": -103.78770209375878
+      },
+      "meshIndex": 32,
+      "meshPosition": {
+        "x": -3616.7509765625,
+        "y": -255.20289611816406,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 167.2
+    },
+    {
+      "id": "768bcc66-d813-450a-8860-49f7e8182d1f",
+      "name": "La Joya",
+      "zone": "Caraballeda",
+      "address": "Caraballeda, La Guaira, Venezuela",
+      "lat": 10.61206,
+      "lng": -66.84299,
+      "floors": 5,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/c364ffd5-6ac9-427c-a163-438979356a4b.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 970.783842271715,
+        "y": -7.588322093865116
+      },
+      "meshIndex": 19424,
+      "meshPosition": {
+        "x": 982.4630432128906,
+        "y": -86.1124038696289,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 79.4
+    },
+    {
+      "id": "6b8a35bd-90aa-4d29-98a4-f70e111103d5",
+      "name": "Edificio costa brava los corales",
+      "zone": "Los Corales",
+      "address": "Los Corales, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61156,
+      "lng": -66.85686,
+      "floors": 7,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/d63ecce0-bb40-44f8-b33d-d080fc3e1316.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -546.8249696969265,
+        "y": -62.87532209373627
+      },
+      "meshIndex": 1271,
+      "meshPosition": {
+        "x": -439.3591766357422,
+        "y": -169.83399963378906,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 151.6
+    },
+    {
+      "id": "69819577-c245-4693-a04c-b78f9d3661ec",
+      "name": "Res Punta Brisas",
+      "zone": "Detras del Hotel las Quince letras",
+      "address": "Calle san Andrés Res punta Brisas",
+      "lat": 10.61064,
+      "lng": -66.88647,
+      "floors": 5,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/79421b02-fda8-4e51-aad2-f86da82be8ef.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -3786.651712480533,
+        "y": -164.60340209381346
+      },
+      "meshIndex": 32,
+      "meshPosition": {
+        "x": -3616.7509765625,
+        "y": -255.20289611816406,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 192.5
+    },
+    {
+      "id": "68d2c35d-19b8-490d-9db1-6e4837ec86ed",
+      "name": "Residencias Coral Park",
+      "zone": "Los Corales",
+      "address": "Residencias Coral Beach, Av. La Costanera, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61176,
+      "lng": -66.85476,
+      "floors": 9,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/23eb22bb-298f-420e-8c50-c8f1b869c71e.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -317.0500234004042,
+        "y": -40.76052209378781
+      },
+      "meshIndex": 1192,
+      "meshPosition": {
+        "x": -283.5564727783203,
+        "y": -119.47915267944336,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 85.5
+    },
+    {
+      "id": "682db6d9-eefd-4d5c-b408-8e138778a4f0",
+      "name": "Edificio Las Palmas o punta piedra (ver video)",
+      "zone": "Camurí Chico",
+      "address": "Avenida José María España, Macuto 1164, La Guaira, Venezuela",
+      "lat": 10.609385,
+      "lng": -66.874757,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/98ff3c11-961e-4400-bca0-6dfc63406cc8.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -2505.054595350555,
+        "y": -303.37377209386324
+      },
+      "meshIndex": 21988,
+      "meshPosition": {
+        "x": -2510.5770263671875,
+        "y": -299.26434326171875,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 6.9
+    },
+    {
+      "id": "65ea1d2b-0be3-4e15-b396-7ae4a4f9bc09",
+      "name": "Victor",
+      "zone": "Caribe",
+      "address": "7076 Coronado Way",
+      "lat": 10.61169,
+      "lng": -66.84248,
+      "floors": 6,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/a37803a4-2e8b-402d-8ad2-e9e8d4e7daa9.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1026.586329230086,
+        "y": -48.50070209388764
+      },
+      "meshIndex": 19427,
+      "meshPosition": {
+        "x": 1027.6240234375,
+        "y": -67.85950088500977,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 19.4
+    },
+    {
+      "id": "604cc2aa-834d-4c60-b26c-c31cdb0bae78",
+      "name": "Residencias Perlamar",
+      "zone": "urbanizacion caribe",
+      "address": "Caribe, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61117,
+      "lng": -66.84174,
+      "floors": 9,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/f8d54b87-aea3-49af-af80-429810af2ea1.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1107.5546436386555,
+        "y": -105.99918209387147
+      },
+      "meshIndex": 19084,
+      "meshPosition": {
+        "x": 1099.9097290039062,
+        "y": -104.88550186157227,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 7.7
+    },
+    {
+      "id": "5b397656-c97a-4fb6-b972-0ec4c9d64e72",
+      "name": "Residencia Bellevue",
+      "zone": "Caraballeda",
+      "address": "Caraballeda, 1165, La Guaira, Venezuela",
+      "lat": 10.6149693,
+      "lng": -66.8484344,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/67cee3bc-f928-4837-80a0-32d28ff136e6.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 375.0758815012405,
+        "y": 314.10461610620894
+      },
+      "meshIndex": 5362,
+      "meshPosition": {
+        "x": 427.7932586669922,
+        "y": -9.29365062713623,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 327.7
+    },
+    {
+      "id": "599ddcd6-55ca-4ad2-872f-486a79284a0f",
+      "name": "caraballeda beach",
+      "zone": "Tanaguarena",
+      "address": "1165 Av La Playa, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61236,
+      "lng": -66.82346,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/bbd8a8a4-3c46-4b83-803d-7c7d5ffeda11.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 3107.690842831082,
+        "y": 25.583877906253974
+      },
+      "meshIndex": 40503,
+      "meshPosition": {
+        "x": 3143.752197265625,
+        "y": 85.1379508972168,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 69.6
+    },
+    {
+      "id": "5967f2ec-0b33-4720-ac64-98c722510e8d",
+      "name": "Residencias Bravamar",
+      "zone": "Caribe",
+      "address": "Av. Circunvalacion, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61152,
+      "lng": -66.84603,
+      "floors": 9,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/c79eb208-81b3-46df-86c2-da7e18c08de2.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 638.1572533471665,
+        "y": -67.29828209376525
+      },
+      "meshIndex": 4277,
+      "meshPosition": {
+        "x": 612.43505859375,
+        "y": -123.37045288085938,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 61.7
+    },
+    {
+      "id": "64c74510-3538-4634-babd-f93601eea966",
+      "name": "Residencia Carmela Mar",
+      "zone": "Tanaguarena",
+      "address": "J55F+WPG, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.60981,
+      "lng": -66.82566,
+      "floors": 6,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/0a33d842-3e49-4668-98df-28ad85b5febd.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2866.9742324248314,
+        "y": -256.37982209387457
+      },
+      "meshIndex": 38021,
+      "meshPosition": {
+        "x": 2915.37548828125,
+        "y": 0.5161995887756348,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 261.4
+    },
+    {
+      "id": "560fb10f-015f-480a-957d-a77de2b6657e",
+      "name": "La Estrella",
+      "zone": "Urbanización Álamo",
+      "address": "Avenida La Playa, Macuto 1164, La Guaira, Venezuela",
+      "lat": 10.604623,
+      "lng": -66.901844,
+      "floors": 7,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/67f2631a-669e-4eca-8aca-6cc066d38789.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -5468.823152653706,
+        "y": -829.9271600938067
+      },
+      "meshIndex": 34501,
+      "meshPosition": {
+        "x": -5461.547119140625,
+        "y": -856.3297119140625,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 27.4
+    },
+    {
+      "id": "4f11d315-84a5-4e55-916b-0a3820ce48d8",
+      "name": "Residencias Airemar",
+      "zone": "Tanaguarena",
+      "address": "J56F+W47, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.60703,
+      "lng": -66.82618,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/e569d871-238a-4336-aa4e-a6e488408f5c.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2810.077579056732,
+        "y": -563.775542093826
+      },
+      "meshIndex": 38021,
+      "meshPosition": {
+        "x": 2915.37548828125,
+        "y": 0.5161995887756348,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 574
+    },
+    {
+      "id": "4d703d45-8f02-4224-91b1-08d8228c934e",
+      "name": "Edificio Caribe detras de las 15 letras",
+      "zone": "Caribe",
+      "address": "J577+G33, paso 3, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61125,
+      "lng": -66.83732,
+      "floors": 6,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/7707c8e1-5f83-4c12-bd86-ee612f199953.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1591.1761972721695,
+        "y": -97.15326209381352
+      },
+      "meshIndex": 18896,
+      "meshPosition": {
+        "x": 1569.708984375,
+        "y": -49.27510070800781,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 52.5
+    },
+    {
+      "id": "4a48cd17-de31-4c06-8f94-42231d17ab10",
+      "name": "Tanaguarena",
+      "zone": "Tanaguarena",
+      "address": "Tanaguarena, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61027,
+      "lng": -66.82458,
+      "floors": 4,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/bd3af60e-38c9-4349-a51d-9a8ca99b650d.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2985.1442048061667,
+        "y": -205.51578209383595
+      },
+      "meshIndex": 38021,
+      "meshPosition": {
+        "x": 2915.37548828125,
+        "y": 0.5161995887756348,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 217.5
+    },
+    {
+      "id": "45832954-90f5-4b12-9911-4c294a434f3d",
+      "name": "Residencias Club Bahía Mar",
+      "zone": "Los Corales",
+      "address": "J49W+6GR, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61189,
+      "lng": -66.85372,
+      "floors": 6,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/e2eab6c4-d025-47a8-a959-262aaf689abc.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -203.25671666264947,
+        "y": -26.385902093742743
+      },
+      "meshIndex": 1191,
+      "meshPosition": {
+        "x": -281.934814453125,
+        "y": -120.43285369873047,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 122.6
+    },
+    {
+      "id": "39ba62e2-1ab9-414a-a009-e31ae13400f5",
+      "name": "Mision vivienda OPP av cariaco oeste",
+      "zone": "Av cariaco oeste",
+      "address": "J586+63P, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61496,
+      "lng": -66.84012,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/83db14af-99d3-433c-a118-a7a5acdfad5c.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1284.8096022106583,
+        "y": 313.07627790617323
+      },
+      "meshIndex": 19770,
+      "meshPosition": {
+        "x": 1400.6823120117188,
+        "y": 56.36374855041504,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 281.7
+    },
+    {
+      "id": "37130602-c8ff-4b49-8a9e-10bed627f8bd",
+      "name": "Residencia Tamiami",
+      "zone": "Los Corales",
+      "address": "Av. Caraballeda, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61239,
+      "lng": -66.85274,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/c4e393de-9579-4432-87a4-fce356269564.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -96.02840839104276,
+        "y": 28.9010979061284
+      },
+      "meshIndex": 45462,
+      "meshPosition": {
+        "x": 0,
+        "y": 0.5,
+        "z": 0
+      },
+      "meshHeight": 0,
+      "distToMeshMeters": 100.1
+    },
+    {
+      "id": "2b302d74-7cb3-42db-9248-1829bd57886a",
+      "name": "Mini CC K-rol",
+      "zone": "El Palmar Este",
+      "address": "Av. La Costanera, Caraballeda, La Guaira, Venezuela",
+      "lat": 10.61222,
+      "lng": -66.84813,
+      "floors": 5,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/105bf557-bd2b-4460-ad76-e785f20d974d.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 408.3823070506443,
+        "y": 10.103517906250772
+      },
+      "meshIndex": 5362,
+      "meshPosition": {
+        "x": 427.7932586669922,
+        "y": -9.29365062713623,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 27.4
+    },
+    {
+      "id": "26bd0d5f-0676-4d81-9f15-2e7ffc783915",
+      "name": "Edificio Agua Marina",
+      "zone": "Al lado del hotel las 15 letras",
+      "address": "Macuto 1164, La Guaira, Venezuela. Al lado del hotel las 15 letras",
+      "lat": 10.60724,
+      "lng": -66.88486,
+      "floors": 7,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/9078cc10-69ac-4134-9551-d4c003c1462f.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -3610.4909203198144,
+        "y": -540.5550020939194
+      },
+      "meshIndex": 0,
+      "meshPosition": {
+        "x": -3630.7342529296875,
+        "y": -525.7196655273438,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 25.1
+    },
+    {
+      "id": "252bf13a-2749-478d-9e0a-887c920ec68a",
+      "name": "Edificio Miramar",
+      "zone": "Caribe",
+      "address": "Caribe, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61288,
+      "lng": -66.84663,
+      "floors": 6,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/fffc9159-c305-4e5c-80c9-ec002558ab7c.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 572.5072686903509,
+        "y": 83.0823579062378
+      },
+      "meshIndex": 2961,
+      "meshPosition": {
+        "x": 567.354248046875,
+        "y": -28.926100730895996,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 112.1
+    },
+    {
+      "id": "2527a72e-9996-43bf-bd4c-58defeeb37f6",
+      "name": "Residencias El Molino",
+      "zone": "Caribe",
+      "address": "Avenida Guaicaipuro, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.611474,
+      "lng": -66.842596,
+      "floors": 5,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/ae089b42-d2c2-4d66-8a29-58bfec73f299.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1013.8939988626145,
+        "y": -72.38468609388696
+      },
+      "meshIndex": 19426,
+      "meshPosition": {
+        "x": 1005.2515869140625,
+        "y": -79.32685089111328,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 11.1
+    },
+    {
+      "id": "2436a2e7-4486-4b21-8a0e-4b01665350e9",
+      "name": "Residencias Mar de Leva",
+      "zone": "Los Corales",
+      "address": "J49W+HV4, Av. José María España, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61179,
+      "lng": -66.85325,
+      "floors": 9,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/eec3884c-2952-4c0a-859d-a3f2425d9714.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -151.83089534941377,
+        "y": -37.44330209391339
+      },
+      "meshIndex": 1053,
+      "meshPosition": {
+        "x": -175.5816192626953,
+        "y": -158.88684844970703,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 123.7
+    },
+    {
+      "id": "1fdb368d-d8d8-4bd9-ad7d-648f01e4b000",
+      "name": "Residencias Arichuna Los Corales",
+      "zone": "Los Corales",
+      "address": "J48R+RQP, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61249,
+      "lng": -66.85806,
+      "floors": 9,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/f6f42e57-2dfc-4596-a48b-12674d7b2126.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -678.1249390090028,
+        "y": 39.95849790610262
+      },
+      "meshIndex": 1029,
+      "meshPosition": {
+        "x": -551.6802062988281,
+        "y": -245.65570068359375,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 312.4
+    },
+    {
+      "id": "11f1a66c-b94d-4fd2-a822-4d3bd536e041",
+      "name": "Supermercado Roca Azul",
+      "zone": "El Palmar Este",
+      "address": "J592+22W, Boulevard Monteclaro, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61234,
+      "lng": -66.84993,
+      "floors": 7,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/ae399ba2-6c2e-438f-b638-ee18faca9134.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 211.43235308175238,
+        "y": 23.372397906141288
+      },
+      "meshIndex": 3888,
+      "meshPosition": {
+        "x": 243.84325408935547,
+        "y": -105.67855072021484,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 133.1
+    },
+    {
+      "id": "102b3cb5-da3c-4baa-a164-228a3ac9727f",
+      "name": "OPP 33",
+      "zone": "Caribe",
+      "address": "Caribe, Caraballeda 1165, opp 33",
+      "lat": 10.60971,
+      "lng": -66.8417,
+      "floors": 5,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/0d2678d3-9c51-4d63-ae98-0a42ba885ae0.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1111.931309282236,
+        "y": -267.4372220938488
+      },
+      "meshIndex": 16942,
+      "meshPosition": {
+        "x": 1122.951416015625,
+        "y": -268.904052734375,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 11.1
+    },
+    {
+      "id": "0b79ab1c-fb17-4b4e-afac-2546562f9bbc",
+      "name": "Edificio Sayemar",
+      "zone": "Tanaguarena",
+      "address": "J569+P77, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61179,
+      "lng": -66.83183,
+      "floors": 4,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/b166baf3-1a39-4d0b-86f1-ad0871ab7280.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2191.87355687729,
+        "y": -37.44330209391339
+      },
+      "meshIndex": 18427,
+      "meshPosition": {
+        "x": 2166.0557861328125,
+        "y": -19.73080062866211,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 31.3
+    },
+    {
+      "id": "0b166f21-44fe-46c0-bf17-5f0220f0b6f2",
+      "name": "Hotel Santuario La Llanada",
+      "zone": "Macuto / Caraballeda",
+      "address": "10.60642187610977",
+      "lat": 10.60629,
+      "lng": -66.87247,
+      "floors": 9,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/a20ee5d8-98a9-4607-beda-edb0a8d86e47.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -2254.818737169867,
+        "y": -645.600302093871
+      },
+      "meshIndex": 7659,
+      "meshPosition": {
+        "x": -2264.1539306640625,
+        "y": -644.24365234375,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 9.4
+    },
+    {
+      "id": "0aca2a9f-b8b7-4e0f-a45d-5e8a0c68b638",
+      "name": "Residencia Elite Beach",
+      "zone": "Caribe",
+      "address": "Caribe, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61294,
+      "lng": -66.84408,
+      "floors": 6,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/a09fbdad-243e-423f-b781-9af3cb6ab3f2.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 851.519703479096,
+        "y": 89.7167979061831
+      },
+      "meshIndex": 19423,
+      "meshPosition": {
+        "x": 977.0867309570312,
+        "y": -88.5578498840332,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 218.1
+    },
+    {
+      "id": "02f31324-b5ef-4ecb-8916-536214cbf776",
+      "name": "Residencias El Nazareno",
+      "zone": "Sector El Ceibo",
+      "address": "J456+235, C. Guaicamacuto, Macuto 1164, La Guaira, Venezuela",
+      "lat": 10.60752,
+      "lng": -66.88975,
+      "floors": 9,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/69097900-06b4-4ed4-acf9-4fca74af8805.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -4145.538295268119,
+        "y": -509.59428209391297
+      },
+      "meshIndex": 529,
+      "meshPosition": {
+        "x": -4136.97216796875,
+        "y": -496.25950622558594,
+        "z": 5.5
+      },
+      "meshHeight": 11,
+      "distToMeshMeters": 15.8
+    },
+    {
+      "id": "5cd408ed-5695-4d33-b149-b5b5c23d4753",
+      "name": "Tahiti",
+      "zone": "Caraballeda",
+      "address": "J592+95G Edificio Tahiti, Boulevard Monteclaro, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61141,
+      "lng": -66.84954,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/a7d29ad4-2094-4075-a3fc-cc3a38c71ca4.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 254.10484310782732,
+        "y": -79.46142209389404
+      },
+      "meshIndex": 3888,
+      "meshPosition": {
+        "x": 243.84325408935547,
+        "y": -105.67855072021484,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 28.2
+    },
+    {
+      "id": "17de28ee-d03a-40fb-bf2a-02582c92c732",
+      "name": "Palafito del mar",
+      "zone": "Caraballeda",
+      "address": "C. Cariaco, La Guaira 1160, La Guaira, Venezuela",
+      "lat": 10.61231,
+      "lng": -66.8413,
+      "floors": 7,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/45c35318-cd6c-40b1-91d8-07908a132c1e.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1155.6979657195948,
+        "y": 20.055177906266863
+      },
+      "meshIndex": 18285,
+      "meshPosition": {
+        "x": 1203.5208740234375,
+        "y": -20.73550033569336,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 62.9
+    },
+    {
+      "id": "70511bcd-2f49-4ce4-9127-4e0c14b2f439",
+      "name": "Residencia la cascada",
+      "zone": "Caribe",
+      "address": "J584+66C, 1165 Av. José María España, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61205,
+      "lng": -66.84448,
+      "floors": 9,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/4b493a56-3621-425a-b75f-0a98870cf65c.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 807.7530470417373,
+        "y": -8.694062093823277
+      },
+      "meshIndex": 16828,
+      "meshPosition": {
+        "x": 830.1668395996094,
+        "y": -145.70590209960938,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 138.8
+    },
+    {
+      "id": "9d95d113-9eea-452d-9719-145cc1c1c4e0",
+      "name": "El Tanagua",
+      "zone": "Caraballeda",
+      "address": "Av. José María España, Caraballeda, La Guaira, Venezuela",
+      "lat": 10.61185,
+      "lng": -66.84378,
+      "floors": 5,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/f5ac164a-b30b-411f-aefd-f585fd17cb9e.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 884.3446958082814,
+        "y": -30.808862093771722
+      },
+      "meshIndex": 19423,
+      "meshPosition": {
+        "x": 977.0867309570312,
+        "y": -88.5578498840332,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 109.3
+    },
+    {
+      "id": "41bb543d-d8bc-429e-a0ab-8ec36cf0a5f0",
+      "name": "Edificio Maratea",
+      "zone": "La Guaira",
+      "address": "Av. José María España, Caraballeda, La Guaira, Venezuela",
+      "lat": 10.61269,
+      "lng": -66.84491,
+      "floors": 5,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/86e1435d-1d3a-4bf3-b74f-6ce6b2fffe6b.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 760.703891372082,
+        "y": 62.07329790624752
+      },
+      "meshIndex": 2961,
+      "meshPosition": {
+        "x": 567.354248046875,
+        "y": -28.926100730895996,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 213.7
+    },
+    {
+      "id": "cea51aa4-7bb7-41cf-820f-610a06290d11",
+      "name": "Edificio Estrella",
+      "zone": "Al lado del hotel Eduard’s",
+      "address": "J34X+3VJ, Macuto 1164, La Guaira, Venezuela",
+      "lat": 10.60521,
+      "lng": -66.90036,
+      "floors": 4,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/cf912988-3e42-481f-a872-1863a3ae46f0.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -5306.448857271743,
+        "y": -765.0202220938677
+      },
+      "meshIndex": 36272,
+      "meshPosition": {
+        "x": -5366.192138671875,
+        "y": -875.7836303710938,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 125.8
+    },
+    {
+      "id": "96a2785d-0a18-4bed-8661-7011cf911205",
+      "name": "Residencias Puerto Coral",
+      "zone": "Macuto",
+      "address": "J468+F86, Macuto 1164, La Guaira, Venezuela",
+      "lat": 10.61119,
+      "lng": -66.884268,
+      "floors": 8,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/b9f767f9-dda3-4cc3-af47-4848fbd9452c.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -3545.716268792648,
+        "y": -103.78770209375878
+      },
+      "meshIndex": 32,
+      "meshPosition": {
+        "x": -3616.7509765625,
+        "y": -255.20289611816406,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 167.2
+    },
+    {
+      "id": "b20f95af-c836-4b66-83e1-a8599b2dee12",
+      "name": "Residencias Aguamarina",
+      "zone": "Macuto",
+      "address": "J466+FW, La Guaira, Venezuela",
+      "lat": 10.611034,
+      "lng": -66.887497,
+      "floors": 4,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/44460fe0-89e9-4792-b517-4b7ce9fa977a.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -3899.022602882997,
+        "y": -121.03724609381285
+      },
+      "meshIndex": 35364,
+      "meshPosition": {
+        "x": -3932.171142578125,
+        "y": 93.09904861450195,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 216.7
+    },
+    {
+      "id": "9cfc15c8-d399-4d83-bf4e-badc1bc5e99a",
+      "name": "Res Mariola y maribel",
+      "zone": "El Palmar Este",
+      "address": "El Palmar Este, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.609618,
+      "lng": -66.848912,
+      "floors": 6,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/b60d07e9-00d3-4382-b1e7-083d2127a40f.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 322.81849371530467,
+        "y": -277.6100300938958
+      },
+      "meshIndex": 4543,
+      "meshPosition": {
+        "x": 322.1794738769531,
+        "y": -269.0953063964844,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 8.5
+    },
+    {
+      "id": "353fdc6f-6680-4a82-ad3c-4838e18e67fc",
+      "name": "Edificio Arcángel",
+      "zone": "Urbanización Álamo",
+      "address": "Avenida La Playa, Macuto 1164, La Guaira, Venezuela",
+      "lat": 10.604623,
+      "lng": -66.901844,
+      "floors": 6,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/5b81d312-635e-4ffb-9b6b-fdce613fa618.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -5468.823152653706,
+        "y": -829.9271600938067
+      },
+      "meshIndex": 34501,
+      "meshPosition": {
+        "x": -5461.547119140625,
+        "y": -856.3297119140625,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 27.4
+    },
+    {
+      "id": "62f9aa6a-326b-4ac6-8f83-940a2662ea4e",
+      "name": "Edificio La Gabarra",
+      "zone": "Los Corales",
+      "address": "Los Corales, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61148,
+      "lng": -66.85651,
+      "floors": 5,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/e9404530-9b80-4832-b749-4a02dda7a4f4.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -508.5291453144319,
+        "y": -71.72124209379422
+      },
+      "meshIndex": 1271,
+      "meshPosition": {
+        "x": -439.3591766357422,
+        "y": -169.83399963378906,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 120
+    },
+    {
+      "id": "0643df19-c5b9-423b-a013-3a26a1e48460",
+      "name": "Res. Gran Terraza",
+      "zone": "Caribe, Caraballeda",
+      "address": "Av. José María España, Caraballeda, La Guaira, Venezuela",
+      "lat": 10.61297,
+      "lng": -66.84448,
+      "floors": 5,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/83e13f04-3e32-4a9c-aff4-875f1374a617.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 807.7530470417373,
+        "y": 93.0340179062539
+      },
+      "meshIndex": 16828,
+      "meshPosition": {
+        "x": 830.1668395996094,
+        "y": -145.70590209960938,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 239.8
+    },
+    {
+      "id": "05e946ce-78df-4fc9-ae35-31f85e37fe1d",
+      "name": "Res. Breña sol",
+      "zone": "Caribe",
+      "address": "Av. José María España, Caraballeda, La Guaira, Venezuela",
+      "lat": 10.61175,
+      "lng": -66.84491,
+      "floors": 4,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/1d304dbe-dd11-4ee1-ab44-0defb68f938d.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 760.703891372082,
+        "y": -41.866262093745945
+      },
+      "meshIndex": 16828,
+      "meshPosition": {
+        "x": 830.1668395996094,
+        "y": -145.70590209960938,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 124.9
+    },
+    {
+      "id": "1b51a5c5-0983-431a-8de6-2af5f86de221",
+      "name": "Centro Comercial IP5",
+      "zone": "El Palmar Este",
+      "address": "J49X+FM8, Av. José María España, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.6117,
+      "lng": -66.85079,
+      "floors": 6,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/5be595ab-fe7c-43fd-80dd-9dd6e7d78b64.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 117.33404174088683,
+        "y": -47.39496209373306
+      },
+      "meshIndex": 1208,
+      "meshPosition": {
+        "x": 126.6522216796875,
+        "y": -120.0401496887207,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 73.2
+    },
+    {
+      "id": "4897ca93-dec9-42b0-8ade-24ce309fefca",
+      "name": "Supermercado Roca Azul",
+      "zone": "Caraballeda",
+      "address": "Boulevard Monte carlo con Av. Cannes. Urb. Palmar Este. Caraballeda, Edo. La Guaira.",
+      "lat": 10.61276,
+      "lng": -66.84992,
+      "floors": 6,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/c505d082-b0f2-476e-9002-bb15b04b8218.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 212.5265194930362,
+        "y": 69.81347790615092
+      },
+      "meshIndex": 3888,
+      "meshPosition": {
+        "x": 243.84325408935547,
+        "y": -105.67855072021484,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 178.3
+    },
+    {
+      "id": "09593f6f-a35f-46f8-beaa-5973bc3009bc",
+      "name": "Edificio Gabarra",
+      "zone": "La Guaira",
+      "address": "Los Corales, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61154,
+      "lng": -66.85651,
+      "floors": 7,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -508.5291453144319,
+        "y": -65.08680209384897
+      },
+      "meshIndex": 1271,
+      "meshPosition": {
+        "x": -439.3591766357422,
+        "y": -169.83399963378906,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 125.5
+    },
+    {
+      "id": "c5e4159f-33aa-4730-bc6c-876caf58df87",
+      "name": "Edificio Costa Brava",
+      "zone": "Caraballeda",
+      "address": "J48V+Q5G, Av. La Costanera, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61166,
+      "lng": -66.85705,
+      "floors": 7,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -567.6141315050994,
+        "y": -51.817922093762036
+      },
+      "meshIndex": 1271,
+      "meshPosition": {
+        "x": -439.3591766357422,
+        "y": -169.83399963378906,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 174.3
+    },
+    {
+      "id": "dc26a6b4-d21e-4a4a-8d29-0a048c23d924",
+      "name": "Recidencias NewPort",
+      "zone": "Vargas",
+      "address": "C. La Playa, La Guaira, Venezuela",
+      "lat": 10.61267,
+      "lng": -66.82818,
+      "floors": 4,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/0574c5e5-6e51-4b23-b920-75288951f57c.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2591.2442968683827,
+        "y": 59.8618179061348
+      },
+      "meshIndex": 38453,
+      "meshPosition": {
+        "x": 2663.864501953125,
+        "y": 38.22815132141113,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 75.8
+    },
+    {
+      "id": "11907361-e608-4185-a18a-ee2a8705c391",
+      "name": "Espomar",
+      "zone": "Caraballeda",
+      "address": "J579+57M, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.613009,
+      "lng": -66.831817,
+      "floors": 7,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/81bedfe0-1046-40d8-87ad-397948fd240c.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2193.2959732110257,
+        "y": 97.34640390616926
+      },
+      "meshIndex": 18523,
+      "meshPosition": {
+        "x": 2191.914794921875,
+        "y": 98.78554916381836,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 2
+    },
+    {
+      "id": "d790351d-0412-4aca-bf95-66088d7742e1",
+      "name": "Residencia Acuario",
+      "zone": "Tanaguarena",
+      "address": "Tanaguarena, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61027,
+      "lng": -66.82458,
+      "floors": 7,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/ee18c365-fa35-40f9-a0ef-b75960ca7b1a.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2985.1442048061667,
+        "y": -205.51578209383595
+      },
+      "meshIndex": 38021,
+      "meshPosition": {
+        "x": 2915.37548828125,
+        "y": 0.5161995887756348,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 217.5
+    },
+    {
+      "id": "1c3e7ad4-d8d5-4a37-bedd-a23d3e547ba3",
+      "name": "Costabella",
+      "zone": "El Palmar Este",
+      "address": "Av. Cannes, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.6118,
+      "lng": -66.85076,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/1b7c9ca2-d72c-4399-960e-2cb1e440e952.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 120.6165409747383,
+        "y": -36.337562093758834
+      },
+      "meshIndex": 1208,
+      "meshPosition": {
+        "x": 126.6522216796875,
+        "y": -120.0401496887207,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 83.9
+    },
+    {
+      "id": "895647b7-0026-42b9-953b-02623c3e98b8",
+      "name": "Edificio Caribe detras de las 15 letras",
+      "zone": "15 Letras",
+      "address": "J577+G33, paso 3, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61015,
+      "lng": -66.88344,
+      "floors": 6,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/27608173-319d-4690-b718-4343701cab91.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -3455.1192899657135,
+        "y": -218.78466209372647
+      },
+      "meshIndex": 32,
+      "meshPosition": {
+        "x": -3616.7509765625,
+        "y": -255.20289611816406,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 165.7
+    },
+    {
+      "id": "9447dec0-e6ff-4515-89d8-f1561fad2779",
+      "name": "Edificio Laguna Mar",
+      "zone": "Caraballeda",
+      "address": "Edificio Laguna Mar, Caraballeda Frente al Sheraton",
+      "lat": 10.61246,
+      "lng": -66.8426,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1013.45633229779,
+        "y": 36.641277906228225
+      },
+      "meshIndex": 19427,
+      "meshPosition": {
+        "x": 1027.6240234375,
+        "y": -67.85950088500977,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 105.5
+    },
+    {
+      "id": "862e33eb-879c-4979-850a-99d0b86b6877",
+      "name": "Auraima",
+      "zone": "Tanaguarena",
+      "address": "Av. Jardín Botánico, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.611782,
+      "lng": -66.826465,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/2de0cfd3-9569-4221-949f-cbc7baf3eb7e.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2778.893836344472,
+        "y": -38.32789409384063
+      },
+      "meshIndex": 311,
+      "meshPosition": {
+        "x": 2789.7855224609375,
+        "y": 33.43415069580078,
+        "z": 5.5
+      },
+      "meshHeight": 11,
+      "distToMeshMeters": 72.6
+    },
+    {
+      "id": "62ef0817-e24d-4aa7-bedf-3a79da0607e8",
+      "name": "Edificio Sayemar",
+      "zone": "La Guaira",
+      "address": "Edificio Sayemar. La Guaira",
+      "lat": 10.61179,
+      "lng": -66.83183,
+      "floors": 9,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2191.87355687729,
+        "y": -37.44330209391339
+      },
+      "meshIndex": 18427,
+      "meshPosition": {
+        "x": 2166.0557861328125,
+        "y": -19.73080062866211,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 31.3
+    },
+    {
+      "id": "607d1a5e-6afd-4cf2-b225-556b3065c44e",
+      "name": "Edificio Tahiti",
+      "zone": "Caraballeda",
+      "address": "Edificio Tahiti. Caraballeda",
+      "lat": 10.61255,
+      "lng": -66.84954,
+      "floors": 4,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 254.10484310782732,
+        "y": 46.592937906244316
+      },
+      "meshIndex": 2844,
+      "meshPosition": {
+        "x": 341.636962890625,
+        "y": -66.17905044555664,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 142.8
+    },
+    {
+      "id": "1463caf3-94ff-47ed-bd8a-35d26a9d36a3",
+      "name": "LidoSol",
+      "zone": "Al lado del restaurante los tres reyes",
+      "address": "Av. Jose Maria Vargas, esquina con Biarritz (Corapalito)",
+      "lat": 10.61213,
+      "lng": -66.86321,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/912c8e78-5750-4df9-8f69-3135580d7a46.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -1241.6206406413573,
+        "y": 0.15185790623468165
+      },
+      "meshIndex": 5870,
+      "meshPosition": {
+        "x": -1348.4117431640625,
+        "y": -182.65029907226562,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 211.7
+    },
+    {
+      "id": "2cdb3379-ddb0-4e10-860b-ebae7b4696b3",
+      "name": "Edificio Tamarumo",
+      "zone": "Tanaguarena",
+      "address": "C. Las Acacias, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.610822,
+      "lng": -66.827821,
+      "floors": 9,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/b66c42ae-d3b1-40f2-a5e1-51f47f166c06.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2630.5248710213436,
+        "y": -144.47893409375035
+      },
+      "meshIndex": 38454,
+      "meshPosition": {
+        "x": 2684.3345947265625,
+        "y": 27.416150093078613,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 180.1
+    },
+    {
+      "id": "2e392d0a-512b-4f4f-8770-f7156451f820",
+      "name": "Residencia Palmeira",
+      "zone": "Caraballeda, La Guaira",
+      "address": "J56G+R3R, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61139,
+      "lng": -66.82494,
+      "floors": 4,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/a438fb27-7949-401c-a388-91e0395a433b.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2945.7542140123883,
+        "y": -81.67290209381031
+      },
+      "meshIndex": 38021,
+      "meshPosition": {
+        "x": 2915.37548828125,
+        "y": 0.5161995887756348,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 87.6
+    },
+    {
+      "id": "3903f9e8-6ba8-4217-a56d-4c0c2a405437",
+      "name": "Anduriña Mar",
+      "zone": "Tanaguarena",
+      "address": "Residencias Anduriña Mar, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.610921,
+      "lng": -66.82147,
+      "floors": 7,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/40c6e0aa-f640-4436-a5bd-e433f6bce0e7.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 3325.429958606592,
+        "y": -133.5321080938898
+      },
+      "meshIndex": 39232,
+      "meshPosition": {
+        "x": 3371.256591796875,
+        "y": -157.7750473022461,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 51.8
+    },
+    {
+      "id": "39be7d70-6a21-4151-83d1-a3017113def0",
+      "name": "Espomar",
+      "zone": "Tanaguarena",
+      "address": "Tanaguarena, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61027,
+      "lng": -66.82458,
+      "floors": 4,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/7a9f60af-e278-45f2-ac22-af2c1c7b9a32.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2985.1442048061667,
+        "y": -205.51578209383595
+      },
+      "meshIndex": 38021,
+      "meshPosition": {
+        "x": 2915.37548828125,
+        "y": 0.5161995887756348,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 217.5
+    },
+    {
+      "id": "3d81fc7a-65f5-4c7a-bcdd-c3d7986bee0f",
+      "name": "Golf Club. Caribe",
+      "zone": "Caribe, Caraballeda, La Guaira",
+      "address": "Av. ppal de Caribe con av Guaicaipuro",
+      "lat": 10.6116,
+      "lng": -66.84244,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/10966cbc-cd11-4cb4-b10e-94289066fa11.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1030.9629948736665,
+        "y": -58.45236209390373
+      },
+      "meshIndex": 19427,
+      "meshPosition": {
+        "x": 1027.6240234375,
+        "y": -67.85950088500977,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 10
+    },
+    {
+      "id": "600dc09e-89fb-48a3-9bbb-3158d55d4acb",
+      "name": "Pin High",
+      "zone": "Caribe",
+      "address": "Avenida Guaicamacuto, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61167,
+      "lng": -66.84522,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/56f40fa5-6de7-449c-9f7e-cf4f564c34ad.webp",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 726.7847326331679,
+        "y": -50.712182093803904
+      },
+      "meshIndex": 4266,
+      "meshPosition": {
+        "x": 625.373291015625,
+        "y": -136.1688995361328,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 132.6
+    },
+    {
+      "id": "710f62ad-7d30-4a65-908b-c6d07628d9a9",
+      "name": "Residencias Avila Caribe",
+      "zone": "El Palmar Este",
+      "address": "Urbanizacion Tanaguarenas, Avenida del Club Entre Av Cerro Grande y Bulevard Naiguata, Residencias Avila Caribe, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.60936,
+      "lng": -66.84953,
+      "floors": 6,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/4fa979ac-1dbb-4dae-b8f4-356aa998e98a.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 255.19900951911114,
+        "y": -306.13812209375857
+      },
+      "meshIndex": 4930,
+      "meshPosition": {
+        "x": 256.28269958496094,
+        "y": -306.2207489013672,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 1.1
+    },
+    {
+      "id": "762cc105-d7a3-4904-90d2-3f681c548465",
+      "name": "Quinta San jose",
+      "zone": "Colegio la merced",
+      "address": "Urbanización Palmar este avenida Acapulco",
+      "lat": 10.61146,
+      "lng": -66.84998,
+      "floors": 6,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/8c679e9c-ef5d-4e10-ba12-8bb7248fd7dc.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 205.9615210268882,
+        "y": -73.93272209390692
+      },
+      "meshIndex": 3888,
+      "meshPosition": {
+        "x": 243.84325408935547,
+        "y": -105.67855072021484,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 49.4
+    },
+    {
+      "id": "7d2a7ff6-b2aa-4a4c-ace9-033d06f329fc",
+      "name": "Residencias Capri Club XVI",
+      "zone": "La Llanada",
+      "address": "Urb Av. La Costanera, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61115,
+      "lng": -66.86691,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/40d200d0-e68b-4efc-b0a0-d11825c5844f.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -1646.4622126888696,
+        "y": -108.21066209378775
+      },
+      "meshIndex": 8767,
+      "meshPosition": {
+        "x": -1659.2752685546875,
+        "y": -304.84629821777344,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 197.1
+    },
+    {
+      "id": "8ed896a5-7eda-4129-9af1-d7881264bea4",
+      "name": "Parque del Caribe",
+      "zone": "Urbanizacion Punta de Brisas",
+      "address": "J468+7FR, Macuto 1164, La Guaira, Venezuela",
+      "lat": 10.610856,
+      "lng": -66.883914,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/73f5a91e-9448-4652-b5bb-50d1e3202e3f.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -3506.9827778453287,
+        "y": -140.7194180938141
+      },
+      "meshIndex": 32,
+      "meshPosition": {
+        "x": -3616.7509765625,
+        "y": -255.20289611816406,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 158.6
+    },
+    {
+      "id": "8b878c43-bfec-40d6-8662-804a6dd6ed97",
+      "name": "Playa Alí Babá",
+      "zone": "Caraballeda",
+      "address": "Playa Alí Babá, Av. José María España, Caraballeda, La Guaira, Venezuela",
+      "lat": 10.61145,
+      "lng": -66.86565,
+      "floors": 6,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/d5d62105-b181-43ff-bfb2-e7b4957fe41b.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -1508.5972449106453,
+        "y": -75.03846209386506
+      },
+      "meshIndex": 5866,
+      "meshPosition": {
+        "x": -1390.82568359375,
+        "y": -213.25029754638672,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 181.6
+    },
+    {
+      "id": "953fc6e0-148c-46d6-8b88-85d68b65a19c",
+      "name": "Residencias Altamar",
+      "zone": "Urbanización las Quince Letras",
+      "address": "J456+H2R, Macuto 1164, La Guaira, Venezuela",
+      "lat": 10.60874,
+      "lng": -66.89026,
+      "floors": 4,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/f7aafa7e-cd31-4aea-82ea-294779fb4dcf.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -4201.340782224935,
+        "y": -374.69400209391307
+      },
+      "meshIndex": 42,
+      "meshPosition": {
+        "x": -4213.596435546875,
+        "y": -428.5876007080078,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 55.3
+    },
+    {
+      "id": "95ecf65b-8cd7-40b1-b6c1-a6b611e0177b",
+      "name": "Remanso II",
+      "zone": "Tanaguarena",
+      "address": "J57G+43F, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61183,
+      "lng": -66.82484,
+      "floors": 6,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/b2470230-4a0e-4455-af04-f13338de420c.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2956.6958781221165,
+        "y": -33.02034209388441
+      },
+      "meshIndex": 38021,
+      "meshPosition": {
+        "x": 2915.37548828125,
+        "y": 0.5161995887756348,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 53.2
+    },
+    {
+      "id": "98353e89-1f0a-4a97-ae49-399b13aaaabd",
+      "name": "Edificio Avila Mar",
+      "zone": "Caraballeda",
+      "address": "Caraballeda, La Guaira, Venezuela",
+      "lat": 10.612839,
+      "lng": -66.849812,
+      "floors": 6,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/56140783-770e-41fd-9e1d-378d7a487e2d.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 224.34351673085874,
+        "y": 78.54882390609521
+      },
+      "meshIndex": 3888,
+      "meshPosition": {
+        "x": 243.84325408935547,
+        "y": -105.67855072021484,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 185.3
+    },
+    {
+      "id": "9a048169-4539-43ea-bc6b-811518ef143a",
+      "name": "Residencias Brisamar",
+      "zone": "Macuto",
+      "address": "Subida Teleferico, Macuto 1164, La Guaira, Venezuela",
+      "lat": 10.60957,
+      "lng": -66.88163,
+      "floors": 7,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/a3812633-9146-4988-8fca-83d980d493ef.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -3257.0751695870927,
+        "y": -282.917582093852
+      },
+      "meshIndex": 28684,
+      "meshPosition": {
+        "x": -3212.1490478515625,
+        "y": -408.2590026855469,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 133.1
+    },
+    {
+      "id": "99ee0417-40d9-4ce0-aa86-d4c997f6b301",
+      "name": "Residencias Newport",
+      "zone": "Tanaguarena",
+      "address": "C. Charaima, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61152,
+      "lng": -66.82857,
+      "floors": 8,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/ee3b5125-c1b1-47db-b33a-d296efac2130.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2548.571806842308,
+        "y": -67.29828209376525
+      },
+      "meshIndex": 38453,
+      "meshPosition": {
+        "x": 2663.864501953125,
+        "y": 38.22815132141113,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 156.3
+    },
+    {
+      "id": "a2c6ef8a-bd62-4163-8487-2db924e34214",
+      "name": "Residencia Cima Del Mar",
+      "zone": "La Llanada",
+      "address": "J45M+72C, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.60818,
+      "lng": -66.86748,
+      "floors": 6,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/73773341-bac9-4a7a-b582-6d69ffef32dc.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -1708.8296981118337,
+        "y": -436.6154420937295
+      },
+      "meshIndex": 10106,
+      "meshPosition": {
+        "x": -1685.7257080078125,
+        "y": -416.6230010986328,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 30.6
+    },
+    {
+      "id": "a550aff4-40a8-4cb9-a837-646d22800823",
+      "name": "Residencias arrecife",
+      "zone": "Caraballeda",
+      "address": "Av. José María España, Caraballeda, La Guaira, Venezuela",
+      "lat": 10.61184,
+      "lng": -66.82711,
+      "floors": 8,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/3ae45176-ba76-49f3-b5a2-7e7d9a98cb69.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2708.320102838434,
+        "y": -31.914602093729854
+      },
+      "meshIndex": 38454,
+      "meshPosition": {
+        "x": 2684.3345947265625,
+        "y": 27.416150093078613,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 64
+    },
+    {
+      "id": "bc12adc3-0575-434a-9f42-a3d7cde8c1ae",
+      "name": "Las brisas",
+      "zone": "Los Corales",
+      "address": "Parque Mar, Avenida17-A, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.60803,
+      "lng": -66.85673,
+      "floors": 7,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/ae8cef3c-e270-4e0e-9020-6c965dd0a51d.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -532.6008063549015,
+        "y": -453.20154209388727
+      },
+      "meshIndex": 6442,
+      "meshPosition": {
+        "x": -530.6386413574219,
+        "y": -453.90399169921875,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 2.1
+    },
+    {
+      "id": "a8e38572-a157-4e66-b4bc-1c5a7afd376b",
+      "name": "Es una casa de ladrillo con color verde y rejas negras pequeñas de 3 pisos",
+      "zone": "Casas en el cerro",
+      "address": "C. Perro Seco, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.60612,
+      "lng": -66.84508,
+      "floors": 3,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/7df385f2-2dea-4e3d-990e-ce366933bf52.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 742.1030623864766,
+        "y": -664.3978820937486
+      },
+      "meshIndex": 5740,
+      "meshPosition": {
+        "x": 602.5571899414062,
+        "y": -424.19395446777344,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 277.8
+    },
+    {
+      "id": "ac2a21b8-cb63-4781-8ed3-24624030ac36",
+      "name": "Coral Plaza",
+      "zone": "Los Corales",
+      "address": "J46W+CJP, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.6111,
+      "lng": -66.85342,
+      "floors": 8,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/998cee3a-04b1-4176-9996-08b952d990bd.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -170.43172433501914,
+        "y": -113.73936209377487
+      },
+      "meshIndex": 1053,
+      "meshPosition": {
+        "x": -175.5816192626953,
+        "y": -158.88684844970703,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 45.4
+    },
+    {
+      "id": "ae08eec0-b6b3-46f8-be96-81668280d309",
+      "name": "Celtamar II",
+      "zone": "Tanaguarena",
+      "address": "Ave plaza el parque, la guaira, tanaguarena",
+      "lat": 10.61135,
+      "lng": -66.83749,
+      "floors": 7,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/7009bc18-cd26-4232-aa4a-e59c8beb8c04.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1572.5753682865643,
+        "y": -86.09586209383929
+      },
+      "meshIndex": 18896,
+      "meshPosition": {
+        "x": 1569.708984375,
+        "y": -49.27510070800781,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 36.9
+    },
+    {
+      "id": "b249b20b-98d0-49d5-9685-3420f2d5046a",
+      "name": "Edificio club de playa",
+      "zone": "Al lado del taller Ferrari",
+      "address": "Avenida la playa,sector el ceibo,Macuto,edificio club de playa",
+      "lat": 10.60885,
+      "lng": -66.88982,
+      "floors": 7,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/06995c1b-1e12-4635-9d60-10ef51858690.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -4153.197460143996,
+        "y": -362.5308620937843
+      },
+      "meshIndex": 42,
+      "meshPosition": {
+        "x": -4213.596435546875,
+        "y": -428.5876007080078,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 89.5
+    },
+    {
+      "id": "bafce602-1d71-49b7-b1bd-ea31c307040a",
+      "name": "Edificio Mafrem",
+      "zone": "Frente a Celicor La Costanera",
+      "address": "avenida principal la costanera con calle 4, Los corales Caraballeda",
+      "lat": 10.61282,
+      "lng": -66.85926,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/91c9f47f-0fe8-4e3f-800b-8db27c41fa57.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -809.4249083226339,
+        "y": 76.44791790609617
+      },
+      "meshIndex": 675,
+      "meshPosition": {
+        "x": -877.1211547851562,
+        "y": -264.3115005493164,
+        "z": 2.200000047683716
+      },
+      "meshHeight": 4.400000095367432,
+      "distToMeshMeters": 347.4
+    },
+    {
+      "id": "de76cac9-69d9-4408-9b30-9f9c8beb73dc",
+      "name": "Parque Azul",
+      "zone": "Tanaguarena",
+      "address": "J57F+2XF, Av La Playa, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61296,
+      "lng": -66.82508,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/e5a7f1a0-8472-43e4-9f87-08b6ba8b28e5.png",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2930.4358842590796,
+        "y": 91.92827790609937
+      },
+      "meshIndex": 35665,
+      "meshPosition": {
+        "x": 2913.1248779296875,
+        "y": 81.11149597167969,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 20.4
+    },
+    {
+      "id": "d2a4026a-f5ee-417f-ac77-9b41ffd5e69e",
+      "name": "Residencia Bergantin",
+      "zone": "Urbanizacion Punta de Brisas",
+      "address": "Urbanizacion Punta de Brisas, Macuto, La Guaira, Venezuela",
+      "lat": 10.61099,
+      "lng": -66.88506,
+      "floors": 8,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/f7b6aef1-07f1-420f-9722-82e34c61890d.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -3632.374248537716,
+        "y": -125.90250209390365
+      },
+      "meshIndex": 32,
+      "meshPosition": {
+        "x": -3616.7509765625,
+        "y": -255.20289611816406,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 130.2
+    },
+    {
+      "id": "f16bb091-aed0-412a-ae46-edba40b715ab",
+      "name": "Caraballeda Country residences Mar.",
+      "zone": "Caraballeda",
+      "address": "J57C+466, Caraballeda, La Guaira, Venezuela",
+      "lat": 10.6114,
+      "lng": -66.82948,
+      "floors": 13,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/9cb0b22d-0691-4f75-8a59-a3c6275892d1.webp",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2449.002663446578,
+        "y": -80.56716209385218
+      },
+      "meshIndex": 38333,
+      "meshPosition": {
+        "x": 2371.242919921875,
+        "y": 130.2041015625,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 224.7
+    },
+    {
+      "id": "fd0260af-8ab8-4b18-91f0-fdbd90316fa4",
+      "name": "Residencia Ocean Caraballeda",
+      "zone": "Junto a las residencias Palma Real, frente a la Playa Los Cocos",
+      "address": "J587+52G, C. La Playa, Caraballeda 1165, La Guaira, Venezuela",
+      "lat": 10.61161,
+      "lng": -66.83743,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/3bbb81e2-58c0-4a1f-96f6-02c3a30dc79b.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1579.1403667527122,
+        "y": -57.34662209374915
+      },
+      "meshIndex": 18896,
+      "meshPosition": {
+        "x": 1569.708984375,
+        "y": -49.27510070800781,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 12.4
+    },
+    {
+      "id": "2426ae0e-32aa-4aff-9a13-bb35fd04bb02",
+      "name": "Edificio Albatros",
+      "zone": "campos de Golf",
+      "address": "Avenida Granada, Caraballeda",
+      "lat": 10.611864,
+      "lng": -66.839656,
+      "floors": 5,
+      "status": "collapsed",
+      "damage_level": "total",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/61a1eeed-11fd-4742-8000-8b0737c2da7b.jpg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1335.5789236774347,
+        "y": -29.260826093751746
+      },
+      "meshIndex": 18251,
+      "meshPosition": {
+        "x": 1334.8807373046875,
+        "y": -30.598899841308594,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 1.5
+    },
+    {
+      "id": "0d2c432b-728a-46a0-89fb-96b128d2e3e7",
+      "name": "Residencia Franco Mar",
+      "zone": "Caraballeda",
+      "address": "Av La Playa, parroquia carballeda, sector tanaguarena, residencia Francomar",
+      "lat": 10.6124439625928,
+      "lng": -66.8320477182784,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "severo",
+      "photo": "https://jckifxsdlnsvbztxydes.supabase.co/storage/v1/object/public/damage-media/reports/016fd092-eee9-4367-9717-7ada7348eb49.jpeg",
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2168.05155414934,
+        "y": 34.86795764254228
+      },
+      "meshIndex": 19941,
+      "meshPosition": {
+        "x": 2166.0909423828125,
+        "y": 34.89529991149902,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 2
+    },
+    {
+      "id": "SOL-EKWTTS",
+      "name": "Res Mirador del Caribe V y Vi",
+      "zone": "Vargas",
+      "address": "Av Principal de La Llanada Res Mirador del Caribe V y VI Urbanización La Llanada. Caraballeda ",
+      "lat": 10.607484,
+      "lng": -66.867535,
+      "floors": 13,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -1714.8476133723398,
+        "y": -513.57494609388
+      },
+      "meshIndex": 11311,
+      "meshPosition": {
+        "x": -1715.840576171875,
+        "y": -517.8019104003906,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 4.3
+    },
+    {
+      "id": "SOL-4BFVUK",
+      "name": "Conjunto Residencial Parque Mar",
+      "zone": "Vargas",
+      "address": "Urbanizacion Los Corales, Avenida Principal con Calle Transversal 17A, Conjunto Residencial Parque Mar, Edificio El Sol (Torre B)",
+      "lat": 10.608808,
+      "lng": -66.858,
+      "floors": 11,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -671.5599405444096,
+        "y": -367.1749700938442
+      },
+      "meshIndex": 23869,
+      "meshPosition": {
+        "x": -667.0515441894531,
+        "y": -379.239990234375,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 12.9
+    },
+    {
+      "id": "SOL-ZS9DZY",
+      "name": "Residencias Camuri chico ",
+      "zone": "Vargas",
+      "address": "Av. La playa, bajada del playón resd. Camuri chico ",
+      "lat": 10.608696,
+      "lng": -66.877563,
+      "floors": 12,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -2812.0776902585253,
+        "y": -379.55925809380744
+      },
+      "meshIndex": 21661,
+      "meshPosition": {
+        "x": -2812.901123046875,
+        "y": -379.3878936767578,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 0.8
+    },
+    {
+      "id": "SOL-JHNRCQ",
+      "name": "Edificio Bergantin - Galeon",
+      "zone": "Vargas",
+      "address": "Calle 1 de punta Brisa, Residencias Bergantin Galeón, Macuto Estado La Guaira",
+      "lat": 10.610562,
+      "lng": -66.884456,
+      "floors": 11,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -3566.286597317631,
+        "y": -173.2281740938405
+      },
+      "meshIndex": 32,
+      "meshPosition": {
+        "x": -3616.7509765625,
+        "y": -255.20289611816406,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 96.3
+    },
+    {
+      "id": "SOL-8U3MG2",
+      "name": "Residencias Caraballeda Humboldt",
+      "zone": "Vargas",
+      "address": "Calle Caobos y Charaima, frente al Hotel La Hosteria",
+      "lat": 10.604726,
+      "lng": -66.843704,
+      "floors": 4,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 892.6603605306176,
+        "y": -818.5380380938843
+      },
+      "meshIndex": 5740,
+      "meshPosition": {
+        "x": 602.5571899414062,
+        "y": -424.19395446777344,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 489.6
+    },
+    {
+      "id": "SOL-S6W2Q9",
+      "name": "Edificio remanso 1 avenida la playa tanaguarenas",
+      "zone": "Vargas",
+      "address": "Avenida la playa tanaguarenas",
+      "lat": 10.610721,
+      "lng": -66.823187,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 3137.561585848868,
+        "y": -155.64690809383825
+      },
+      "meshIndex": 44929,
+      "meshPosition": {
+        "x": 3160.1168212890625,
+        "y": 76.90655136108398,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 233.6
+    },
+    {
+      "id": "SOL-9L53YM",
+      "name": "La Estrella ",
+      "zone": "Vargas",
+      "address": "Edificio la estrella ph4 Av la playa calle 1 urbanización Álamo parroquia macuto Edo la guaira ",
+      "lat": 10.605348,
+      "lng": -66.900401,
+      "floors": 9,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -5310.93493955614,
+        "y": -749.7610100938954
+      },
+      "meshIndex": 36272,
+      "meshPosition": {
+        "x": -5366.192138671875,
+        "y": -875.7836303710938,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 137.6
+    },
+    {
+      "id": "SOL-8YBBPL",
+      "name": "Residencia parque Mar Edificio las Brisas torre A los corales Caraballeda ",
+      "zone": "Vargas",
+      "address": "Conjunto residencial parque Mar edificio Las Brisas torre A los corales Caraballeda ",
+      "lat": 10.60804,
+      "lng": -66.857297,
+      "floors": 25,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -594.6400418554134,
+        "y": -452.0958020937327
+      },
+      "meshIndex": 6788,
+      "meshPosition": {
+        "x": -592.818359375,
+        "y": -447.771240234375,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 4.7
+    },
+    {
+      "id": "SOL-V6Y4R8",
+      "name": "Residencias Caraballeda Humboldt ",
+      "zone": "Vargas",
+      "address": "Urbanización caribe calle Charaima entre caobos y lomas residencias caraballeda Humboldt sector Tanaguarenas ",
+      "lat": 10.610391,
+      "lng": -66.830624,
+      "floors": 4,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2323.8300260358255,
+        "y": -192.1363280938318
+      },
+      "meshIndex": 18389,
+      "meshPosition": {
+        "x": 2155.6541748046875,
+        "y": -118.17354965209961,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 183.7
+    },
+    {
+      "id": "SOL-9XDNSB",
+      "name": "Cimarrón ",
+      "zone": "Vargas",
+      "address": "Av. Circunvalación.  Res. El Cimarrón ",
+      "lat": 10.610758,
+      "lng": -66.845383,
+      "floors": 2,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 708.9498201348392,
+        "y": -151.55567009375744
+      },
+      "meshIndex": 5023,
+      "meshPosition": {
+        "x": 647.4174194335938,
+        "y": -175.15585327148438,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 65.9
+    },
+    {
+      "id": "SOL-FD3CBU",
+      "name": "Edificio Caraballeda Humboltd ",
+      "zone": "Vargas",
+      "address": "Calle Charaima ",
+      "lat": 10.61019,
+      "lng": -66.830441,
+      "floors": 4,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2343.8532713567215,
+        "y": -214.3617020938939
+      },
+      "meshIndex": 18389,
+      "meshPosition": {
+        "x": 2155.6541748046875,
+        "y": -118.17354965209961,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 211.4
+    },
+    {
+      "id": "SOL-4PMWSC",
+      "name": "Edificio Santa clara ",
+      "zone": "Vargas",
+      "address": "Tanaguarena",
+      "lat": 10.609537,
+      "lng": -66.839679,
+      "floors": 1,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1333.0623409324148,
+        "y": -286.56652409387095
+      },
+      "meshIndex": 16882,
+      "meshPosition": {
+        "x": 1364.4216918945312,
+        "y": -278.3926086425781,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 32.4
+    },
+    {
+      "id": "SOL-7WLUCY",
+      "name": "Casa sandy",
+      "zone": "Vargas",
+      "address": "Baja del cojo calle el medio Qtal Sandy",
+      "lat": 10.60811,
+      "lng": -66.889802,
+      "floors": 1,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -4151.227960604618,
+        "y": -444.3556220938293
+      },
+      "meshIndex": 530,
+      "meshPosition": {
+        "x": -4125.013916015625,
+        "y": -482.78529357910156,
+        "z": 5.5
+      },
+      "meshHeight": 11,
+      "distToMeshMeters": 46.5
+    },
+    {
+      "id": "SOL-B2GLKL",
+      "name": "Edificio Costa Bella",
+      "zone": "Vargas",
+      "address": "Av. Cannes con Boulevard Montecarlo",
+      "lat": 10.617605,
+      "lng": -66.850676,
+      "floors": 12,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 129.80753882516868,
+        "y": 605.5445079061005
+      },
+      "meshIndex": 45462,
+      "meshPosition": {
+        "x": 0,
+        "y": 0.5,
+        "z": 0
+      },
+      "meshHeight": 0,
+      "distToMeshMeters": 618.8
+    },
+    {
+      "id": "SOL-53CFJ6",
+      "name": "Edificio Malvin",
+      "zone": "Vargas",
+      "address": "Av principal de Álamo entre 3ra y 4ta calle",
+      "lat": 10.603052,
+      "lng": -66.902746,
+      "floors": 3,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -5567.516962919786,
+        "y": -1003.6389140938301
+      },
+      "meshIndex": 31750,
+      "meshPosition": {
+        "x": -5565.53662109375,
+        "y": -1002.625732421875,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 2.2
+    },
+    {
+      "id": "SOL-VMSYUB",
+      "name": "Quinta chinta",
+      "zone": "Vargas",
+      "address": "Av mar de plata ",
+      "lat": 10.609854,
+      "lng": -66.849165,
+      "floors": 3,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 295.13608351853145,
+        "y": -251.51456609378374
+      },
+      "meshIndex": 4540,
+      "meshPosition": {
+        "x": 299.5563659667969,
+        "y": -255.4375,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 5.9
+    },
+    {
+      "id": "SOL-USVBC9",
+      "name": "Casa N46",
+      "zone": "Vargas",
+      "address": "Avenida Calle Victoria Corapal",
+      "lat": 10.6098993,
+      "lng": -66.8588761,
+      "floors": 3,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -767.419859806478,
+        "y": -246.5055638937809
+      },
+      "meshIndex": 675,
+      "meshPosition": {
+        "x": -877.1211547851562,
+        "y": -264.3115005493164,
+        "z": 2.200000047683716
+      },
+      "meshHeight": 4.400000095367432,
+      "distToMeshMeters": 111.1
+    },
+    {
+      "id": "SOL-C9XQSX",
+      "name": "Cada Vari.",
+      "zone": "Vargas",
+      "address": "Ah. Deuville. Casa Vari. Urb. Palmar Este. Caraballeda",
+      "lat": 10.617011,
+      "lng": -66.84845,
+      "floors": 2,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 373.3689819004463,
+        "y": 539.8635519061514
+      },
+      "meshIndex": 5362,
+      "meshPosition": {
+        "x": 427.7932586669922,
+        "y": -9.29365062713623,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 551.8
+    },
+    {
+      "id": "SOL-737LK3",
+      "name": "Quinta Chacao",
+      "zone": "Vargas",
+      "address": "Avenida Florida, Palmar Este, Caraballeda, La Guaira",
+      "lat": 10.615505,
+      "lng": -66.849859,
+      "floors": 1,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 219.20093460000166,
+        "y": 373.33910790624884
+      },
+      "meshIndex": 45462,
+      "meshPosition": {
+        "x": 0,
+        "y": 0.5,
+        "z": 0
+      },
+      "meshHeight": 0,
+      "distToMeshMeters": 432.5
+    },
+    {
+      "id": "SOL-2ARUBG",
+      "name": "Calle Bolívar Casa #16",
+      "zone": "Vargas",
+      "address": "Avenida la Playa, Playa Lido Corapal ",
+      "lat": 10.609572,
+      "lng": -66.859335,
+      "floors": 2,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -817.6311564041528,
+        "y": -282.69643409382104
+      },
+      "meshIndex": 675,
+      "meshPosition": {
+        "x": -877.1211547851562,
+        "y": -264.3115005493164,
+        "z": 2.200000047683716
+      },
+      "meshHeight": 4.400000095367432,
+      "distToMeshMeters": 62.3
+    },
+    {
+      "id": "SOL-S7JFPF",
+      "name": "Av Charaima,entre av Circunvalación y Las Lomas,Urb Tanaguarena Residencia Caraballeda Humbolt ",
+      "zone": "Vargas",
+      "address": "Av Charaima entre av Circunvalación y Las Lomas,Tanaguarena Caraballeda Residencia Caraballeda Humbolt ",
+      "lat": 10.617898,
+      "lng": -66.831299,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2249.973793297491,
+        "y": 637.9426899062096
+      },
+      "meshIndex": 18425,
+      "meshPosition": {
+        "x": 2099.56005859375,
+        "y": 285.46849060058594,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 383.2
+    },
+    {
+      "id": "SOL-PY2YJH",
+      "name": "La guarimba",
+      "zone": "Vargas",
+      "address": "Av principal los corales, calle 19 ",
+      "lat": 10.608939,
+      "lng": -66.855498,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -397.7995045273389,
+        "y": -352.68977609388185
+      },
+      "meshIndex": 1617,
+      "meshPosition": {
+        "x": -414.6031036376953,
+        "y": -345.07000732421875,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 18.5
+    },
+    {
+      "id": "SOL-PG4E4Z",
+      "name": "Edificio Golf Plaza",
+      "zone": "Vargas",
+      "address": "AV GRANADA EDIF GOLF PLAZA PISO PH APT PH1 URB CARIBE CARABALLEDA LA GUAIRA ZONA POSTAL 1165",
+      "lat": 10.611509,
+      "lng": -66.838946,
+      "floors": 4,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1413.2647388537075,
+        "y": -68.51459609383706
+      },
+      "meshIndex": 17023,
+      "meshPosition": {
+        "x": 1413.5478515625,
+        "y": -57.79720115661621,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 10.7
+    },
+    {
+      "id": "SOL-VQFDQ6",
+      "name": "Edificio el profesor",
+      "zone": "Vargas",
+      "address": "Calle la iglesia con calle el medio ",
+      "lat": 10.605967,
+      "lng": -66.893711,
+      "floors": 6,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -4578.937610638944,
+        "y": -681.3157040938545
+      },
+      "meshIndex": 29917,
+      "meshPosition": {
+        "x": -4579.57177734375,
+        "y": -682.5013122558594,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 1.3
+    },
+    {
+      "id": "SOL-3S378V",
+      "name": "El Tanagua",
+      "zone": "Vargas",
+      "address": "Boulevard Naiguata Av principal el Caribe",
+      "lat": 10.615095,
+      "lng": -66.843953,
+      "floors": 4,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 865.4156168986689,
+        "y": 328.00376790619737
+      },
+      "meshIndex": 19427,
+      "meshPosition": {
+        "x": 1027.6240234375,
+        "y": -67.85950088500977,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 427.8
+    },
+    {
+      "id": "SOL-MGY3XF",
+      "name": "Res.Jesus Romero Anselmo opp 35d",
+      "zone": "Vargas",
+      "address": "Av charaima tanaguarena urbanización caribe parroquia caraballeda",
+      "lat": 10.611414,
+      "lng": -66.828814,
+      "floors": 9,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2521.874146416001,
+        "y": -79.01912609383221
+      },
+      "meshIndex": 38453,
+      "meshPosition": {
+        "x": 2663.864501953125,
+        "y": 38.22815132141113,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 184.1
+    },
+    {
+      "id": "SOL-X6Z54K",
+      "name": "Remanso1 ",
+      "zone": "Vargas",
+      "address": "Av la playa, sector tanaguarenas",
+      "lat": 10.611041,
+      "lng": -66.823341,
+      "floors": 6,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 3120.7114231210057,
+        "y": -120.26322809380287
+      },
+      "meshIndex": 44929,
+      "meshPosition": {
+        "x": 3160.1168212890625,
+        "y": 76.90655136108398,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 201.1
+    },
+    {
+      "id": "SOL-M52AVJ",
+      "name": "Quinta Menorca ",
+      "zone": "Vargas",
+      "address": "Avenida Cannes quinta Menorca #004-009, al lado del supermercado roca azul ",
+      "lat": 10.617515,
+      "lng": -66.849659,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 241.08426281790358,
+        "y": 595.5928479060844
+      },
+      "meshIndex": 5362,
+      "meshPosition": {
+        "x": 427.7932586669922,
+        "y": -9.29365062713623,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 633
+    },
+    {
+      "id": "SOL-BEBLG5",
+      "name": "HOTEL JOFER",
+      "zone": "Vargas",
+      "address": "Av la playa Bulevard de Macuto frente a la playa A",
+      "lat": 10.606748,
+      "lng": -66.892621,
+      "floors": 3,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -4459.673471847879,
+        "y": -594.9574100938632
+      },
+      "meshIndex": 24200,
+      "meshPosition": {
+        "x": -4469.732177734375,
+        "y": -608.0948486328125,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 16.5
+    },
+    {
+      "id": "SOL-96D8YJ",
+      "name": "Caraballeda calle real.. Frente a la escauala nacional. Edificio R. K",
+      "zone": "Vargas",
+      "address": "Calle Real",
+      "lat": 10.612694,
+      "lng": -66.836014,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1734.0743305404335,
+        "y": 62.51559390611291
+      },
+      "meshIndex": 17264,
+      "meshPosition": {
+        "x": 1728.9906616210938,
+        "y": 58.51594924926758,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 6.5
+    },
+    {
+      "id": "SOL-HJ2KJJ",
+      "name": "Edificio Esther",
+      "zone": "Vargas",
+      "address": "Calle Guaicaipuro Urbanización caribe ",
+      "lat": 10.603245,
+      "lng": -66.86142,
+      "floors": 2,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -1045.7648530837494,
+        "y": -982.2981320938916
+      },
+      "meshIndex": 33868,
+      "meshPosition": {
+        "x": -1078.0823974609375,
+        "y": -881.3579406738281,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 106
+    },
+    {
+      "id": "SOL-8N74SX",
+      "name": "Edificio Punta Brava ",
+      "zone": "Vargas",
+      "address": "Av La Playa Sector Las 15 Letras Edificio Punta Brava Piso 2 Apto 28",
+      "lat": 10.61033,
+      "lng": -66.888676,
+      "floors": 2,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -4028.024822733243,
+        "y": -198.8813420938907
+      },
+      "meshIndex": 31847,
+      "meshPosition": {
+        "x": -4077.970703125,
+        "y": 26.498148918151855,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 230.8
+    },
+    {
+      "id": "SOL-DASB6F",
+      "name": "QTA URIMARE NRO 0716",
+      "zone": "Vargas",
+      "address": "AV SAN SEBASTIÁN QTA URIMARE NRO 0716 URB PALMAR OESTE CARABALLEDA LA GUAIRA ZONA POSTAL 1165",
+      "lat": 10.610894,
+      "lng": -66.860468,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -941.6002107628043,
+        "y": -136.51760609381606
+      },
+      "meshIndex": 675,
+      "meshPosition": {
+        "x": -877.1211547851562,
+        "y": -264.3115005493164,
+        "z": 2.200000047683716
+      },
+      "meshHeight": 4.400000095367432,
+      "distToMeshMeters": 143.1
+    },
+    {
+      "id": "SOL-V33D9R",
+      "name": "Vista hermosa ",
+      "zone": "Vargas",
+      "address": "Av boulevar Naiguata",
+      "lat": 10.621017,
+      "lng": -66.841507,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 1133.048721014416,
+        "y": 982.8229959061955
+      },
+      "meshIndex": 19770,
+      "meshPosition": {
+        "x": 1400.6823120117188,
+        "y": 56.36374855041504,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 964.3
+    },
+    {
+      "id": "SOL-UMX2NY",
+      "name": "MaMa Bartola",
+      "zone": "Vargas",
+      "address": "Caraballeda sector B 27 de julio calle ciega ",
+      "lat": 10.611369,
+      "lng": -66.85069,
+      "floors": 2,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 128.27570585061525,
+        "y": -83.99495609384026
+      },
+      "meshIndex": 1208,
+      "meshPosition": {
+        "x": 126.6522216796875,
+        "y": -120.0401496887207,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 36.1
+    },
+    {
+      "id": "SOL-7ATFJZ",
+      "name": "Residencias Taguapire",
+      "zone": "Vargas",
+      "address": "Edificio Residencias Taguapire, Av. Álamo con Calle Isabel La Católica, Urb. Álamo, Macuto, La Guaira 1165, La Guaira, Venezuela",
+      "lat": 10.604448,
+      "lng": -66.898397,
+      "floors": 8,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -5091.663990804522,
+        "y": -849.2776100938598
+      },
+      "meshIndex": 26087,
+      "meshPosition": {
+        "x": -5059.13330078125,
+        "y": -804.5366516113281,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 55.3
+    },
+    {
+      "id": "SOL-NZ6UR6",
+      "name": "Edificio Residencias Jenifer Plaza",
+      "zone": "Vargas",
+      "address": "Avenida Charayma mas avenida oeste de la capilla",
+      "lat": 10.610396,
+      "lng": -66.833256,
+      "floors": 3,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2035.8454266767296,
+        "y": -191.58345809385273
+      },
+      "meshIndex": 18286,
+      "meshPosition": {
+        "x": 2034.6357421875,
+        "y": -94.90735244750977,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 96.7
+    },
+    {
+      "id": "SOL-72Z4CP",
+      "name": "Urbanización Caraballeda Humboldt sector tanaguarena ",
+      "zone": "Vargas",
+      "address": "Urbanización caraballeda humbolt cerca de la plaza",
+      "lat": 10.609085,
+      "lng": -66.827436,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2672.650277841777,
+        "y": -336.54597209378596
+      },
+      "meshIndex": 38454,
+      "meshPosition": {
+        "x": 2684.3345947265625,
+        "y": 27.416150093078613,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 364.1
+    },
+    {
+      "id": "SOL-XRGL8A",
+      "name": "Edificio Residencias Princess ",
+      "zone": "Vargas",
+      "address": "Av ppal de Caraballeda y Circunvalación. Edificio Princess ",
+      "lat": 10.610287,
+      "lng": -66.84529,
+      "floors": 9,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 719.125567755736,
+        "y": -203.63602409386783
+      },
+      "meshIndex": 5000,
+      "meshPosition": {
+        "x": 661.5361633300781,
+        "y": -200.23255157470703,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 57.7
+    },
+    {
+      "id": "SOL-N3T5HV",
+      "name": "Residencia Caraballeda Humboldt",
+      "zone": "Vargas",
+      "address": "Av Principal de Caribe, Calle Charaima",
+      "lat": 10.610537,
+      "lng": -66.830853,
+      "floors": 4,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2298.7736152248895,
+        "y": -175.99252409373585
+      },
+      "meshIndex": 18389,
+      "meshPosition": {
+        "x": 2155.6541748046875,
+        "y": -118.17354965209961,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 154.4
+    },
+    {
+      "id": "SOL-TG4GNZ",
+      "name": "CAMILA Nro 17",
+      "zone": "Vargas",
+      "address": "CALLE VISTA ALEGRE CASA CAMILA CORAPAL",
+      "lat": 10.610412,
+      "lng": -66.859226,
+      "floors": 3,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -805.7047425255129,
+        "y": -189.81427409380183
+      },
+      "meshIndex": 675,
+      "meshPosition": {
+        "x": -877.1211547851562,
+        "y": -264.3115005493164,
+        "z": 2.200000047683716
+      },
+      "meshHeight": 4.400000095367432,
+      "distToMeshMeters": 103.2
+    },
+    {
+      "id": "SOL-XCRY9C",
+      "name": "Resistencias Caraballeda Humboltd",
+      "zone": "Vargas",
+      "address": "Calle Charaima Sector Tanaguarenas",
+      "lat": 10.610347,
+      "lng": -66.830262,
+      "floors": 4,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2363.4388501112385,
+        "y": -197.00158409372617
+      },
+      "meshIndex": 18389,
+      "meshPosition": {
+        "x": 2155.6541748046875,
+        "y": -118.17354965209961,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 222.2
+    },
+    {
+      "id": "SOL-BCSM7G",
+      "name": "Qta motaya",
+      "zone": "Vargas",
+      "address": "Av. Cannes con av Casablanca, Urb palmar este Caraballeda ",
+      "lat": 10.61736,
+      "lng": -66.851032,
+      "floors": 2,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 90.85521459621482,
+        "y": 578.453877906144
+      },
+      "meshIndex": 45462,
+      "meshPosition": {
+        "x": 0,
+        "y": 0.5,
+        "z": 0
+      },
+      "meshHeight": 0,
+      "distToMeshMeters": 585.1
+    },
+    {
+      "id": "SOL-YWBNQM",
+      "name": "Quinta ketty ",
+      "zone": "Vargas",
+      "address": "Urbanización palmar este, Avenida Florida entre Montecarlo y Casablanca, Quinta ketty Caraballeda ",
+      "lat": 10.615611,
+      "lng": -66.851026,
+      "floors": 2,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 91.51171444267413,
+        "y": 385.0599519061194
+      },
+      "meshIndex": 45462,
+      "meshPosition": {
+        "x": 0,
+        "y": 0.5,
+        "z": 0
+      },
+      "meshHeight": 0,
+      "distToMeshMeters": 395.3
+    },
+    {
+      "id": "SOL-5U76XD",
+      "name": "Quinta FRE-MIR",
+      "zone": "Vargas",
+      "address": "Urb.Palmar Oeste, Av. Ostende, Qta. FRE-MIR",
+      "lat": 10.610325,
+      "lng": -66.863995,
+      "floors": 2,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -1327.512703900704,
+        "y": -199.43421209386977
+      },
+      "meshIndex": 5869,
+      "meshPosition": {
+        "x": -1345.0079956054688,
+        "y": -203.08090209960938,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 17.9
+    },
+    {
+      "id": "SOL-YL83WK",
+      "name": "Punta brava",
+      "zone": "Vargas",
+      "address": "Avenida la playa",
+      "lat": 10.609813,
+      "lng": -66.888328,
+      "floors": 19,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -3989.9478316323834,
+        "y": -256.04810009373
+      },
+      "meshIndex": 108,
+      "meshPosition": {
+        "x": -3910.9791259765625,
+        "y": -416.2277526855469,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 178.6
+    },
+    {
+      "id": "SOL-QBJCKW",
+      "name": "Res. Punta Brava ",
+      "zone": "Vargas",
+      "address": "Av. La plata, Res. Punta brava, las 15 letras",
+      "lat": 10.609545,
+      "lng": -66.889728,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -4143.131129163917,
+        "y": -285.6819320937473
+      },
+      "meshIndex": 42,
+      "meshPosition": {
+        "x": -4213.596435546875,
+        "y": -428.5876007080078,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 159.3
+    },
+    {
+      "id": "SOL-E6BRZD",
+      "name": "Punta brava",
+      "zone": "Vargas",
+      "address": "Av la playa edificio punta brava",
+      "lat": 10.609678,
+      "lng": -66.889256,
+      "floors": 19,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -4091.4864745674913,
+        "y": -270.97559009375414
+      },
+      "meshIndex": 42,
+      "meshPosition": {
+        "x": -4213.596435546875,
+        "y": -428.5876007080078,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 199.4
+    },
+    {
+      "id": "SOL-RHLXHH",
+      "name": "Quinta amarilla",
+      "zone": "Vargas",
+      "address": "Avenida principal de los corales ",
+      "lat": 10.61223,
+      "lng": -66.857922,
+      "floors": 1,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -663.0254425388837,
+        "y": 11.209257906208904
+      },
+      "meshIndex": 1029,
+      "meshPosition": {
+        "x": -551.6802062988281,
+        "y": -245.65570068359375,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 280
+    },
+    {
+      "id": "SOL-GADC4C",
+      "name": "Edificio punta brava",
+      "zone": "Vargas",
+      "address": "AVDA la playa sector las 15 letras ",
+      "lat": 10.602568,
+      "lng": -66.893196,
+      "floors": 19,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -4522.588040476486,
+        "y": -1057.1567300938468
+      },
+      "meshIndex": 24857,
+      "meshPosition": {
+        "x": -4556.758056640625,
+        "y": -1091.738037109375,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 48.6
+    },
+    {
+      "id": "SOL-UKT3W6",
+      "name": "Residencias Punta brava ",
+      "zone": "Vargas",
+      "address": "Av la playa",
+      "lat": 10.610196,
+      "lng": -66.888045,
+      "floors": 19,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -3958.9829222033136,
+        "y": -213.69825809380117
+      },
+      "meshIndex": 108,
+      "meshPosition": {
+        "x": -3910.9791259765625,
+        "y": -416.2277526855469,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 208.1
+    },
+    {
+      "id": "SOL-Q53MNT",
+      "name": "Casa",
+      "zone": "Vargas",
+      "address": "27 de Julio,parte alta",
+      "lat": 10.6072302,
+      "lng": -66.8427847,
+      "floors": 1,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 993.247078688748,
+        "y": -541.6386272938155
+      },
+      "meshIndex": 16942,
+      "meshPosition": {
+        "x": 1122.951416015625,
+        "y": -268.904052734375,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 302
+    },
+    {
+      "id": "SOL-YP4FEG",
+      "name": "Quinta karola",
+      "zone": "Vargas",
+      "address": "Segunda transversal entre la calle miramar y la calle teresita",
+      "lat": 10.611049,
+      "lng": -66.858776,
+      "floors": 2,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -756.4672540332899,
+        "y": -119.37863609387564
+      },
+      "meshIndex": 675,
+      "meshPosition": {
+        "x": -877.1211547851562,
+        "y": -264.3115005493164,
+        "z": 2.200000047683716
+      },
+      "meshHeight": 4.400000095367432,
+      "distToMeshMeters": 188.6
+    },
+    {
+      "id": "SOL-HPQ3E2",
+      "name": "Edificio brisas del mar ",
+      "zone": "Vargas",
+      "address": "Av la playa sector el ceibo ",
+      "lat": 10.607526,
+      "lng": -66.891328,
+      "floors": 2,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -4318.197754913352,
+        "y": -508.9308380938202
+      },
+      "meshIndex": 2,
+      "meshPosition": {
+        "x": -4335.675048828125,
+        "y": -471.7667541503906,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 41.1
+    },
+    {
+      "id": "SOL-TZBARV",
+      "name": "S/N",
+      "zone": "Vargas",
+      "address": "Los Corales calle 12 quinta amarilla clara con rejas negras al lado de edif Catinam",
+      "lat": 10.60662,
+      "lng": -66.807861,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 4814.481027250366,
+        "y": -609.1108820938774
+      },
+      "meshIndex": 45461,
+      "meshPosition": {
+        "x": 4948.821533203125,
+        "y": -678.9007263183594,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 151.4
+    },
+    {
+      "id": "SOL-FHR7MM",
+      "name": "Casa N°42-21",
+      "zone": "Vargas",
+      "address": "Av. Circunvalación ",
+      "lat": 10.608694,
+      "lng": -66.843854,
+      "floors": 4,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 876.24786436758,
+        "y": -379.78040609383834
+      },
+      "meshIndex": 16820,
+      "meshPosition": {
+        "x": 909.4906005859375,
+        "y": -195.48955535888672,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 187.3
+    },
+    {
+      "id": "SOL-4S3UQL",
+      "name": "Residencias ParqueMar La Llovizna torre D La guaira Los Corales",
+      "zone": "Vargas",
+      "address": " Urbanización Parque Mar, Parroquia Caraballeda, Municipio Vargas, Estado La Guaira, Venezuela.",
+      "lat": 10.609006,
+      "lng": -66.858523,
+      "floors": 22,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -728.7848438365166,
+        "y": -345.2813180937302
+      },
+      "meshIndex": 21275,
+      "meshPosition": {
+        "x": -740.4100036621094,
+        "y": -375.03761291503906,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 31.9
+    },
+    {
+      "id": "SOL-24GB2U",
+      "name": "Coral Prince",
+      "zone": "Vargas",
+      "address": "Los Corales",
+      "lat": 10.612562,
+      "lng": -66.856286,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -484.0198177091378,
+        "y": 47.91982590623337
+      },
+      "meshIndex": 1016,
+      "meshPosition": {
+        "x": -397.3161926269531,
+        "y": -142.00585174560547,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 208.8
+    },
+    {
+      "id": "SOL-6JZJZ5",
+      "name": "Edificio Corazon de maria",
+      "zone": "Vargas",
+      "address": "Calle san bartolome cruce con cajigal edif. Hc",
+      "lat": 10.605783,
+      "lng": -66.893119,
+      "floors": 3,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -4514.162959111777,
+        "y": -701.6613200937521
+      },
+      "meshIndex": 22785,
+      "meshPosition": {
+        "x": -4520.813232421875,
+        "y": -708.5852661132812,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 9.6
+    },
+    {
+      "id": "SOL-LM4HYD",
+      "name": "Residencias El Dorado. Av. La Costanera. Calle 6. Los Corales. Caraballeda. ",
+      "zone": "Vargas",
+      "address": "Av La Costanera. Calle 6. Res El Dorado. Los Corales Caraballeda ",
+      "lat": 10.614405,
+      "lng": -66.859484,
+      "floors": 10,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -833.934235926373,
+        "y": 251.7077079061395
+      },
+      "meshIndex": 675,
+      "meshPosition": {
+        "x": -877.1211547851562,
+        "y": -264.3115005493164,
+        "z": 2.200000047683716
+      },
+      "meshHeight": 4.400000095367432,
+      "distToMeshMeters": 517.8
+    },
+    {
+      "id": "SOL-UY4CGP",
+      "name": "Edificio Brisas del Caribe 1",
+      "zone": "Vargas",
+      "address": "Av la costanera Urb la llanada ",
+      "lat": 10.610065,
+      "lng": -66.867456,
+      "floors": 12,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -1706.2036987259964,
+        "y": -228.1834520937635
+      },
+      "meshIndex": 8810,
+      "meshPosition": {
+        "x": -1681.6727905273438,
+        "y": -307.16680908203125,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 82.7
+    },
+    {
+      "id": "SOL-FY4YRG",
+      "name": "Quinta El Nazareno No. 190.",
+      "zone": "Vargas",
+      "address": "Av. Principal de Álamo. ",
+      "lat": 10.603145,
+      "lng": -66.902614,
+      "floors": 2,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -5553.073966296127,
+        "y": -993.3555320938658
+      },
+      "meshIndex": 31764,
+      "meshPosition": {
+        "x": -5552.142333984375,
+        "y": -994.3102111816406,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 1.3
+    },
+    {
+      "id": "SOL-2FSUST",
+      "name": "Casa#9 ",
+      "zone": "Vargas",
+      "address": "Av intercomunal de macuto , sector vegamar, calle Ayacucho casa número 9",
+      "lat": 10.608448,
+      "lng": -66.882048,
+      "floors": 3,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -3302.8113255638295,
+        "y": -406.98161009390856
+      },
+      "meshIndex": 61,
+      "meshPosition": {
+        "x": -3329.5030517578125,
+        "y": -423.7680969238281,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 31.5
+    },
+    {
+      "id": "SOL-3PSU8M",
+      "name": "Residencias Caraballeda Humboldt",
+      "zone": "Vargas",
+      "address": "Calle Charayma con Circunvalación y Las Lomas  ",
+      "lat": 10.609977,
+      "lng": -66.830933,
+      "floors": 4,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2290.0202839377284,
+        "y": -237.91396409374866
+      },
+      "meshIndex": 18389,
+      "meshPosition": {
+        "x": 2155.6541748046875,
+        "y": -118.17354965209961,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 180
+    },
+    {
+      "id": "SOL-GY6JRF",
+      "name": "Residencia Catinam",
+      "zone": "Vargas",
+      "address": "Entre calle 10 y 12 ",
+      "lat": 10.612323,
+      "lng": -66.857729,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -641.9080308082584,
+        "y": 21.492639906173167
+      },
+      "meshIndex": 1271,
+      "meshPosition": {
+        "x": -439.3591766357422,
+        "y": -169.83399963378906,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 278.6
+    },
+    {
+      "id": "SOL-ZYJ3S8",
+      "name": "Residencia San Miguel Arcangel ",
+      "zone": "Vargas",
+      "address": "Caraballeda, Palmar Este, calle nueva, al frente del cementerio",
+      "lat": 10.609847,
+      "lng": -66.849661,
+      "floors": 5,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 240.86542953626878,
+        "y": -252.28858409379373
+      },
+      "meshIndex": 4762,
+      "meshPosition": {
+        "x": 227.74691009521484,
+        "y": -252.07659912109375,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 13.1
+    },
+    {
+      "id": "SOL-3GSVZY",
+      "name": "Casa mis esfuerzos número 9",
+      "zone": "Vargas",
+      "address": "Avenida Guaicamacuto Con Calle Paramaconi",
+      "lat": 10.609364,
+      "lng": -66.843379,
+      "floors": 2,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 928.2207688864576,
+        "y": -305.6958260938932
+      },
+      "meshIndex": 16820,
+      "meshPosition": {
+        "x": 909.4906005859375,
+        "y": -195.48955535888672,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 111.8
+    },
+    {
+      "id": "SOL-AYK693",
+      "name": "Macuto",
+      "zone": "Vargas",
+      "address": "Calle Linares. Edf. MACUTO. frente al Inass",
+      "lat": 10.605993,
+      "lng": -66.892979,
+      "floors": 3,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -4498.844629358468,
+        "y": -678.4407800938454
+      },
+      "meshIndex": 574,
+      "meshPosition": {
+        "x": -4502.81689453125,
+        "y": -683.8961486816406,
+        "z": 4.400000095367432
+      },
+      "meshHeight": 8.800000190734863,
+      "distToMeshMeters": 6.7
+    },
+    {
+      "id": "SOL-AL4PPQ",
+      "name": "Edificio Res. Villamar",
+      "zone": "Vargas",
+      "address": "Av. Guaiqueri, Res. Villamar",
+      "lat": 10.610911,
+      "lng": -66.844317,
+      "floors": 10,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 825.587959540066,
+        "y": -134.63784809384794
+      },
+      "meshIndex": 16828,
+      "meshPosition": {
+        "x": 830.1668395996094,
+        "y": -145.70590209960938,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 12
+    },
+    {
+      "id": "SOL-G4Z32F",
+      "name": "Conjunto Residencial Caraballeda Humboldt ",
+      "zone": "Vargas",
+      "address": "Calle Charayma con Circunvalación y las Lomas Residencias Caraballeda Humboldt ",
+      "lat": 10.610115,
+      "lng": -66.830941,
+      "floors": 4,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": 2289.1449508096343,
+        "y": -222.65475209377638
+      },
+      "meshIndex": 18389,
+      "meshPosition": {
+        "x": 2155.6541748046875,
+        "y": -118.17354965209961,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 169.5
+    },
+    {
+      "id": "SOL-HS2C3X",
+      "name": "Residencias María Luisa ",
+      "zone": "Vargas",
+      "address": "Av. La Playa, sector las 15 letras ",
+      "lat": 10.610761,
+      "lng": -66.888154,
+      "floors": 10,
+      "status": "damaged",
+      "damage_level": "parcial",
+      "photo": null,
+      "boletin": "verde",
+      "projectedGLB": {
+        "x": -3970.9093360819534,
+        "y": -151.22394809380927
+      },
+      "meshIndex": 31847,
+      "meshPosition": {
+        "x": -4077.970703125,
+        "y": 26.498148918151855,
+        "z": 5
+      },
+      "meshHeight": 10,
+      "distToMeshMeters": 207.5
+    }
+  ]
+}

@@ -27,6 +27,7 @@
     <!-- CDNs de Librerías -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
 </head>
@@ -2568,31 +2569,42 @@
                                                 <i class="fa-solid fa-rotate-left"></i>
                                             </button>
                                         </div>
-                                        <div style="display: flex; gap: 6px; align-items: center; justify-content: space-between; margin-top: 2px;">
-                                            <span style="font-size: 10.5px; color: var(--text-muted); font-weight: 600;">Velocidad:</span>
-                                            <div class="city-speed-group" style="margin: 0;">
-                                                <button class="city-speed-btn" data-speed="0.5" style="padding: 4px 8px; font-size: 11px;">0.5×</button>
-                                                <button class="city-speed-btn active" data-speed="1" style="padding: 4px 8px; font-size: 11px;">1×</button>
-                                                <button class="city-speed-btn" data-speed="2" style="padding: 4px 8px; font-size: 11px;">2×</button>
-                                                <button class="city-speed-btn" data-speed="4" style="padding: 4px 8px; font-size: 11px;">4×</button>
-                                            </div>
-                                        </div>
+                                         <!-- SECCIÓN CAPAS DE RIESGO -->
+                                         <div class="city-floating-layers-header" style="margin-top: 6px;">
+                                             <i class="fa-solid fa-layer-group" style="color: #ffb703;"></i>
+                                             <span>Capas de Riesgo 3D</span>
+                                         </div>
+                                         <div class="city-floating-layers-body">
+                                             <label class="city-floating-layer-item">
+                                                 <input type="checkbox" id="city-float-toggle-glb" checked style="accent-color: #a855f7;">
+                                                 <span><i class="fa-solid fa-building" style="color: #a855f7;"></i> Mallas 3D (scene.glb)</span>
+                                             </label>
+                                             <label class="city-floating-layer-item">
+                                                 <input type="checkbox" id="city-float-toggle-fans" style="accent-color: #ffb703;">
+                                                 <span><i class="fa-solid fa-water" style="color: #ffb703;"></i> Abanicos Fluviales (Licuación)</span>
+                                             </label>
+                                             <label class="city-floating-layer-item">
+                                                 <input type="checkbox" id="city-float-toggle-bedrock" style="accent-color: #38bdf8;">
+                                                 <span><i class="fa-solid fa-mountain" style="color: #38bdf8;"></i> Profundidad a Roca Dura</span>
+                                             </label>
+                                         </div>
 
-                                        <!-- SECCIÓN CAPAS DE RIESGO -->
-                                        <div class="city-floating-layers-header" style="margin-top: 6px;">
-                                            <i class="fa-solid fa-layer-group" style="color: #ffb703;"></i>
-                                            <span>Capas de Riesgo 3D</span>
-                                        </div>
-                                        <div class="city-floating-layers-body">
-                                            <label class="city-floating-layer-item">
-                                                <input type="checkbox" id="city-float-toggle-fans" style="accent-color: #ffb703;">
-                                                <span><i class="fa-solid fa-water" style="color: #ffb703;"></i> Abanicos Fluviales (Licuación)</span>
-                                            </label>
-                                            <label class="city-floating-layer-item">
-                                                <input type="checkbox" id="city-float-toggle-bedrock" style="accent-color: #38bdf8;">
-                                                <span><i class="fa-solid fa-mountain" style="color: #38bdf8;"></i> Profundidad a Roca Dura</span>
-                                            </label>
-                                        </div>
+                                         <!-- SECCIÓN NAVEGACIÓN RÁPIDA -->
+                                         <div class="city-floating-layers-header" style="margin-top: 6px;">
+                                             <i class="fa-solid fa-compass" style="color: #60a5fa;"></i>
+                                             <span>Navegación Rápida 3D</span>
+                                         </div>
+                                         <div style="display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap;">
+                                             <button class="city-nav-btn" data-target="caraballeda" style="padding: 5px 8px; font-size: 11px; flex: 1; min-width: 85px; background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                                                 <i class="fa-solid fa-location-dot" style="color: #f43f5e;"></i> Caraballeda
+                                             </button>
+                                             <button class="city-nav-btn" data-target="maiquetia" style="padding: 5px 8px; font-size: 11px; flex: 1; min-width: 85px; background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                                                 <i class="fa-solid fa-plane" style="color: #38bdf8;"></i> Aeropuerto
+                                             </button>
+                                             <button class="city-nav-btn" data-target="macuto" style="padding: 5px 8px; font-size: 11px; flex: 1; min-width: 85px; background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                                                 <i class="fa-solid fa-city" style="color: #a855f7;"></i> Macuto
+                                             </button>
+                                         </div>
                                         </div><!-- /city-floating-layers-collapsible -->
                                     </div>
                                     <div id="city-loading" class="city-loading">
