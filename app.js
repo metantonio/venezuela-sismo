@@ -8911,6 +8911,89 @@ function createBedrockDepthBandsMesh(toScene, ext) {
     return meshes;
 }
 
+// ==========================================================================
+// CATÁLOGO DE MODELOS 3D FOTOGRAMÉTRICOS REALES (RPE / NIRA REALITY CAPTURE)
+// ==========================================================================
+const RPE_MODELS = {
+    'viaducto1': {
+        id: 'viaducto1',
+        name: 'Viaducto 1 Caracas - La Guaira',
+        zone: 'Autopista Caracas - La Guaira',
+        coords: '10.55160, -66.97900',
+        lat: 10.5516,
+        lng: -66.9790,
+        url: 'https://sigis.nira.app/a/XDfYW0rWS7exavy-IbrRbA/1',
+        desc: 'Levantamiento fotogramétrico tridimensional de alta resolución del Viaducto 1 en la Autopista Caracas - La Guaira. Permite la inspección técnica detallada de pilas, estribos, juntas de expansión y estabilidad de taludes adyacentes ante solicitaciones sísmicas severas.',
+        buildingId: null
+    },
+    'caraballeda-jme': {
+        id: 'caraballeda-jme',
+        name: 'Caraballeda - Av. José María España',
+        zone: 'Caraballeda, Litoral Central',
+        coords: '10.61520, -66.83280',
+        lat: 10.6152,
+        lng: -66.8328,
+        url: 'https://sigis.nira.app/a/amCLxW4RQtiCjZCpL-gEfg/1',
+        desc: 'Levantamiento 3D del corredor costero y fachadas urbanas de la Avenida José María España en Caraballeda. Muestra el entorno de edificaciones y afectaciones en la zona de mayor espesor aluvial y amplificación sísmica del litoral.',
+        buildingId: null
+    },
+    'el-jurel': {
+        id: 'el-jurel',
+        name: 'Edificio El Jurel',
+        zone: 'Playa Grande, Catia La Mar',
+        coords: '10.61039, -67.00838',
+        lat: 10.61039,
+        lng: -67.00838,
+        url: 'https://sigis.nira.app/a/I0C1vpKYQ3SOT1_hnBLfvg/1',
+        desc: 'Estructura residencial de 5 niveles en Playa Grande. Modelo 3D de alta densidad para auditoría forense post-sismo, inspección de fallas en columnas/vigas de concreto y evaluación de vulnerabilidad de entrepiso.',
+        buildingId: 'e9a905c0-f8cd-4b48-b9d5-41c147bc0ee3'
+    },
+    'laguna-beach': {
+        id: 'laguna-beach',
+        name: 'Edificio Laguna Beach',
+        zone: 'Caraballeda / Playa Caribe',
+        coords: '10.61280, -66.83850',
+        lat: 10.6128,
+        lng: -66.8385,
+        url: 'https://sigis.nira.app/a/lmDVydjhS1mkzg-WTQNA1w/1',
+        desc: 'Edificación costera en Caraballeda. Reconstrucción fotogramétrica para análisis de rigidez lateral, degradación de cerramientos y comportamiento estructural ante sismos destructivos sucesivos.',
+        buildingId: null
+    },
+    'res-caribe': {
+        id: 'res-caribe',
+        name: 'Residencias Caribe (Modelo 3D OBJ)',
+        zone: 'Urbanización Caribe, Caraballeda',
+        coords: '10.61229, -66.83928',
+        lat: 10.61229,
+        lng: -66.83928,
+        url: 'https://sigis.nira.app/a/C92RbMS9Qp6GcNvSQjxlBQ/1',
+        desc: 'Conjunto residencial de 7 niveles colapsado/afectado por el sismo. Reconstrucción tridimensional OBJ por fotogrametría RPE para auditoría forense, detallado de roturas y verificación de deriva límite.',
+        buildingId: 'f11ab6e5-c436-4a17-a9ee-a5caffbaf0a0'
+    }
+};
+
+function getRPEModelForBuilding(b) {
+    if (!b) return null;
+    const name = (b.name || '').toLowerCase();
+    const id = b.id || '';
+    if (id === 'f11ab6e5-c436-4a17-a9ee-a5caffbaf0a0' || name.includes('residencias caribe') || name.includes('res. caribe') || name.includes('conjunto residencias caribe')) {
+        return RPE_MODELS['res-caribe'];
+    }
+    if (id === 'e9a905c0-f8cd-4b48-b9d5-41c147bc0ee3' || name.includes('jurel')) {
+        return RPE_MODELS['el-jurel'];
+    }
+    if (name.includes('laguna beach')) {
+        return RPE_MODELS['laguna-beach'];
+    }
+    if (name.includes('viaducto')) {
+        return RPE_MODELS['viaducto1'];
+    }
+    if (name.includes('josé maría españa') || name.includes('jme') || name.includes('av jme')) {
+        return RPE_MODELS['caraballeda-jme'];
+    }
+    return null;
+}
+
 async function loadCityGLBModel(group, toScene, vargas, xWest, terr, loadingEl) {
     if (typeof THREE.GLTFLoader === 'undefined') {
         console.warn('[city-sim] GLTFLoader no está disponible, usando modelo paramétrico.');
@@ -9191,6 +9274,67 @@ async function initCitySim() {
         console.warn('[city-sim] Error al generar mallas de profundidad a roca dura:', e);
     }
 
+    // --- Capa de Balizas Holográficas 3D para Modelos Fotogramétricos RPE ---
+    const rpeBeaconsGroup = new THREE.Group();
+    group.add(rpeBeaconsGroup);
+    citySim.rpeBeaconsGroup = rpeBeaconsGroup;
+    citySim.rpeBeacons = [];
+    citySim.rpePickableMeshes = [];
+
+    Object.values(RPE_MODELS).forEach(model => {
+        const p = toScene(model.lat, model.lng);
+        const beacon = new THREE.Group();
+        beacon.position.set(p.x, 30, p.z);
+
+        // Pin vertical luminoso
+        const pinGeo = new THREE.CylinderGeometry(2, 6, 60, 8);
+        const pinMat = new THREE.MeshLambertMaterial({
+            color: 0x00f2fe,
+            emissive: 0x00f2fe,
+            emissiveIntensity: 0.8,
+            transparent: true,
+            opacity: 0.85
+        });
+        const pinMesh = new THREE.Mesh(pinGeo, pinMat);
+        pinMesh.position.y = 30;
+        pinMesh.userData.rpeModel = model;
+        beacon.add(pinMesh);
+        citySim.rpePickableMeshes.push(pinMesh);
+
+        // Diamante giratorio superior
+        const diamondGeo = new THREE.OctahedronGeometry(12, 0);
+        const diamondMat = new THREE.MeshLambertMaterial({
+            color: 0xffb703,
+            emissive: 0xffb703,
+            emissiveIntensity: 0.7
+        });
+        const diamondMesh = new THREE.Mesh(diamondGeo, diamondMat);
+        diamondMesh.position.y = 75;
+        diamondMesh.userData.rpeModel = model;
+        beacon.add(diamondMesh);
+        citySim.rpePickableMeshes.push(diamondMesh);
+
+        // Anillo de suelo pulsante
+        const ringGeo = new THREE.RingGeometry(10, 18, 16);
+        const ringMat = new THREE.MeshBasicMaterial({
+            color: 0x00f2fe,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.65
+        });
+        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+        ringMesh.rotation.x = -Math.PI / 2;
+        ringMesh.position.y = 1.5;
+        beacon.add(ringMesh);
+
+        beacon.userData.rpeModel = model;
+        beacon.userData.y0 = 30;
+        beacon.userData.diamond = diamondMesh;
+        beacon.userData.ring = ringMesh;
+        rpeBeaconsGroup.add(beacon);
+        citySim.rpeBeacons.push(beacon);
+    });
+
     console.info(`[city-sim] Terreno: ${citySim.groundType}, DEM: ${terr.demType}, altura máx ≈ ${Math.round(terr.maxH)} m, onda oeste→este a ${CITY_CFG.waveSpeed} m/s`);
 
     // --- Frentes de onda sísmica (uno por evento del doblete) ---
@@ -9426,11 +9570,23 @@ async function initCitySim() {
     if (loadingEl) loadingEl.classList.add('hidden');
     window.addEventListener('resize', resizeCityRenderer);
 
-    // Picking de edificios del catálogo
+    // Picking de edificios del catálogo y balizas RPE
     renderer.domElement.addEventListener('pointerdown', (ev) => {
         citySim.pointer.x = (ev.offsetX / renderer.domElement.clientWidth) * 2 - 1;
         citySim.pointer.y = -(ev.offsetY / renderer.domElement.clientHeight) * 2 + 1;
         citySim.raycaster.setFromCamera(citySim.pointer, citySim.camera);
+
+        // 1. Primero verificar si se hizo clic en una baliza RPE
+        if (citySim.rpePickableMeshes && citySim.rpePickableMeshes.length > 0) {
+            const beaconHits = citySim.raycaster.intersectObjects(citySim.rpePickableMeshes, false);
+            if (beaconHits.length > 0 && beaconHits[0].object.userData.rpeModel) {
+                const rpeModel = beaconHits[0].object.userData.rpeModel;
+                openRPEModelViewer(rpeModel.id);
+                return;
+            }
+        }
+
+        // 2. Verificar edificios del catálogo
         const meshes = citySim.buildings.map(s => s.mesh);
         const hits = citySim.raycaster.intersectObjects(meshes, false);
         if (hits.length > 0) showCityBuildingCard(hits[0].object.userData.cityState);
@@ -9539,6 +9695,34 @@ function wireCityControls() {
             }
         });
     });
+
+    // Handlers para botones de Modelos 3D Reales (Fotogrametría RPE)
+    document.querySelectorAll('.city-rpe-quick-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const modelKey = btn.dataset.model;
+            const model = RPE_MODELS[modelKey];
+            if (model) {
+                flyCityCameraTo(model.lat, model.lng, 500, 1100);
+                openRPEModelViewer(modelKey);
+            }
+        });
+    });
+
+    // Handler botón post-simulación
+    const btnOpenRPEStudio = document.getElementById('btn-open-rpe-studio');
+    if (btnOpenRPEStudio) {
+        btnOpenRPEStudio.addEventListener('click', () => {
+            openRPEModelViewer('viaducto1');
+        });
+    }
+
+    const btnDismissPostSim = document.getElementById('btn-dismiss-post-sim');
+    if (btnDismissPostSim) {
+        btnDismissPostSim.addEventListener('click', () => {
+            const banner = document.getElementById('city-post-sim-banner');
+            if (banner) banner.style.display = 'none';
+        });
+    }
 }
 
 function flyCityCameraTo(lat, lng, height = 650, dist = 1400) {
@@ -9819,10 +10003,21 @@ function updateCityUI() {
     if (scrubber && document.activeElement !== scrubber) scrubber.value = t;
     if (pill) {
         let txt = 'En calma', cls = 'city-phase-pill';
-        if (t >= CITY_CFG.duration) { txt = 'Final del registro'; cls += ' phase-end'; }
-        else if (t >= CITY_CFG.shock2Start) { txt = 'Evento 2 — 0.60g'; cls += ' phase-eq2'; }
-        else if (t >= 30) { txt = 'Interludio'; cls += ' phase-end'; }
-        else if (t > 0.5) { txt = 'Evento 1 — 0.40g'; cls += ' phase-eq1'; }
+        if (t >= CITY_CFG.duration) {
+            txt = 'Final del registro';
+            cls += ' phase-end';
+            const postBanner = document.getElementById('city-post-sim-banner');
+            if (postBanner) postBanner.style.display = 'block';
+        } else if (t >= CITY_CFG.shock2Start) {
+            txt = 'Evento 2 — 0.60g';
+            cls += ' phase-eq2';
+        } else if (t >= 30) {
+            txt = 'Interludio';
+            cls += ' phase-end';
+        } else if (t > 0.5) {
+            txt = 'Evento 1 — 0.40g';
+            cls += ' phase-eq1';
+        }
         pill.textContent = txt;
         pill.className = cls;
     }
@@ -9862,6 +10057,21 @@ function cityFrameLoop(now) {
         const pulseB = 0.35 + Math.sin(now * 0.0018) * 0.06;
         citySim.bedrockGroup.children.forEach(mesh => {
             if (mesh.material) mesh.material.opacity = pulseB;
+        });
+    }
+
+    // Animar balizas holográficas 3D de modelos RPE
+    if (citySim && citySim.rpeBeacons) {
+        const bHover = Math.sin(now * 0.003) * 5;
+        const ringPulse = 0.5 + Math.sin(now * 0.004) * 0.3;
+        citySim.rpeBeacons.forEach(b => {
+            b.position.y = b.userData.y0 + bHover;
+            if (b.userData.diamond) {
+                b.userData.diamond.rotation.y = now * 0.0025;
+            }
+            if (b.userData.ring && b.userData.ring.material) {
+                b.userData.ring.material.opacity = ringPulse;
+            }
         });
     }
 
@@ -9931,6 +10141,16 @@ function showCityBuildingCard(st) {
     const bDepth = getBedrockDepth(b.lat, b.lng);
     const bRangeInfo = getBedrockDepthRangeInfo(bDepth);
 
+    const rpe = getRPEModelForBuilding(b);
+    let rpeBtnHtml = '';
+    if (rpe) {
+        rpeBtnHtml = `
+            <button class="city-card-rpe-btn" onclick="openRPEModelViewer('${rpe.id}')">
+                <i class="fa-solid fa-cube"></i> Ver Modelo 3D Real (Fotogrametría RPE)
+            </button>
+        `;
+    }
+
     card.innerHTML = `
         <button class="city-card-close" title="Cerrar"><i class="fa-solid fa-xmark"></i></button>
         <h4><i class="fa-solid fa-building"></i> ${b.name || 'Sin nombre'}</h4>
@@ -9942,6 +10162,7 @@ function showCityBuildingCard(st) {
         <div class="city-card-row"><span>P(colapso) MC 2019</span><b>${pMC}</b></div>
         <div class="city-card-row"><span>Roca Dura</span><b style="color: ${bRangeInfo.colorCss}; font-weight: 700;">${bDepth.toFixed(0)} m (${bRangeInfo.id}m)</b></div>
         <div style="margin-top: 6px; font-size: 10.5px; opacity: 0.75;">${b.address || ''}</div>
+        ${rpeBtnHtml}
         ${photo ? `<img src="${photo}" alt="Foto de ${b.name}" loading="lazy" onerror="this.style.display='none'">` : ''}
     `;
     card.style.display = 'block';
@@ -9954,6 +10175,113 @@ function hideCityBuildingCard() {
     const card = document.getElementById('city-info-card');
     if (card) card.style.display = 'none';
 }
+
+// ==========================================================================
+// CONTROLADOR DEL VISOR 3D RPE (FOTOGRAMETRÍA NIRA)
+// ==========================================================================
+let currentRPEModelId = 'viaducto1';
+
+function openRPEModelViewer(modelId = 'viaducto1') {
+    const modal = document.getElementById('rpe-modal-viewer');
+    if (!modal) return;
+
+    const model = RPE_MODELS[modelId] || RPE_MODELS['viaducto1'];
+    currentRPEModelId = model.id;
+
+    // Actualizar textos y ficha técnica
+    const heading = document.getElementById('rpe-modal-heading');
+    const sub = document.getElementById('rpe-modal-subheading');
+    const nameEl = document.getElementById('rpe-info-name');
+    const zoneEl = document.getElementById('rpe-info-zone');
+    const coordsEl = document.getElementById('rpe-info-coords');
+    const descEl = document.getElementById('rpe-info-desc');
+    const iframe = document.getElementById('rpe-viewer-iframe');
+    const extBtn = document.getElementById('rpe-btn-external');
+    const flyBtn = document.getElementById('rpe-btn-fly-city');
+    const loadingEl = document.getElementById('rpe-iframe-loading');
+
+    if (heading) heading.textContent = model.name;
+    if (sub) sub.textContent = `Levantamiento Fotogramétrico RPE — ${model.zone}`;
+    if (nameEl) nameEl.textContent = model.name;
+    if (zoneEl) zoneEl.textContent = model.zone;
+    if (coordsEl) coordsEl.textContent = model.coords;
+    if (descEl) descEl.textContent = model.desc;
+    if (extBtn) extBtn.href = model.url;
+
+    // Botón para volar la cámara hacia el edificio en la ciudad 3D
+    if (flyBtn) {
+        flyBtn.onclick = () => {
+            closeRPEModelViewer();
+            switchTab('tab-city');
+            flyCityCameraTo(model.lat, model.lng, 450, 950);
+        };
+    }
+
+    // Actualizar estado activo en las pestañas
+    document.querySelectorAll('.rpe-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.model === model.id);
+    });
+
+    // Cargar iframe de Nira con indicador de carga
+    if (loadingEl) loadingEl.style.display = 'flex';
+    if (iframe) {
+        iframe.onload = () => {
+            if (loadingEl) loadingEl.style.display = 'none';
+        };
+        // Evitar recargar si ya está en esa misma URL
+        if (iframe.src !== model.url) {
+            iframe.src = model.url;
+        } else {
+            if (loadingEl) loadingEl.style.display = 'none';
+        }
+    }
+
+    modal.style.display = 'flex';
+}
+
+function closeRPEModelViewer() {
+    const modal = document.getElementById('rpe-modal-viewer');
+    if (!modal) return;
+    modal.style.display = 'none';
+    const iframe = document.getElementById('rpe-viewer-iframe');
+    if (iframe) iframe.src = ''; // Detener el renderizado de Nira en segundo plano
+}
+
+window.openRPEModelViewer = openRPEModelViewer;
+window.closeRPEModelViewer = closeRPEModelViewer;
+
+// Inicialización de eventos del modal RPE
+document.addEventListener('DOMContentLoaded', () => {
+    // Botón de cierre
+    const closeBtn = document.getElementById('rpe-btn-close');
+    if (closeBtn) closeBtn.addEventListener('click', closeRPEModelViewer);
+
+    // Cierre al hacer clic fuera del contenedor
+    const modalOverlay = document.getElementById('rpe-modal-viewer');
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeRPEModelViewer();
+        });
+    }
+
+    // Navegación por pestañas
+    document.querySelectorAll('.rpe-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const modelKey = btn.dataset.model;
+            if (modelKey) openRPEModelViewer(modelKey);
+        });
+    });
+
+    // Tecla ESC para cerrar modal
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const rpeModal = document.getElementById('rpe-modal-viewer');
+            if (rpeModal && rpeModal.style.display === 'flex') {
+                closeRPEModelViewer();
+            }
+        }
+    });
+});
 
 async function initDamageMap() {
     const container = document.getElementById('damage-map-container');
@@ -10733,6 +11061,19 @@ async function initDamageMap() {
             ${boletinHtml}
             ${atrHtml}
             ${requestedHtml}
+            ${(() => {
+                const rpe = getRPEModelForBuilding(b);
+                if (rpe) {
+                    return `
+                        <div style="text-align: center; margin-top: 8px;">
+                            <button onclick="window.openRPEModelViewer('${rpe.id}')" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; background:linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color:#000; font-weight:700; border:none; padding:6px 10px; border-radius:6px; font-size:11px; cursor:pointer; width:100%; box-shadow: 0 2px 8px rgba(0,242,254,0.3); transition: transform 0.2s;">
+                                <i class="fa-solid fa-cube"></i> Ver Modelo 3D RPE (Nira)
+                            </button>
+                        </div>
+                    `;
+                }
+                return '';
+            })()}
             ${confirmedBadge}
             ${photoHtml}
         `;
@@ -10915,6 +11256,8 @@ async function initDamageMap() {
             const color2001 = getColor(b.p2001 !== null ? b.p2001 : b, '2001');
             const color2019 = getColor(b.p2019 !== null ? b.p2019 : b, '2019');
             const zoneHtml = b.zone ? `<span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px;">📍 ${b.zone}</span>` : '';
+            const rpe = getRPEModelForBuilding(b);
+            const rpeBadgeHtml = rpe ? `<button onclick="event.stopPropagation(); window.openRPEModelViewer('${rpe.id}')" title="Ver Modelo 3D RPE Fotogramétrico" style="margin-left: 6px; background: rgba(0, 242, 254, 0.15); border: 1px solid rgba(0, 242, 254, 0.4); color: #00f2fe; border-radius: 4px; padding: 2px 6px; font-size: 9.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; vertical-align: middle;"><i class="fa-solid fa-cube"></i> 3D RPE</button>` : '';
 
             const floorsCell = b.has_real_floors ? `${b.floors}P` : `<span style="color: var(--text-muted); font-size: 11px;" title="Pisos no especificados en el reporte real">N/D</span>`;
             const p2001Cell = b.p2001 !== null ? `${b.p2001.toFixed(1)}%` : `<span style="color: #ffb703; font-size: 11px;" title="Estructura en pie (Daño sin colapso)">N/D</span>`;
@@ -10924,7 +11267,7 @@ async function initDamageMap() {
                 <tr class="damage-table-row" data-index="${i}" style="transition: background 0.15s ease;">
                     <td class="calc-param-name">${i + 1}</td>
                     <td class="calc-value" style="text-align: left; font-weight: 500;">
-                        <span style="font-weight: 600; color: #fff;">${b.name}</span>
+                        <span style="font-weight: 600; color: #fff;">${b.name}</span>${rpeBadgeHtml}
                         ${zoneHtml}
                     </td>
                     <td class="calc-value">${floorsCell}</td>

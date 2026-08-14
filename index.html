@@ -2542,6 +2542,27 @@
                                     </div>
                                 </div>
 
+                                <!-- BANNER DE INSPECCIÓN POST-SIMULACIÓN URBANA -->
+                                <div id="city-post-sim-banner" class="city-post-sim-banner" style="display: none;">
+                                    <div class="city-post-sim-content">
+                                        <div class="city-post-sim-icon">
+                                            <i class="fa-solid fa-cube"></i>
+                                        </div>
+                                        <div class="city-post-sim-text">
+                                            <h4>Simulación Sísmica Finalizada &bull; Auditoría Post-Sismo</h4>
+                                            <p>Se ha completado el ciclo sísmico del doblete. Explora e inspecciona los <strong>Modelos 3D Reales (Fotogrametría RPE)</strong> de las estructuras e infraestructuras críticas del litoral.</p>
+                                        </div>
+                                        <div class="city-post-sim-actions">
+                                            <button id="btn-open-rpe-studio" class="btn btn-primary" style="font-size: 12px; padding: 7px 14px; background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #000; font-weight: 700; border: none;">
+                                                <i class="fa-solid fa-cube"></i> Ver Modelos 3D RPE
+                                            </button>
+                                            <button id="btn-dismiss-post-sim" class="btn btn-secondary" style="font-size: 11px; padding: 7px 10px;" title="Ocultar aviso">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- VIEWPORT 3D -->
                                 <div id="city-canvas-container" class="city-canvas-container">
                                     <!-- PANEL FLOTANTE DE CAPAS DE RIESGO 3D -->
@@ -2603,6 +2624,29 @@
                                              </button>
                                              <button class="city-nav-btn" data-target="macuto" style="padding: 5px 8px; font-size: 11px; flex: 1; min-width: 85px; background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
                                                  <i class="fa-solid fa-city" style="color: #a855f7;"></i> Macuto
+                                             </button>
+                                         </div>
+
+                                         <!-- SECCIÓN MODELOS 3D FOTOGRAMETRÍA REAL (RPE) -->
+                                         <div class="city-floating-layers-header" style="margin-top: 8px;">
+                                             <i class="fa-solid fa-cube" style="color: #00f2fe;"></i>
+                                             <span>Modelos 3D Reales (RPE)</span>
+                                         </div>
+                                         <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 4px;">
+                                             <button class="city-rpe-quick-btn" data-model="viaducto1">
+                                                 <i class="fa-solid fa-bridge" style="color: #38bdf8;"></i> <span>Viaducto 1 Ccs - La Guaira</span>
+                                             </button>
+                                             <button class="city-rpe-quick-btn" data-model="caraballeda-jme">
+                                                 <i class="fa-solid fa-road" style="color: #ffb703;"></i> <span>Caraballeda Av. JME</span>
+                                             </button>
+                                             <button class="city-rpe-quick-btn" data-model="el-jurel">
+                                                 <i class="fa-solid fa-building-circle-exclamation" style="color: #ef4444;"></i> <span>Edif. El Jurel - Playa Grande</span>
+                                             </button>
+                                             <button class="city-rpe-quick-btn" data-model="laguna-beach">
+                                                 <i class="fa-solid fa-hotel" style="color: #a855f7;"></i> <span>Edif. Laguna Beach</span>
+                                             </button>
+                                             <button class="city-rpe-quick-btn" data-model="res-caribe">
+                                                 <i class="fa-solid fa-city" style="color: #00f2fe;"></i> <span>Residencias Caribe 3D</span>
                                              </button>
                                          </div>
                                         </div><!-- /city-floating-layers-collapsible -->
@@ -3664,8 +3708,86 @@
                 </div>
             </div>
 
+            <!-- MODAL VISOR 3D RPE (FOTOGRAMETRÍA NIRA) -->
+            <div id="rpe-modal-viewer" class="rpe-modal-overlay" style="display: none;">
+                <div class="rpe-modal-container">
+                    <div class="rpe-modal-header">
+                        <div class="rpe-modal-title">
+                            <div class="rpe-modal-badge"><i class="fa-solid fa-cube"></i> RPE 3D Reality Capture</div>
+                            <h3 id="rpe-modal-heading">Edificio El Jurel - Playa Grande</h3>
+                            <span id="rpe-modal-subheading" class="rpe-modal-sub">Inspección Fotogramétrica de Alta Precisión</span>
+                        </div>
+                        <div class="rpe-modal-tools">
+                            <button id="rpe-btn-fly-city" class="rpe-tool-btn" title="Volar a esta edificación en la simulación urbana 3D">
+                                <i class="fa-solid fa-location-crosshairs"></i> <span>Ver en Ciudad 3D</span>
+                            </button>
+                            <a id="rpe-btn-external" href="#" target="_blank" class="rpe-tool-btn rpe-tool-btn-primary" title="Abrir en pantalla completa en Nira">
+                                <i class="fa-solid fa-up-right-from-square"></i> <span>Abrir Nira</span>
+                            </a>
+                            <button id="rpe-btn-close" class="rpe-modal-close-btn" title="Cerrar visor 3D">&times;</button>
+                        </div>
+                    </div>
+
+                    <!-- TABS DE NAVEGACIÓN ENTRE MODELOS RPE -->
+                    <div class="rpe-tabs-bar">
+                        <button class="rpe-tab-btn active" data-model="viaducto1">
+                            <i class="fa-solid fa-bridge"></i> <span>Viaducto 1</span>
+                        </button>
+                        <button class="rpe-tab-btn" data-model="caraballeda-jme">
+                            <i class="fa-solid fa-road"></i> <span>Caraballeda Av. JME</span>
+                        </button>
+                        <button class="rpe-tab-btn" data-model="el-jurel">
+                            <i class="fa-solid fa-building-circle-exclamation"></i> <span>Edif. El Jurel</span>
+                        </button>
+                        <button class="rpe-tab-btn" data-model="laguna-beach">
+                            <i class="fa-solid fa-hotel"></i> <span>Edif. Laguna Beach</span>
+                        </button>
+                        <button class="rpe-tab-btn" data-model="res-caribe">
+                            <i class="fa-solid fa-city"></i> <span>Res. Caribe 3D</span>
+                        </button>
+                    </div>
+
+                    <div class="rpe-modal-body">
+                        <div class="rpe-iframe-wrapper">
+                            <div id="rpe-iframe-loading" class="rpe-iframe-loading">
+                                <i class="fa-solid fa-circle-notch fa-spin"></i>
+                                <span>Cargando modelo 3D fotogramétrico de alta resolución...</span>
+                            </div>
+                            <iframe id="rpe-viewer-iframe" src="" allow="fullscreen; xr-spatial-tracking; accelerometer; gyroscope" frameborder="0"></iframe>
+                        </div>
+                        <div class="rpe-info-sidebar">
+                            <h4><i class="fa-solid fa-clipboard-list"></i> Ficha Técnica Estructural</h4>
+                            <div class="rpe-info-row">
+                                <span>Estructura:</span>
+                                <b id="rpe-info-name">—</b>
+                            </div>
+                            <div class="rpe-info-row">
+                                <span>Zona / Sector:</span>
+                                <b id="rpe-info-zone">—</b>
+                            </div>
+                            <div class="rpe-info-row">
+                                <span>Coordenadas:</span>
+                                <b id="rpe-info-coords">—</b>
+                            </div>
+                            <div class="rpe-info-row">
+                                <span>Tecnología:</span>
+                                <b style="color: #00f2fe;">Fotogrametría RPE (Nira)</b>
+                            </div>
+                            <div class="rpe-info-desc-block">
+                                <label>Diagnóstico / Contexto Técnico:</label>
+                                <p id="rpe-info-desc">—</p>
+                            </div>
+                            <div class="rpe-info-note">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <span>Usa <strong>clic izquierdo</strong> para rotar la vista 3D, <strong>clic derecho / 2 dedos</strong> para desplazar y la <strong>rueda</strong> para zoom.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Custom JavaScript -->
-            <script src="app.js?v=1134"></script>
+            <script src="app.js?v=1135"></script>
 </body>
 
 </html>
